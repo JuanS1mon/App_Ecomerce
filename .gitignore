@@ -1,0 +1,8 @@
+env/
+FastAPI_SQL/
+__pycache__/
+sql_app/__pycache__/
+sql_app/db/__pycache__/
+sql_app/routers/__pycache__/
+sql_app/db/crud/__pycache__/
+sql_app/db/schemas/__pycache__/
