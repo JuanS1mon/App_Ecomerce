@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mi tabla</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        #tabla {
+            width: 80%;
+            border-collapse: collapse;
+            margin: 50px auto;
+        }
+        #tabla th, #tabla td {
+            padding: 15px;
+            text-align: left;
+        }
+        #tabla th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #tabla tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #tabla tr:hover {
+            background-color: #ddd;
+        }
+        #tabla tr {
+            cursor: pointer;
+        }
+        #tabla a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <table id="tabla">
+        <thead>
+            <tr>
+                <th>Descripción</th>
+                <th>Ejecutable</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Los datos se insertarán aquí -->
+        </tbody>
+    </table>
+
+    <script>
+    $(document).ready(function() {
+        $.get('http://127.0.0.1:8000/modulos', function(data) {
+            data.forEach(function(item) {
+                $('#tabla tbody').append('<tr><td><a href="http://127.0.0.1:8000/' + item.descripcion.toLowerCase() + '">' + item.descripcion + '</a></td><td>' + item.ejecutable + '</td></tr>');
+            });
+        });
+    });
+    </script>
+</body>
+</html>

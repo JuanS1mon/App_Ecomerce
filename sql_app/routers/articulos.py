@@ -1,11 +1,11 @@
 from fastapi import APIRouter, status, Depends
-from ..db.schemas.articulos import Articulos
+from db.schemas.articulos import Articulos
 from sqlalchemy.orm import Session
-from ..db.crud import articulos as crud_articulos
-from ..db.database import get_db
+from db.crud import articulos as crud_articulos
+from db.database import get_db
 import time
 
-router = APIRouter(prefix="/Articulos", 
+router = APIRouter(prefix="/articulos", 
                    tags=["Articulos"], 
                    responses={status.HTTP_404_NOT_FOUND: {"message": "No Encontrado"}})
 

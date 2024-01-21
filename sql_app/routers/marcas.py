@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from ..db.schemas.marcas import Marca,MarcaCreate
+from db.schemas.marcas import Marca,MarcaCreate
 from sqlalchemy.orm import Session
-from ..db.crud.marcas import get,gets,create,delete,update,get_descripcion
-from ..db.database import  get_db
+from db.crud.marcas import get,gets,create,delete,update,get_descripcion
+from db.database import  get_db
 
 router = APIRouter(
     prefix="/marcas",
