@@ -19,10 +19,7 @@ def create(db: Session, descripcion: str):
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="No se pudo crear la marca")
-
-
-
-
+    
 def get(db: Session, codigo: int):
     try:
         result = db.execute(text("SELECT codigo,descripcion FROM marcas WHERE codigo = :codigo"), {"codigo": codigo})
@@ -33,7 +30,6 @@ def get(db: Session, codigo: int):
     except SQLAlchemyError:
         db.rollback()
         raise HTTPException(status_code=400, detail="No se pudo obtener la marca")
-
 
 def get_descripcion(db: Session, descripcion: str):
     try:
@@ -59,8 +55,6 @@ def gets(db: Session):
         db.rollback()
         raise HTTPException(status_code=400, detail="No se pudieron obtener las marcas")
     
-
-
 def update(db: Session, codigo: int, descripcion: str):
     try:
         db.execute(text("UPDATE marcas SET descripcion = :descripcion WHERE codigo = :codigo"), {"codigo": codigo, "descripcion": descripcion})
@@ -70,7 +64,6 @@ def update(db: Session, codigo: int, descripcion: str):
         db.rollback()
         raise HTTPException(status_code=400, detail="No se pudo actualizar la marca")
     
-
 def delete(db: Session, codigo: int):
     try:
         statement = text("DELETE FROM Marcas WHERE codigo = :codigo")

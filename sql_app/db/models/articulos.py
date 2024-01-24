@@ -1,8 +1,8 @@
 from sqlalchemy import Boolean, Column, Integer, String, Float,DateTime
 from ..database import Base
 
-class ArticulosNene(Base):
-    __tablename__ = "Articulos_nene"
+class Articulos(Base):
+    __tablename__ = "Articulos"
 
     Codigo = Column(Integer, primary_key=True)
     EAN = Column(Float)
@@ -53,3 +53,4 @@ class ArticulosNene(Base):
     CxPP = Column(Integer)
     GeneraRemitoComponentes = Column(Boolean)
     Serializado = Column(Boolean)
+    sector= Column(Integer)

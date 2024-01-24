@@ -1,6 +1,5 @@
-from pydantic import BaseModel # Importamos BaseModel de pydantic para crear modelos de datos que se utilizarán para validar la entrada de datos y convertir los datos en diferentes formatos.
+from pydantic import BaseModel
 from datetime import datetime
-
 
 class Articulos(BaseModel):
     Codigo: int
@@ -25,11 +24,34 @@ class Articulos(BaseModel):
     BalDiasVto: int
     BalCodigo: int
     Tipo: str
-    CodigoEnvase: int
+    CodigoEnvase: float
     FechaModificacion: datetime
     FechaAlta: datetime
     HoraModificacion: str
     Transmitido: bool
+    Deposito: int
+    PresentacionCantidad: float
+    PresentacionUnidad: str
+    Ruteo: str
+    Alfa: str
+    Peso: float
+    StockMinimo: float
+    CxB: int
+    DescuentoXCaja: float
+    ImpInterno: float
+    ArMargenTeorico: float
+    CuentaContable: float
+    SubFamilia: int
+    DiasAlVto: int
+    MargenIIBB: float
+    MargenOtrosImp: float
+    ModeloEtiqueta: str
+    CantidadEtiquetas: int
+    CxP: int
+    CxPP: int
+    GeneraRemitoComponentes: bool
+    Serializado: bool
+    Sector: int
 
 class ArticulosNeneCreate(Articulos):
     pass
@@ -39,4 +61,3 @@ class ArticulosNene(Articulos):
         from_attributes = True
 
 
-    
