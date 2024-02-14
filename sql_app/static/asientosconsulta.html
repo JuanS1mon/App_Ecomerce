@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Módulo Contabilidad</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+</head>
+<body>
+
+<h1>Formulario de Asientos</h1>
+
+<form id="form_common">
+    <label for="fechadesde">Fecha Desde:</label><br>
+    <input type="date" id="fechadesde" name="fechadesde"><br>
+    <label for="fechahasta">Fecha Hasta:</label><br>
+    <input type="date" id="fechahasta" name="fechahasta"><br>
+    <label for="TipodeMovimiento">Tipo de Movimiento:</label><br>
+    <input type="text" id="TipodeMovimiento" name="TipodeMovimiento"><br>
+    <label for="codigos_asientos">Códigos de Asientos:</label><br>
+    <input type="text" id="codigos_asientos" name="codigos_asientos"><br>
+    <input type="submit" value="Submit">
+</form> 
+<table id="table-common" class="responseTable">
+    <tr>
+        <th>Asiento</th>
+        <th>Fecha</th>
+        <th>Detalle</th>
+        <th>Tipo de Movimiento</th>
+        <th>Asiento Detalle</th>
+    </tr>
+</table>
+<script>
+    function formatDate(dateString) {
+    var date = new Date(dateString);
+    var day = String(date.getDate()).padStart(2, '0');
+    var month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript comienzan en 0
+    var year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+}
+document.getElementById('form_common').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    var data = {
+        fechadesde: event.target.fechadesde.value,
+        fechahasta: event.target.fechahasta.value,
+    };
+
+    if (event.target.TipodeMovimiento.value) {
+        data.TipodeMovimiento = event.target.TipodeMovimiento.value.split(',').map(Number);
+    }
+
+    if (event.target.codigos_asientos.value) {
+        data.codigos_asientos = event.target.codigos_asientos.value.split(',').map(Number);
+    }
+
+    fetch('http://localhost:8000/contabilidad/asientos/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        var table = document.getElementById('table-common'); // Cambiado aquí
+        data.forEach(item => {
+            var row = table.insertRow(-1);
+            row.insertCell(0).innerHTML = item.asiento;
+            row.insertCell(1).innerHTML = item.fecha;
+            row.insertCell(2).innerHTML = item.detalle;
+            row.insertCell(3).innerHTML = item.tipomovimiento;
+            // Crear una tabla para asiento_detalle
+            var detalleTable = "<table>";
+            item.asiento_detalle.forEach(detalle => {
+                detalleTable += "<tr><td>" + detalle.cuenta + "</td><td>" + detalle.signo + "</td><td>" + detalle.importe + "</td><td>" + detalle.detalle + "</td><td>" + detalle.centro_costo + "</td></tr>";
+            });
+            detalleTable += "</table>";
+            row.insertCell(4).innerHTML = detalleTable;
+        });
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+});
+</script>
+
+</body>
+</html>

@@ -11,8 +11,37 @@ from ..schemas.marcas import MarcaCreate
 #para que sirve el Session ?? https://docs.sqlalchemy.org/en/14/orm/session_api.html
 def create(db: Session, descripcion: str):
     try:
-        sql = text("INSERT INTO marcas(descripcion) VALUES(:descripcion)")
-        db.execute(sql.params(descripcion=descripcion))
+        sql = text("""INSERT INTO Articulos
+                   (Codigo, EAN, Descripcion, DescripcionCorta, PrecioCosto,
+                   PrecioVenta, Margen, IVA, EsCombo, Proveedor,
+                    Departamento, Marca, Familia, UxB, HabilCajas,
+                    HabilEstad, HabilStock, HabilOC, HabilBalanzas, BalDiasVto,
+                    BalCodigo, Tipo, CodigoEnvase, FechaModificacion, FechaAlta,
+                    HoraModificacion, Transmitido, Deposito, PresentacionCantidad, PresentacionUnidad,
+                    Ruteo, Alfa, Peso, StockMinimo, CxB, 
+                   DescuentoXCaja, ImpInterno, ArMargenTeorico, CuentaContable, SubFamilia, 
+                   DiasAlVto,MargenIIBB, MargenOtrosImp, ModeloEtiqueta, CantidadEtiquetas, 
+                   CxP,CxPP, GeneraRemitoComponentes, Serializado, Sector)
+                    VALUES(:Codigo, :EAN, :Descripcion, :DescripcionCorta, :PrecioCosto,
+                    :PrecioVenta, :Margen, :IVA, :EsCombo, :Proveedor,
+                    :Departamento, :Marca, :Familia, :UxB, :HabilCajas,
+                    :HabilEstad, :HabilStock, :HabilOC, :HabilBalanzas, :BalDiasVto,
+                    :BalCodigo, :Tipo, :CodigoEnvase, :FechaModificacion, :FechaAlta,
+                    :HoraModificacion, :Transmitido, :Deposito, :PresentacionCantidad, :PresentacionUnidad,
+                    :Ruteo, :Alfa, :Peso, :StockMinimo, :CxB,
+                    :DescuentoXCaja, :ImpInterno, :ArMargenTeorico, :CuentaContable, :SubFamilia,
+                    :DiasAlVto, :MargenIIBB, :MargenOtrosImp, :ModeloEtiqueta, :CantidadEtiquetas,
+                    :CxP, :CxPP, :GeneraRemitoComponentes, :Serializado, :Sector)""")
+        db.execute(sql.params(Codigo=Codigo, EAN=EAN, Descripcion=Descripcion, DescripcionCorta=DescripcionCorta, PrecioCosto=PrecioCosto,
+                              PrecioVenta=PrecioVenta, Margen=Margen, IVA=IVA, EsCombo=EsCombo, Proveedor=Proveedor,
+                              Departamento=Departamento, Marca=Marca, Familia=Familia, UxB=UxB, HabilCajas=HabilCajas,
+                              HabilEstad=HabilEstad, HabilStock=HabilStock, HabilOC=HabilOC, HabilBalanzas=HabilBalanzas, BalDiasVto=BalDiasVto,
+                              BalCodigo=BalCodigo, Tipo=Tipo, CodigoEnvase=CodigoEnvase, FechaModificacion=FechaModificacion, FechaAlta=FechaAlta,
+                              HoraModificacion=HoraModificacion, Transmitido=Transmitido, Deposito=Deposito, PresentacionCantidad=PresentacionCantidad, PresentacionUnidad=PresentacionUnidad,
+                              Ruteo=Ruteo, Alfa=Alfa, Peso=Peso, StockMinimo=StockMinimo, CxB=CxB,
+                              DescuentoXCaja=DescuentoXCaja, ImpInterno=ImpInterno, ArMargenTeorico=ArMargenTeorico, CuentaContable=CuentaContable, SubFamilia=SubFamilia,
+                              DiasAlVto=DiasAlVto, MargenIIBB=MargenIIBB, MargenOtrosImp=MargenOtrosImp, ModeloEtiqueta=ModeloEtiqueta, CantidadEtiquetas=CantidadEtiquetas,
+                              CxP=CxP, CxPP=CxPP, GeneraRemitoComponentes=GeneraRemitoComponentes, Serializado=Serializado, Sector=Sector))
         db.commit()
         result = db.execute(text("SELECT codigo,descripcion FROM marcas WHERE descripcion = :descripcion"), {"descripcion": descripcion})
         return result
@@ -50,7 +79,19 @@ def get_descripcion(db: Session, descripcion: str):
 
 def gets(db: Session):
     try:
-        result = db.execute(text("SELECT codigo,descripcion FROM marcas"))
+        result = db.execute(text("""
+    SELECT
+    [Codigo],             [EAN],                [Descripcion],         [DescripcionCorta],    [PrecioCosto],
+    [PrecioVenta],        [Margen],             [IVA],                 [EsCombo],             [Proveedor],
+    [Departamento],       [Marca],              [Familia],             [UxB],                 [HabilCajas],
+    [HabilEstad],         [HabilStock],         [HabilOC],             [HabilBalanzas],       [BalDiasVto],
+    [BalCodigo],          [Tipo],               [CodigoEnvase],        [FechaModificacion],   [FechaAlta],
+    [HoraModificacion],   [Transmitido],        [Deposito],            [PresentacionCantidad],[PresentacionUnidad],
+    [Ruteo],             [Alfa],               [Peso],                [StockMinimo],         [CxB],
+    [DescuentoXCaja],     [ImpInterno],         [ArMargenTeorico],     [CuentaContable],      [SubFamilia],
+    [DiasAlVto],          [MargenIIBB],         [MargenOtrosImp],      [ModeloEtiqueta],      [CantidadEtiquetas],
+    [CxP],                [CxPP],               [GeneraRemitoComponentes], [Serializado],     [Sector]
+    FROM [Articulos]"""))
         marcas = result.fetchall()
         if not marcas:
             raise HTTPException(status_code=404, detail="No se encontraron marcas")

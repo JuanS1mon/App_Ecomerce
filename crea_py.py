@@ -55,7 +55,7 @@ from sqlalchemy.orm import sessionmaker
 import os
 import sqlalchemy
 
-DATABASE_URL = "mssql+pyodbc://SA:LaCrujia_3261@LocalHost/COCO?driver=ODBC+Driver+17+for+SQL+Server"
+DATABASE_URL = "mssql+pyodbc://SA:LaCrujia_3261@LocalHost/pruebas?driver=ODBC+Driver+17+for+SQL+Server"
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 session = Session()
