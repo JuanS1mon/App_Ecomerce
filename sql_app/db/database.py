@@ -4,7 +4,13 @@ from sqlalchemy.orm import sessionmaker
 
 #SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db" 
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
-SQLALCHEMY_DATABASE_URL = "mssql+pyodbc://SA:LaCrujia_3261@LocalHost/pruebas?driver=ODBC+Driver+17+for+SQL+Server"
+DB_USER = "SA"
+DB_PASSWORD = "LaCrujia_3261"
+DB_HOST = "LocalHost"
+DB_NAME = "pruebas"
+DB_DRIVER = "ODBC Driver 17 for SQL Server"
+
+SQLALCHEMY_DATABASE_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?driver={DB_DRIVER}"
 
 
 engine = create_engine(
@@ -15,7 +21,7 @@ engine = create_engine(
     pool_pre_ping=True,  # Prueba la viabilidad de una conexión antes de usarla
     pool_recycle=3600  # Recicla las conexiones después de 1 hora
 )
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=True, bind=engine)
 
 Base = declarative_base()
 

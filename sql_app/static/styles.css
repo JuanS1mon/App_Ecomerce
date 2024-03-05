@@ -1,5 +1,5 @@
 :root {
-    --color-primary: #2a6ccf;
+    --color-primary: #8cb1e7;
     --color-secondary: #2c3e50;
     --color-tertiary: #dd9e28;
     --table-width: 80%;
@@ -11,7 +11,7 @@
     width: var(--table-width);
     margin: var(--table-margin);
     border-collapse: collapse;
-    color: #333;
+    color: #e6e5e5;
     font-family: Arial, sans-serif;
 }
 

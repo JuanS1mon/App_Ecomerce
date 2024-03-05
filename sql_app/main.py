@@ -1,13 +1,25 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles # que es StaticFiles ?? https://fastapi.tiangolo.com/es/tutorial/static-files/
-from routers import articulos,users,marcas,modulos,Asientos
+
 from fastapi import FastAPI
 from errors import register_exception_handlers
 from fastapi.middleware.cors import CORSMiddleware
 
 from starlette.responses import FileResponse
 
+
+from routers import modulos
+from routers.Contabilidad import Contabilidad
+from routers.Articulos import marcas
+from routers.Maestros import Usuarios
+
+from prometheus_fastapi_instrumentator import Instrumentator
+
+# Crear una instancia de FastAPI
 app = FastAPI()
+
+# Instrumentar la aplicación con Prometheus
+Instrumentator().instrument(app).expose(app)
 
 
 origins = [
@@ -25,22 +37,23 @@ app.add_middleware(
 )
 
 #router de la API
-app.include_router(articulos.router)
-app.include_router(users.router)
 app.include_router(marcas.router)
+app.include_router(Usuarios.router)
 app.include_router(modulos.router)
-app.include_router(Asientos.router)
+app.include_router(Contabilidad.router)
 
 register_exception_handlers(app)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
+
 @app.get("/")
 async def read_root():
+    return FileResponse('static/login.html')
+
+
+
+@app.get("/index")   #EndPoint
+async def index():
     return FileResponse('static/index.html')
-
-
-
-@app.get("/nombre")   #EndPoint
-async def nombre():
-    return { "nombre": "Tecnolar"}
