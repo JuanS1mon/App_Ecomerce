@@ -4,37 +4,19 @@
     <title>Menu</title>
     <link rel="stylesheet" type="text/css" href="/static/styles.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    
 </head>
 <body>
-    <table id="table-common" class="responseTable">
-        <thead>
-            <tr>
-                <th>Descripción</th>
-                <th>Ejecutable</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-    
-            </tr>
-            <tr>
-    
-            </tr>
-            <!-- Puedes agregar más filas aquí -->
-        </tbody>
-    </table>
+    <ul id="menu-common" class="responseMenu">
+        <!-- Los elementos del menú se agregarán aquí -->
+    </ul>
     <script>
     $(document).ready(function() {
         $.get('http://127.0.0.1:8000/modulos', function(data) {
             data.forEach(function(item) {
-                $('#table-common tbody').append('<tr><td><a href="http://127.0.0.1:8000/' + item.descripcion.toLowerCase() + '">' + item.descripcion + '</a></td><td>' + item.ejecutable + '</td></tr>');
+                $('#menu-common').append('<li><a href="http://127.0.0.1:8000/' + item.descripcion.toLowerCase() + '">' + item.descripcion + '</a></li>');
             });
         });
-
-    
-        });
-
+    });
     </script>
 </body>
 </html>

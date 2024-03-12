@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles # que es StaticFiles ?? https://fastapi.tiangolo.com/es/tutorial/static-files/
 
 from fastapi import FastAPI
-from errors import register_exception_handlers
 from fastapi.middleware.cors import CORSMiddleware
 
 from starlette.responses import FileResponse
@@ -42,7 +41,7 @@ app.include_router(Usuarios.router)
 app.include_router(modulos.router)
 app.include_router(Contabilidad.router)
 
-register_exception_handlers(app)
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

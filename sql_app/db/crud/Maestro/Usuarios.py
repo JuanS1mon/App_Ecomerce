@@ -28,6 +28,7 @@ def create_usuario(db: Session, nombre: str, usuario: str, clave: str, email: st
     
   
 def get_usuario(db: Session, codigo: int = None, usuario: str = None):
+    print(codigo, usuario)
     try:
         if codigo is not None:
             result = db.execute(text("SELECT codigo,usuario,nombreCompleto,Email FROM Usuarios WHERE codigo = :codigo"), {"codigo": codigo})
@@ -85,14 +86,21 @@ def update_usuario(db: Session, codigo: int, usuario: str, clave: str, nombre: s
         db.rollback()
         raise HTTPException(status_code=400, detail="No se pudo actualizar el usuario")
     
-
+    
 def authenticate_user(db: Session, username: str, password: str):
+    if not password:
+        return False
     result = db.execute(text("SELECT clave FROM Usuarios WHERE usuario = :usuario"), {"usuario": username})
     row = result.fetchone()
     if not row:
         return False
     hashed_password = row[0]  # Extrae la contraseña encriptada del objeto Row
-    print (hashed_password)
-    if not pwd_context.verify(password, hashed_password):
-        return False
-    return True
+    # Comprueba si la contraseña está encriptada
+    if hashed_password and pwd_context.identify(hashed_password):
+        if not pwd_context.verify(password, hashed_password):
+            return False
+    else:
+        # Si la contraseña no está encriptada, compara directamente
+        if password != hashed_password:
+            return False
+    return {"username": username}

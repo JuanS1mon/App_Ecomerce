@@ -13,5 +13,25 @@
         <input type="password" id="password" name="password"><br>
         <input type="submit" value="Iniciar sesión">
     </form>
+
+    <script>
+    document.getElementById('form_common').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        fetch('/usuarios/login', {
+            method: 'POST',
+            body: new FormData(event.target) // Envía los datos del formulario
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.access_token) {
+                localStorage.setItem('token', data.access_token); // Almacena el token en el almacenamiento local
+                window.location.href = '/index'; // Redirige al usuario a '/index'
+            } else {
+                // Manejar el error de autenticación
+            }
+        });
+    });
+    </script>
 </body>
 </html>
