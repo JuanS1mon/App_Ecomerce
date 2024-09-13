@@ -1,0 +1,18 @@
+# Ignorar el archivo .env
+.env
+
+# Ignorar la carpeta .git (aunque normalmente no es necesario ya que Git ignora esta carpeta por defecto)
+.git
+
+# Ignorar carpetas de caché comunes
+__pycache__/
+*.py[cod]
+*.swp
+.cache/
+node_modules/
+dist/
+build/
+.DS_Store
+*.log
+*.bak
+*.tmp
