@@ -16,3 +16,27 @@ build/
 *.log
 *.bak
 *.tmp
+
+# Excluir archivos compilados de Python
+*.pyc
+__pycache__/
+
+# Excluir archivos de configuración del entorno virtual
+env/
+venv/
+
+# Excluir archivos de configuración de IDEs
+.vscode/
+.idea/
+
+# Excluir archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Excluir archivos de configuración de otros editores
+*.sublime-project
+*.sublime-workspace
+
+# Excluir archivos de configuración de otros entornos
+*.envrc
+.venv/
