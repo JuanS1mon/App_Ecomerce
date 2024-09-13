@@ -1,0 +1,258 @@
+@import "https://fonts.googleapis.com/css?family=Press%20Start%202P";
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.container table {
+  margin-top:5%;
+  width: 100%;
+  border-collapse: collapse;
+  color: #ffffff; /* Color de texto blanco */
+  background-color: #000000; /* Fondo negro */
+}
+
+.container th, .container td {
+  padding: 10px;
+  border: 1px solid #ffffff; /* Borde blanco */
+}
+
+.container th {
+  background-color: #1a1a1a; /* Fondo un poco más claro para los encabezados */
+}
+
+.container tr:nth-child(even) {
+  background-color: #333333; /* Fondo un poco más claro para las filas pares */
+}
+
+
+/* Estilos para la barra de navegación */
+.navbar {
+  height: 50px; /* Ajusta la altura de la barra de navegación */
+  width: 100%; /* Asegura que la barra de navegación ocupe todo el ancho de la página */
+  position: fixed; /* Fija la barra de navegación en la parte superior de la página */
+  z-index: 1; /* Asegura que la barra de navegación esté por encima de otros elementos */
+  top: 0; /* Posiciona la barra de navegación en la parte superior de la página */
+  left: 0; /* Alinea la barra de navegación con el lado izquierdo de la página */
+  background-color: #111;
+  overflow-x: hidden;
+}
+
+.navbar a {
+  float: left; /* Hace que los enlaces se alineen horizontalmente */
+  display: block;
+  text-align: center; /* Centra el texto dentro de cada enlace */
+  padding: 14px 16px; /* Ajusta el padding para centrar el texto verticalmente */
+  text-decoration: none;
+  font-size: 17px;
+  color: #818181;
+}
+
+.navbar a:hover {
+  color: #f1f1f1;
+}
+.sidebar-navigation {
+  width: auto;
+  position: fixed;
+  height: 97%;
+  background: #333;
+  color: #fff;
+  overflow: auto;
+}
+
+.sidebar-navigation ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-navigation li {
+  width: 100%;
+}
+
+.sidebar-navigation a {
+  display: block;
+  color: #fff;
+  padding: 10px;
+  text-decoration: none;
+}
+
+.sidebar-navigation a:hover {
+  background: #444;
+}
+
+.sidebar-navigation .tooltip {
+  margin-left: 10px;
+}
+#content {
+  margin-left: 200px;
+  padding: 20px;
+}
+
+html, body {
+  display: flex;
+  font-family: 'Press Start 2P';
+  font-size: 1rem;
+  line-height: 2;
+  height: 100%;
+  background-color: #221;
+  text-transform: uppercase;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+h1{
+  color: #F6EB14;
+  text-align: center;
+
+}
+a {
+  text-decoration: none;
+  color: #fff090;
+}
+
+li {
+  color: #4FAF44;
+}
+
+
+label {
+    color: #F6EB14; /* mismo color que .arrow */
+}
+
+input[type="text"] {
+    width: 300px; /* Adjust the width to make the input box larger */
+    height: 40px; /* Adjust the height to make the input box taller */
+    background-color: #221; /* mismo color que el fondo */
+    font-family: 'Press Start 2P'; /* mismo tipo de letra */
+    font-size: 1.5rem; /* tamaño de letra más grande */
+    color: #4FAF44; /* mismo color que li */
+}
+input[type="password"] {
+  width: 300px; /* Adjust the width to make the input box larger */
+  height: 40px; /* Adjust the height to make the input box taller */
+  background-color: #221; /* mismo color que el fondo */
+  font-family: 'Press Start 2P'; /* mismo tipo de letra */
+  font-size: 1.5rem; /* tamaño de letra más grande */
+  color: #4FAF44; /* mismo color que li */
+}
+
+input[type="number"] {
+  width: 300px; /* Adjust the width to make the input box larger */
+  height: 40px; /* Adjust the height to make the input box taller */
+  background-color: #221; /* mismo color que el fondo */
+  font-family: 'Press Start 2P'; /* mismo tipo de letra */
+  font-size: 1.5rem; /* tamaño de letra más grande */
+  color: #4FAF44; /* mismo color que li */
+}
+
+button {
+    font-size: 1.5rem; /* tamaño de letra más grande */
+    padding: 10px; /* padding adicional para hacer el botón más grande */
+}
+
+
+#fields div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+select, button {
+    width: 300px; /* mismo ancho que input[type="text"] */
+    height: 40px; /* misma altura que input[type="text"] */
+    font-family: 'Press Start 2P'; /* mismo tipo de letra */
+    font-size: 1.5rem; /* mismo tamaño de letra */
+    background-color: #221;
+    color:#fff090
+}
+
+button.remove{
+    background-color: #e6211b; /* mismo color que li */
+}
+button.remove_small{
+  background-color: #e6211b; /* mismo color que li */
+  width: 45px;
+  height: 45px;
+  
+}
+td {
+  width: fit-content;
+}
+button.add{
+    background-color: #22661a; /* mismo color que li */
+
+}
+button.generar{
+    background-color: #1c278a; /* mismo color que li */
+    color:aliceblue
+}
+ul ol {
+  margin-block-start: 5px;
+  margin-block-end: 0px;
+  margin-left: 50px;
+}
+
+input[type="submit"] {
+  width: 300px; /* mismo ancho que input[type="text"] */
+  height: 40px; /* misma altura que input[type="text"] */
+  font-family: 'Press Start 2P'; /* mismo tipo de letra */
+  font-size: 1.5rem; /* mismo tamaño de letra */
+  background-color:#22661a;
+  color:#fff090;
+}
+
+.arrow i {
+  display: none;
+}
+
+.arrow {
+  position:relative;
+	display: block;
+  color: #F6EB14;
+}
+
+.arrow:hover {
+  cursor: pointer;
+  background-color: rgba(0,0,0,0.2);
+}
+
+.arrow:hover i { 
+  display: block;
+  position: absolute;
+  top: 0.50em; 
+  left: -6em;
+}
+
+
+.header .container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  margin-left: 50px;
+  width: 100%;
+  z-index: 2;
+}
+
+.container .logo{
+  margin: 15px 25px;
+}
+
+@media (max-width: 767px) {
+  .container .logo{
+      margin-top: -20px;
+      margin-left: 22px;
+      text-align: center;
+      position: relative;
+      top: 46px;
+      left: 80%;
+      transform: translate(-50%, -50%);
+  }
+}

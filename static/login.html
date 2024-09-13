@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .login-container {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        .login-header {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .login-button {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .login-button:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto">
+        <div class="flex justify-center">
+            <div class="w-full max-w-md">
+                <div class="login-container mt-5">
+                    <h1 class="login-header text-center">Iniciar sesión</h1>
+                    <form id="form_common" class="mt-4">
+                        <div class="mb-4">
+                            <label for="username" class="block text-gray-700">Nombre de usuario:</label>
+                            <input type="text" id="username" name="username" class="w-full px-3 py-2 border border-gray-300 rounded mt-1" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="block text-gray-700">Contraseña:</label>
+                            <input type="password" id="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded mt-1" required>
+                        </div>
+                        <div class="text-center">
+                            <button id="submit_button" type="submit" class="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-700">Iniciar</button>
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="/registerpage" class="text-blue-500 hover:underline">Registrarse</a>
+                        </div>
+                    </form>
+                    <div id="message" class="mt-4 text-center text-red-500"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('form_common').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let formData = new FormData(document.getElementById('form_common'));
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'username': formData.get('username'),
+                    'password': formData.get('password')
+                }),
+                credentials: 'include'  // Asegúrate de enviar las cookies con la solicitud
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Nombre de usuario o contraseña incorrectos');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.access_token) {
+                    console.log('Token de acceso recibido:', data.access_token);  // Imprimir el token en la consola
+                    // Almacenar el token en localStorage
+                    localStorage.setItem('access_token', data.access_token);
+                    // Redirigir al usuario a '/admin/page'
+                    window.location.href = '/admin/page';
+                } else {
+                    document.getElementById('message').textContent = 'Nombre de usuario o contraseña incorrectos';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('message').textContent = 'Nombre de usuario o contraseña incorrectos';
+            });
+        });
+    </script>
+</body>
+</html>

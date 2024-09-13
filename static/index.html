@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>appapp</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .parallax {
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+        .overlay {
+            background: rgba(0, 0, 0, 0.5); /* Overlay oscuro */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+        }
+        .fixed-section {
+            position: sticky;
+            top: 0;
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1a202c;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Incluir la barra de navegación -->
+    {% include 'head.html' %}
+
+    <div class="container mx-auto p-4">
+        <header class="text-center my-5">
+            <h1 class="text-4xl font-bold">Generadora de apps</h1>
+            <p class="text-lg mt-2">es una app para hacer apps, en python!</p>
+            <button class="btn btn-primary mx-2" onclick="location.href='#about'">Saber más</button>
+            <button class="btn btn-secondary mx-2" onclick="location.href='#contact'">Contactar</button>
+        </header>
+    </div>
+
+    <section id="about" class="h-screen flex items-center justify-center bg-blue-500 text-white fixed-section">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold">Sobre Nosotros</h2>
+            <p class="mt-4">Somos una empresa dedicada a la creación de aplicaciones innovadoras utilizando Python.</p>
+        </div>
+    </section>
+
+    <section id="services" class="h-screen flex items-center justify-center parallax bg-cover bg-center relative fixed-section" style="background-image: url('https://source.unsplash.com/random/1600x900?coding');">
+        <div class="overlay"></div>
+        <div class="content text-center text-white">
+            <h2 class="text-3xl font-bold">Servicios</h2>
+            <p class="mt-4">Ofrecemos una amplia gama de servicios para ayudarte a desarrollar tu aplicación.</p>
+        </div>
+    </section>
+
+    <section id="testimonials" class="h-screen flex items-center justify-center bg-green-500 text-white fixed-section">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold">Testimonios</h2>
+            <p class="mt-4">Lo que nuestros clientes dicen sobre nosotros.</p>
+        </div>
+    </section>
+
+    <section id="contact" class="h-screen flex items-center justify-center parallax bg-cover bg-center relative fixed-section" style="background-image: url('https://source.unsplash.com/random/1600x900?contact');">
+        <div class="overlay"></div>
+        <div class="content text-center text-white">
+            <h2 class="text-3xl font-bold">Contacto</h2>
+            <p class="mt-4">Ponte en contacto con nosotros para más información.</p>
+        </div>
+    </section>
+
+    <footer class="text-center my-5">
+        <p>&copy; 2023 appapp. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Botón flotante para ir arriba -->
+    <div class="back-to-top" id="back-to-top" onclick="scrollToTop()">↑</div>
+
+    <script>
+        // Mostrar el botón de "ir arriba" cuando se hace scroll hacia abajo
+        window.onscroll = function() {
+            const backToTopButton = document.getElementById('back-to-top');
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                backToTopButton.style.display = 'block';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        };
+
+        // Función para hacer scroll hacia arriba
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

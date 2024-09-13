@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <table id="dashboard" class="display">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <script>
+    $(document).ready(function() {
+        $('#dashboard').DataTable({
+            ajax: {
+                url: '/dashboard_data',
+                dataSrc: ''
+            },
+            columns: [
+                { data: 'name' },
+                { data: 'value' }
+            ]
+        });
+    });
+    </script>
+</body>
+</html>

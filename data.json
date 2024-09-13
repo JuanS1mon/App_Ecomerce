@@ -1,0 +1,9 @@
+{
+    "databases": [
+        {
+            "name": "DB1",
+            "recovery": "SIMPLE",
+            "auto_shrink": "ON"
+        }
+    ]
+}

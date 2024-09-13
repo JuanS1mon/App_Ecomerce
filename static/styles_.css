@@ -1,0 +1,104 @@
+:root {
+    --color-primary: #8cb1e7;
+    --color-secondary: #2c3e50;
+    --color-tertiary: #dd9e28;
+    --table-width: 100%;
+    --table-margin:0 auto;
+}
+
+@media screen and (max-width: 600px) {
+    .styled-table {
+        width: 100%;
+    }
+}
+
+.menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: var(--color-secondary);
+}
+
+.menu li {
+    float: left;
+}
+
+.menu li a {
+    color: var(--color-secondary);
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.menu li a:hover {
+    background-color: #111;
+}
+
+#form_common {
+    font-family: Arial, sans-serif;
+    width: var(--form-width);
+    margin: var(--form-margin);
+}
+
+#form_common label {
+    display: block;
+    margin: 5px 0;
+}
+
+#form_common input[type="text"],
+#form_common input[type="date"],
+#form_common input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+#form_common input[type="submit"] {
+    width: 100%;
+    background-color: var(--color-tertiary);
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#form_common input[type="submit"]:hover {
+    background-color: #e29a2d;
+}
+
+#form_common h2 {
+    color: #333;
+}
+
+#my-body #menu-common {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: var(--color-secondary) !important;
+}
+
+#my-body #menu-common li {
+    float: left;
+}
+
+#my-body #menu-common li a {
+    color: var(--color-secondary);
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+#my-body #menu-common li a:hover {
+    background-color: #111;
+}

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script> 
+        $(function(){
+          $("#navbar").load("../static/head.html"); 
+          $("#footer").load("../static/footer.html"); 
+        });
+      </script> 
+</head>
+
+<body class="bg-light text-dark">
+    <div class="container">
+        <form id="generador" action="/generar/generate" method="post" class="mt-5">
+            <div class="form-group">
+                <label for="module_name">Nombre del módulo:</label>
+                <input type="text" id="module_name" name="module_name" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="fields">Campos:</label><br><label for="fields">El campo1 es obligatorio para realizar busquedas</label>
+                <div id="fields">
+                    <!-- Los campos se agregarán aquí -->
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary mb-3" id="add_field">Agregar</button>
+            
+            <!-- Tus otros campos aquí -->
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="generate_crud" name="generate_crud" value="true">
+                <label class="form-check-label" for="generate_crud">Generar CRUD</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="generate_schema" name="generate_schema" value="true">
+                <label class="form-check-label" for="generate_schema">Generar Esquema</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="generate_route" name="generate_route" value="true">
+                <label class="form-check-label" for="generate_route">Generar Ruta</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="generate_html_form" name="generate_html_form" value="true">
+                <label class="form-check-label" for="generate_html_form">Generar Formulario HTML</label>
+            </div>
+            <button type="submit" class="btn btn-success mt-3" value="Generar">Generar</button>
+        </form>
+    </div>
+    <!-- Tus scripts aquí -->
+</body>
+<script>
+document.getElementById('add_field').addEventListener('click', function() {
+    var div = document.createElement('div');
+    
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.name = 'field_names[]';
+    div.appendChild(input);
+    
+    var select = document.createElement('select');
+    select.name = 'field_types[]';
+    var option1 = document.createElement('option');
+    option1.value = 'str';
+    option1.text = 'str';
+    select.appendChild(option1);
+    var option2 = document.createElement('option');
+    option2.value = 'int';
+    option2.text = 'int';
+    select.appendChild(option2);
+    var option3 = document.createElement('option');
+    option3.value = 'float';
+    option3.text = 'float';
+    select.appendChild(option3);
+    // Agregar la opción 'bool'
+    var option4 = document.createElement('option');
+    option4.value = 'bool';
+    option4.text = 'bool';
+    select.appendChild(option4);
+    div.appendChild(select);
+    
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = 'Quitar';
+    button.className = 'remove';
+    div.appendChild(button);
+    
+    document.getElementById('fields').appendChild(div);
+
+    // Añade el enfoque al campo de entrada
+    input.focus();
+});
+
+document.addEventListener('click', function(e) {
+    if (e.target && e.target.classList.contains('remove')) {
+        e.target.parentNode.remove();
+    }
+});
+</script>
+
+<script>
+    document.getElementById('generador').addEventListener('submit', function(event) {
+        var fields = document.querySelectorAll('#fields div');
+        if (fields.length < 2) {
+            alert('Por favor, añada más de un campo.');
+            event.preventDefault();
+            return;
+        }
+        var inputs = document.querySelectorAll('input[type=text]');
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].value === '') {
+                alert('Por favor, rellene todos los campos de texto.');
+                event.preventDefault();
+                return;
+            }
+        }
+    });
+</script>
+</html>

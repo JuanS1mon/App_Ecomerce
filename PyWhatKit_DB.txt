@@ -1,0 +1,10 @@
+Date: 3/9/2024
+Time: 20:12
+Phone Number: +1134196870
+Message: Hola Juan, tu registro ha sido exitoso. Tienes 10 minutos para activar tu cuenta, haz clic en el siguiente enlace: http://localhost:8000/activar?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKdWFuIiwiZXhwIjoxNzI1NDA1NzMwfQ.-FCcvyFEu5ea9TXj7_STMDppG_FRZDdj46_I0-PF_VM/
+--------------------
+Date: 11/9/2024
+Time: 23:4
+Phone Number: +1134196870
+Message: Hola Juan1, tu registro ha sido exitoso. Tienes 10 minutos para activar tu cuenta, haz clic en el siguiente enlace: http://localhost:8000/activar?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKdWFuMSIsImV4cCI6MTcyNjEwNzI1Nn0.wpmXAUXw9pmg8PKiaP6dFzldYAail-wCrOhIozYBGiw/
+--------------------

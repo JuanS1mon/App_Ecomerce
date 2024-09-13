@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Configuración de Base de Datos</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script> 
+        $(function(){
+          $("#navbar").load("static/navbar.html"); 
+          $("#footer").load("static/footer.html"); 
+        });
+      </script> 
+</head>
+<body class="container">
+    <nav id="navbar"></nav>
+    <h1 class="mt-5">Configuración de la Base de Datos</h1>
+    <form id="env-form" class="mt-4">
+        <div class="form-group">
+            <label for="db_user">DB_USER:</label>
+            <input type="text" id="db_user" name="db_user" value="{{ env_values.get('DB_USER', '') }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="db_password">DB_PASSWORD:</label>
+            <input type="password" id="db_password" name="db_password" value="{{ env_values.get('DB_PASSWORD', '') }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="db_host">DB_HOST:</label>
+            <input type="text" id="db_host" name="db_host" value="{{ env_values.get('DB_HOST', '') }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="db_name">DB_NAME:</label>
+            <input type="text" id="db_name" name="db_name" value="{{ env_values.get('DB_NAME', '') }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="db_driver">DB_DRIVER:</label>
+            <input type="text" id="db_driver" name="db_driver" value="{{ env_values.get('DB_DRIVER', '') }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="pool_size">POOL_SIZE:</label>
+            <input type="number" id="pool_size" name="pool_size" value="{{ env_values.get('POOL_SIZE', '') }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="max_overflow">MAX_OVERFLOW:</label>
+            <input type="number" id="max_overflow" name="max_overflow" value="{{ env_values.get('MAX_OVERFLOW', '') }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="pool_timeout">POOL_TIMEOUT:</label>
+            <input type="number" id="pool_timeout" name="pool_timeout" value="{{ env_values.get('POOL_TIMEOUT', '') }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="pool_pre_ping">POOL_PRE_PING:</label>
+            <input type="text" id="pool_pre_ping" name="pool_pre_ping" value="{{ env_values.get('POOL_PRE_PING', '') }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="pool_recycle">POOL_RECYCLE:</label>
+            <input type="number" id="pool_recycle" name="pool_recycle" value="{{ env_values.get('POOL_RECYCLE', '') }}" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    </form>
+    <footer id="footer"></footer>
+</body>
+</html>
+<script>
+    document.getElementById('env-form').addEventListener('submit', function(event) {
+        // Prevenir el comportamiento de envío por defecto
+        event.preventDefault();
+    
+        // Obtener todos los campos de entrada del formulario
+        var inputs = event.target.getElementsByTagName('input');
+    
+        // Para cada campo de entrada, hacer una solicitud PUT a la ruta "/env/{key}"
+        for (var i = 0; i < inputs.length; i++) {
+            var input = inputs[i];
+    
+            // Ignorar el botón de envío
+            if (input.type === 'submit') {
+                continue;
+            }
+    
+            // Hacer la solicitud PUT
+            fetch('/env/' + input.name, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    value: input.value,
+                }),
+            });
+        }
+    });
+    </script>

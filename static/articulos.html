@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Articulos</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <table id="table-common" class="responseTable">
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>EAN</th>
+                <th>Descripcion</th>
+                <!-- Agrega más columnas según sea necesario -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Las filas de datos irán aquí -->
+        </tbody>
+    </table>
+</body>
+
+    <script>
+    fetch('/articulos/listado')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('table-common').getElementsByTagName('tbody')[0];
+            data.forEach(item => {
+                const row = document.createElement('tr');
+
+                const cellCodigo = document.createElement('td');
+                cellCodigo.textContent = item.Codigo;
+                row.appendChild(cellCodigo);
+
+                const cellEAN = document.createElement('td');
+                cellEAN.textContent = item.EAN;
+                row.appendChild(cellEAN);
+
+                const cellDescripcion = document.createElement('td');
+                cellDescripcion.textContent = item.Descripcion;
+                row.appendChild(cellDescripcion);
+
+                // Agrega más celdas según sea necesario
+                
+                tbody.appendChild(row);
+            });
+        });
+    </script>
+</body>
+</html>

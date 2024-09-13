@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+      <script> 
+    $(function(){
+      $("#navbar").load("../static/head.html"); 
+      $("#footer").load("../static/footer.html"); 
+    });
+  </script> 
+   <div id="navbar"></div> <!-- Aquí se cargará el contenido de navbar.html -->
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">configuracion de app</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="configuracion" role="button" data-toggle="dropdown">
+                        Configuración
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="configuracion">
+                        <a class="dropdown-item" href="/configdb/">Configuración de la base de datos</a>
+                        <a class="dropdown-item" href="#">App</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/generar">Agregar ruta</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="rutas" role="button" data-toggle="dropdown">
+                        Rutas
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="rutas">
+                        {% for route in routes %}
+                            <a class="dropdown-item" href="/{{ route }}/pagina">{{ route }}</a>
+                        {% endfor %}
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div id="content" class="container">
+        <!-- Contenido principal aquí -->
+    </div>
+</body>
+</html>
