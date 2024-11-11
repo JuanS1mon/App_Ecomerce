@@ -1,0 +1,157 @@
+<html>
+ <head>
+  <title>
+   Admin
+  </title>
+  <link href="/static/css/styles.css" rel="stylesheet" type="text/css"/>
+  <script type="text/javascript">
+   function myFunction(event) {
+                event.preventDefault();
+
+                var formData = new FormData(event.target);
+                var formObject = {};
+
+                formData.forEach(function(value, key){
+                    formObject[key] = value;
+                });
+
+                fetch('/Pruebe/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formObject)
+                }).then(response => {
+                    if (!response.ok) {  // Si la respuesta no es ok (es decir, el código de estado no es 2xx)
+                        return response.json().then(json => { throw new Error(json.detail); });  // Lanza un error con el detalle de la respuesta
+                    }
+                    return response.json();
+                })
+                .then(data => alert("Formulario enviado!"))
+                .catch(error => alert(error));  // Muestra el error en un alerta
+            }
+
+            window.onload = function() {
+                fetch("/Pruebe/")
+                    .then(response => response.json())
+                .then(data => {
+                    var table = document.querySelector('.table tbody');
+                    data.forEach(item => {
+                        var row = document.createElement('tr');
+                        for (var property in item) {
+                            var cell = document.createElement('td');
+                            cell.textContent = item[property];
+                            row.appendChild(cell);
+                        }
+
+                        var deleteCell = document.createElement('td');  // Crea una nueva celda para el botón de eliminar
+                        var deleteButton = document.createElement('button');  // Crea el botón de eliminar
+                        deleteButton.textContent = 'X';
+                        deleteButton.className = 'remove_small';
+                        deleteButton.dataset.code = item.codigo;  // Agrega el valor del código como un atributo de datos personalizado
+                        deleteButton.addEventListener('click', deleteItem);  // Vincula la función deleteItem al evento click del botón
+                        deleteCell.appendChild(deleteButton);  // Agrega el botón a la celda
+                        row.appendChild(deleteCell);  // Agrega la celda a la fila
+
+                        table.appendChild(row);
+                });
+            });
+
+            fetch('/static/head.html')
+            .then(response => response.text())
+            .then(data => {
+            document.getElementById('nav').innerHTML = data;
+            })
+            .catch(error => {
+            console.error('Error:', error);
+            });
+            };
+
+            fetch('/static/footer.html')
+            .then(response => response.text())
+            .then(data => {
+            document.getElementById('footer').innerHTML = data;
+            })
+            .catch(error => {
+            console.error('Error:', error);
+            });
+
+
+        function deleteItem(event) {
+            var code = event.target.dataset.code;
+            fetch("/Pruebe/" + code, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al eliminar el elemento');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('El elemento se elimino correctamente');
+            })
+            .catch(error => {
+                alert('Error: ' + error);
+            });
+        }
+  </script>
+ </head>
+ <body>
+  <nav id="nav">
+   <ul>
+    &lt;!-- Aquí va el código de la barra de navegación --&gt;
+   </ul>
+  </nav>
+  <div id="content">
+   <form onsubmit="myFunction(event)">
+    <h1>
+     Formulario para Pruebe
+    </h1>
+    <label>
+     Campoq:
+    </label>
+    <input name="Campoq" type="number"/>
+    <label>
+     Campob:
+    </label>
+    <input name="Campob" type="text"/>
+    <label>
+     Campoc:
+    </label>
+    <input name="Campoc" type="number"/>
+    <input type="submit" value="Guardar"/>
+   </form>
+  </div>
+ </body>
+</html>
+<div class="container">
+ <table class="table">
+  <thead>
+   <tr>
+    <th>
+     Campoq
+    </th>
+    <th>
+     Campob
+    </th>
+    <th>
+     Campoc
+    </th>
+   </tr>
+  </thead>
+  <tbody>
+   <tr>
+    <td>
+    </td>
+    <td>
+    </td>
+    <td>
+    </td>
+   </tr>
+  </tbody>
+ </table>
+ <footer id="footer">
+  <!-- Aquí se insertará el contenido del archivo footer.html -->
+ </footer>
+</div>

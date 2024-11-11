@@ -1,108 +1,97 @@
-from fastapi import Depends, FastAPI, Request, status
+from fastapi import Depends, FastAPI, Request, status, HTTPException
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, FileResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.staticfiles import StaticFiles # que es StaticFiles ?? https://fastapi.tiangolo.com/es/tutorial/static-files/
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
-
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-
-from requests import Session
-
-
 from fastapi.middleware.cors import CORSMiddleware
-
-from starlette.responses import FileResponse
-from datetime import timedelta
-
-from Services.security.security import crear_access_token, authenticate_user, current_user, ACCESS_TOKEN_DURATION
-from db.database import get_db
-from pydantic import BaseModel
-
-
-from routers import usuarios as aut_usuario
-from routers import Blog
-from routers.Maestros import  Route_usuario, Route_Companias, Route_Productos, Route_Usuarios_roles, Route_transactiones, Route_inventarios
-from routers.Configuraciones import Generar,Admin,configDB
-from routers.Configuraciones.Admin import create_admin_router,create_admin_router
-
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
-
-from db.schemas.Maestro.Usuarios import UserDB
-from pydantic import BaseModel
-
-
-
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
-#from prometheus_fastapi_instrumentator import Instrumentator
+from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
 
-#habilitar prometheus  para tener un monitoreo de la aplicacion
-#cd
-
-#atomatizar la creacion de dashboards
-#automatizar subir y bajar de git
-#automatizar la creación de la documentación
-#usar nssm para crear un servicio de windows
-#usar docker para crear un contenedor
-
-#Modelos
-# Crear todas las tablas de la base de datos
-from db.database import Base, engine  # Importa engine desde db.database
-#from db.models import * # Importa los modelos desde db.models
-import traceback
 import os
+import httpx
+import traceback
 import importlib
+from pydantic import BaseModel
+from datetime import timedelta
 
-#Ruta de la carpeta models
-models_dir = os.path.join(os.path.dirname(__file__), 'db', 'models')
+# Importa lógica y módulos
+from Services.security.security import crear_access_token, authenticate_user, current_user, ACCESS_TOKEN_DURATION
+from db.database import Base, engine, get_db
+from routers import usuarios as aut_usuario
+from routers import Blog
+from routers.Maestros import Route_usuario, Route_Usuarios_roles, Route_test1, Route_test2, Route_pruebat1
+from routers.Configuraciones import Generar, configDB
+from routers.Configuraciones.Admin import create_admin_router
+from db.schemas.Maestro.Usuarios import UserDB
+from db.database import create_database, create_tables
 
-# Listar todos los archivos en la carpeta models
-model_files = [f for f in os.listdir(models_dir) if f.endswith('.py') and f != '__init__.py']
+# Configuración de entorno
+FRONTEND_URL = os.getenv("FRONTEND_URL")
+ORIGINS = os.getenv("ORIGINS", "http://localhost http://localhost:8000 http://localhost:3000").split()
 
-# Importar dinámicamente todos los módulos en la carpeta models
-for model_file in model_files:
-    module_name = f"db.models.{model_file[:-3]}"  # Eliminar la extensión .py
-    importlib.import_module(module_name)
-# Crear todas las tablas de la base de datos
-try:
-    Base.metadata.create_all(bind=engine)
-    print("Tablas conocidas por SQLAlchemy:", Base.metadata.tables)
-except Exception as e:
-    print("Ha ocurrido un error:", e)
-    traceback.print_exc()
-
-
-# Crear una instancia de FastAPI
+# Inicializar aplicación
 app = FastAPI()
 
-# Instrumentar la aplicación con Prometheus
-#Instrumentator().instrument(app).expose(app)
+# Configurar plantillas
+templates = Jinja2Templates(directory="static")
+
+# Montar archivos estáticos
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Middleware de redirección al frontend
+class FrontendRedirectMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        frontend_prefix = "/frontend"
+        if request.url.path.startswith(frontend_prefix):
+            try:
+                async with httpx.AsyncClient() as client:
+                    response = await client.get(f"{FRONTEND_URL}{request.url.path[len(frontend_prefix):]}")
+                    if response.status_code == 200:
+                        return RedirectResponse(url=f"{FRONTEND_URL}{request.url.path[len(frontend_prefix):]}")
+            except httpx.RequestError:
+                return JSONResponse(status_code=503, content={"detail": "El frontend está caído. Por favor, intenta más tarde."})
+        return await call_next(request)
+
+# Middleware de error personalizado
+class CustomErrorMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        if response.status_code == 404:
+            return FileResponse('static/404.html', status_code=404)
+        elif response.status_code == 401:
+            return FileResponse('static/401.html', status_code=401)
+        return response
+
+# Agregar middlewares a la app
+def add_middlewares(app):
+    app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+    app.add_middleware(FrontendRedirectMiddleware)
+    app.add_middleware(CustomErrorMiddleware)
+
+add_middlewares(app)
 
 
-origins = [
-    "http://localhost",  # Permitir solicitudes desde localhost
-    "http://localhost:8000",  # Permitir solicitudes desde localhost con puerto 8000
-    "https://example.com",  # Permitir solicitudes desde example.com
-    # Puedes agregar más orígenes si es necesario
-]
+# Crear todas las tablas en la base de datos
+def create_tables():
+    models_dir = os.path.join(os.path.dirname(__file__), 'db', 'models')
+    model_files = [f for f in os.listdir(models_dir) if f.endswith('.py') and f != '__init__.py']
+    for model_file in model_files:
+        module_name = f"db.models.{model_file[:-3]}"
+        importlib.import_module(module_name)
+    try:
+        create_tables()
+    except Exception as e:
+        print("Error al crear tablas:", e)
+        traceback.print_exc()
+# Llamar a la función para crear la base de datos y las tablas
+# Llamar a la función para crear la base de datos y las tablas
+create_database()
+create_tables()
 
-# Configurar CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost", "http://localhost:8000"],  # Agrega los orígenes necesarios
-    allow_credentials=True,
-    allow_methods=["*"],  # Permitir todos los métodos
-    allow_headers=["*"],  # Permitir todos los encabezados
-)
 
-
-
-
-#Configuraciones.
-#Inicio Router de la API
+# Rutas de API
 app.include_router(aut_usuario.router)
 app.include_router(Generar.router)
 app.include_router(configDB.router)
@@ -110,84 +99,43 @@ app.include_router(create_admin_router(app))
 app.include_router(Blog.router)
 
 #Maestros
-app.include_router(Route_inventarios.router)
-app.include_router(Route_transactiones.router)
+app.include_router(Route_pruebat1.router)
+app.include_router(Route_test2.router)
+app.include_router(Route_test1.router)
 app.include_router(Route_Usuarios_roles.router)
-app.include_router(Route_Productos.router)
-app.include_router(Route_Companias.router)
 app.include_router(Route_usuario.router)
 
-
-
-#Fin Router de la API
-
-templates = Jinja2Templates(directory="static")
-
-
-# Ruta para servir archivos estáticos
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-
-# Ruta para login
-# Ruta para la página de inicio
-@app.get("/index", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-
-# Dashboard
-class Item(BaseModel):
-    name: str
-    value: int
-
-@app.get("/dashboard_data")
-async def get_dashboard_data():
-    # Aquí es donde obtendrías los datos reales para tu dashboard.
-    # Por ahora, solo devolveré algunos datos de ejemplo.
-    return [
-        Item(name="Item 1", value=123),
-        Item(name="Item 2", value=456),
-        Item(name="Item 3", value=789),
-    ]
-
-@app.get("/admin")
-async def read_admin(current_user: UserDB = Depends(current_user)):
-    return {"message": "Tienes acceso a esta ruta", "user": current_user.usuario}
-
-# Manejador de excepciones para errores de validación
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content=jsonable_encoder({"detail": "Se produjo un error de validación.", "errors": exc.errors()}),
-    )
-
-class NotFoundMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        response = await call_next(request)
-        if response.status_code == 404:
-            return FileResponse('static/404.html', status_code=404)
-        return response
-
-class UnauthorizedMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        response = await call_next(request)
-        if response.status_code == 401:
-            return FileResponse('static/401.html', status_code=401)
-        return response
-
-# Añadir los middlewares a la aplicación
-app.add_middleware(NotFoundMiddleware)
-app.add_middleware(UnauthorizedMiddleware)
-
-# Manejador de excepciones para errores HTTP
+# Manejadores de errores personalizados
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     if exc.status_code == 404:
         return FileResponse('static/404.html', status_code=404)
     elif exc.status_code == 401:
         return FileResponse('static/401.html', status_code=401)
-    return JSONResponse(
-        status_code=exc.status_code,
-        content=jsonable_encoder({"detail": exc.detail}),
-    )
+    return JSONResponse(status_code=exc.status_code, content=jsonable_encoder({"detail": exc.detail}))
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=jsonable_encoder({"detail": "Se produjo un error de validación.", "errors": exc.errors()}))
+
+# Ruta de inicio
+@app.get("/index", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+# Ejemplo de datos del dashboard
+class Item(BaseModel):
+    name: str
+    value: int
+
+@app.get("/dashboard_data")
+async def get_dashboard_data():
+    return [Item(name="Item 1", value=123), Item(name="Item 2", value=456), Item(name="Item 3", value=789)]
+
+@app.get("/hello")
+async def say_hello():
+    return {"message": "Hola"}
+
+@app.get("/admin")
+async def read_admin(current_user: UserDB = Depends(current_user)):
+    return {"message": "Tienes acceso a esta ruta", "user": current_user.usuario}
