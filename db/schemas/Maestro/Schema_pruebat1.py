@@ -14,3 +14,4 @@ class Pruebat1Update(Pruebat1Base):
 class Pruebat1Read(Pruebat1Base):
     campot1: int
     model_config = ConfigDict(from_attributes=True)
+    

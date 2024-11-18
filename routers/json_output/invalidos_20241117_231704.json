@@ -1,0 +1,17 @@
+[
+    {
+        "campo1": "f",
+        "campo2": 6,
+        "campo3": "mal",
+        "EAN": NaN,
+        "descripcion": "d"
+    },
+    {
+        "campo1": "a",
+        "campo2": 1,
+        "campo3": "mal 13",
+        "EAN": 1234567891230.0,
+        "descripcion": "a",
+        "EAN_MODIFICADO": NaN
+    }
+]

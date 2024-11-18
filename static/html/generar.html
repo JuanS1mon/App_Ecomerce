@@ -1,127 +1,143 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
+    <title>Admin - Generar</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script> 
-        $(function(){
-          $("#navbar").load("../static/head.html"); 
-          $("#footer").load("../static/footer.html"); 
-        });
-    </script> 
 </head>
-
-<body class="bg-gray-900 text-gray-100">
-    <div class="container mx-auto mt-5">
-        <form id="generador" action="/generar/generate" method="post" class="bg-gray-800 p-6 rounded shadow-md">
-            <div class="mb-4">
-                <label for="module_name" class="block text-gray-300">Nombre del módulo:</label>
-                <input type="text" id="module_name" name="module_name" class="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-gray-100">
+<body class="bg-gray-100 min-h-screen">
+    <!-- Barra de navegación -->
+    <nav class="bg-gray-800 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
+                <span class="text-gray-400">/</span>
+                <a href="/admin/page" class="text-white text-lg font-semibold hover:text-gray-300">Admin</a>
+                <span class="text-gray-400">/</span>
+                <span class="text-gray-300">Generar</span>
             </div>
-            <div class="mb-4">
-                <label for="fields" class="block text-gray-300">Campos:</label>
-                <label for="fields" class="block text-gray-400 text-sm">El campo1 es obligatorio para realizar búsquedas</label>
-                <div id="fields" class="mt-2">
-                    <!-- Los campos se agregarán aquí -->
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container mx-auto p-8">
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h1 class="text-3xl font-bold mb-4">Generar Aplicación</h1>
+            <p class="text-gray-700 mb-4">Utiliza esta sección para generar nuevas aplicaciones de manera rápida y sencilla. Completa los campos necesarios y haz clic en "Generar" para crear una nueva aplicación.</p>
+        </div>
+
+        <!-- Formulario para generar aplicaciones -->
+        <div class="container mx-auto mt-5">
+            <form id="generador" action="/generar/generate" method="post" class="bg-gray-800 p-6 rounded shadow-md">
+                <div class="mb-4">
+                    <label for="module_name" class="block text-gray-300">Nombre del módulo:</label>
+                    <input type="text" id="module_name" name="module_name" class="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-gray-100">
                 </div>
-            </div>
-            <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded mb-3" id="add_field">Agregar</button>
-            
-            <!-- Tus otros campos aquí -->
-            <div class="mb-4">
-                <input type="checkbox" class="mr-2" id="generate_crud" name="generate_crud" value="true">
-                <label class="text-gray-300" for="generate_crud">Generar CRUD</label>
-            </div>
-            <div class="mb-4">
-                <input type="checkbox" class="mr-2" id="generate_schema" name="generate_schema" value="true">
-                <label class="text-gray-300" for="generate_schema">Generar Esquema</label>
-            </div>
-            <div class="mb-4">
-                <input type="checkbox" class="mr-2" id="generate_route" name="generate_route" value="true">
-                <label class="text-gray-300" for="generate_route">Generar Ruta</label>
-            </div>
-            <div class="mb-4">
-                <input type="checkbox" class="mr-2" id="generate_html_form" name="generate_html_form" value="true">
-                <label class="text-gray-300" for="generate_html_form">Generar Formulario HTML</label>
-            </div>
-            <div class="mb-4">
-                <input type="checkbox" class="mr-2" id="generate_tests" name="generate_tests" value="true">
-                <label class="text-gray-300" for="generate_tests">Generar Pruebas</label>
-            </div>
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded mt-3" value="Generar">Generar</button>
-        </form>
+                <div class="mb-4">
+                    <label for="fields" class="block text-gray-300">Campos:</label>
+                    <label for="fields" class="block text-gray-400 text-sm">El campo1 es obligatorio para realizar búsquedas</label>
+                    <div id="fields" class="mt-2">
+                        <!-- Los campos se agregarán aquí -->
+                    </div>
+                </div>
+                <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded mb-3" id="add_field">Agregar</button>
+                
+                <!-- Opciones adicionales -->
+                <div class="mb-4">
+                    <input type="checkbox" class="mr-2" id="generate_crud" name="generate_crud" value="true">
+                    <label class="text-gray-300" for="generate_crud">Generar CRUD</label>
+                </div>
+                <div class="mb-4">
+                    <input type="checkbox" class="mr-2" id="generate_schema" name="generate_schema" value="true">
+                    <label class="text-gray-300" for="generate_schema">Generar Esquema</label>
+                </div>
+                <div class="mb-4">
+                    <input type="checkbox" class="mr-2" id="generate_route" name="generate_route" value="true">
+                    <label class="text-gray-300" for="generate_route">Generar Ruta</label>
+                </div>
+                <div class="mb-4">
+                    <input type="checkbox" class="mr-2" id="generate_html_form" name="generate_html_form" value="true">
+                    <label class="text-gray-300" for="generate_html_form">Generar Formulario HTML</label>
+                </div>
+                <div class="mb-4">
+                    <input type="checkbox" class="mr-2" id="generate_tests" name="generate_tests" value="true">
+                    <label class="text-gray-300" for="generate_tests">Generar Pruebas</label>
+                </div>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded mt-3" value="Generar">Generar</button>
+            </form>
+        </div>
     </div>
-    <!-- Tus scripts aquí -->
-</body>
-<script>
-document.getElementById('add_field').addEventListener('click', function() {
-    var div = document.createElement('div');
-    div.className = 'mb-2 flex items-center';
 
-    var input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'field_names[]';
-    input.className = 'w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-gray-100 mr-2';
-    div.appendChild(input);
+    <!-- Scripts -->
+    <script>
+        document.getElementById('add_field').addEventListener('click', function() {
+            var div = document.createElement('div');
+            div.className = 'mb-2 flex items-center';
 
-    var select = document.createElement('select');
-    select.name = 'field_types[]';
-    select.className = 'px-3 py-2 border border-gray-600 rounded bg-gray-700 text-gray-100 mr-2';
-    var option1 = document.createElement('option');
-    option1.value = 'str';
-    option1.text = 'str';
-    select.appendChild(option1);
-    var option2 = document.createElement('option');
-    option2.value = 'int';
-    option2.text = 'int';
-    select.appendChild(option2);
-    var option3 = document.createElement('option');
-    option3.value = 'float';
-    option3.text = 'float';
-    select.appendChild(option3);
-    var option4 = document.createElement('option');
-    option4.value = 'bool';
-    option4.text = 'bool';
-    select.appendChild(option4);
-    div.appendChild(select);
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'field_names[]';
+            input.className = 'w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-gray-100 mr-2';
+            div.appendChild(input);
 
-    var button = document.createElement('button');
-    button.type = 'button';
-    button.textContent = 'Quitar';
-    button.className = 'bg-red-500 text-white px-3 py-2 rounded';
-    div.appendChild(button);
+            var select = document.createElement('select');
+            select.name = 'field_types[]';
+            select.className = 'px-3 py-2 border border-gray-600 rounded bg-gray-700 text-gray-100 mr-2';
+            var option1 = document.createElement('option');
+            option1.value = 'str';
+            option1.text = 'str';
+            select.appendChild(option1);
+            var option2 = document.createElement('option');
+            option2.value = 'int';
+            option2.text = 'int';
+            select.appendChild(option2);
+            var option3 = document.createElement('option');
+            option3.value = 'float';
+            option3.text = 'float';
+            select.appendChild(option3);
+            var option4 = document.createElement('option');
+            option4.value = 'bool';
+            option4.text = 'bool';
+            select.appendChild(option4);
+            div.appendChild(select);
 
-    document.getElementById('fields').appendChild(div);
+            var button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = 'Quitar';
+            button.className = 'bg-red-500 text-white px-3 py-2 rounded';
+            div.appendChild(button);
 
-    input.focus();
-});
+            document.getElementById('fields').appendChild(div);
 
-document.addEventListener('click', function(e) {
-    if (e.target && e.target.textContent === 'Quitar') {
-        e.target.parentNode.remove();
-    }
-});
-</script>
+            input.focus();
+        });
 
-<script>
-    document.getElementById('generador').addEventListener('submit', function(event) {
-        var fields = document.querySelectorAll('#fields div');
-        if (fields.length < 2) {
-            alert('Por favor, añada más de un campo.');
-            event.preventDefault();
-            return;
-        }
-        var inputs = document.querySelectorAll('input[type=text]');
-        for (var i = 0; i < inputs.length; i++) {
-            if (inputs[i].value === '') {
-                alert('Por favor, rellene todos los campos de texto.');
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.textContent === 'Quitar') {
+                e.target.parentNode.remove();
+            }
+        });
+    </script>
+
+    <script>
+        document.getElementById('generador').addEventListener('submit', function(event) {
+            var fields = document.querySelectorAll('#fields div');
+            if (fields.length < 2) {
+                alert('Por favor, añada más de un campo.');
                 event.preventDefault();
                 return;
             }
-        }
-    });
-</script>
+            var inputs = document.querySelectorAll('input[type=text]');
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].value === '') {
+                    alert('Por favor, rellene todos los campos de texto.');
+                    event.preventDefault();
+                    return;
+                }
+            }
+        });
+    </script>
+</body>
 </html>

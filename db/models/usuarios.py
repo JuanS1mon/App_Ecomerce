@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, NVARCHAR, Boolean
-from ..database import Base
-
+from sqlalchemy.orm import relationship
+from db.database import Base
 
 class usuarios(Base):
     __tablename__ = 'usuarios'
@@ -11,3 +11,5 @@ class usuarios(Base):
     mail = Column(NVARCHAR(100), unique=True, nullable=False)
     activo = Column(Boolean(create_constraint=False), default=True)
     clave = Column(NVARCHAR(250), nullable=False)
+
+    activities = relationship("ActivityLog", back_populates="usuario")

@@ -5,6 +5,10 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from Services.security.security import get_current_user  # Importar la función de seguridad
 from db.database import get_db
+from db.models.usuarios import usuarios 
+from db.models.activityLog import ActivityLog
+from datetime import date, timedelta
+
 
 templates = Jinja2Templates(directory="static")
 
@@ -18,7 +22,28 @@ def create_admin_router(app: FastAPI):
     @router.get("/page")
     async def admin(request: Request, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
         routes = extract_route_names()
-        return templates.TemplateResponse("html/admin.html", {"request": request, "routes": routes, "user": current_user})
+        # Contar la cantidad de usuarios en la base de datos
+        user_count = db.query(usuarios).count()
+        
+        # Filtrar actividades de los últimos 7 días
+        seven_days_ago = date.today() - timedelta(days=7)
+        activities = db.query(ActivityLog).filter(ActivityLog.timestamp >= seven_days_ago).order_by(ActivityLog.timestamp.desc()).all()
+        
+        # Preparar los datos para el gráfico
+        chart_data = prepare_activity_data(activities)
+
+        #contar la cantidad de actividades
+        activity_count = db.query(ActivityLog).count()
+
+        return templates.TemplateResponse("html/admin.html", {
+            "request": request,
+            "routes": routes,
+            "user": current_user,
+            "user_count": user_count,
+            "activities": activities[:10],  # Mostrar las últimas 10 en la lista si es necesario
+            "chart_data": chart_data,
+            "activity_count": activity_count
+        })
 
     @router.get("/")
     async def read_admin(user: dict = Depends(get_current_user)):
@@ -63,3 +88,40 @@ def extract_route_names():
     route_names = [line.split('.')[0].replace('Route_', '') for line in route_lines]
 
     return route_names
+
+from collections import defaultdict
+from datetime import timezone
+
+def prepare_activity_data(activities):
+    activity_counts = defaultdict(lambda: defaultdict(int))
+
+    for activity in activities:
+        if activity.usuario:
+            timestamp = activity.timestamp
+            if timestamp.tzinfo is None:
+                timestamp = timestamp.replace(tzinfo=timezone.utc)
+            local_timestamp = timestamp.astimezone()
+            date_str = local_timestamp.date().isoformat()
+            user = activity.usuario.nombre
+            activity_counts[user][date_str] += 1
+
+    datasets = []
+    color_palette = {
+        user: color for user, color in zip(activity_counts.keys(), ['red', 'blue', 'green', 'orange', 'purple'])
+    }
+
+    for user, dates in activity_counts.items():
+        data = []
+        for date, count in dates.items():
+            data.append({'x': date, 'y': count})
+        user_data = {
+            'label': user,
+            'data': data,
+            'backgroundColor': color_palette[user]
+        }
+        datasets.append(user_data)
+
+    chart_data = {
+        'datasets': datasets
+    }
+    return chart_data

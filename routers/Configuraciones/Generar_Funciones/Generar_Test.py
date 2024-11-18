@@ -6,176 +6,183 @@ def generate_tests(module_name, field_names, field_types):
     test_code = f"""import sys
 import os
 import time
+import warnings
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
+
+# Filtrar las advertencias específicas
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
 
 # Añadir la ruta del directorio raíz del proyecto al sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from ..main import app  # Asegúrate de importar tu aplicación FastAPI
+from ..main import app  # Asegúrate de importar tu aplicación FastAPI correctamente
 
 client = TestClient(app)
+
+# Definir el número de iteraciones
+ITERATIONS = 10  # Puedes ajustar este valor según tus necesidades
 """
 
-    # Definir la función run_tests
+    # Obtener el nombre del campo clave (asumiendo que es el primer campo)
+    key_field = field_names[0]
+
+    # Función test_create parametrizada
     test_code += f"""
-
-def run_tests():
-    start_time = time.time()
-    iterations = 10  # Número de veces que se ejecutarán las pruebas
-
-    for i in range(iterations):
-        print(f"Ejecutando iteración {{i + 1}} de {{iterations}}")
-        test_create_{module_name}()
-        test_gets_{module_name}_all()
-        test_get_{module_name}_by_id()
-        test_update_{module_name}()
-        test_delete_{module_name}()
-
-    end_time = time.time()
-    total_time = end_time - start_time
-    print(f"Las pruebas se ejecutaron {{iterations}} veces en {{total_time:.2f}} segundos")
-"""
-
-    # Función test_create
-    test_code += f"""
-
-def test_create_{module_name}():
+@pytest.mark.parametrize("{key_field}_value", range(1, ITERATIONS + 1))
+def test_create_{module_name}({key_field}_value):
     response = client.post("/{module_name}/", json={{
 """
     # Valores de prueba para creación
-    test_values = {}
     for field_name, field_type in zip(field_names, field_types):
-        if field_type == 'int':
-            test_value = 1
+        if field_name == key_field:
+            test_value = f"{key_field}_value"
+        elif field_type == 'int':
+            test_value = f"{key_field}_value * 10"
         elif field_type == 'str':
-            test_value = "Valor de prueba"
+            test_value = f"f'Valor de prueba {{{key_field}_value}}'"
         elif field_type == 'float':
-            test_value = 3.14
+            test_value = f"3.14 + {key_field}_value"
         elif field_type == 'bool':
-            test_value = True
+            test_value = f"{key_field}_value % 2 == 0"
         else:
-            test_value = None
-        test_values[field_name] = test_value
-        test_code += f'        "{field_name}": {repr(test_value)},\n'
+            test_value = "None"
+        test_code += f'        "{field_name}": {test_value},\n'
     test_code += f"""    }})
     assert response.status_code == 200
     data = response.json()
 """
     for field_name in field_names:
-        test_code += f'    assert data["{field_name}"] == {repr(test_values[field_name])}\n'
+        if field_name == key_field:
+            test_code += f'    assert data["{field_name}"] == {key_field}_value\n'
+        elif field_types[field_names.index(field_name)] == 'str':
+            test_code += f'    assert data["{field_name}"] == f"Valor de prueba {{{key_field}_value}}"\n'
+        elif field_types[field_names.index(field_name)] == 'bool':
+            test_code += f'    assert data["{field_name}"] == ({key_field}_value % 2 == 0)\n'
+        else:
+            test_code += f'    assert data["{field_name}"] == {test_value}\n'
 
-    # Función test_gets_all
+    # Función test_gets_all parametrizada
     test_code += f"""
 
-def test_gets_{module_name}_all():
+@pytest.mark.parametrize("{key_field}_value", range(1, ITERATIONS + 1))
+def test_gets_{module_name}_all({key_field}_value):
     response = client.get("/{module_name}/")
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
 """
 
-    # Función test_get_by_id
+    # Función test_get_by_id parametrizada
     test_code += f"""
 
-def test_get_{module_name}_by_id():
-    # Primero, creamos un registro de prueba
-    client.post("/{module_name}/", json={{
+@pytest.mark.parametrize("{key_field}_value", range(1, ITERATIONS + 1))
+def test_get_{module_name}_by_id({key_field}_value):
+    # Asegurarnos de que el registro existe
+    response = client.get(f"/{module_name}/id/{{{key_field}_value}}")
+    if response.status_code == 404:
+        # Crear el registro si no existe
+        client.post("/{module_name}/", json={{
 """
-    # Valores de prueba para obtener por ID
-    test_values_get = {}
     for field_name, field_type in zip(field_names, field_types):
-        if field_type == 'int':
-            test_value = 2
+        if field_name == key_field:
+            test_value = f"{key_field}_value"
+        elif field_type == 'int':
+            test_value = f"{key_field}_value * 10"
         elif field_type == 'str':
-            test_value = "Otro valor"
+            test_value = f"f'Valor de prueba {{{key_field}_value}}'"
         elif field_type == 'float':
-            test_value = 2.71
+            test_value = f"2.71 + {key_field}_value"
         elif field_type == 'bool':
-            test_value = False
+            test_value = "False"
         else:
-            test_value = None
-        test_values_get[field_name] = test_value
-        test_code += f'        "{field_name}": {repr(test_value)},\n'
+            test_value = "None"
+        test_code += f'            "{field_name}": {test_value},\n'
+    test_code += f"""        }})
+        response = client.get(f"/{module_name}/id/{{{key_field}_value}}")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["{key_field}"] == {key_field}_value
+"""
+
+    # Función test_update parametrizada
+    test_code += f"""
+
+@pytest.mark.parametrize("{key_field}_value", range(1, ITERATIONS + 1))
+def test_update_{module_name}({key_field}_value):
+    response = client.put(f"/{module_name}/id/{{{key_field}_value}}", json={{
+"""
+    for field_name, field_type in zip(field_names, field_types):
+        if field_name == key_field:
+            continue  # No actualizamos el campo clave
+        elif field_type == 'int':
+            test_value = f"1.61 + {key_field}_value"
+        elif field_type == 'str':
+            test_value = f"f'Valor actualizado {{{key_field}_value}}'"
+        elif field_type == 'float':
+            test_value = f"1.61 + {key_field}_value"
+        elif field_type == 'bool':
+            test_value = f"{key_field}_value % 2 != 0"
+        else:
+            test_value = "None"
+        test_code += f'        "{field_name}": {test_value},\n'
     test_code += f"""    }})
-    # Luego, intentamos obtenerlo
-    response = client.get("/{module_name}/{test_values_get[field_names[0]]}")
     assert response.status_code == 200
     data = response.json()
 """
     for field_name in field_names:
-        test_code += f'    assert data["{field_name}"] == {repr(test_values_get[field_name])}\n'
+        if field_name == key_field:
+            continue  # No actualizamos el campo clave
+        elif field_types[field_names.index(field_name)] == 'str':
+            test_code += f'    assert data["{field_name}"] == f"Valor actualizado {{{key_field}_value}}"\n'
+        elif field_types[field_names.index(field_name)] == 'bool':
+            test_code += f'    assert data["{field_name}"] == ({key_field}_value % 2 != 0)\n'
+        else:
+            test_code += f'    assert data["{field_name}"] == {test_value}\n'
 
-    # Función test_update
+    # Función test_delete parametrizada
     test_code += f"""
 
-def test_update_{module_name}():
-    # Primero, creamos el registro que vamos a actualizar
-    response = client.post("/{module_name}/", json={{
-"""
-    test_values_update = {}
-    for field_name, field_type in zip(field_names, field_types):
-        if field_type == 'int':
-            test_value = 3
-        elif field_type == 'str':
-            test_value = "Valor inicial"
-        elif field_type == 'float':
-            test_value = 2.71
-        elif field_type == 'bool':
-            test_value = False
-        else:
-            test_value = None
-        test_values_update[field_name] = test_value
-        test_code += f'        "{field_name}": {repr(test_value)},\n'
-    test_code += f"""    }})
-    assert response.status_code == 200
-
-    # Ahora, actualizamos el registro con {field_names[0]} = {test_values_update[field_names[0]]}
-    response = client.put("/{module_name}/{test_values_update[field_names[0]]}", json={{
-"""
-    # Valores actualizados
-    updated_values = {}
-    for field_name, field_type in zip(field_names, field_types):
-        if field_name == field_names[0]:
-            continue  # No actualizamos la clave primaria
-        if field_type == 'int':
-            updated_value = 4
-        elif field_type == 'str':
-            updated_value = "Valor actualizado"
-        elif field_type == 'float':
-            updated_value = 1.61
-        elif field_type == 'bool':
-            updated_value = True
-        else:
-            updated_value = None
-        updated_values[field_name] = updated_value
-        test_code += f'        "{field_name}": {repr(updated_value)},\n'
-    test_code += f"""    }})
+@pytest.mark.parametrize("{key_field}_value", range(1, ITERATIONS + 1))
+def test_delete_{module_name}({key_field}_value):
+    response = client.delete(f"/{module_name}/id/{{{key_field}_value}}")
     assert response.status_code == 200
     data = response.json()
-"""
-    for field_name in updated_values:
-        test_code += f'    assert data["{field_name}"] == {repr(updated_values[field_name])}\n'
+    assert data["{key_field}"] == {key_field}_value
 
-    # Función test_delete
-    test_code += f"""
-
-def test_delete_{module_name}():
-    # Eliminamos el registro con {field_names[0]} = {test_values_get[field_names[0]]}
-    response = client.delete("/{module_name}/{test_values_get[field_names[0]]}")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["{field_names[0]}"] == {test_values_get[field_names[0]]}
-    # Verificamos que ya no existe
-    response = client.get("/{module_name}/{test_values_get[field_names[0]]}")
+    # Verificar que ya no existe
+    response = client.get(f"/{module_name}/id/{{{key_field}_value}}")
     assert response.status_code == 404
 """
 
-    # Bloque principal para ejecutar las pruebas
+    # Funciones adicionales de prueba (opcional)
+
+    # Prueba para crear registro inválido
     test_code += f"""
 
-if __name__ == "__main__":
-    run_tests()
+def test_create_{module_name}_invalid():
+    response = client.post("/{module_name}/", json={{
+"""
+    for field_name in field_names[1:]:  # Omite el campo clave
+        test_code += f'        "{field_name}": None,\n'
+    test_code += f"""    }})
+    assert response.status_code == 422  # Unprocessable Entity
 """
 
+    # Añadir otras pruebas según sea necesario...
+
     return test_code
+
+# Ejemplo de uso de la función
+if __name__ == "__main__":
+    module_name = "pruebat1"
+    field_names = ["campot1", "campot2", "campot3", "campot4"]
+    field_types = ["int", "str", "float", "bool"]
+    test_code = generate_tests(module_name, field_names, field_types)
+
+    # Guardar el código generado en un archivo
+    with open(f"test_{module_name}.py", "w", encoding="utf-8") as f:
+        f.write(test_code)

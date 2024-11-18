@@ -18,14 +18,13 @@ from datetime import timedelta
 
 # Importa lógica y módulos
 from Services.security.security import crear_access_token, authenticate_user, current_user, ACCESS_TOKEN_DURATION
-from db.database import Base, engine, get_db
+from db.database import Base, engine, get_db, create_database, create_tables
 from routers import usuarios as aut_usuario
 from routers import Blog
 from routers.Maestros import Route_usuario, Route_Usuarios_roles, Route_test1, Route_test2, Route_pruebat1
-from routers.Configuraciones import Generar, configDB
+from routers.Configuraciones import Generar, configDB, Migraciones
 from routers.Configuraciones.Admin import create_admin_router
 from db.schemas.Maestro.Usuarios import UserDB
-from db.database import create_database, create_tables
 
 # Configuración de entorno
 FRONTEND_URL = os.getenv("FRONTEND_URL")
@@ -72,9 +71,8 @@ def add_middlewares(app):
 
 add_middlewares(app)
 
-
 # Crear todas las tablas en la base de datos
-def create_tables():
+def create_all_tables():
     models_dir = os.path.join(os.path.dirname(__file__), 'db', 'models')
     model_files = [f for f in os.listdir(models_dir) if f.endswith('.py') and f != '__init__.py']
     for model_file in model_files:
@@ -85,11 +83,10 @@ def create_tables():
     except Exception as e:
         print("Error al crear tablas:", e)
         traceback.print_exc()
-# Llamar a la función para crear la base de datos y las tablas
+
 # Llamar a la función para crear la base de datos y las tablas
 create_database()
-create_tables()
-
+create_all_tables()
 
 # Rutas de API
 app.include_router(aut_usuario.router)
@@ -97,8 +94,9 @@ app.include_router(Generar.router)
 app.include_router(configDB.router)
 app.include_router(create_admin_router(app))
 app.include_router(Blog.router)
+app.include_router(Migraciones.router)
 
-#Maestros
+# Maestros
 app.include_router(Route_pruebat1.router)
 app.include_router(Route_test2.router)
 app.include_router(Route_test1.router)
@@ -120,6 +118,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 # Ruta de inicio
 @app.get("/index", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
