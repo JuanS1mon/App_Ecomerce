@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Request, status, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, FileResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -27,8 +28,9 @@ from routers.Configuraciones.Admin import create_admin_router
 from db.schemas.Maestro.Usuarios import UserDB
 
 # Configuración de entorno
+load_dotenv()
 FRONTEND_URL = os.getenv("FRONTEND_URL")
-ORIGINS = os.getenv("ORIGINS", "http://localhost http://localhost:8000 http://localhost:3000").split()
+ORIGINS = os.getenv("ORIGINS", "*").split()
 
 # Inicializar aplicación
 app = FastAPI()
@@ -64,12 +66,14 @@ class CustomErrorMiddleware(BaseHTTPMiddleware):
         return response
 
 # Agregar middlewares a la app
-def add_middlewares(app):
-    app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-    app.add_middleware(FrontendRedirectMiddleware)
-    app.add_middleware(CustomErrorMiddleware)
 
-add_middlewares(app)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permite todos los orígenes en desarrollo
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Crear todas las tablas en la base de datos
 def create_all_tables():

@@ -1,4 +1,3 @@
-# seguridad.py
 from fastapi import HTTPException, Depends, status, Request
 from sqlalchemy.orm import Session
 from db.database import get_db
@@ -20,6 +19,7 @@ load_dotenv()
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_DURATION = int(os.getenv("ACCESS_TOKEN_DURATION", 30))  # Valor por defecto de 30 minutos
 SECRET = os.getenv("SECRET")
+TOKEN_EXPIRE_MINUTES = 30
 
 class TokenData(BaseModel):
     username: Optional[str] = None
@@ -56,15 +56,16 @@ def decodifica_token(token: str):
         print("Token inválido")
         return None
 
-def crear_access_token(data: dict, expires_delta: timedelta = None):
+
+def crear_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_DURATION)  # Duración por defecto
+        expire = datetime.now(timezone.utc) + timedelta(minutes=TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET, algorithm=ALGORITHM)
+
 
 def authenticate_user(db: Session, username: str, password: str):
     user_info = user_pass(db, username, password)
@@ -106,20 +107,57 @@ def generar_token_activacion(usuario_id):
     token = jwt.encode(payload, SECRET, algorithm=ALGORITHM)
     return token
 
-async def get_current_user(request: Request):
+async def get_current_user(request: Request, db: Session = Depends(get_db)):
+    # Obtener el token de la cookie
     token = request.cookies.get('access_token')
-    if token is None:
-        raise HTTPException(status_code=401, detail="Token no proporcionado")
-
-    # Si el token contiene el prefijo 'Bearer ', elimínalo
-    if token.startswith("Bearer "):
-        token = token[len("Bearer "):]
+    print(f"Token recibido: {token}")
+    
+    if not token:
+        # Intentar obtener el token del encabezado Authorization
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+            print(f"Token obtenido del encabezado Authorization: {token}")
+    
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token no proporcionado",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     try:
+        # Decodificar el token
         payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
-            raise HTTPException(status_code=401, detail="Token inválido")
-        return {"username": username}
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Token inválido")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token inválido",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # Obtener usuario de la base de datos
+        user = get_user_from_db(db, username)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Usuario no encontrado",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # Verificar si el usuario está activo
+        if not user.activo:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Usuario deshabilitado",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+            
+        return user
+    except JWTError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Token inválido: {str(e)}",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

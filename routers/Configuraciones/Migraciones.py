@@ -2,8 +2,9 @@
 
 import os
 import logging
-from fastapi import APIRouter, Request, status, Depends, File, UploadFile, HTTPException
+from fastapi import APIRouter, Request, status, Depends, File, UploadFile, HTTPException, BackgroundTasks, Query
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import RedirectResponse
 from Services.security.security import get_current_user
 import pandas as pd
 from io import BytesIO
@@ -14,7 +15,7 @@ from sqlalchemy import MetaData, Table, Column, Integer, String, Float, DateTime
 from db.database import get_db
 from db.models.activityLog import ActivityLog
 from db.models.usuarios import usuarios
-
+from db.schemas.Maestro.Usuarios import UserDB
 
 # Configuración de logging
 logging.basicConfig(
@@ -27,10 +28,12 @@ logging.basicConfig(
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 JSON_DIR = os.path.join(BASE_DIR, "json_output")
+RESULTS_DIR = os.path.join(BASE_DIR, "results")
 
 # Crear directorios si no existen
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(JSON_DIR, exist_ok=True)
+os.makedirs(RESULTS_DIR, exist_ok=True)
 os.makedirs('logs', exist_ok=True)
 
 # Ajustar el directorio de las plantillas
@@ -51,7 +54,7 @@ def eanCheck(ean):
         if len(ean) not in [8, 12, 13]:
             return False
         checksum = 0
-        for i, digit in enumerate(reversed(ean[:-1])):
+        for i, digit in enumerate(reversed(ean[:-1])): 
             checksum += int(digit) * (3 if i % 2 == 0 else 1)
         check_digit = (10 - (checksum % 10)) % 10
         return check_digit == int(ean[-1])
@@ -107,78 +110,30 @@ def convertir_a_float(valor):
     except (ValueError, TypeError):
         return valor
 
-@router.get("/page")
-async def migraciones_page(
-    request: Request,
-    current_user: dict = Depends(get_current_user)
-):
-    return templates.TemplateResponse("migracion.html", {"request": request, "username": current_user})
-
-@router.post("/upload")
-async def upload_migracion_file(
-    request: Request,
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
+def procesar_archivo(contents, json_path, result_path, db: Session, current_user: UserDB):
     try:
-       
-        # Validaciones iniciales
-        if file.content_type not in [
-            "application/vnd.ms-excel",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ]:
-            logging.warning(f"Tipo de archivo inválido: {file.content_type}")
-            return templates.TemplateResponse(
-                "migracion.html",
-                {
-                    "request": request,
-                    "user": current_user,
-                    "error": "Tipo de archivo inválido. Solo se aceptan archivos Excel (.xls, .xlsx)."
-                }
-            )
+        # Leer el archivo Excel
+        df = pd.read_excel(BytesIO(contents))
 
-        # Leer archivo
-        contents = await file.read()
-
-        # Validar que el archivo no esté vacío
-        if not contents:
-            return templates.TemplateResponse(
-                "migracion.html",
-                {
-                    "request": request,
-                    "user": current_user,
-                    "error": "El archivo está vacío."
-                }
-            )
-
-        # Procesar Excel
-        try:
-            df = pd.read_excel(BytesIO(contents), engine='openpyxl')
-        except Exception as e:
-            logging.warning(f"Fallo al leer con openpyxl: {str(e)}. Intentando con xlrd.")
-            try:
-                df = pd.read_excel(BytesIO(contents), engine='xlrd')
-            except Exception as e:
-                logging.error(f"Fallo al leer con xlrd: {str(e)}")
-                return templates.TemplateResponse(
-                    "migracion.html",
-                    {
-                        "request": request,
-                        "user": current_user,
-                        "error": "No se pudo leer el archivo Excel. Asegúrese de que el archivo esté en un formato válido."
-                    }
-                )
-
+        # Validar que el DataFrame no esté vacío
         if df.empty:
-            return templates.TemplateResponse(
-                "migracion.html",
-                {
-                    "request": request,
-                    "user": current_user,
-                    "error": "El archivo Excel no contiene datos."
-                }
-            )
+            logging.error("El archivo Excel no contiene datos.")
+            result = {
+                "status": "error",
+                "message": "El archivo Excel no contiene datos."
+            }
+            with open(result_path, 'w', encoding='utf-8') as f:
+                json.dump(result, f, ensure_ascii=False, indent=4)
+            return
+
+        # Convertir DataFrame a una lista de diccionarios
+        data = df.to_dict(orient='records')
+
+        # Guardar datos en un archivo JSON
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+
+        logging.info("Archivo procesado y datos guardados exitosamente en formato JSON.")
 
         # Contador de registros originales
         total_registros = len(df)
@@ -257,8 +212,7 @@ async def upload_migracion_file(
         
         for record in records:
             try:
-                with db.begin():
-                    db.execute(dynamic_table.insert(), [record])
+                db.execute(dynamic_table.insert(), [record])
                 registros_procesados += 1
             except Exception as e:
                 logging.error(f"Error al insertar registro: {str(e)}")
@@ -281,7 +235,7 @@ async def upload_migracion_file(
                     f"{porcentaje_cargados:.2f}% de registros cargados")
 
         # Buscar el usuario por nombre de usuario
-        usuario = db.query(usuarios).filter(usuarios.usuario == current_user['username']).first()
+        usuario = db.query(usuarios).filter(usuarios.usuario == current_user.usuario).first()
         if not usuario:
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
@@ -293,29 +247,97 @@ async def upload_migracion_file(
         db.add(new_activity)
         db.commit()
 
+        # Guardar resultado
+        result = {
+            "status": "success",
+            "message": f"Migración completada: {registros_procesados} registros procesados, "
+                       f"{len(registros_no_guardados)} registros inválidos, "
+                       f"{porcentaje_cargados:.2f}% de registros cargados"
+        }
+        with open(result_path, 'w', encoding='utf-8') as f:
+            json.dump(result, f, ensure_ascii=False, indent=4)
+
+    except Exception as e:
+        logging.error(f"Ocurrió un error al procesar el archivo: {str(e)}")
+        result = {
+            "status": "error",
+            "message": f"Ocurrió un error al procesar el archivo: {str(e)}"
+        }
+        with open(result_path, 'w', encoding='utf-8') as f:
+            json.dump(result, f, ensure_ascii=False, indent=4)
+
+@router.get("/page")
+async def migraciones_page(
+    request: Request,
+    current_user: UserDB = Depends(get_current_user)
+):
+    return templates.TemplateResponse("migracion.html", {"request": request, "user": current_user})
+
+@router.post("/upload")
+async def upload_migracion_file(
+    request: Request,
+    background_tasks: BackgroundTasks,
+
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(get_current_user)
+):
+    try:
+        # Validaciones iniciales
+        if file.content_type not in [
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ]:
+            logging.warning(f"Tipo de archivo inválido: {file.content_type}")
+            return templates.TemplateResponse(
+                "migracion.html",
+                {
+                    "request": request,
+                    "user": current_user,
+                    "error": "Tipo de archivo inválido. Solo se aceptan archivos Excel (.xls, .xlsx)."
+                }
+            )
+
+        # Leer archivo
+        contents = await file.read()
+
+        # Validar que el archivo no esté vacío
+        if not contents:
+            return templates.TemplateResponse(
+                "migracion.html",
+                {
+                    "request": request,
+                    "user": current_user,
+                    "error": "El archivo está vacío."
+                }
+            )
+
+        # Crear directorio del usuario si no existe
+        user_results_dir = os.path.join(RESULTS_DIR, current_user.usuario)
+        os.makedirs(user_results_dir, exist_ok=True)
+
+        # Ruta donde se guardará el archivo JSON
+        json_filename = "datos.json"
+        json_path = os.path.join(user_results_dir, json_filename)
+
+        # Ruta donde se guardará el resultado
+        result_filename = f"result_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        result_path = os.path.join(user_results_dir, result_filename)
+
+        # Agregar la tarea en segundo plano
+        background_tasks.add_task(procesar_archivo, contents, json_path, result_path, db, current_user)
+
+        # Redirigir a la página de resultados en una nueva ventana
         return templates.TemplateResponse(
             "migracion.html",
             {
                 "request": request,
                 "user": current_user,
-                "message": f"Proceso completado. {registros_procesados} registros guardados, "
-                          f"{len(registros_no_guardados)} registros inválidos. "
-                          f"{porcentaje_cargados:.2f}% de registros cargados.",
-                "registros_invalidos": len(registros_no_guardados) > 0,
-                "tabla_generada": table_name
+                "message": "Archivo recibido. El procesamiento se realizará en segundo plano.",
+                "result_url": f"/migraciones/results"
             }
         )
 
-    except pd.errors.EmptyDataError:
-        logging.error("Archivo Excel vacío")
-        return templates.TemplateResponse(
-            "migracion.html",
-            {
-                "request": request,
-                "user": current_user,
-                "error": "El archivo Excel está vacío o no contiene datos legibles."
-            }
-        )
     except Exception as e:
         logging.error(f"Error en el proceso de migración: {str(e)}")
         return templates.TemplateResponse(
@@ -324,5 +346,46 @@ async def upload_migracion_file(
                 "request": request,
                 "user": current_user,
                 "error": f"Error en el proceso: {str(e)}"
+            }
+        )
+
+@router.get("/results")
+async def get_all_results(
+    request: Request,
+    current_user: UserDB = Depends(get_current_user)
+):
+    try:
+        user_results_dir = os.path.join(RESULTS_DIR, current_user.usuario)
+        if not os.path.exists(user_results_dir):
+            return templates.TemplateResponse(
+                "results.html",
+                {
+                    "request": request,
+                    "message": "No se encontraron resultados para este usuario."
+                }
+            )
+
+        result_files = [f for f in os.listdir(user_results_dir) if f.startswith("result_") and f.endswith(".json")]
+        results = []
+        for result_file in result_files:
+            result_path = os.path.join(user_results_dir, result_file)
+            with open(result_path, 'r', encoding='utf-8') as f:
+                result = json.load(f)
+                results.append(result)
+
+        return templates.TemplateResponse(
+            "results.html",
+            {
+                "request": request,
+                "results": results
+            }
+        )
+    except Exception as e:
+        logging.error(f"Error al obtener los resultados: {str(e)}")
+        return templates.TemplateResponse(
+            "results.html",
+            {
+                "request": request,
+                "error": f"Error al obtener los resultados: {str(e)}"
             }
         )

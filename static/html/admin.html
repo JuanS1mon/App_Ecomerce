@@ -19,6 +19,9 @@
     <nav class="bg-gray-800 p-4 z-30 relative">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-4">
+                <a href="">
+                    <img src="../static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
+                </a>
                 <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
                 <span class="text-gray-400">/</span>
                 <span class="text-white text-lg font-semibold">Admin</span>
@@ -29,7 +32,7 @@
                 <a href="/migraciones/page" class="text-white hover:text-gray-300">Migraciones</a>
                 <a href="/user/page" class="text-white hover:text-gray-300">
                     <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center">
-                        {{ user.username[0]|upper }}
+                        {{ user.nombre[0]|upper }}
                     </div>
                 </a>
             </div>
@@ -39,7 +42,7 @@
     <div id="content" class="container mx-auto p-8">
         <!-- Bienvenida -->
         <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 class="text-2xl font-bold mb-4">Bienvenido, {{ user.username }}</h2>
+            <h2 class="text-2xl font-bold mb-4">Bienvenido, {{ user.nombre }}</h2>
             <p class="text-gray-700">Aquí puedes gestionar las aplicaciones, ver estadísticas y realizar otras tareas administrativas.</p>
         </div>
 

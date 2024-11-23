@@ -114,7 +114,7 @@ async def registrar_usuario(usuario: UserRegistration, db: Session = Depends(get
 class Token(BaseModel):
     access_token: str
     token_type: str
-
+    
 @router.post("/login", response_model=Token)
 async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
@@ -124,13 +124,13 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
             detail="Usuario o contraseña incorrectos",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    access_token_expires = timedelta(minutes=30)
     access_token = crear_access_token(data={"sub": user["username"]}, expires_delta=access_token_expires)
-    
     response.set_cookie(
         key="access_token",
-        value=f"Bearer {access_token}",
+        value=f"{access_token}",
         httponly=True,
-        secure=True,
+        secure=False,  # Cambiar a False en desarrollo
         samesite="Lax"
     )
     return {"access_token": access_token, "token_type": "bearer"}

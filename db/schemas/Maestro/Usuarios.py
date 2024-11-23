@@ -1,18 +1,17 @@
-from pydantic import BaseModel, Field # Importamos BaseModel de pydantic para crear Usuarios de datos que se utilizarán para validar la entrada de datos y convertir los datos en diferentes formatos.
+from pydantic import BaseModel, Field
 from typing import Optional
 
-
-class Usuarios (BaseModel):
+class Usuarios(BaseModel):
     codigo: int
     usuario: str
     nombre: str   
     mail: str
     telefono: Optional[str] = None
-class UserDB (Usuarios):
+
+class UserDB(Usuarios):
     activo: bool
     clave: str
     codigo: Optional[int] = Field(None, description="Código del usuario, generado automáticamente")
-
 
 class Usuario(BaseModel):
     codigo: int
@@ -23,7 +22,6 @@ class Usuario(BaseModel):
 
 class PasswordResetRequest(BaseModel):
     email: str
-
 
 class PasswordReset(BaseModel):
     usuario: str = Field(..., description="Nombre de usuario del que solicita el restablecimiento de contraseña")

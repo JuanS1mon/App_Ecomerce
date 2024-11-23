@@ -8,7 +8,7 @@ from db.database import get_db
 from db.models.usuarios import usuarios 
 from db.models.activityLog import ActivityLog
 from datetime import date, timedelta
-
+from db.schemas.Maestro.Usuarios import UserDB  # Asegúrate de importar UserDB
 
 templates = Jinja2Templates(directory="static")
 
@@ -18,23 +18,22 @@ def create_admin_router(app: FastAPI):
         tags=["Admin"],
         responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
     )
-
     @router.get("/page")
-    async def admin(request: Request, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    async def admin_page(request: Request, db: Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)):
+        print("current_user: ", current_user)
         routes = extract_route_names()
-        # Contar la cantidad de usuarios en la base de datos
         user_count = db.query(usuarios).count()
         
         # Filtrar actividades de los últimos 7 días
-        seven_days_ago = date.today() - timedelta(days=7)
-        activities = db.query(ActivityLog).filter(ActivityLog.timestamp >= seven_days_ago).order_by(ActivityLog.timestamp.desc()).all()
-        
+        #seven_days_ago = date.today() - timedelta(days=7)
+        activities = db.query(ActivityLog).order_by(ActivityLog.timestamp.desc()).all()
+        print("activities: ", activities)
         # Preparar los datos para el gráfico
         chart_data = prepare_activity_data(activities)
-
-        #contar la cantidad de actividades
+    
+        # Contar la cantidad de actividades
         activity_count = db.query(ActivityLog).count()
-
+    
         return templates.TemplateResponse("html/admin.html", {
             "request": request,
             "routes": routes,
@@ -44,6 +43,7 @@ def create_admin_router(app: FastAPI):
             "chart_data": chart_data,
             "activity_count": activity_count
         })
+
 
     @router.get("/")
     async def read_admin(user: dict = Depends(get_current_user)):

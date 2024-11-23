@@ -4,15 +4,19 @@ import os
 import fileinput
 import time
 from fastapi.security import OAuth2PasswordBearer
+from Services.security.security import get_current_user
 from  .Generar_Funciones.Generar_Routes import generate_route 
 from  .Generar_Funciones.Generar_Cruds import generate_crud_functions
 from  .Generar_Funciones.Generar_Schema import generate_schema
 from  .Generar_Funciones.Generar_Models import generate_model
 from  .Generar_Funciones.Generar_Html import generate_html_form
 from  .Generar_Funciones.Generar_Test import generate_tests
+from fastapi.templating import Jinja2Templates
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
+# Ajustar el directorio de las plantillas
+templates = Jinja2Templates(directory="static/html")
 
 router = APIRouter(
     prefix="/generar",
@@ -21,9 +25,11 @@ router = APIRouter(
 )
 
 @router.get("/")
-async def read_root():
-
-    return FileResponse('static/html/generar.html')
+async def migraciones_page(
+    request: Request,
+    current_user: dict = Depends(get_current_user)
+):
+    return templates.TemplateResponse("generar.html", {"request": request, "user": current_user})
 
 @router.post("/generate")
 async def generate(request: Request):
@@ -86,6 +92,7 @@ async def generate(request: Request):
     return data_dict
 #////////////////////////////////////////////////////////////////////////////////////////
 #////////////////////////////////////////////////////////////////////////////////////////
+
 #generar y guardar el código de las rutas (endpoints) para un módulo dado.
 def generate_and_save_route():
     """
@@ -107,6 +114,7 @@ def generate_and_save_route():
         with open(file_path, 'w') as file:
             file.write(route_code)
             print(f"Archivo {file_path} creado con éxito.")
+
 #generar y guardar el código CRUD para un módulo dado.
 def generate_and_save_crud():
     """
@@ -199,7 +207,6 @@ def save_html_form(module_name, html_content):
         with open(file_path, 'w', encoding='utf-8') as file:
             file.write(html_content)
             print(f"Archivo {file_path} creado con éxito.")
-
 
 
 def generate_and_save_tests():

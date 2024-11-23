@@ -9,17 +9,29 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
     <!-- Barra de navegación -->
-    <nav class="bg-gray-800 p-4">
+     
+    <nav class="bg-gray-800 p-4 z-30 relative">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-4">
-                <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
-                <span class="text-gray-400">/</span>
-                <a href="/admin/page" class="text-white text-lg font-semibold hover:text-gray-300">Admin</a>
-                <span class="text-gray-400">/</span>
-                <span class="text-gray-300">Generar</span>
+                <a href="">
+                    <img src="../static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
+                    <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
+                    <span class="text-gray-400">/</span>
+                    <a href="/admin/page" class="text-white text-lg font-semibold hover:text-gray-300">Admin</a>
+                    <span class="text-gray-400">/</span>
+                    <span class="text-gray-300">Generar</span>
             </div>
-        </div>
+            <div class="flex items-center space-x-4">
+                <a href="/docs" class="text-white hover:text-gray-300">Documentacion</a>
+                <a href="/migraciones/page" class="text-white hover:text-gray-300">Migraciones</a>
+                <a href="/user/page" class="text-white hover:text-gray-300">
+                    <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center">
+                        {{ user.nombre[0]|upper }}
+                    </div>
+                </a>
+            </div>
     </nav>
+
 
     <!-- Contenido principal -->
     <div class="container mx-auto p-8">
