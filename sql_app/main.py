@@ -124,13 +124,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 # Ruta de inicio
 @app.get("/index", response_class=HTMLResponse)
-async def read_root(request: Request, db: Session = Depends(get_db)):
-    blog_posts = db.query(BlogPostModel).all()
-    return templates.TemplateResponse("index.html", {"request": request, "blog_posts": blog_posts})
-
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request, db: Session = Depends(get_db)):
-    blog_posts = db.query(BlogPostModel).all()
+    blog_posts = db.query(BlogPostModel).order_by(BlogPostModel.created_at.desc()).all()
     return templates.TemplateResponse("index.html", {"request": request, "blog_posts": blog_posts})
 
 # Ejemplo de datos del dashboard
