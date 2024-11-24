@@ -1,0 +1,11 @@
+from sqlalchemy import Column, Integer, NVARCHAR, Boolean, Float
+from ..database import Base
+
+
+class test1(Base):
+    __tablename__ = 'test1'
+
+    campo1 = Column(Integer, primary_key=True, index=True, default=0)
+    campo2 = Column(NVARCHAR(50), default=' ')
+    campo3 = Column(Float, default=0.0)
+    campo4 = Column(Boolean, default=False)

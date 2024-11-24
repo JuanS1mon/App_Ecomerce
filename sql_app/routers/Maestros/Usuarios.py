@@ -34,7 +34,7 @@ def get_db():
     finally:
         db.close()
 
-SECRET_KEY = "7ad9dc5125b3f5db448e0fd6bd9c8d3a3dedd4ae5cd56b5470f701808147634a"
+SECRET_KEY = "palabra secreta"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 540 #9 horas
 

@@ -1,22 +1,209 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Menu</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>appapp</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .parallax {
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+        .overlay {
+            background: rgba(9, 98, 110, 0.5); /* Overlay oscuro */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+        }
+        .fixed-section {
+            position: relative;
+            z-index: 2;
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1a202c;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            z-index: 1000;
+        }
+        .custom-green {
+            background-color: rgba(9, 98, 110, 1);
+        }
+        .custom-green:hover {
+            background-color: rgba(9, 98, 110, 0.8);
+        }
+        .custom-greenbg {
+            background-color: rgba(9, 98, 110, 1);
+        }
+    </style>
 </head>
-<body>
-    <ul id="menu-common" class="responseMenu">
-        <!-- Los elementos del menú se agregarán aquí -->
-    </ul>
+<body class="bg-gray-100">
+    <!-- Barra de navegación -->
+    <nav class="bg-gray-800 p-4 w-full z-10">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a href="">
+                    <img src="static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
+                </a>
+                <span class="text-gray-400">/</span>
+                <a href="#about" class="text-white hover:text-gray-300">Sobre la App</a>
+                <span class="text-gray-400">/</span>
+                <a href="#services" class="text-white hover:text-gray-300">Servicios</a>
+                <span class="text-gray-400">/</span>
+                <a href="#testimonials" class="text-white hover:text-gray-300">Testimonios</a>
+                <span class="text-gray-400">/</span>
+                <a href="#contact" class="text-white hover:text-gray-300">Contacto</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="flex space-x-4">
+                    <li class="nav-item">
+                        <a class="nav-link text-gray-300 hover:text-white" href="/admin/page">Administracion</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-gray-300 hover:text-white" href="/news">Noticias</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-gray-300 hover:text-white" href="/loginpage">Iniciar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="Generadora de apps" class="h-screen flex flex-col items-center justify-center bg-gray-100 text-gray-800">
+        <h1 class="text-4xl font-bold mb-4">Generadora de apps</h1>
+        <p class="text-lg mb-6 text-center px-4">es una app para hacer apps, en python!</p>
+        <div class="flex flex-wrap justify-center">
+            <button class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 mx-2 mb-2" onclick="location.href='#about'">Saber más</button>
+            <button class="custom-green text-white py-2 px-4 rounded-lg shadow-md transition duration-300 mx-2 mb-2" onclick="location.href='#contact'">Contactar</button>
+        </div>
+    </section>
+
+    <section id="about" class="min-h-screen flex items-center justify-center bg-blue-500 text-white fixed-section">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <!-- Columna izquierda: Texto -->
+            <div class="md:w-1/2 text-left">
+                <h2 class="text-3xl font-bold mb-12">Sobre la Aplicación</h2>
+                <p class="mt-4">
+                    Esta aplicación web es una herramienta integral para desarrolladores y administradores de bases de datos, diseñada para automatizar y simplificar tareas comunes en la creación y gestión de APIs y migración de datos.
+
+                    Backend Robusto: Basada en FastAPI, la aplicación ofrece una API eficiente y escalable. Todo el entorno está completamente dockerizado, lo que garantiza portabilidad y facilidad de despliegue. Actualmente soporta bases de datos SQL Server y PostgreSQL, y próximamente integrará MySQL.
+                    
+                    Generación Automática de Componentes:
+                    La aplicación automatiza la creación de:
+                    
+                    Rutas para solicitudes API (request routes).
+                    Modelos y esquemas adaptados a las bases de datos.
+                    Pruebas para verificar la funcionalidad.
+                    Archivos HTML con JavaScript, proporcionando una interfaz web para enviar solicitudes y visualizar los datos devueltos.
+                    Migración de Datos:
+                    Ofrece soporte para importar datos desde archivos Excel (.xls y .xlsx) hacia bases de datos SQL. Incluye múltiples validaciones para garantizar la integridad y calidad de los datos durante la migración.
+                    
+                    Entorno Web Intuitivo:
+                    La aplicación cuenta con una interfaz web diseñada para configuraciones rápidas y sencillas, facilitando la interacción con los usuarios sin necesidad de modificar el código directamente.
+                    
+                    Con tecnologías como SQLAlchemy para la gestión de bases de datos, Jinja2 para la renderización de plantillas HTML y Bootstrap para un diseño moderno y responsivo, la aplicación combina funcionalidad y experiencia de usuario. Además, utiliza Uvicorn como servidor ASGI para asegurar un rendimiento óptimo, y pandas para la manipulación avanzada de datos.
+                    
+                    Este proyecto representa una solución innovadora para automatizar procesos de desarrollo, permitiendo a los equipos centrarse en lo que realmente importa: crear valor.                </p>
+            </div>
+            <!-- Columna derecha: Imagen -->
+            <div class="md:w-1/2 mt-8 md:mt-0 flex justify-center">
+                <img src="static/img/diagrama_app.jpg" alt="Diagrama de Flujo" class="max-w-full h-auto">
+            </div>
+        </div>
+    </section>
+
+    <section id="news" class="min-h-screen flex items-center justify-center parallax bg-cover bg-center relative fixed-section" style="background-image: url('https://source.unsplash.com/random/1600x900?news');">
+        <div class="overlay"></div>
+        <div class="content text-center text-white relative z-10 p-8">
+            <h2 class="text-4xl font-bold mb-12">Noticias</h2> <!-- Ajuste de margen inferior -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for post in blog_posts %}
+                    <div class="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg text-black">
+                        <h3 class="text-2xl font-semibold mb-2">{{ post.title }}</h3>
+                        <p class="mt-2">{{ post.content }}</p>
+                        {% if post.created_at %}
+                            <p class="mt-2 text-sm text-gray-600">Publicado el {{ post.created_at.strftime('%d/%m/%Y') }}</p>
+                        {% else %}
+                            <p class="mt-2 text-sm text-gray-600">Fecha de publicación no disponible</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="min-h-screen flex items-center justify-center bg-green-500 text-white fixed-section">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold">Testimonios</h2>
+            <p class="mt-4">Lo que nuestros clientes dicen sobre nosotros.</p>
+        </div>
+    </section>
+
+    <section id="contact" class="min-h-screen flex items-center justify-center custom-greenbg text-gray-80">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+            <h2 class="text-3xl font-bold mb-4 text-center text-gray-800">Contacto</h2>
+            <p class="text-lg mb-6 text-center text-gray-700">Ponte en contacto con nosotros para más información.</p>
+            <form action="mailto:tuemail@example.com" method="post" enctype="text/plain">
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-700">Nombre:</label>
+                    <input type="text" id="name" name="name" class="w-full px-3 py-2 border border-gray-300 rounded mt-1" required>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-gray-700">Correo electrónico:</label>
+                    <input type="email" id="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded mt-1" required>
+                </div>
+                <div class="mb-4">
+                    <label for="message" class="block text-gray-700">Mensaje:</label>
+                    <textarea id="message" name="message" class="w-full px-3 py-2 border border-gray-300 rounded mt-1" rows="4" required></textarea>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300">Enviar</button>
+                </div>
+            </form>
+            <div class="text-center mt-4">
+                <p class="text-lg text-gray-700">O contáctanos por WhatsApp:</p>
+                <a href="https://wa.me/1234567890" target="_blank" class="bg-green-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-600 transition duration-300 inline-block mt-2">WhatsApp</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center my-5">
+        <p>&copy; 2023 appapp. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Botón flotante para ir arriba -->
+    <div class="back-to-top" id="back-to-top" onclick="scrollToTop()">↑</div>
+
     <script>
-    $(document).ready(function() {
-        $.get('http://127.0.0.1:8000/modulos', function(data) {
-            data.forEach(function(item) {
-                $('#menu-common').append('<li><a href="http://127.0.0.1:8000/' + item.descripcion.toLowerCase() + '">' + item.descripcion + '</a></li>');
-            });
-        });
-    });
+        // Mostrar el botón de "ir arriba" cuando se hace scroll hacia abajo
+        window.onscroll = function() {
+            const backToTopButton = document.getElementById('back-to-top');
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                backToTopButton.style.display = 'block';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        };
+
+        // Función para hacer scroll hacia arriba
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     </script>
 </body>
 </html>

@@ -1,0 +1,30 @@
+<!-- templates/edit_blog.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Blog</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Incluir la barra de navegación -->
+    {% include 'head.html' %}
+
+    <div class="container">
+        <h1 class="mt-5">Editar Blog</h1>
+        <form action="/edit_blog/{{ post.id }}" method="post">
+            <div class="form-group">
+                <label for="title">Título</label>
+                <input type="text" class="form-control" id="title" name="title" value="{{ post.title }}" required>
+            </div>
+            <div class="form-group">
+                <label for="content">Contenido</label>
+                <textarea class="form-control" id="content" name="content" rows="5" maxlength="250" required>{{ post.content }}</textarea>
+                <small class="form-text text-muted">Máximo 250 caracteres.</small>
+            </div>
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+        </form>
+    </div>
+</body>
+</html>
