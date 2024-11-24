@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>appapp</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css">
+
     <style>
         .parallax {
             background-attachment: fixed;
@@ -47,8 +49,26 @@
             background-color: rgba(9, 98, 110, 0.8);
         }
         .custom-greenbg {
-            background-color: rgba(9, 98, 110, 1);
+            background-color: rgb(22, 81, 88);
         }
+
+        .bg-pastel-yellow {
+            background-color: #f7d7c5; /* Light pastel yellow */
+        }
+        .bg-pastel-darkblue {
+            background-color: #17183b; /* Light pastel yellow */
+        }
+        .bg-pastel-blue {
+            background-color: hsl(226, 67%, 55%); /* Light pastel blue */
+        }
+        .bg-pastel-green {
+            background-color: #98FB98; /* Light pastel green */
+        }
+    
+        .bg-pastel-pink {
+            background-color: #f5e2f2; /* Light pastel pink */
+        }
+        
     </style>
 </head>
 <body class="bg-gray-100">
@@ -62,7 +82,7 @@
                 <span class="text-gray-400">/</span>
                 <a href="#about" class="text-white hover:text-gray-300">Sobre la App</a>
                 <span class="text-gray-400">/</span>
-                <a href="#services" class="text-white hover:text-gray-300">Servicios</a>
+                <a href="#noticias" class="text-white hover:text-gray-300">Noticias</a>
                 <span class="text-gray-400">/</span>
                 <a href="#testimonials" class="text-white hover:text-gray-300">Testimonios</a>
                 <span class="text-gray-400">/</span>
@@ -84,16 +104,20 @@
         </div>
     </nav>
 
-    <section id="Generadora de apps" class="h-screen flex flex-col items-center justify-center bg-gray-100 text-gray-800">
-        <h1 class="text-4xl font-bold mb-4">Generadora de apps</h1>
-        <p class="text-lg mb-6 text-center px-4">es una app para hacer apps, en python!</p>
-        <div class="flex flex-wrap justify-center">
-            <button class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 mx-2 mb-2" onclick="location.href='#about'">Saber más</button>
-            <button class="custom-green text-white py-2 px-4 rounded-lg shadow-md transition duration-300 mx-2 mb-2" onclick="location.href='#contact'">Contactar</button>
+    <section id="Generadora de apps" class="h-screen flex flex-col items-center justify-center bg-pastel-pink text-gray-800 relative">
+        <img src="static/img/logo.jpg" alt="Generadora de apps" class="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none">
+        <h1 class="text-4xl font-bold mb-4 z-10">Generadora de apps</h1>
+        <p class="text-lg mb-6 text-center px-4 z-10">es una app para hacer apps, en python!</p>
+        <div class="flex flex-wrap justify-center z-10">
+            <button class="bg-blue-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 mx-2 mb-2" onclick="location.href='#about'">Saber más</button>
+            <button class="bg-green-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-600 transition duration-300 mx-2 mb-2" onclick="location.href='#contact'">Contactar</button>
         </div>
     </section>
+    
+    
 
-    <section id="about" class="min-h-screen flex items-center justify-center bg-blue-500 text-white fixed-section">
+
+    <section id="about" class="min-h-screen flex items-center justify-center bg-gray-800 text-white fixed-section">
         <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
             <!-- Columna izquierda: Texto -->
             <div class="md:w-1/2 text-left">
@@ -127,34 +151,44 @@
         </div>
     </section>
 
-    <section id="news" class="min-h-screen flex items-center justify-center parallax bg-cover bg-center relative fixed-section" style="background-image: url('https://source.unsplash.com/random/1600x900?news');">
+    <section id="noticias" class="min-h-screen flex items-center justify-center parallax bg-cover bg-center relative fixed-section" style="background-image: url('https://source.unsplash.com/random/1600x900?news');">
         <div class="overlay"></div>
         <div class="content text-center text-white relative z-10 p-8">
-            <h2 class="text-4xl font-bold mb-12">Noticias</h2> <!-- Ajuste de margen inferior -->
+            <h2 class="text-4xl font-bold mb-4 relative inline-block">
+                Noticias
+                <span class="absolute bottom-0 left-0 h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500"></span>
+            </h2>
+            <p class="text-lg text-gray-300 mb-12">Mantente informado con nuestras últimas actualizaciones.</p>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for post in blog_posts %}
-                    <div class="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg text-black">
+                    <div class="news-card bg-white bg-opacity-90 p-6 rounded-lg shadow-lg text-black transition transform hover:scale-105">
+                        <img src="{{ post.image_url }}" alt="{{ post.title }}" class="rounded-t-lg w-full h-40 object-cover mb-4">
                         <h3 class="text-2xl font-semibold mb-2">{{ post.title }}</h3>
-                        <p class="mt-2">{{ post.content }}</p>
-                        {% if post.created_at %}
-                            <p class="mt-2 text-sm text-gray-600">Publicado el {{ post.created_at.strftime('%d/%m/%Y') }}</p>
-                        {% else %}
-                            <p class="mt-2 text-sm text-gray-600">Fecha de publicación no disponible</p>
-                        {% endif %}
+                        <p class="mt-2 text-justify">{{ post.content | truncate(150) }}...</p>
+                        <p class="mt-2 text-sm text-gray-600">
+                            <i class="fas fa-calendar-alt text-blue-500"></i> Publicado el {{ post.created_at.strftime('%d/%m/%Y') }}
+                        </p>
+                        <a href="/news" class="block mt-4 bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700">Leer más</a>
                     </div>
                 {% endfor %}
             </div>
+            <div class="mt-12">
+                <button class="bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 px-6 rounded-lg shadow-lg hover:opacity-90 transition">
+                    Ver más noticias
+                </button>
+            </div>
         </div>
     </section>
+    
 
-    <section id="testimonials" class="min-h-screen flex items-center justify-center bg-green-500 text-white fixed-section">
+    <section id="testimonials" class="min-h-screen flex items-center justify-center bg-pastel-darkblue text-white fixed-section">
         <div class="text-center">
             <h2 class="text-3xl font-bold">Testimonios</h2>
             <p class="mt-4">Lo que nuestros clientes dicen sobre nosotros.</p>
         </div>
     </section>
 
-    <section id="contact" class="min-h-screen flex items-center justify-center custom-greenbg text-gray-80">
+    <section id="contact" class="min-h-screen flex items-center justify-center bg-pastel-yellow text-gray-80">
         <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
             <h2 class="text-3xl font-bold mb-4 text-center text-gray-800">Contacto</h2>
             <p class="text-lg mb-6 text-center text-gray-700">Ponte en contacto con nosotros para más información.</p>
@@ -190,20 +224,14 @@
     <div class="back-to-top" id="back-to-top" onclick="scrollToTop()">↑</div>
 
     <script>
-        // Mostrar el botón de "ir arriba" cuando se hace scroll hacia abajo
-        window.onscroll = function() {
-            const backToTopButton = document.getElementById('back-to-top');
-            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-                backToTopButton.style.display = 'block';
-            } else {
-                backToTopButton.style.display = 'none';
-            }
-        };
-
-        // Función para hacer scroll hacia arriba
-        function scrollToTop() {
+        const backToTopButton = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', () => {
+            backToTopButton.style.display = window.scrollY > 300 ? 'block' : 'none';
+        });
+        backToTopButton.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        });
     </script>
+    
 </body>
 </html>
