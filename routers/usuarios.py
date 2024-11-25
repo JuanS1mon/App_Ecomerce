@@ -1,6 +1,7 @@
 # backend/routers/usuarios.py
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -185,8 +186,9 @@ async def login_page(request: Request):
 async def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
+
 @router.post("/logout")
-async def logout(response: JSONResponse):
-    response = JSONResponse(content={"message": "Logout exitoso"})
+async def logout(response: Response):
+    response = RedirectResponse(url="/index", status_code=303)
     response.delete_cookie("access_token")
     return response

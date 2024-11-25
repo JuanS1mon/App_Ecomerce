@@ -22,11 +22,12 @@ from Services.security.security import crear_access_token, authenticate_user, cu
 from db.database import Base, engine, get_db, create_database, create_tables
 from routers import usuarios as aut_usuario
 from routers import Blog
-from routers.Maestros import Route_usuario, Route_Usuarios_roles, Route_test1, Route_test2, Route_pruebat1
+from routers.Maestros import  Route_usuario, Route_Usuarios_roles, Route_test1, Route_test2, Route_pruebat1
 from routers.Configuraciones import Generar, configDB, Migraciones
 from routers.Configuraciones.Admin import create_admin_router
 from db.schemas.Maestro.Usuarios import UserDB
-
+from db.models.Blog import BlogPost as BlogPostModel
+from sqlalchemy.orm import Session
 # Configuración de entorno
 load_dotenv()
 FRONTEND_URL = os.getenv("FRONTEND_URL")
@@ -120,14 +121,13 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=jsonable_encoder({"detail": "Se produjo un error de validación.", "errors": exc.errors()}))
 
+
 # Ruta de inicio
 @app.get("/index", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
 @app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def read_root(request: Request, db: Session = Depends(get_db)):
+    blog_posts = db.query(BlogPostModel).order_by(BlogPostModel.created_at.desc()).all()
+    return templates.TemplateResponse("index.html", {"request": request, "blog_posts": blog_posts})
 
 # Ejemplo de datos del dashboard
 class Item(BaseModel):

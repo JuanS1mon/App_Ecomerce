@@ -18,9 +18,10 @@ async def read_items():
         html_content = f.read()
     return HTMLResponse(content=html_content, status_code=200)
 
+
 @router.post("/", response_model=list[usuarioRead])
 async def routes_Post_usuario (usuario: usuario, db: Session = Depends(get_db)):
-    # Validación de campos requeridos
+    # Validaciï¿½n de campos requeridos
     if usuario.id is None or usuario.username is None:
         raise HTTPException(status_code=status.HTTP_417_EXPECTATION_FAILED, detail="Todos los campos requeridos deben tener un valor")
     else:
@@ -61,7 +62,7 @@ async def routes_delete_usuario_numero(id: int, db: Session = Depends(get_db)):
         
 @router.put("/", response_model=list[usuarioRead]) 
 async def routes_update_usuario(usuario: usuario, db: Session = Depends(get_db)):
-    # Validación de campos requeridos
+    # Validaciï¿½n de campos requeridos
     if usuario.id is None or usuario.username is None:
         raise ValueError("Todos los campos requeridos deben tener un valor")
     else:

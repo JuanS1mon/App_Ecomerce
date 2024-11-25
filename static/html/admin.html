@@ -16,7 +16,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
     <!-- Barra de navegación -->
-    <nav class="bg-gray-800 p-4 z-30 relative">
+      <nav class="bg-gray-800 p-4 relative z-30">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-4">
                 <a href="">
@@ -26,16 +26,28 @@
                 <span class="text-gray-400">/</span>
                 <span class="text-white text-lg font-semibold">Admin</span>
             </div>
-            <div class="flex items-center space-x-4">
-                <a href="/docs" class="text-white hover:text-gray-300">Documentacion</a>
-                <a href="/generar" class="text-white hover:text-gray-300">Generar appi</a>
+            <div class="flex items-center space-x-4 relative">
+                <a href="/docs" class="text-white hover:text-gray-300">Documentación</a>
+                <a href="/generar" class="text-white hover:text-gray-300">Generar API</a>
                 <a href="/migraciones/page" class="text-white hover:text-gray-300">Migraciones</a>
-                <a href="/user/page" class="text-white hover:text-gray-300">
-                    <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center">
-                        {{ user.nombre[0]|upper }}
+                <div class="relative">
+                    <button id="perfil" class="flex items-center focus:outline-none">
+                        <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white">
+                            {{ user.nombre[0]|upper }}
+                        </div>
+                        <svg class="ml-2 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
+                        <a href="/admin/perfil" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Perfil de usuario</a>
+                        <form action="/logout" method="post">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">Logout</button>
+                        </form>
                     </div>
-                </a>
+                </div>
             </div>
+        </div>
     </nav>
 
     <!-- Contenido principal -->
@@ -73,6 +85,8 @@
                 <a href="/generar" class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300">Generar App</a>
                 <a href="/migraciones/page" class="bg-green-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-600 transition duration-300">Migraciones</a>
                 <a href="/admin/usuarios" class="bg-yellow-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-yellow-600 transition duration-300">Gestionar Usuarios</a>
+                <a href="/create_blog" class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300">Crear Nueva Noticia</a>
+
             </div>
         </div>
 
@@ -96,6 +110,23 @@
         </div>
     </div>
 <script>
+
+            const perfilBtn = document.getElementById('perfil');
+            const perfilMenu = document.getElementById('menu-perfil');
+        
+            perfilBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                perfilMenu.classList.toggle('hidden');
+            });
+        
+            document.addEventListener('click', function(event) {
+                const isClickInside = perfilBtn.contains(event.target) || perfilMenu.contains(event.target);
+                if (!isClickInside) {
+                    perfilMenu.classList.add('hidden');
+                }
+            });
+
+
     document.addEventListener('DOMContentLoaded', function() {
         // Datos del gráfico
         const chartData = JSON.parse('{{ chart_data | tojson | safe }}');

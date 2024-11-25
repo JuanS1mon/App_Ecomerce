@@ -1,16 +1,16 @@
 import os
 import re
-from fastapi import FastAPI, Request, APIRouter, status, Depends, HTTPException
+from fastapi import FastAPI, Form, Request, APIRouter, status, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from Services.security.security import get_current_user  # Importar la función de seguridad
+from Services.security.security import encriptar_clave, get_current_user  # Importar la función de seguridad
 from db.database import get_db
 from db.models.usuarios import usuarios 
 from db.models.activityLog import ActivityLog
 from datetime import date, timedelta
 from db.schemas.Maestro.Usuarios import UserDB  # Asegúrate de importar UserDB
 
-templates = Jinja2Templates(directory="static")
+templates = Jinja2Templates(directory="static/html")  # Ajusta el directorio según sea necesario
 
 def create_admin_router(app: FastAPI):
     router = APIRouter(
@@ -18,10 +18,10 @@ def create_admin_router(app: FastAPI):
         tags=["Admin"],
         responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
     )
+
     @router.get("/page")
     async def admin_page(request: Request, db: Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)):
         print("current_user: ", current_user)
-        routes = extract_route_names()
         user_count = db.query(usuarios).count()
         
         # Filtrar actividades de los últimos 7 días
@@ -34,9 +34,8 @@ def create_admin_router(app: FastAPI):
         # Contar la cantidad de actividades
         activity_count = db.query(ActivityLog).count()
     
-        return templates.TemplateResponse("html/admin.html", {
+        return templates.TemplateResponse("admin.html", {
             "request": request,
-            "routes": routes,
             "user": current_user,
             "user_count": user_count,
             "activities": activities[:10],  # Mostrar las últimas 10 en la lista si es necesario
@@ -44,6 +43,42 @@ def create_admin_router(app: FastAPI):
             "activity_count": activity_count
         })
 
+    
+    @router.get("/perfil")
+    async def user_perfil(request: Request, user: UserDB = Depends(get_current_user)):
+        return templates.TemplateResponse("admin_user.html", {
+            "request": request,
+            "user": user
+        })
+
+    @router.post("/perfil")
+    async def update_perfil(
+        request: Request,
+        nombre: str = Form(...),
+        telefono: str = Form(...),
+        email: str = Form(...),
+        direccion: str = Form(...),
+        fecha_nacimiento: str = Form(...),
+        password: str = Form(None),
+        db: Session = Depends(get_db),
+        user: UserDB = Depends(get_current_user)
+    ):
+        # Actualizar los datos del usuario en la base de datos
+        user.nombre = nombre
+        user.telefono = telefono
+        user.email = email
+        user.direccion = direccion
+        user.fecha_nacimiento = fecha_nacimiento
+        if password:
+            user.hashed_password = encriptar_clave(password)
+        db.commit()
+        db.refresh(user)
+        
+        return templates.TemplateResponse("admin_user.html", {
+            "request": request,
+            "user": user,
+            "message": "Perfil actualizado exitosamente"
+        })
 
     @router.get("/")
     async def read_admin(user: dict = Depends(get_current_user)):
@@ -56,38 +91,6 @@ def create_admin_router(app: FastAPI):
     app.include_router(router)
     
     return router
-
-def extract_route_names():
-    # Obtener la ruta absoluta del directorio que contiene este script
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-
-    # Construir la ruta al archivo main.py
-    main_path = os.path.join(dir_path, '../../main.py')
-
-    try:
-        with open(main_path, 'r') as file:
-            data = file.read()
-    except FileNotFoundError:
-        return []
-
-    # Buscar el inicio y el fin de la sección de rutas
-    start = data.find('#Inicio Router de la API')
-    end = data.find('#Fin Router de la API')
-
-    # Si no se encontraron las marcas de inicio o fin, devolver una lista vacía
-    if start == -1 or end == -1:
-        return []
-
-    # Extraer la sección de rutas
-    routes_section = data[start:end]
-
-    # Buscar todas las líneas que incluyen 'app.include_router'
-    route_lines = re.findall(r'app\.include_router\((.*?)\)', routes_section)
-
-    # Extraer los nombres de las rutas
-    route_names = [line.split('.')[0].replace('Route_', '') for line in route_lines]
-
-    return route_names
 
 from collections import defaultdict
 from datetime import timezone
