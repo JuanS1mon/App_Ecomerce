@@ -22,7 +22,7 @@ from Services.security.security import crear_access_token, authenticate_user, cu
 from db.database import Base, engine, get_db, create_database, create_tables
 from routers import usuarios as aut_usuario
 from routers import Blog
-from routers.Maestros import  Route_usuario, Route_Usuarios_roles, Route_test1, Route_test2, Route_pruebat1
+from routers.Maestros import  Route_usuario, Route_Usuarios_roles, Route_test1, Route_test2, Route_pruebat1, Route_products
 from routers.Configuraciones import Generar, configDB, Migraciones
 from routers.Configuraciones.Admin import create_admin_router
 from db.schemas.Maestro.Usuarios import UserDB
@@ -107,6 +107,7 @@ app.include_router(Route_test2.router)
 app.include_router(Route_test1.router)
 app.include_router(Route_Usuarios_roles.router)
 app.include_router(Route_usuario.router)
+app.include_router(Route_products.router)
 
 # Manejadores de errores personalizados
 @app.exception_handler(StarletteHTTPException)

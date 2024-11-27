@@ -1,0 +1,334 @@
+<html lang="es">
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Gestión de Products
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <script type="text/javascript">
+    // Aplicar el modo oscuro al cargar la página
+    window.onload = function() {
+        document.documentElement.classList.add('dark');
+        fetchData();
+    }
+
+    async function fetchData() {
+        const response = await fetch('/products/');
+        const data = await response.json();
+        const tableBody = document.getElementById('data-table-body');
+        tableBody.innerHTML = '';
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="border px-4 py-2">${item.id}</td>
+                <td class="border px-4 py-2">${item.name}</td>
+                <td class="border px-4 py-2">${item.sku}</td>
+                <td class="border px-4 py-2">${item.barcode}</td>
+                <td class="border px-4 py-2">${item.quantity}</td>
+                <td class="border px-4 py-2">${item.category}</td>
+                <td class="border px-4 py-2">${item.location}</td>
+                <td class="border px-4 py-2">${item.MinimunStock}</td>
+                <td class="border px-4 py-2">${item.MaximumStock}</td>
+                <td class="border px-4 py-2">${item.price}</td>
+                <td class="border px-4 py-2">${item.cost}</td>
+                <td class="border px-4 py-2">${item.supplier}</td>
+                <td class="border px-4 py-2">${item.brand}</td>
+                <td class="border px-4 py-2">${item.LastUpdate}</td>
+                <td class="border px-4 py-2">
+                    <button class="bg-blue-500 text-white px-2 py-1" onclick="editItem(${item.id})">Editar</button>
+                    <button class="bg-red-500 text-white px-2 py-1" onclick="deleteItem(${item.id})">Eliminar</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    async function addItem(event) {
+        event.preventDefault();
+        const formData = {
+            id: parseInt(document.getElementById('id').value),
+            name: document.getElementById('name').value,
+            sku: document.getElementById('sku').value,
+            barcode: parseInt(document.getElementById('barcode').value),
+            quantity: parseInt(document.getElementById('quantity').value),
+            category: document.getElementById('category').value,
+            location: document.getElementById('location').value,
+            MinimunStock: parseInt(document.getElementById('MinimunStock').value),
+            MaximumStock: parseInt(document.getElementById('MaximumStock').value),
+            price: parseFloat(document.getElementById('price').value),
+            cost: parseFloat(document.getElementById('cost').value),
+            supplier: document.getElementById('supplier').value,
+            brand: document.getElementById('brand').value,
+            LastUpdate: document.getElementById('LastUpdate').value
+        };
+
+        try {
+            const response = await fetch('/products/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Error en la solicitud POST');
+            }
+
+            fetchData();
+            document.getElementById('data-form').reset();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // También ajusta las funciones editItem, updateItem y deleteItem para que usen los IDs y campos correctos
+
+</script>
+ </head>
+ <body class="p-4 bg-gray-900 text-white">
+  <div class="flex justify-between items-center mb-4">
+   <h1 class="text-2xl">
+    Gestión de Products
+   </h1>
+  </div>
+  <form class="mb-4" id="data-form" onsubmit="addItem(event)">
+   <div class="flex flex-wrap -mx-2">
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      id:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="id" required="True" type="number"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      name:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="name" required="True" type="text"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      sku:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="sku" required="True" type="text"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      barcode:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="barcode" required="True" type="number"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      quantity:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="quantity" required="True" type="text"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      category:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="category" required="True" type="text"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      location:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="location" required="True" type="text"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      MinimunStock:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="MinimunStock" required="True" type="number"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      MaximumStock:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="MaximumStock" required="True" type="number"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      price:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="price" required="True" type="number"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      cost:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="cost" required="True" type="number"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      supplier:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="supplier" required="True" type="text"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      brand:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="brand" required="True" type="text"/>
+    </div>
+    <div class="w-full md:w-1/4 px-2 mb-4">
+     <label class="block">
+      LastUpdate:
+     </label>
+     <input class="w-full border px-2 py-1 bg-gray-800 text-white" id="LastUpdate" required="True" type="text"/>
+    </div>
+   </div>
+   <button class="bg-green-500 text-white px-4 py-2" type="submit" value="Agregar">
+   </button>
+  </form>
+  <table class="table-auto w-full border-collapse">
+   <thead>
+    <tr>
+     <th class="border px-4 py-2">
+      id
+     </th>
+     <th class="border px-4 py-2">
+      name
+     </th>
+     <th class="border px-4 py-2">
+      sku
+     </th>
+     <th class="border px-4 py-2">
+      barcode
+     </th>
+     <th class="border px-4 py-2">
+      quantity
+     </th>
+     <th class="border px-4 py-2">
+      category
+     </th>
+     <th class="border px-4 py-2">
+      location
+     </th>
+     <th class="border px-4 py-2">
+      MinimunStock
+     </th>
+     <th class="border px-4 py-2">
+      MaximumStock
+     </th>
+     <th class="border px-4 py-2">
+      price
+     </th>
+     <th class="border px-4 py-2">
+      cost
+     </th>
+     <th class="border px-4 py-2">
+      supplier
+     </th>
+     <th class="border px-4 py-2">
+      brand
+     </th>
+     <th class="border px-4 py-2">
+      LastUpdate
+     </th>
+     <th class="border px-4 py-2">
+      Acciones
+     </th>
+    </tr>
+   </thead>
+   <tbody id="data-table-body">
+    &lt;!-- Los datos se cargarán aquí --&gt;
+   </tbody>
+  </table>
+  <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden" id="edit-modal">
+   <div class="bg-gray-800 p-4 rounded w-96">
+    <h2 class="text-xl mb-4">
+     Editar Products
+    </h2>
+    <form id="edit-form" onsubmit="updateItem(event)">
+     <input id="edit-campot1" type="hidden"/>
+     <div class="mb-2">
+      <label>
+       name:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-name" type="text"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       sku:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-sku" type="text"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       barcode:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-barcode" type="number"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       quantity:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-quantity" type="text"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       category:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-category" type="text"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       location:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-location" type="text"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       MinimunStock:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-MinimunStock" type="number"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       MaximumStock:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-MaximumStock" type="number"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       price:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-price" type="number"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       cost:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-cost" type="number"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       supplier:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-supplier" type="text"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       brand:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-brand" type="text"/>
+     </div>
+     <div class="mb-2">
+      <label>
+       LastUpdate:
+      </label>
+      <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-LastUpdate" type="text"/>
+     </div>
+     <div class="flex justify-end">
+      <button class="mr-2 px-4 py-2" onclick="closeEditModal()" type="button" value="Cancelar">
+      </button>
+      <button class="bg-blue-500 text-white px-4 py-2" type="submit" value="Guardar">
+      </button>
+     </div>
+    </form>
+   </div>
+  </div>
+ </body>
+</html>
