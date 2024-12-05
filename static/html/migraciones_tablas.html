@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapeo de Campos para Migración</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos personalizados */
+        #tables-container {
+            position: relative;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        .fields {
+            position: relative;
+        }
+        .field-item {
+            cursor: grab;
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            background-color: #f3f4f6;
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .field-item.table2 {
+            justify-content: flex-start;
+        }
+        .connection-line {
+            position: absolute;
+            pointer-events: none;
+            stroke-width: 2px;
+        }
+        body {
+            background-color: #f0f4f8;
+        }
+    
+        /* Estilos para evitar que las filas se expandan verticalmente */
+        table {
+            table-layout: fixed;
+        }
+    
+        td, th {
+            vertical-align: top;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-gray-800 p-4 z-30 relative">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a href="">
+                    <img src="../static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
+                </a>
+                <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
+                <span class="text-gray-400">/</span>
+                <a href="/admin/page" class="text-white text-lg font-semibold hover:text-gray-300">Admin</a>
+                <span class="text-gray-400">/</span>
+                <a href="/migraciones/admin_migraciones" class="text-white text-lg font-semibold hover:text-gray-300">Migraciones</a>
+                <span class="text-gray-400">/</span>
+                <span class="text-gray-300">Resultados de migraciones</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="/user/page" class="text-white hover:text-gray-300">
+                    <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center">
+                        {{ user.nombre[0]|upper }}
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex justify-center">
+        <h1 class="text-3xl font-bold mb-8 text-gray-700">Mapeo de Campos para Migración</h1>
+    </div>
+
+    <!-- Descripción de la app -->
+    <div class="flex justify-center p-4">
+        <div class="bg-blue-50 p-6 rounded-lg shadow-md max-w-lg">
+            <h2 class="text-xl font-bold text-blue-600 mb-4">Optimiza tus procesos de mapeo de campos</h2>
+            <div id="description" class="hidden">
+                <p class="text-gray-700">
+                    Esta herramienta te permite mapear campos entre diferentes tablas de datos para facilitar la migración de información.
+                    Puedes arrastrar y soltar campos de una tabla a otra para establecer relaciones y conexiones entre los datos.
+                </p>
+                <p class="text-gray-700 mt-2">
+                    Diseñada para ser intuitiva y eficiente, esta aplicación asegura que los datos se migren correctamente, minimizando errores
+                    y garantizando la integridad de la información.
+                </p>
+                <p class="text-gray-700 mt-2">
+                    Utiliza esta herramienta para visualizar y gestionar cómo los datos de una tabla se trasladan a otra, optimizando tus procesos
+                    de migración y mejorando la precisión de tus datos.
+                </p>
+            </div>
+            <button id="toggleButton" class="mt-4 text-blue-600 hover:underline" onclick="toggleDescription()">Leer más</button>
+        </div>
+    </div>
+
+    <!-- Contenedor de las tablas de campos -->
+    <div class="flex flex-col md:flex-row justify-center mb-8 relative w-full max-w-4xl mx-auto" id="tables-container">
+        <div class="mx-4 w-full md:w-1/2" id="table1-container">
+            <h2 class="text-2xl font-semibold text-center mb-4 text-gray-700">
+                <select id="table1-select" class="bg-gray-200 p-2 rounded w-full" onchange="fetchTableFields('table1')">
+                    <option value="">Seleccione una tabla</option>
+                    {% for table in tables1 %}
+                        <option value="{{ table }}">{{ table }}</option>
+                    {% endfor %}
+                </select>
+            </h2>
+            <ul class="fields" id="table1-fields">
+                <!-- Campos de la tabla 1 se cargarán aquí -->
+            </ul>
+        </div>
+        <div class="mx-4 w-full md:w-1/2" id="table2-container">
+            <h2 class="text-2xl font-semibold text-center mb-4 text-gray-700">
+                <select id="table2-select" class="bg-gray-200 p-2 rounded w-full" onchange="fetchTableFields('table2')">
+                    <option value="">Seleccione una tabla</option>
+                    {% for table in tables2 %}
+                        <option value="{{ table }}">{{ table }}</option>
+                    {% endfor %}
+                </select>
+            </h2>
+            <ul class="fields" id="table2-fields">
+                <!-- Campos de la tabla 2 se cargarán aquí -->
+            </ul>
+        </div>
+        <!-- SVG para líneas de conexión -->
+        <svg id="connection-svg" class="absolute top-0 left-0 w-full h-full pointer-events-none"></svg>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="flex justify-center space-x-4 mb-8">
+        <button id="clear-btn" class="bg-red-500 text-white px-4 py-2 rounded shadow">Limpiar Mapeos</button>
+        <button id="migrate-btn" class="bg-blue-500 text-white px-4 py-2 rounded shadow">Migrar</button>
+    </div>
+
+   <!-- Contenedor de las tablas de datos -->
+<div class="flex flex-wrap justify-center mb-8 w-full max-w-6xl mx-auto">
+    <div class="w-full md:w-1/2 p-2">
+        <!-- Tabla de datos de Tabla 1 -->
+        <table id="tabla1_datos" class="border-collapse border border-gray-300 bg-white shadow rounded-lg w-full">
+            <caption class="text-xl font-semibold mb-2 text-gray-700">Datos de tabla 1</caption>
+            <thead id="table1-head">
+                <tr>
+                    <!-- Encabezados de la tabla 1 se cargarán aquí -->
+                </tr>
+            </thead>
+            <tbody id="table1-body">
+                <!-- Datos de la tabla 1 se cargarán aquí -->
+            </tbody>
+        </table>
+    </div>
+    <div class="w-full md:w-1/2 p-2">
+        <!-- Tabla de datos de Tabla 2 -->
+        <table id="tabla2_datos" class="border-collapse border border-gray-300 bg-white shadow rounded-lg w-full">
+            <caption class="text-xl font-semibold mb-2 text-gray-700">Datos de tabla 2</caption>
+            <thead id="table2-head">
+                <tr>
+                    <!-- Encabezados de la tabla 2 se cargarán aquí -->
+                </tr>
+            </thead>
+            <tbody id="table2-body">
+                <!-- Datos de la tabla 2 se cargarán aquí -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+    <script>
+        const table1Fields = document.getElementById('table1-fields');
+        const table2Fields = document.getElementById('table2-fields');
+        const table1Head = document.getElementById('table1-head');
+        const table1Body = document.getElementById('table1-body');
+        const table2Head = document.getElementById('table2-head');
+        const table2Body = document.getElementById('table2-body');
+        const connectionSvg = document.getElementById('connection-svg');
+        const tablesContainer = document.getElementById('tables-container');
+        let draggedField = null;
+        let mappings = [];
+        let fieldColors = {};
+
+        // Colores para las líneas de conexión
+        const colors = [
+            '#FF0000',  // Rojo
+            '#00FF00',  // Verde
+            '#0000FF',  // Azul
+            '#FFA500',  // Naranja
+            '#800080',  // Púrpura
+            '#00FFFF',  // Cian
+            '#FFC0CB',  // Rosa
+            '#FFD700',  // Amarillo
+            '#A52A2A',  // Marrón
+            '#008000',  // Verde oscuro
+            '#FFC0CB',  // Rosa claro
+            '#800000',  // Rojo oscuro
+            '#FFFF00',  // Amarillo brillante
+            '#00BFFF',  // Azul profundo
+            '#FF6347',  // Tomate
+            '#3CB371',  // Verde medio
+            '#D2691E',  // Chocolate
+            '#8B0000',  // Rojo oscuro
+            '#32CD32',  // Verde lima
+            '#20B2AA',  // Verde aguamarina
+            '#6A5ACD',  // Azul pizarra
+            '#FF1493',  // Rosa profundo
+            '#FF4500',  // Naranja rojo
+            '#9932CC',  // Púrpura oscuro
+            '#8B4513'   // Sienna
+        ];
+                function getElementSidePosition(element, side) {
+            const rect = element.getBoundingClientRect();
+            const svgRect = connectionSvg.getBoundingClientRect();
+            let xPos;
+            if (side === 'left') {
+                xPos = rect.left - svgRect.left;
+            } else if (side === 'right') {
+                xPos = rect.right - svgRect.left;
+            } else {
+                xPos = rect.left + rect.width / 2 - svgRect.left;
+            }
+            return {
+                x: xPos,
+                y: rect.top + rect.height / 2 - svgRect.top
+            };
+        }
+        
+        function createConnectionLine(fromElement, toElement, fromSide, toSide, fieldName) {
+            const color = fieldColors[fieldName] || '#000';
+            const fromPosition = getElementSidePosition(fromElement, fromSide);
+            const toPosition = getElementSidePosition(toElement, toSide);
+        
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromPosition.x);
+            line.setAttribute('y1', fromPosition.y);
+            line.setAttribute('x2', toPosition.x);
+            line.setAttribute('y2', toPosition.y);
+            line.setAttribute('stroke', color);
+            line.setAttribute('stroke-width', '2');
+            connectionSvg.appendChild(line);
+        }
+
+        function drawConnectionLine(fromField, toField) {
+            // Obtiene las posiciones de los campos de origen y destino
+            const fromPosition = getElementSidePosition(fromField, 'right');
+            const toPosition = getElementSidePosition(toField, 'left');
+            
+            // Crea una línea SVG entre las posiciones obtenidas
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromPosition.x);
+            line.setAttribute('y1', fromPosition.y);
+            line.setAttribute('x2', toPosition.x);
+            line.setAttribute('y2', toPosition.y);
+            line.setAttribute('stroke', '#000'); // Color de la línea
+            line.setAttribute('stroke-width', '2'); // Ancho de la línea
+            connectionSvg.appendChild(line);
+        }
+
+
+        async function fetchTableFields(tableId) {
+            const tableSelect = document.getElementById(`${tableId}-select`);
+            const tableName = tableSelect.value;
+            const fieldsContainer = document.getElementById(`${tableId}-fields`);
+            const tableHead = document.getElementById(`${tableId}-head`);
+            const tableBody = document.getElementById(`${tableId}-body`);
+
+            if (!tableName) {
+                // Si no se selecciona ninguna tabla, limpiar los campos y datos anteriores
+                fieldsContainer.innerHTML = '';
+                tableHead.innerHTML = '';
+                tableBody.innerHTML = '';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/migraciones/get_table_fields/${tableName}`);
+                const data = await response.json();
+
+                // Limpiar campos y datos anteriores
+                fieldsContainer.innerHTML = '';
+                tableHead.innerHTML = '';
+                tableBody.innerHTML = '';
+
+                // Cargar campos
+                data.fields.forEach(field => {
+                    const fieldItem = document.createElement('li');
+                    fieldItem.className = `field-item p-2 m-2 ${tableId === 'table2' ? 'table2' : ''}`;
+                    fieldItem.setAttribute('draggable', 'true');
+                    fieldItem.setAttribute('data-field', field.name);
+                    fieldItem.textContent = `${field.name} (${field.type})`;
+
+                    fieldsContainer.appendChild(fieldItem);
+
+                    // Agregar eventos de arrastrar y soltar
+                    fieldItem.addEventListener('dragstart', (e) => {
+                        draggedField = {
+                            element: e.target,
+                            field: e.target.getAttribute('data-field'),
+                            table: tableId === 'table2' ? 2 : 1
+                        };
+                    });
+
+                    fieldItem.addEventListener('click', (e) => {
+                        const fieldName = e.target.getAttribute('data-field');
+                        const color = colors[Math.floor(Math.random() * colors.length)];
+                        e.target.style.backgroundColor = color;
+                        fieldColors[fieldName] = color;
+                    });
+
+                    fieldItem.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                    });
+
+                    fieldItem.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        if (draggedField && draggedField.table !== (tableId === 'table2' ? 2 : 1)) {
+                            const fromElement = draggedField.element;
+                            const toElement = e.target;
+                    
+                            let fromSide, toSide;
+                            if (draggedField.table === 1 && tableId === 'table2') {
+                                // De table1-fields a table2-fields:
+                                fromSide = 'right'; // Lado derecho de table1-fields
+                                toSide = 'left';    // Lado izquierdo de table2-fields
+                            } else if (draggedField.table === 2 && tableId === 'table1') {
+                                // De table2-fields a table1-fields:
+                                fromSide = 'left';  // Lado izquierdo de table2-fields
+                                toSide = 'right';   // Lado derecho de table1-fields
+                            }
+                    
+                            createConnectionLine(fromElement, toElement, fromSide, toSide, draggedField.field);
+                    
+                            mappings.push({
+                                from: draggedField.field,
+                                to: toElement.getAttribute('data-field')
+                            });
+                    
+                            updatePreview();
+                    
+                            draggedField = null;
+                        }
+                    });
+                });
+
+                // Cargar encabezados de la tabla
+                const headerRow = document.createElement('tr');
+                data.fields.forEach(field => {
+                    const th = document.createElement('th');
+                    th.className = 'border border-gray-300 px-4 py-2';
+                    th.textContent = field.name;
+                    headerRow.appendChild(th);
+                });
+                tableHead.appendChild(headerRow);
+
+                // Cargar datos de la tabla
+                const recordsResponse = await fetch(`/migraciones/get_table_records/${tableName}`);
+                const recordsData = await recordsResponse.json();
+                recordsData.records.forEach(record => {
+                    const row = document.createElement('tr');
+                    data.fields.forEach(field => {
+                        const td = document.createElement('td');
+                        td.className = 'border border-gray-300 px-4 py-2';
+                        td.textContent = record[field.name];
+                        row.appendChild(td);
+                    });
+                    tableBody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Error al obtener los campos de la tabla:', error);
+            }
+        }
+
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            mappings = [];
+            connectionSvg.innerHTML = '';
+            updatePreview();
+        });
+
+        document.getElementById('migrate-btn').addEventListener('click', () => {
+            // Aquí puedes agregar la lógica para manejar la migración de datos
+            console.log('Migrar datos:', mappings);
+        });
+
+        function updatePreview() {
+            // Aquí puedes agregar la lógica para actualizar la vista previa de los mapeos
+            console.log('Mapeos actualizados:', mappings);
+        }
+
+document.getElementById('migrate-btn').addEventListener('click', async () => {
+    const sourceTable = document.getElementById('table1-select').value;
+    const targetTable = document.getElementById('table2-select').value;
+
+    if (!sourceTable || !targetTable || mappings.length === 0) {
+        alert('Debe seleccionar las tablas y definir los mapeos antes de migrar.');
+        return;
+    }
+
+    const migrationData = {
+        source_table: sourceTable,
+        target_table: targetTable,
+        mappings: mappings
+    };
+
+    try {
+        const response = await fetch('/migraciones/migrate_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(migrationData)
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message);
+        } else {
+            alert('Error: ' + result.detail);
+        }
+    } catch (error) {
+        console.error('Error al migrar datos:', error);
+        alert('Error al migrar datos.');
+    }
+});
+    </script>
+</body>
+</html>

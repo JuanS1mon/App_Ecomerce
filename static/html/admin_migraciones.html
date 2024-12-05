@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Migraciones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Script para gráficos, por ejemplo Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Script para DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Barra de navegación -->
+    <nav class="bg-gray-800 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a href="">
+                    <img src="../static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
+                </a>
+                <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
+                <span class="text-gray-400">/</span>
+                <a href="/admin/page" class="text-white text-lg font-semibold hover:text-gray-300">Admin</a>
+                <span class="text-gray-400">/</span>
+                <span class="text-gray-300">Migraciones</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="/user/page" class="text-white hover:text-gray-300">
+                    <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center">
+                        {{ user.nombre[0]|upper }}
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-4">Panel de Migraciones</h1>
+
+        <!-- Sección de estadísticas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <!-- Gráfico de migraciones -->
+            <div class="bg-white p-4 rounded shadow">
+                <canvas id="migracionesChart"></canvas>
+            </div>
+            <!-- Últimas actividades -->
+            <div class="bg-white p-4 rounded shadow">
+                <!-- Mostrar el número total de migraciones -->
+                <h2 class="text-xl font-semibold mb-2">Total de Migraciones: {{ total_migraciones }}</h2>
+
+                <!-- Listar las últimas actividades -->
+                <ul id="actividades" class="list-disc pl-5">
+                    {% for actividad in actividades %}
+                    <li>{{ actividad }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Accesos directos -->
+        <div class="flex space-x-4">
+            <a href="/migraciones/nueva_migracion" class="bg-blue-500 text-white px-4 py-2 rounded shadow">Nueva Migración</a>
+            <a href="/migraciones/control_migraciones" class="bg-blue-500 text-white px-4 py-2 rounded shadow">Control</a>
+            <a href="/migraciones/tablas_migraciones" class="bg-blue-500 text-white px-4 py-2 rounded shadow">Mapeo de Campos</a>
+        </div>
+
+        <!-- Sección de selección de tabla -->
+        <div class="mb-8">
+            <label for="table-select" class="block text-sm font-medium text-gray-700">Selecciona una tabla</label>
+            <select id="table-select" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <option value="">Seleccione una tabla</option>
+                {% for table in tables1 %}
+                    <option value="{{ table }}">{{ table }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Tabla de datos -->
+        <div class="bg-white p-4 rounded shadow">
+            <table id="data-table" class="display">
+                <thead>
+                    <tr id="table-head">
+                        <!-- Encabezados de la tabla se cargarán aquí -->
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Datos de la tabla se cargarán aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Script para el gráfico -->
+    <script>
+        const ctx = document.getElementById('migracionesChart').getContext('2d');
+        const migracionesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: JSON.parse('{{ labels | tojson | safe }}'),
+                datasets: [{
+                    label: 'Migraciones',
+                    data: JSON.parse('{{ data | tojson | safe }}'),
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Función para obtener los datos de la tabla seleccionada
+        async function fetchTableData(tableName) {
+        try {
+            const response = await fetch(`/migraciones/get_table_records/${encodeURIComponent(tableName)}`);
+            const data = await response.json();
+
+            // Limpiar encabezados y cuerpo de la tabla
+            const tableHead = document.getElementById('table-head');
+            const tableBody = document.getElementById('table-body');
+            tableHead.innerHTML = '';
+            tableBody.innerHTML = '';
+
+            // Cargar encabezados de la tabla
+            if (data.records.length > 0) {
+                const headers = Object.keys(data.records[0]);
+                headers.forEach(header => {
+                    const th = document.createElement('th');
+                    th.textContent = header;
+                    tableHead.appendChild(th);
+                });
+
+                // Cargar datos de la tabla
+                data.records.forEach(record => {
+                    const row = document.createElement('tr');
+                    headers.forEach(header => {
+                        const td = document.createElement('td');
+                        td.textContent = record[header];
+                        row.appendChild(td);
+                    });
+                    tableBody.appendChild(row);
+                });
+
+                // Inicializar DataTables
+                $('#data-table').DataTable();
+            }
+        } catch (error) {
+            console.error('Error al obtener los datos de la tabla:', error);
+        }
+    }
+
+    // Manejar el cambio de selección de la tabla
+    document.getElementById('table-select').addEventListener('change', (event) => {
+        const tableName = event.target.value;
+        if (tableName) {
+            fetchTableData(tableName);
+        }
+    });
+    </script>
+</body>
+</html>
