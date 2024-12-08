@@ -9,7 +9,6 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
     <!-- Barra de navegación -->
-     
     <nav class="bg-gray-800 p-4 z-30 relative">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-4">
@@ -24,11 +23,22 @@
             <div class="flex items-center space-x-4">
                 <a href="/docs" class="text-white hover:text-gray-300">Documentacion</a>
                 <a href="/migraciones/page" class="text-white hover:text-gray-300">Migraciones</a>
-                <a href="/user/page" class="text-white hover:text-gray-300">
-                    <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center">
+                <div class="relative">
+                    <button id="perfil" class="flex items-center focus:outline-none">
+                      <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white">
                         {{ user.nombre[0]|upper }}
+                      </div>
+                      <svg class="ml-2 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                    <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
+                      <a href="/perfil" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Perfil de usuario</a>
+                      <form action="/logout" method="post">
+                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">Logout</button>
+                      </form>
                     </div>
-                </a>
+                  </div>
             </div>
     </nav>
 
@@ -81,7 +91,7 @@
             </form>
         </div>
     </div>
-
+    {% include 'footer.html' %}
     <!-- Scripts -->
     <script>
         document.getElementById('add_field').addEventListener('click', function() {
@@ -151,5 +161,20 @@
             }
         });
     </script>
+      <script>
+        const perfilBtn = document.getElementById('perfil');
+        const perfilMenu = document.getElementById('menu-perfil');
+    
+        perfilBtn.addEventListener('click', function(event) {
+          event.preventDefault();
+          perfilMenu.classList.toggle('hidden');
+        });
+    
+        window.addEventListener('click', function(event) {
+          if (!perfilBtn.contains(event.target) && !perfilMenu.contains(event.target)) {
+            perfilMenu.classList.add('hidden');
+          }
+        });
+      </script>
 </body>
 </html>

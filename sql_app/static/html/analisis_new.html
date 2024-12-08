@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de Datos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Navegación -->
+    <nav class="bg-gray-800 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-white text-xl font-bold">Analizador de Datos</h1>
+        </div>
+    </nav>
+
+    <!-- Contenedor Principal -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Selección de Tabla -->
+        <div class="bg-white p-4 rounded shadow mb-6">
+            <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona una Tabla</h2>
+            <select id="table-select" class="block w-full px-4 py-2 border border-gray-300 rounded-md">
+                <option value="" disabled selected>Selecciona una tabla...</option>
+                {% for table in tabla2 %}
+                    <option value="{{ table }}">{{ table }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Selección de Columna -->
+        <div class="bg-white p-4 rounded shadow mb-6">
+            <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona una Columna para Clustering</h2>
+            <select id="column-select" class="block w-full px-4 py-2 border border-gray-300 rounded-md">
+                <option value="" disabled selected>Selecciona una columna...</option>
+            </select>
+        </div>
+
+        <!-- Opciones de Visualización -->
+        <div class="bg-white p-4 rounded shadow mb-6">
+            <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona el Tipo de Análisis</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600" id="show-kpis">
+                    KPIs
+                </button>
+                <button class="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600" id="show-graph">
+                    Gráficos
+                </button>
+                <button class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600" id="show-table">
+                    Tabla Detallada
+                </button>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div id="kpi-section" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white p-4 rounded shadow flex items-center">
+                    <div class="flex-1">
+                        <h2 class="text-gray-600 text-sm">Total de Registros</h2>
+                        <p class="text-2xl font-bold text-gray-800" id="total-records">0</p>
+                    </div>
+                    <i class="fas fa-database text-indigo-500 text-3xl"></i>
+                </div>
+                <div class="bg-white p-4 rounded shadow flex items-center">
+                    <div class="flex-1">
+                        <h2 class="text-gray-600 text-sm">Categorías</h2>
+                        <p class="text-2xl font-bold text-gray-800" id="categories">-</p>
+                    </div>
+                    <i class="fas fa-tags text-indigo-500 text-3xl"></i>
+                </div>
+                <div class="bg-white p-4 rounded shadow flex items-center">
+                    <div class="flex-1">
+                        <h2 class="text-gray-600 text-sm">Última Fecha</h2>
+                        <p class="text-2xl font-bold text-gray-800" id="last-date">-</p>
+                    </div>
+                    <i class="fas fa-calendar-alt text-indigo-500 text-3xl"></i>
+                </div>
+                <div class="bg-white p-4 rounded shadow flex items-center">
+                    <div class="flex-1">
+                        <h2 class="text-gray-600 text-sm">Primera Fecha</h2>
+                        <p class="text-2xl font-bold text-gray-800" id="first-date">-</p>
+                    </div>
+                    <i class="fas fa-calendar-alt text-indigo-500 text-3xl"></i>
+                </div>
+                <div class="bg-white p-4 rounded shadow flex items-center">
+                    <div class="flex-1">
+                        <h2 class="text-gray-600 text-sm">Valor Máximo</h2>
+                        <p class="text-2xl font-bold text-gray-800" id="max-value">-</p>
+                    </div>
+                    <i class="fas fa-arrow-up text-indigo-500 text-3xl"></i>
+                </div>
+                <div class="bg-white p-4 rounded shadow flex items-center">
+                    <div class="flex-1">
+                        <h2 class="text-gray-600 text-sm">Valor Mínimo</h2>
+                        <p class="text-2xl font-bold text-gray-800" id="min-value">-</p>
+                    </div>
+                    <i class="fas fa-arrow-down text-indigo-500 text-3xl"></i>
+                </div>
+                <div class="bg-white p-4 rounded shadow flex items-center">
+                    <div class="flex-1">
+                        <h2 class="text-gray-600 text-sm">Clusters</h2>
+                        <ul id="cluster-results" class="list-disc list-inside text-gray-700"></ul>
+                    </div>
+                    <i class="fas fa-project-diagram text-indigo-500 text-3xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div id="graph-section" class="hidden bg-white p-4 rounded shadow mb-6">
+            <h2 class="text-gray-800 font-bold mb-4">Análisis Gráfico</h2>
+            <canvas id="chart"></canvas>
+        </div>
+
+        <!-- Tabla Detallada -->
+        <div id="table-section" class="hidden bg-white p-4 rounded shadow">
+            <h2 class="text-gray-800 font-bold mb-4">Datos Detallados</h2>
+            <table class="min-w-full table-auto border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200" id="table-headers"></tr>
+                </thead>
+                <tbody id="table-data"></tbody>
+            </table>
+            <button class="mt-4 bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600">
+                Exportar a Excel
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const kpiSection = document.getElementById("kpi-section");
+        const graphSection = document.getElementById("graph-section");
+        const tableSection = document.getElementById("table-section");
+
+        document.getElementById("show-kpis").addEventListener("click", () => {
+            kpiSection.classList.remove("hidden");
+            graphSection.classList.add("hidden");
+            tableSection.classList.add("hidden");
+        });
+
+        document.getElementById("show-graph").addEventListener("click", () => {
+            kpiSection.classList.add("hidden");
+            graphSection.classList.remove("hidden");
+            tableSection.classList.add("hidden");
+
+            // Carga de gráfico dinámico
+            const ctx = document.getElementById('chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Enero', 'Febrero', 'Marzo'],
+                    datasets: [{
+                        label: 'Ejemplo',
+                        data: [10, 20, 30],
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                }
+            });
+        });
+
+        document.getElementById("show-table").addEventListener("click", () => {
+            kpiSection.classList.add("hidden");
+            graphSection.classList.add("hidden");
+            tableSection.classList.remove("hidden");
+
+            // Ejemplo de datos dinámicos
+            const headers = ["Columna 1", "Columna 2", "Columna 3"];
+            const data = [
+                ["Dato 1", "Dato 2", "Dato 3"],
+                ["Dato A", "Dato B", "Dato C"]
+            ];
+
+            const headerRow = document.getElementById("table-headers");
+            headerRow.innerHTML = headers.map(header => `<th class="border px-4 py-2">${header}</th>`).join("");
+
+            const tableBody = document.getElementById("table-data");
+            tableBody.innerHTML = data.map(row => 
+                `<tr>${row.map(cell => `<td class="border px-4 py-2">${cell}</td>`).join("")}</tr>`
+            ).join("");
+        });
+
+        document.getElementById("table-select").addEventListener("change", async function() {
+            const tableName = this.value;
+
+            // Obtener las columnas de la tabla seleccionada
+            const columnsResponse = await fetch(`/analisis/columnas`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ table_name: tableName })
+            });
+            const columnsData = await columnsResponse.json();
+
+            // Poblar el select de columnas
+            const columnSelect = document.getElementById("column-select");
+            columnSelect.innerHTML = '<option value="" disabled selected>Selecciona una columna...</option>';
+            columnsData.columns.forEach(column => {
+                columnSelect.innerHTML += `<option value="${column}">${column}</option>`;
+            });
+        });
+
+        document.getElementById("column-select").addEventListener("change", async function() {
+            const tableName = document.getElementById("table-select").value;
+            const columnName = this.value;
+
+            const response = await fetch(`/analisis/analizar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ table_name: tableName, column_name: columnName })
+            });
+            const data = await response.json();
+
+            // Actualizar KPIs
+            document.getElementById("total-records").textContent = data.total_registros;
+            document.getElementById("categories").textContent = data.categorias;
+            document.getElementById("last-date").textContent = data.last_date;
+            document.getElementById("first-date").textContent = data.first_date;
+            document.getElementById("max-value").textContent = data.max_value;
+            document.getElementById("min-value").textContent = data.min_value;
+
+            // Mostrar resultados de clustering
+            const clusterResults = document.getElementById("cluster-results");
+            clusterResults.innerHTML = data.clusters.map((cluster, index) => `<li>Registro ${index + 1}: Cluster ${cluster}</li>`).join("");
+
+            // Actualizar gráfico
+            const ctx = document.getElementById('chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.chart_data.labels,
+                    datasets: [{
+                        label: 'Análisis',
+                        data: data.chart_data.values,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                }
+            });
+
+            // Actualizar tabla detallada
+            const headers = Object.keys(data.table_data[0]);
+            const headerRow = document.getElementById("table-headers");
+            headerRow.innerHTML = headers.map(header => `<th class="border px-4 py-2">${header}</th>`).join("");
+
+            const tableBody = document.getElementById("table-data");
+            tableBody.innerHTML = data.table_data.map(row => 
+                `<tr>${headers.map(header => `<td class="border px-4 py-2">${row[header]}</td>`).join("")}</tr>`
+            ).join("");
+        });
+    </script>
+</body>
+</html>

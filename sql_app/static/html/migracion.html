@@ -28,6 +28,18 @@
         function openResultWindow(url) {
             window.open(url, '_blank');
         }
+
+        function toggleDescription() {
+            const description = document.getElementById('description');
+            const toggleButton = document.getElementById('toggleButton');
+            if (description.classList.contains('hidden')) {
+                description.classList.remove('hidden');
+                toggleButton.textContent = 'Minimizar';
+            } else {
+                description.classList.add('hidden');
+                toggleButton.textContent = 'Leer más';
+            }
+        }
     </script>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -42,11 +54,11 @@
                 <span class="text-gray-400">/</span>
                 <a href="/admin/page" class="text-white text-lg font-semibold hover:text-gray-300">Admin</a>
                 <span class="text-gray-400">/</span>
-                <span class="text-gray-300">Migraciones</span>
+                <a href="/migraciones/admin_migraciones" class="text-white text-lg font-semibold hover:text-gray-300">Migraciones</a>
+                <span class="text-gray-400">/</span>
+                <span class="text-gray-300">Nueva Migracion</span>
             </div>
             <div class="flex items-center space-x-4">
-                <a href="/docs" class="text-white hover:text-gray-300">Documentacion</a>
-                <a href="/generar" class="text-white hover:text-gray-300">Generar appi</a>
                 <a href="/user/page" class="text-white hover:text-gray-300">
                     <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center">
                         {{ user.nombre[0]|upper }}
@@ -55,6 +67,30 @@
             </div>
         </div>
     </nav>
+
+    <!-- Descripción de la app -->
+    <div class="flex justify-center p-4">
+        <div class="bg-blue-50 p-6 rounded-lg shadow-md max-w-lg">
+            <h2 class="text-xl font-bold text-blue-600 mb-4">Optimiza tus procesos de migración de datos</h2>
+            <div id="description" class="hidden">
+                <p class="text-gray-700">
+                    Nuestra aplicación simplifica la carga y migración de datos desde archivos Excel en formatos 
+                    <strong>XLS</strong> y <strong>XLSX</strong>. Permite procesar la información de manera segura y eficiente, 
+                    validando el contenido antes de su importación para evitar errores comunes.
+                </p>
+                <p class="text-gray-700 mt-2">
+                    Ideal para manejar grandes volúmenes de datos, la aplicación incluye procesamiento en segundo plano para 
+                    garantizar que las tareas complejas no interfieran con tu flujo de trabajo. Podrás consultar los resultados 
+                    directamente desde la interfaz una vez finalizada la operación.
+                </p>
+                <p class="text-gray-700 mt-2">
+                    Aprovecha esta herramienta para migrar datos a sistemas de gestión, mejorar la precisión en la información 
+                    y optimizar tu productividad.
+                </p>
+            </div>
+            <button id="toggleButton" class="mt-4 text-blue-600 hover:underline" onclick="toggleDescription()">Leer más</button>
+        </div>
+    </div>
 
     <!-- Contenido principal -->
     <div class="flex items-center justify-center p-8">
@@ -77,24 +113,23 @@
                     <label for="fileInput" class="block text-sm font-medium text-gray-700">Selecciona un archivo XLS o XLSX</label>
                     <input type="file" id="fileInput" name="file" accept=".xls,.xlsx" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
+                <div>
+                    <label for="migrationName" class="block text-sm font-medium text-gray-700">Nombre de la Migración</label>
+                    <input type="text" id="migrationName" name="migration_name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
                 <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cargar</button>
             </form>
-            
-            <div class="mt-4">
-                <a href="/admin/page" class="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-center block">Volver</a>
-            </div>
 
             <!-- Spinner de carga -->
-            <div id="loadingSpinner" class="flex justify-center items-center mt-4 hidden">
+            <div id="spinner" class="hidden flex justify-center mt-4">
                 <div class="spinner"></div>
-                <span class="ml-2 text-gray-700">Cargando...</span>
             </div>
         </div>
     </div>
-
+    {% include 'footer.html' %}
     <script>
         document.getElementById('uploadForm').addEventListener('submit', function() {
-            document.getElementById('loadingSpinner').classList.remove('hidden');
+            document.getElementById('spinner').classList.remove('hidden');
         });
     </script>
 </body>

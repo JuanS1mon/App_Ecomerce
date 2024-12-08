@@ -1,0 +1,4 @@
+{
+    "status": "error",
+    "message": "Ocurrió un error al procesar el archivo: Object of type datetime is not JSON serializable"
+}

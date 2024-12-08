@@ -162,18 +162,16 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for post in blog_posts %}
                     <div class="news-card bg-white bg-opacity-90 p-6 rounded-lg shadow-lg text-black transition transform hover:scale-105">
-                        <img src="{{ post.image_url }}" alt="{{ post.title }}" class="rounded-t-lg w-full h-40 object-cover mb-4">
                         <h3 class="text-2xl font-semibold mb-2">{{ post.title }}</h3>
                         <p class="mt-2 text-justify">{{ post.content | truncate(150) }}...</p>
                         <p class="mt-2 text-sm text-gray-600">
                             <i class="fas fa-calendar-alt text-blue-500"></i> Publicado el {{ post.created_at.strftime('%d/%m/%Y') }}
                         </p>
-                        <a href="/news" class="block mt-4 bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700">Leer más</a>
                     </div>
                 {% endfor %}
             </div>
             <div class="mt-12">
-                <button class="bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 px-6 rounded-lg shadow-lg hover:opacity-90 transition">
+                <button  onclick="location.href='/news'" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 px-6 rounded-lg shadow-lg hover:opacity-90 transition">
                     Ver más noticias
                 </button>
             </div>
@@ -232,6 +230,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     </script>
-    
+        {% include 'footer.html' %}
 </body>
 </html>
