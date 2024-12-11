@@ -75,6 +75,7 @@ def convertir_a_float(valor):
     except (ValueError, TypeError):
         return valor
         
+
 def procesar_archivo(contents, json_path, result_path, db: Session, current_user, table_name):
     try:
         # Leer el archivo Excel
@@ -90,6 +91,10 @@ def procesar_archivo(contents, json_path, result_path, db: Session, current_user
             with open(result_path, 'w', encoding='utf-8') as f:
                 json.dump(result, f, ensure_ascii=False, indent=4)
             return
+
+        # Convertir objetos de tipo Timestamp a strings
+        for column in df.select_dtypes(include=['datetime64[ns]', 'datetime64[ns, UTC]']):
+            df[column] = df[column].astype(str)
 
         # Convertir DataFrame a una lista de diccionarios
         data = df.to_dict(orient='records')

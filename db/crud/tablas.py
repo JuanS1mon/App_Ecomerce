@@ -23,3 +23,10 @@ def get_tables(db: Session):
     logging.info(f"Otras tablas: {tabla2}")
     
     return tabla1, tabla2
+
+
+def get_columns(table_name: str, db: Session):
+    inspector = inspect(db.get_bind())
+    columns = inspector.get_columns(table_name)
+    column_names = [column['name'] for column in columns]
+    return column_names

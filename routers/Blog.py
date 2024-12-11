@@ -50,7 +50,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
 # Configurar Jinja2Templates para buscar en el directorio "static"
-templates = Jinja2Templates(directory="static")
+templates = Jinja2Templates(directory="static/html")
 
 
 # Ejemplo de ruta para renderizar la plantilla
