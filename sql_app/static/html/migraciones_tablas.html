@@ -5,6 +5,13 @@
     <title>Mapeo de Campos para Migración</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+
+#general {
+            max-height: 500px; /* Altura máxima de 500 píxeles */
+            overflow-y: auto; /* Barra de desplazamiento vertical si el contenido excede la altura */
+            padding-right: 10px; /* Espacio para la barra de desplazamiento */
+            margin-right: -10px; /* Mover la barra de desplazamiento más cerca de las tablas */
+        }
         /* Estilos personalizados */
         #tables-container {
             position: relative;
@@ -102,39 +109,43 @@
     </div>
 
     <!-- Contenedor de las tablas de campos -->
-    <div class="flex flex-col md:flex-row justify-center mb-8 relative w-full max-w-4xl mx-auto" id="tables-container">
-        <div class="mx-4 w-full md:w-1/2" id="table1-container">
-            <h2 class="text-2xl font-semibold text-center mb-4 text-gray-700">
-                <select id="table1-select" class="bg-gray-200 p-2 rounded w-full" onchange="fetchTableFields('table1')">
-                    <option value="">Seleccione una tabla</option>
-                    {% for table in tables1 %}
-                        <option value="{{ table }}">{{ table }}</option>
-                    {% endfor %}
-                </select>
-            </h2>
-            <ul class="fields" id="table1-fields">
-                <!-- Campos de la tabla 1 se cargarán aquí -->
-            </ul>
+     <!-- Contenedor de las tablas de campos -->
+     <div class="mx-200" id="general">
+        <div class="flex flex-col md:flex-row justify-center mb-8 relative w-full max-w-4xl mx-auto" id="tables-container">
+            <div class="mx-4 w-full md:w-1/2" id="table1-container">
+                <h2 class="text-2xl font-semibold text-center mb-4 text-gray-700">
+                    <select id="table1-select" class="bg-gray-200 p-2 rounded w-full" onchange="fetchTableFields('table1')">
+                        <option value="">Seleccione una tabla</option>
+                        {% for table in tables1 %}
+                            <option value="{{ table }}">{{ table }}</option>
+                        {% endfor %}
+                    </select>
+                </h2>
+                <ul class="fields" id="table1-fields">
+                    <!-- Campos de la tabla 1 se cargarán aquí -->
+                </ul>
+            </div>
+        
+            <div class="mx-4 w-full md:w-1/2" id="table2-container">
+                <h2 class="text-2xl font-semibold text-center mb-4 text-gray-700">
+                    <select id="table2-select" class="bg-gray-200 p-2 rounded w-full" onchange="fetchTableFields('table2')">
+                        <option value="">Seleccione una tabla</option>
+                        {% for table in tables2 %}
+                            <option value="{{ table }}">{{ table }}</option>
+                        {% endfor %}
+                    </select>
+                </h2>
+                <ul class="fields" id="table2-fields">
+                    <!-- Campos de la tabla 2 se cargarán aquí -->
+                </ul>
+            </div>
+            <!-- SVG para líneas de conexión -->
+            <svg id="connection-svg" class="absolute top-0 left-0 w-full h-full pointer-events-none"></svg>
         </div>
-        <div class="mx-4 w-full md:w-1/2" id="table2-container">
-            <h2 class="text-2xl font-semibold text-center mb-4 text-gray-700">
-                <select id="table2-select" class="bg-gray-200 p-2 rounded w-full" onchange="fetchTableFields('table2')">
-                    <option value="">Seleccione una tabla</option>
-                    {% for table in tables2 %}
-                        <option value="{{ table }}">{{ table }}</option>
-                    {% endfor %}
-                </select>
-            </h2>
-            <ul class="fields" id="table2-fields">
-                <!-- Campos de la tabla 2 se cargarán aquí -->
-            </ul>
-        </div>
-        <!-- SVG para líneas de conexión -->
-        <svg id="connection-svg" class="absolute top-0 left-0 w-full h-full pointer-events-none"></svg>
     </div>
 
     <!-- Botones de acción -->
-    <div class="flex justify-center space-x-4 mb-8">
+    <div class="flex justify-center space-x-4 mb-8 pt-5">
         <button id="clear-btn" class="bg-red-500 text-white px-4 py-2 rounded shadow">Limpiar Mapeos</button>
         <button id="migrate-btn" class="bg-blue-500 text-white px-4 py-2 rounded shadow">Migrar</button>
     </div>

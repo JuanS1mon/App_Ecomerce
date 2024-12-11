@@ -22,9 +22,12 @@ from Services.security.security import crear_access_token, authenticate_user, cu
 from db.database import Base, engine, get_db, create_database, create_tables
 from routers import usuarios as aut_usuario
 from routers import Blog
-from routers.Maestros import   Route_Usuarios_roles, Route_test1, Route_test2, Route_pruebat1, Route_products
+from routers.Maestros import Route_Usuarios_roles, Route_test1, Route_test2, Route_pruebat1, Route_products
 from routers.Configuraciones import Generar, configDB, Migraciones,Analisis
+from Services import mail
+
 from routers.Configuraciones.Admin import create_admin_router
+
 from db.schemas.Maestro.Usuarios import UserDB
 from db.models.Blog import BlogPost as BlogPostModel
 from sqlalchemy.orm import Session
@@ -101,6 +104,7 @@ app.include_router(create_admin_router(app))
 app.include_router(Blog.router)
 app.include_router(Migraciones.router)
 app.include_router(Analisis.router)
+app.include_router(mail.router)
 
 # Maestros
 app.include_router(Route_pruebat1.router)

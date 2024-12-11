@@ -14,84 +14,92 @@
             <div class="flex items-center space-x-4">
                 <a href="">
                     <img src="../static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
-                    <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
-                    <span class="text-gray-400">/</span>
-                    <a href="/admin/page" class="text-white text-lg font-semibold hover:text-gray-300">Admin</a>
-                    <span class="text-gray-400">/</span>
-                    <span class="text-gray-300">Generar</span>
+                </a>
+                <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
+                <span class="text-gray-400">/</span>
+                <a href="/admin/page" class="text-white text-lg font-semibold hover:text-gray-300">Admin</a>
+                <span class="text-gray-400">/</span>
+                <span class="text-gray-300">Generar</span>
             </div>
             <div class="flex items-center space-x-4">
-                <a href="/docs" class="text-white hover:text-gray-300">Documentacion</a>
+                <a href="/docs" class="text-white hover:text-gray-300">Documentación</a>
                 <a href="/migraciones/page" class="text-white hover:text-gray-300">Migraciones</a>
                 <div class="relative">
                     <button id="perfil" class="flex items-center focus:outline-none">
-                      <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white">
-                        {{ user.nombre[0]|upper }}
-                      </div>
-                      <svg class="ml-2 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
-                      </svg>
+                        <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white">
+                            {{ user.nombre[0]|upper }}
+                        </div>
+                        <svg class="ml-2 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                        </svg>
                     </button>
                     <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
-                      <a href="/perfil" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Perfil de usuario</a>
-                      <form action="/logout" method="post">
-                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">Logout</button>
-                      </form>
+                        <a href="/perfil" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Perfil de usuario</a>
+                        <form action="/logout" method="post">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">Logout</button>
+                        </form>
                     </div>
-                  </div>
+                </div>
             </div>
+        </div>
     </nav>
-
 
     <!-- Contenido principal -->
     <div class="container mx-auto p-8">
         <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h1 class="text-3xl font-bold mb-4">Generar Aplicación</h1>
+            <h1 class="text-3xl font-bold mb-4 text-gray-800">Generar Aplicación</h1>
             <p class="text-gray-700 mb-4">Utiliza esta sección para generar nuevas aplicaciones de manera rápida y sencilla. Completa los campos necesarios y haz clic en "Generar" para crear una nueva aplicación.</p>
         </div>
 
         <!-- Formulario para generar aplicaciones -->
-        <div class="container mx-auto mt-5">
-            <form id="generador" action="/generar/generate" method="post" class="bg-gray-800 p-6 rounded shadow-md">
-                <div class="mb-4">
-                    <label for="module_name" class="block text-gray-300">Nombre del módulo:</label>
-                    <input type="text" id="module_name" name="module_name" class="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-gray-100">
-                </div>
-                <div class="mb-4">
-                    <label for="fields" class="block text-gray-300">Campos:</label>
-                    <label for="fields" class="block text-gray-400 text-sm">El campo1 es obligatorio para realizar búsquedas</label>
-                    <div id="fields" class="mt-2">
-                        <!-- Los campos se agregarán aquí -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <form id="generador" action="/generar/generate" method="post">
+                <div class="grid grid-cols-1 gap-6">
+                    <div>
+                        <label for="module_name" class="block text-gray-700 font-semibold">Nombre del módulo:</label>
+                        <input type="text" id="module_name" name="module_name" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
+                    </div>
+                    <div>
+                        <label for="fields" class="block text-gray-700 font-semibold">Campos:</label>
+                        <label class="block text-gray-500 text-sm">El campo1 es obligatorio para realizar búsquedas</label>
+                        <div id="fields" class="mt-2">
+                            <!-- Los campos se agregarán aquí -->
+                        </div>
+                        <button type="button" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600" id="add_field">Agregar Campo</button>
+                    </div>
+                    <!-- Opciones adicionales -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <input type="checkbox" class="mr-2" id="generate_crud" name="generate_crud" value="true">
+                            <label class="text-gray-700" for="generate_crud">Generar CRUD</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="mr-2" id="generate_schema" name="generate_schema" value="true">
+                            <label class="text-gray-700" for="generate_schema">Generar Esquema</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="mr-2" id="generate_route" name="generate_route" value="true">
+                            <label class="text-gray-700" for="generate_route">Generar Ruta</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="mr-2" id="generate_html_form" name="generate_html_form" value="true">
+                            <label class="text-gray-700" for="generate_html_form">Generar Formulario HTML</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="mr-2" id="generate_tests" name="generate_tests" value="true">
+                            <label class="text-gray-700" for="generate_tests">Generar Pruebas</label>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="mt-4 bg-green-500 text-white px-6 py-2 rounded shadow hover:bg-green-600" value="Generar">Generar</button>
                     </div>
                 </div>
-                <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded mb-3" id="add_field">Agregar</button>
-                
-                <!-- Opciones adicionales -->
-                <div class="mb-4">
-                    <input type="checkbox" class="mr-2" id="generate_crud" name="generate_crud" value="true">
-                    <label class="text-gray-300" for="generate_crud">Generar CRUD</label>
-                </div>
-                <div class="mb-4">
-                    <input type="checkbox" class="mr-2" id="generate_schema" name="generate_schema" value="true">
-                    <label class="text-gray-300" for="generate_schema">Generar Esquema</label>
-                </div>
-                <div class="mb-4">
-                    <input type="checkbox" class="mr-2" id="generate_route" name="generate_route" value="true">
-                    <label class="text-gray-300" for="generate_route">Generar Ruta</label>
-                </div>
-                <div class="mb-4">
-                    <input type="checkbox" class="mr-2" id="generate_html_form" name="generate_html_form" value="true">
-                    <label class="text-gray-300" for="generate_html_form">Generar Formulario HTML</label>
-                </div>
-                <div class="mb-4">
-                    <input type="checkbox" class="mr-2" id="generate_tests" name="generate_tests" value="true">
-                    <label class="text-gray-300" for="generate_tests">Generar Pruebas</label>
-                </div>
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded mt-3" value="Generar">Generar</button>
             </form>
         </div>
     </div>
+
     {% include 'footer.html' %}
+
     <!-- Scripts -->
     <script>
         document.getElementById('add_field').addEventListener('click', function() {
@@ -101,34 +109,26 @@
             var input = document.createElement('input');
             input.type = 'text';
             input.name = 'field_names[]';
-            input.className = 'w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-gray-100 mr-2';
+            input.placeholder = 'Nombre del campo';
+            input.className = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 mr-2';
             div.appendChild(input);
 
             var select = document.createElement('select');
             select.name = 'field_types[]';
-            select.className = 'px-3 py-2 border border-gray-600 rounded bg-gray-700 text-gray-100 mr-2';
-            var option1 = document.createElement('option');
-            option1.value = 'str';
-            option1.text = 'str';
-            select.appendChild(option1);
-            var option2 = document.createElement('option');
-            option2.value = 'int';
-            option2.text = 'int';
-            select.appendChild(option2);
-            var option3 = document.createElement('option');
-            option3.value = 'float';
-            option3.text = 'float';
-            select.appendChild(option3);
-            var option4 = document.createElement('option');
-            option4.value = 'bool';
-            option4.text = 'bool';
-            select.appendChild(option4);
+            select.className = 'px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 mr-2';
+            var opcionTipos = ['str', 'int', 'float', 'bool'];
+            opcionTipos.forEach(function(tipo) {
+                var option = document.createElement('option');
+                option.value = tipo;
+                option.text = tipo;
+                select.appendChild(option);
+            });
             div.appendChild(select);
 
             var button = document.createElement('button');
             button.type = 'button';
             button.textContent = 'Quitar';
-            button.className = 'bg-red-500 text-white px-3 py-2 rounded';
+            button.className = 'bg-red-500 text-white px-3 py-2 rounded shadow hover:bg-red-600';
             div.appendChild(button);
 
             document.getElementById('fields').appendChild(div);
@@ -161,20 +161,21 @@
             }
         });
     </script>
-      <script>
+
+    <script>
         const perfilBtn = document.getElementById('perfil');
         const perfilMenu = document.getElementById('menu-perfil');
-    
+
         perfilBtn.addEventListener('click', function(event) {
-          event.preventDefault();
-          perfilMenu.classList.toggle('hidden');
+            event.preventDefault();
+            perfilMenu.classList.toggle('hidden');
         });
-    
+
         window.addEventListener('click', function(event) {
-          if (!perfilBtn.contains(event.target) && !perfilMenu.contains(event.target)) {
-            perfilMenu.classList.add('hidden');
-          }
+            if (!perfilBtn.contains(event.target) && !perfilMenu.contains(event.target)) {
+                perfilMenu.classList.add('hidden');
+            }
         });
-      </script>
+    </script>
 </body>
 </html>

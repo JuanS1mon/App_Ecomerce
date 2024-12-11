@@ -1,0 +1,10 @@
+{
+    "user_id": "juan",
+    "table_name": "dieta",
+    "column_name": "id",
+    "accuracy": 0.0,
+    "predicciones": [
+        5,
+        5
+    ]
+}

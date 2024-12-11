@@ -41,6 +41,11 @@
             cursor: pointer;
             display: none;
             z-index: 1000;
+            transition: opacity 0.3s;
+        }
+        
+        .back-to-top:hover {
+            background-color: #2d3748;
         }
         .custom-green {
             background-color: rgba(9, 98, 110, 1);
@@ -86,7 +91,7 @@
                 <span class="text-gray-400">/</span>
                 <a href="#testimonials" class="text-white hover:text-gray-300">Testimonios</a>
                 <span class="text-gray-400">/</span>
-                <a href="#contact" class="text-white hover:text-gray-300">Contacto</a>
+                <a href="#Contacto" class="text-white hover:text-gray-300">Contacto</a>
             </div>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="flex space-x-4">
@@ -110,39 +115,24 @@
         <p class="text-lg mb-6 text-center px-4 z-10">es una app para hacer apps, en python!</p>
         <div class="flex flex-wrap justify-center z-10">
             <button class="bg-blue-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 mx-2 mb-2" onclick="location.href='#about'">Saber más</button>
-            <button class="bg-green-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-600 transition duration-300 mx-2 mb-2" onclick="location.href='#contact'">Contactar</button>
+            <button class="bg-green-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-600 transition duration-300 mx-2 mb-2" onclick="location.href='#Contacto'">Contactar</button>
         </div>
     </section>
     
-    
-
-
     <section id="about" class="min-h-screen flex items-center justify-center bg-gray-800 text-white fixed-section">
         <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
             <!-- Columna izquierda: Texto -->
             <div class="md:w-1/2 text-left">
                 <h2 class="text-3xl font-bold mb-12">Sobre la Aplicación</h2>
                 <p class="mt-4">
-                    Esta aplicación web es una herramienta integral para desarrolladores y administradores de bases de datos, diseñada para automatizar y simplificar tareas comunes en la creación y gestión de APIs y migración de datos.
-
-                    Backend Robusto: Basada en FastAPI, la aplicación ofrece una API eficiente y escalable. Todo el entorno está completamente dockerizado, lo que garantiza portabilidad y facilidad de despliegue. Actualmente soporta bases de datos SQL Server y PostgreSQL, y próximamente integrará MySQL.
-                    
-                    Generación Automática de Componentes:
-                    La aplicación automatiza la creación de:
-                    
-                    Rutas para solicitudes API (request routes).
-                    Modelos y esquemas adaptados a las bases de datos.
-                    Pruebas para verificar la funcionalidad.
-                    Archivos HTML con JavaScript, proporcionando una interfaz web para enviar solicitudes y visualizar los datos devueltos.
-                    Migración de Datos:
-                    Ofrece soporte para importar datos desde archivos Excel (.xls y .xlsx) hacia bases de datos SQL. Incluye múltiples validaciones para garantizar la integridad y calidad de los datos durante la migración.
-                    
-                    Entorno Web Intuitivo:
-                    La aplicación cuenta con una interfaz web diseñada para configuraciones rápidas y sencillas, facilitando la interacción con los usuarios sin necesidad de modificar el código directamente.
-                    
-                    Con tecnologías como SQLAlchemy para la gestión de bases de datos, Jinja2 para la renderización de plantillas HTML y Bootstrap para un diseño moderno y responsivo, la aplicación combina funcionalidad y experiencia de usuario. Además, utiliza Uvicorn como servidor ASGI para asegurar un rendimiento óptimo, y pandas para la manipulación avanzada de datos.
-                    
-                    Este proyecto representa una solución innovadora para automatizar procesos de desarrollo, permitiendo a los equipos centrarse en lo que realmente importa: crear valor.                </p>
+                    Sobre la Aplicación
+                    Una herramienta avanzada para desarrolladores y administradores de bases de datos, diseñada para simplificar y automatizar la creación de APIs, la migración de datos y el análisis con inteligencia artificial.
+                    Backend Robusto: Construida con FastAPI, soporta SQL Server y PostgreSQL (próximamente MySQL). Totalmente dockerizada para despliegue rápido y escalable.
+                    Automatización de Componentes: Genera rutas, modelos, esquemas, pruebas, y archivos HTML con JavaScript para una gestión eficiente.
+                    Migración de Datos: Importa datos desde Excel (.xls y .xlsx) hacia bases de datos SQL con validaciones que garantizan su calidad.
+                    Análisis de Datos con IA: Integra modelos de inteligencia artificial para el análisis avanzado de datos, ofreciendo insights clave para la toma de decisiones.
+                    Interfaz Intuitiva: Un entorno web basado en Jinja2, Bootstrap y SQLAlchemy para configuraciones rápidas y experiencia responsiva, sin necesidad de modificar código.
+                    Esta solución innovadora combina automatización, análisis avanzado y un entorno intuitivo, permitiendo a los equipos centrarse en crear valor y mejorar su productividad.</p>
             </div>
             <!-- Columna derecha: Imagen -->
             <div class="md:w-1/2 mt-8 md:mt-0 flex justify-center">
@@ -184,52 +174,126 @@
             <h2 class="text-3xl font-bold">Testimonios</h2>
             <p class="mt-4">Lo que nuestros clientes dicen sobre nosotros.</p>
         </div>
-    </section>
-
-    <section id="contact" class="min-h-screen flex items-center justify-center bg-pastel-yellow text-gray-80">
-        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 class="text-3xl font-bold mb-4 text-center text-gray-800">Contacto</h2>
-            <p class="text-lg mb-6 text-center text-gray-700">Ponte en contacto con nosotros para más información.</p>
-            <form action="mailto:tuemail@example.com" method="post" enctype="text/plain">
+    </section><!-- Formulario de contacto -->
+       <section id="Contacto" class="min-h-screen flex items-center justify-center parallax bg-cover bg-center relative fixed-section" style="background-image: url('https://source.unsplash.com/random/1600x900?contact');">
+        <div class="overlay"></div>
+        <div class="content text-center text-white relative z-10 p-8">
+            <h2 class="text-4xl font-bold mb-4">Contáctanos</h2>
+            <p class="text-lg text-gray-300 mb-8">Envíanos tus consultas o comentarios. Estaremos encantados de atenderte.</p>
+            <form id="contact-form" class="max-w-2xl mx-auto bg-white bg-opacity-90 p-6 rounded-lg shadow-lg text-black">
                 <div class="mb-4">
-                    <label for="name" class="block text-gray-700">Nombre:</label>
-                    <input type="text" id="name" name="name" class="w-full px-3 py-2 border border-gray-300 rounded mt-1" required>
+                    <label for="nombre" class="block text-gray-700 font-semibold">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
                 </div>
                 <div class="mb-4">
-                    <label for="email" class="block text-gray-700">Correo electrónico:</label>
-                    <input type="email" id="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded mt-1" required>
+                    <label for="email" class="block text-gray-700 font-semibold">Correo electrónico:</label>
+                    <input type="email" id="email" name="email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
                 </div>
                 <div class="mb-4">
-                    <label for="message" class="block text-gray-700">Mensaje:</label>
-                    <textarea id="message" name="message" class="w-full px-3 py-2 border border-gray-300 rounded mt-1" rows="4" required></textarea>
+                    <label for="mensaje" class="block text-gray-700 font-semibold">Mensaje:</label>
+                    <textarea id="mensaje" name="mensaje" rows="5" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"></textarea>
                 </div>
-                <div class="text-center">
-                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300">Enviar</button>
+                <div>
+                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600 transition">Enviar mensaje</button>
                 </div>
             </form>
-            <div class="text-center mt-4">
-                <p class="text-lg text-gray-700">O contáctanos por WhatsApp:</p>
-                <a href="https://wa.me/1234567890" target="_blank" class="bg-green-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-600 transition duration-300 inline-block mt-2">WhatsApp</a>
-            </div>
         </div>
     </section>
+        <!-- Botón de flecha para ir arriba -->
+        <div id="back-to-top" class="back-to-top">
+            &#8679;
+        </div>
 
-    <footer class="text-center my-5">
-        <p>&copy; 2023 appapp. Todos los derechos reservados.</p>
-    </footer>
+    {% include 'footer.html' %}
+<!-- Scripts -->
+<script>
+    document.getElementById('contact-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevenir comportamiento predeterminado
 
-    <!-- Botón flotante para ir arriba -->
-    <div class="back-to-top" id="back-to-top" onclick="scrollToTop()">↑</div>
+        const nombre = document.getElementById('nombre').value;
+        const emailUsuario = document.getElementById('email').value;
+        const mensajeUsuario = document.getElementById('mensaje').value;
 
-    <script>
-        const backToTopButton = document.querySelector('.back-to-top');
-        window.addEventListener('scroll', () => {
-            backToTopButton.style.display = window.scrollY > 300 ? 'block' : 'none';
+        // Mensaje de agradecimiento al usuario
+        const asuntoUsuario = "Gracias por contactarte con nosotros";
+        const mensajeAUsuario = `Hola ${nombre},
+
+Gracias por contactarte con nosotros. Enseguida te responderemos.
+
+Saludos cordiales,
+El equipo`;
+
+        // Enviar correo al usuario
+        enviarCorreo(emailUsuario, asuntoUsuario, mensajeAUsuario)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.mensaje);
+            }
+            return response.json();
+        })
+        .then(() => {
+            // Enviar correo al propietario con el mensaje del usuario
+            const emailPropietario = "fjuansimon@gmail.com"; // Pasa esta variable desde tu backend
+            const asuntoPropietario = `Nuevo mensaje de ${nombre}`;
+            const mensajeAPropietario = `Has recibido un nuevo mensaje de ${nombre} (${emailUsuario}):${mensajeUsuario}`;
+
+            return enviarCorreo(emailPropietario, asuntoPropietario, mensajeAPropietario);
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la solicitud al enviar correo al propietario: ' + response);
+            }
+            return response.json();
+        })
+        .then(() => {
+            alert('Gracias por contactarte con nosotros, enseguida te responderemos.');
+            document.getElementById('contact-form').reset();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al enviar el mensaje: ' + error.message);
         });
-        backToTopButton.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    function enviarCorreo(destinatario, asunto, mensaje) {
+        return fetch('/envios/enviar_correo', { // Actualizado con el prefijo /envios
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                destinatario: destinatario,
+                asunto: asunto,
+                mensaje: mensaje
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la solicitud: ' + response.statusText);
+            }
+            return response.json();
         });
-    </script>
-        {% include 'footer.html' %}
+    }
+</script>
+
+
+
+<script>
+    // Mostrar el botón de flecha cuando el usuario se desplaza hacia abajo
+    window.addEventListener('scroll', function() {
+        const backToTopButton = document.getElementById('back-to-top');
+        if (window.scrollY > 300) {
+            backToTopButton.style.display = 'block';
+        } else {
+            backToTopButton.style.display = 'none';
+        }
+    });
+
+    // Desplazar hacia arriba cuando se hace clic en el botón de flecha
+    document.getElementById('back-to-top').addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+</script>
 </body>
 </html>

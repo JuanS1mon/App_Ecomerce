@@ -1,0 +1,101 @@
+{
+    "user_id": "juan",
+    "table_name": "dieta",
+    "column_name": "id",
+    "total_registros": 7,
+    "categorias": 4,
+    "last_date": "2024-12-11 00:00:00",
+    "first_date": "2024-12-07 00:00:00",
+    "max_value": 7.0,
+    "min_value": 1.0,
+    "chart_data": {
+        "labels": [
+            "2024-12-07 00:00:00",
+            "2024-12-08 00:00:00",
+            "2024-12-09 00:00:00",
+            "2024-12-10 00:00:00",
+            "2024-12-11 00:00:00"
+        ],
+        "values": [
+            2,
+            2,
+            1,
+            1,
+            1
+        ]
+    },
+    "table_data": [
+        {
+            "id": 1,
+            "comida": "Huevos revueltos con aguacate y tomate",
+            "fecha": "2024-12-07 00:00:00",
+            "categoria": "comida sana",
+            "dia": "Viernes",
+            "fecha_str": "2024-12-07 00:00:00",
+            "cluster": 1
+        },
+        {
+            "id": 2,
+            "comida": "Pan integral con aguacate y huevos",
+            "fecha": "2024-12-08 00:00:00",
+            "categoria": "comida sana",
+            "dia": "Sábado",
+            "fecha_str": "2024-12-08 00:00:00",
+            "cluster": 1
+        },
+        {
+            "id": 3,
+            "comida": "Yogur con granola y frutas frescas",
+            "fecha": "2024-12-09 00:00:00",
+            "categoria": "yogures",
+            "dia": "Domingo",
+            "fecha_str": "2024-12-09 00:00:00",
+            "cluster": 0
+        },
+        {
+            "id": 4,
+            "comida": "Pan integral con aguacate y huevos",
+            "fecha": "2024-12-10 00:00:00",
+            "categoria": "panes",
+            "dia": "Lunes",
+            "fecha_str": "2024-12-10 00:00:00",
+            "cluster": 0
+        },
+        {
+            "id": 5,
+            "comida": "Yogur con granola y frutas frescas",
+            "fecha": "2024-12-11 00:00:00",
+            "categoria": "yogures",
+            "dia": "Martes",
+            "fecha_str": "2024-12-11 00:00:00",
+            "cluster": 0
+        },
+        {
+            "id": 6,
+            "comida": "Yogur con granola y frutas frescas",
+            "fecha": "2024-12-07 00:00:00",
+            "categoria": "yogures",
+            "dia": "Miércoles",
+            "fecha_str": "2024-12-07 00:00:00",
+            "cluster": 2
+        },
+        {
+            "id": 7,
+            "comida": "Oatmeal con frutas frescas y nueces",
+            "fecha": "2024-12-08 00:00:00",
+            "categoria": "postre",
+            "dia": "Jueves",
+            "fecha_str": "2024-12-08 00:00:00",
+            "cluster": 2
+        }
+    ],
+    "clusters": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        2,
+        2
+    ]
+}

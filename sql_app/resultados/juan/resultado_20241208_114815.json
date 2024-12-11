@@ -1,0 +1,29 @@
+{
+    "user_id": "juan",
+    "table_name": "dieta",
+    "column_name": "comida",
+    "total_registros": 7,
+    "categorias": 4,
+    "last_date": "2024-12-11 00:00:00",
+    "first_date": "2024-12-07 00:00:00",
+    "max_value": "Yogur con granola y frutas frescas",
+    "min_value": "Huevos revueltos con aguacate y tomate",
+    "chart_data": {
+        "labels": [
+            "2024-12-07 00:00:00",
+            "2024-12-08 00:00:00",
+            "2024-12-09 00:00:00",
+            "2024-12-10 00:00:00",
+            "2024-12-11 00:00:00"
+        ],
+        "values": [
+            2,
+            2,
+            1,
+            1,
+            1
+        ]
+    },
+    "table_data": [],
+    "clusters": []
+}
