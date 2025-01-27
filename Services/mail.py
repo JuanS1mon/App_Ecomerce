@@ -33,6 +33,7 @@ router = APIRouter(
 )
 
 # Ruta de FastAPI para enviar correo
+# Ruta de FastAPI para enviar correo
 @router.post("/enviar_correo")
 async def enviar_correo_route(request: EmailRequest):
     # Validar el email
@@ -42,10 +43,10 @@ async def enviar_correo_route(request: EmailRequest):
     # Enviar el correo
     try:
         enviar_correo(destinatario, request.asunto, request.mensaje)
-        return {'mensaje': f"Correo enviado exitosamente"}
+        return {'mensaje': "Correo enviado exitosamente"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Error al enviar el correo")
-
+        raise HTTPException(status_code=500, detail=f"Error al enviar el correo: {str(e)}")
+    
 def enviar_correo(destinatario, asunto, mensaje):
     msg = MIMEMultipart()
     msg['From'] = USERNAME
@@ -59,9 +60,8 @@ def enviar_correo(destinatario, asunto, mensaje):
         text = msg.as_string()
         server.sendmail(USERNAME, destinatario, text)
         server.quit()
-        print("Correo enviado exitosamente a", destinatario)
     except Exception as e:
-        print("Error al enviar el correo:", e)
+
         raise e  # Propagar la excepción
 
 def validar_email(email):

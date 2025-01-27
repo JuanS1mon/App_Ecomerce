@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>appapp</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="static/css/styles.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p6vG6KlNwD8Ke6EqRIpyfuYm/9xV7NKTPV36F+VE+tTmdevLAILo5kh5K+3gSRDSdziVhUnyhka/qZq7oyt+1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         .parallax {
             background-attachment: fixed;
@@ -74,6 +73,20 @@
             background-color: #f5e2f2; /* Light pastel pink */
         }
         
+        .sending-message {
+            display: none;
+            align-items: center;
+            font-size: 16px;
+            color: #1a202c;
+            margin-left: 10px;
+            animation: fly 2s infinite;
+        }
+
+        @keyframes fly {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -193,19 +206,25 @@
                     <label for="mensaje" class="block text-gray-700 font-semibold">Mensaje:</label>
                     <textarea id="mensaje" name="mensaje" rows="5" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"></textarea>
                 </div>
-                <div>
+                <div class="flex items-center">
                     <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600 transition">Enviar mensaje</button>
+                    <div id="sending-message" class="sending-message">
+                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                        <span>Enviando...</span>
+                    </div>
                 </div>
             </form>
         </div>
     </section>
-        <!-- Botón de flecha para ir arriba -->
-        <div id="back-to-top" class="back-to-top">
-            &#8679;
-        </div>
+
+    <!-- Botón de flecha para ir arriba -->
+    <div id="back-to-top" class="back-to-top">
+        &#8679;
+    </div>
 
     {% include 'footer.html' %}
-<!-- Scripts -->
+
+ <!-- En la sección de scripts de tu archivo index.html -->
 <script>
     document.getElementById('contact-form').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevenir comportamiento predeterminado
@@ -213,6 +232,10 @@
         const nombre = document.getElementById('nombre').value;
         const emailUsuario = document.getElementById('email').value;
         const mensajeUsuario = document.getElementById('mensaje').value;
+        const sendingMessage = document.getElementById('sending-message');
+
+        // Mostrar el mensaje de envío
+        sendingMessage.style.display = 'flex';
 
         // Mensaje de agradecimiento al usuario
         const asuntoUsuario = "Gracias por contactarte con nosotros";
@@ -225,38 +248,34 @@ El equipo`;
 
         // Enviar correo al usuario
         enviarCorreo(emailUsuario, asuntoUsuario, mensajeAUsuario)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(response.mensaje);
-            }
-            return response.json();
-        })
+        .then(response => manejarRespuesta(response, 'Error al enviar correo al usuario'))
         .then(() => {
             // Enviar correo al propietario con el mensaje del usuario
             const emailPropietario = "fjuansimon@gmail.com"; // Pasa esta variable desde tu backend
             const asuntoPropietario = `Nuevo mensaje de ${nombre}`;
-            const mensajeAPropietario = `Has recibido un nuevo mensaje de ${nombre} (${emailUsuario}):${mensajeUsuario}`;
+            const mensajeAPropietario = `Has recibido un nuevo mensaje de ${nombre} (${emailUsuario}):
+
+${mensajeUsuario}`;
 
             return enviarCorreo(emailPropietario, asuntoPropietario, mensajeAPropietario);
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la solicitud al enviar correo al propietario: ' + response);
-            }
-            return response.json();
-        })
+        .then(response => manejarRespuesta(response, 'Error al enviar correo al propietario'))
         .then(() => {
-            alert('Gracias por contactarte con nosotros, enseguida te responderemos.');
+            alert('Tu mensaje ha sido enviado con éxito.');
             document.getElementById('contact-form').reset();
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Ocurrió un error al enviar el mensaje: ' + error.message);
+        })
+        .finally(() => {
+            // Ocultar el mensaje de envío
+            sendingMessage.style.display = 'none';
         });
     });
 
     function enviarCorreo(destinatario, asunto, mensaje) {
-        return fetch('/envios/enviar_correo', { // Actualizado con el prefijo /envios
+        return fetch('/envios/enviar_correo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -264,17 +283,19 @@ El equipo`;
                 asunto: asunto,
                 mensaje: mensaje
             })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la solicitud: ' + response.statusText);
-            }
-            return response.json();
         });
     }
+
+    function manejarRespuesta(response, errorMessage) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            return response.json().then(errorData => {
+                throw new Error(errorMessage + ': ' + (errorData.detail || response.statusText));
+            });
+        }
+    }
 </script>
-
-
 
 <script>
     // Mostrar el botón de flecha cuando el usuario se desplaza hacia abajo

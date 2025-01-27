@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y Condiciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p6vG6KlNwD8Ke6EqRIpyfuYm/9xV7NKTPV36F+VE+tTmdevLAILo5kh5K+3gSRDSdziVhUnyhka/qZq7oyt+1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .parallax {
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+        .overlay {
+            background: rgba(9, 98, 110, 50); /* Overlay oscuro */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+        }
+        .fixed-section {
+            position: relative;
+            z-index: 2;
+        }
+        .custom-green {
+            background-color: rgba(9, 98, 110, 1);
+        }
+        .custom-green:hover {
+            background-color: rgba(9, 98, 110, 0.8);
+        }
+        .custom-greenbg {
+            background-color: rgb(22, 81, 88);
+        }
+        .bg-pastel-yellow {
+            background-color: #f7d7c5; /* Light pastel yellow */
+        }
+        .bg-pastel-darkblue {
+            background-color: #17183b; /* Light pastel yellow */
+        }
+        .bg-pastel-blue {
+            background-color: hsl(226, 67%, 55%); /* Light pastel blue */
+        }
+        .bg-pastel-green {
+            background-color: #98FB98; /* Light pastel green */
+        }
+        .bg-pastel-pink {
+            background-color: #f5e2f2; /* Light pastel pink */
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Barra de navegación -->
+    <nav class="bg-gray-800 p-4 w-full z-10">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a href="index">
+                    <img src="static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
+                </a>
+                <span class="text-gray-400">/</span>
+                <a href="index#about" class="text-white hover:text-gray-300">Sobre la App</a>
+                <span class="text-gray-400">/</span>
+                <a href="index#noticias" class="text-white hover:text-gray-300">Noticias</a>
+                <span class="text-gray-400">/</span>
+                <a href="index#testimonials" class="text-white hover:text-gray-300">Testimonios</a>
+                <span class="text-gray-400">/</span>
+                <a href="index#Contacto" class="text-white hover:text-gray-300">Contacto</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="flex space-x-4">
+                    <li class="nav-item">
+                        <a class="nav-link text-gray-300 hover:text-white" href="/admin/page">Administracion</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-gray-300 hover:text-white" href="/news">Noticias</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-gray-300 hover:text-white" href="/loginpage">Iniciar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="min-h-screen flex items-center justify-center bg-pastel-pink text-gray-800 relative">
+        <img src="static/img/logo.jpg" alt="Generadora de apps" class="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none">
+
+        <div class="container mx-auto px-4 py-8">
+            <h1 class="text-4xl font-bold mb-4">Términos y Condiciones</h1>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">1. Introducción</h2>
+                <p class="mb-4">Bienvenido a nuestra aplicación. Al acceder o utilizar nuestra aplicación, usted acepta estar sujeto a estos términos y condiciones.</p>
+
+                <h2 class="text-2xl font-semibold mb-4">2. Uso de la Aplicación</h2>
+                <p class="mb-4">Nuestra aplicación está destinada a ser utilizada para [descripción del propósito de la aplicación]. Usted se compromete a utilizar la aplicación de manera responsable y de acuerdo con todas las leyes y regulaciones aplicables.</p>
+
+                <h2 class="text-2xl font-semibold mb-4">3. Propiedad Intelectual</h2>
+                <p class="mb-4">Todo el contenido, diseño, texto, gráficos, logotipos, iconos, imágenes, clips de audio, descargas, interfaces y código, y la selección y disposición de los mismos, son propiedad de Juan Ferreyra o de sus proveedores de contenido y están protegidos por las leyes de derechos de autor.</p>
+
+                <h2 class="text-2xl font-semibold mb-4">4. Limitación de Responsabilidad</h2>
+                <p class="mb-4">En ningún caso [Nombre de la Empresa] será responsable de ningún daño indirecto, incidental, especial o consecuente que surja del uso o la imposibilidad de uso de la aplicación.</p>
+
+                <h2 class="text-2xl font-semibold mb-4">5. Modificaciones de los Términos</h2>
+                <p class="mb-4">Nos reservamos el derecho de modificar estos términos y condiciones en cualquier momento. Las modificaciones serán efectivas inmediatamente después de su publicación en la aplicación.</p>
+
+                <h2 class="text-2xl font-semibold mb-4">6. Contacto</h2>
+                <p class="mb-4">Si tiene alguna pregunta sobre estos términos y condiciones, por favor contáctenos en fjuansimon@gmail.com </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Botón de flecha para ir arriba -->
+    <div id="back-to-top" class="back-to-top">
+        &#8679;
+    </div>
+    <!-- Scripts -->
+    <script>
+        // Mostrar el botón de flecha cuando el usuario se desplaza hacia abajo
+        window.addEventListener('scroll', function() {
+            const backToTopButton = document.getElementById('back-to-top');
+            if (window.scrollY > 300) {
+                backToTopButton.style.display = 'block';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        });
+
+        // Desplazar hacia arriba cuando se hace clic en el botón de flecha
+        document.getElementById('back-to-top').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>

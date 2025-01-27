@@ -8,33 +8,124 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
 </head>
 <body class="bg-gray-100">
-    <!-- Navegación -->
-    <nav class="bg-gray-800 p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-white text-xl font-bold">Analizador de Datos</h1>
+<!-- Barra de navegación -->
+<nav class="bg-gray-800 p-4 relative z-30">
+    <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <a href="">
+                <img src="../static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
+            </a>
+            <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
+            <span class="text-gray-400">/</span>
+            <a href="/admin/page" class="text-white text-lg font-semibold hover:text-gray-300">Admin</a>
+            <span class="text-gray-400">/</span>
+            <a href="/analisis/admin" class="text-white text-lg font-semibold hover:text-gray-300">Analisis de datos</a>
+            <span class="text-gray-400">/</span>
+            <span class="text-white text-lg font-semibold">Nuevo Analisis</span>
         </div>
-    </nav>
-
+        <div class="flex items-center space-x-4 relative">
+            <a href="/docs" class="text-white hover:text-gray-300">Documentación</a>
+            <a href="/generar" class="text-white hover:text-gray-300">Generar API</a>
+            <a href="/migraciones/admin_migraciones" class="text-white hover:text-gray-300">Migraciones</a>
+            <div class="relative">
+                <button id="perfil" class="flex items-center focus:outline-none">
+                    <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white">
+                        {{ user.nombre[0]|upper }}
+                    </div>
+                    <svg class="ml-2 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
+                    <a href="/admin/perfil" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Perfil de usuario</a>
+                    <form action="/logout" method="post">
+                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+<!-- Descripción de la app -->
+<div class="flex justify-center p-4">
+    <div class="bg-blue-50 p-6 rounded-lg shadow-md max-w-lg">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-blue-600">Análisis de datos</h2>
+            <button id="toggleButton" class="text-blue-600 hover:underline text-xl ml-2" onclick="toggleDescription()">
+                <i class="fas fa-info-circle"></i>
+            </button>
+        </div>
+        <div id="description" class="hidden">
+            <p class="text-gray-700">
+                En esta página, puedes seleccionar tablas y columnas de una base de datos para realizar análisis de datos. 
+                La aplicación permite definir rangos de fechas y agregar campos adicionales para un análisis más detallado.
+            </p>
+            <p class="text-gray-700 mt-2">
+                La página proporciona varias secciones de análisis, incluyendo indicadores clave de rendimiento (KPIs), 
+                gráficos dinámicos y tablas detalladas. Los usuarios pueden alternar entre estas secciones utilizando botones específicos.
+            </p>
+            <p class="text-gray-700 mt-2">
+                Además, la aplicación permite realizar análisis avanzados como clustering, clasificación y regresión en los datos seleccionados. 
+                Los resultados de estos análisis se muestran en la sección correspondiente.
+            </p>
+            <p class="text-gray-700 mt-2">
+                Utiliza esta herramienta para obtener información valiosa de tus datos de manera eficiente y optimizar tu productividad 
+                en la gestión de información.
+            </p>
+        </div>
+    </div>
+</div>
     <!-- Contenedor Principal -->
     <div class="container mx-auto px-4 py-8">
-        <!-- Selección de Tabla -->
+        <!-- Sección de Selección -->
         <div class="bg-white p-4 rounded shadow mb-6">
-            <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona una Tabla</h2>
-            <select id="table-select" class="block w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="" disabled selected>Selecciona una tabla...</option>
-                {% for table in tabla2 %}
-                    <option value="{{ table }}">{{ table }}</option>
-                {% endfor %}
-            </select>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-gray-700 font-bold text-lg">Objetivo de analisis</h2>
+                <button onclick="toggleSection()" class="bg-blue-500 text-white px-2 py-1">
+                    <i id="toggle-icon" class="fas fa-minus"></i>
+                </button>
+            </div>
+            <div id="selection-section">
+                <!-- Selección de Tabla -->
+                <div class="mb-6">
+                    <select id="table-select" class="block w-full px-4 py-2 border border-gray-300 rounded-md">
+                        <option value="" disabled selected>Selecciona una tabla...</option>
+                        {% for table in tabla2 %}
+                            <option value="{{ table }}">{{ table }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+    
+                <!-- Selección de Columna -->
+                <div class="mb-6">
+                    <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona una Columna para el Análisis</h2>
+                    <select id="column-select" class="block w-full px-4 py-2 border border-gray-300 rounded-md">
+                        <option value="" disabled selected>Selecciona una columna...</option>
+                    </select>
+                </div>
+    
+                <!-- Selección de Campo de Fecha y Rango de Fechas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona un Campo de Fecha</h2>
+                        <select id="date_field" name="date_field" class="block w-full px-4 py-2 border border-gray-300 rounded-md">
+                            <option value="" disabled selected>Selecciona un campo de fecha...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona un Rango de Fechas</h2>
+                        <input type="date" id="start_date" name="start_date" class="w-full border px-4 py-2 border-gray-300 rounded-md mb-2">
+                        <input type="date" id="end_date" name="end_date" class="w-full border px-4 py-2 border-gray-300 rounded-md">
+                    </div>
+                </div>
+                <!-- Campos Adicionales -->
+                <div id="additional-fields" class="mb-6">
+                    <h2 class="text-gray-700 font-bold text-lg mb-4">Campos Adicionales</h2>
+                    <button type="button" onclick="addField()" class="bg-green-500 text-white px-4 py-2 mb-2">Agregar Campo</button>
+                </div>
+            </div>
         </div>
-
-        <!-- Selección de Columna -->
-        <div class="bg-white p-4 rounded shadow mb-6">
-            <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona una Columna para el Análisis</h2>
-            <select id="column-select" class="block w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="" disabled selected>Selecciona una columna...</option>
-            </select>
-        </div>
+    </div>
 
         <!-- Opciones de Análisis -->
         <div class="bg-white p-4 rounded shadow mb-6">
@@ -139,192 +230,194 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const kpiSection = document.getElementById("kpi-section");
-        const graphSection = document.getElementById("graph-section");
-        const tableSection = document.getElementById("table-section");
+    <script src="path/to/your/script.js"></script>
+</body>
+</html>
+<script>
+    function toggleDescription() {
+        const description = document.getElementById('description');
+        const toggleButton = document.getElementById('toggleButton');
+        if (description.classList.contains('hidden')) {
+            description.classList.remove('hidden');
+            toggleButton.innerHTML = '<i class="fas fa-times-circle"></i>';
+        } else {
+            description.classList.add('hidden');
+            toggleButton.innerHTML = '<i class="fas fa-info-circle"></i>';
+        }
+    }
+</script>
 
-        document.getElementById("show-kpis").addEventListener("click", () => {
-            kpiSection.classList.remove("hidden");
-            graphSection.classList.add("hidden");
-            tableSection.classList.add("hidden");
-        });
+<script>
+    // Establecer la fecha actual por defecto en el campo end_date
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const today = new Date().toISOString().split('T')[0];
+        const endDateField = document.getElementById('end_date');
+        if (endDateField) {
+            endDateField.value = today;
+        }
+    });
+</script>
 
-        document.getElementById("show-graph").addEventListener("click", () => {
-            kpiSection.classList.add("hidden");
-            graphSection.classList.remove("hidden");
-            tableSection.classList.add("hidden");
+<script>
+    // Función para mostrar/ocultar la sección de selección
+    function toggleSection() {
+        const section = document.getElementById('selection-section');
+        const icon = document.getElementById('toggle-icon');
+        section.classList.toggle('hidden');
+        icon.classList.toggle('fa-minus');
+        icon.classList.toggle('fa-plus');
+    }
+</script>
 
-            // Carga de gráfico dinámico
-            const ctx = document.getElementById('chart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Enero', 'Febrero', 'Marzo'],
-                    datasets: [{
-                        label: 'Ejemplo',
-                        data: [10, 20, 30],
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                }
-            });
-        });
+<script>
+    // Función para agregar un campo adicional
+    function addField() {
+        const container = document.getElementById('additional-fields');
+        const field = document.createElement('div');
+        field.className = 'mb-4 flex items-center';
+        field.innerHTML = `
+            <div class="flex-1">
+                <label for="additional_field" class="block text-gray-700 font-bold mb-2">Campo Adicional:</label>
+                <select name="additional_fields[]" class="block w-full px-4 py-2 border border-gray-300 rounded-md">
+                    <!-- Opciones de campos adicionales se cargarán aquí -->
+                </select>
+            </div>
+            <button type="button" onclick="removeField(this)" class="ml-4 bg-red-500 text-white px-4 py-2 rounded-md self-end">Eliminar</button>
+        `;
+        container.appendChild(field);
 
-        document.getElementById("show-table").addEventListener("click", () => {
-            kpiSection.classList.add("hidden");
-            graphSection.classList.add("hidden");
-            tableSection.classList.remove("hidden");
-
-            // Ejemplo de datos dinámicos
-            const headers = ["Columna 1", "Columna 2", "Columna 3"];
-            const data = [
-                ["Dato 1", "Dato 2", "Dato 3"],
-                ["Dato A", "Dato B", "Dato C"]
-            ];
-
-            const headerRow = document.getElementById("table-headers");
-            headerRow.innerHTML = headers.map(header => `<th class="border px-4 py-2">${header}</th>`).join("");
-
-            const tableBody = document.getElementById("table-data");
-            tableBody.innerHTML = data.map(row => 
-                `<tr>${row.map(cell => `<td class="border px-4 py-2">${cell}</td>`).join("")}</tr>`
-            ).join("");
-        });
-
-        document.getElementById("table-select").addEventListener("change", async function() {
-            const tableName = this.value;
-
-            // Obtener las columnas de la tabla seleccionada
-            const columnsResponse = await fetch(`/analisis/columnas`, {
+        // Llenar el nuevo select con las columnas
+        const tableName = document.getElementById("table-select").value;
+        if (tableName) {
+            fetch(`/analisis/columnas`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ table_name: tableName })
+            })
+            .then(response => response.json())
+            .then(columnsData => {
+                const select = field.querySelector('select[name="additional_fields[]"]');
+                select.innerHTML = '<option value="" disabled selected>Selecciona un campo...</option>';
+                columnsData.columns.forEach(column => {
+                    select.innerHTML += `<option value="${column.name}">${column.name}</option>`;
+                });
             });
-            const columnsData = await columnsResponse.json();
+        }
+    }
+</script>
 
-            // Poblar el select de columnas
-            const columnSelect = document.getElementById("column-select");
-            columnSelect.innerHTML = '<option value="" disabled selected>Selecciona una columna...</option>';
+<script>
+    // Función para eliminar un campo adicional
+    function removeField(button) {
+        const field = button.parentElement;
+        field.remove();
+    }
+</script>
+
+<script>
+    // Variables para las secciones de KPIs, gráficos y tabla
+    const kpiSection = document.getElementById("kpi-section");
+    const graphSection = document.getElementById("graph-section");
+    const tableSection = document.getElementById("table-section");
+
+    // Mostrar la sección de KPIs
+    document.getElementById("show-kpis").addEventListener("click", () => {
+        kpiSection.classList.remove("hidden");
+        graphSection.classList.add("hidden");
+        tableSection.classList.add("hidden");
+    });
+</script>
+
+<script>
+    // Mostrar la sección de gráficos
+    document.getElementById("show-graph").addEventListener("click", () => {
+        kpiSection.classList.add("hidden");
+        graphSection.classList.remove("hidden");
+        tableSection.classList.add("hidden");
+
+        // Carga de gráfico dinámico
+        const ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Enero', 'Febrero', 'Marzo'],
+                datasets: [{
+                    label: 'Ejemplo',
+                    data: [10, 20, 30],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            }
+        });
+    });
+</script>
+
+<script>
+    // Mostrar la sección de tabla detallada
+    document.getElementById("show-table").addEventListener("click", () => {
+        kpiSection.classList.add("hidden");
+        graphSection.classList.add("hidden");
+        tableSection.classList.remove("hidden");
+
+        // Ejemplo de datos dinámicos
+        const headers = ["Columna 1", "Columna 2", "Columna 3"];
+        const data = [
+            ["Dato 1", "Dato 2", "Dato 3"],
+            ["Dato A", "Dato B", "Dato C"]
+        ];
+
+        const headerRow = document.getElementById("table-headers");
+        headerRow.innerHTML = headers.map(header => `<th class="border px-4 py-2">${header}</th>`).join("");
+
+        const tableBody = document.getElementById("table-data");
+        tableBody.innerHTML = data.map(row => 
+            `<tr>${row.map(cell => `<td class="border px-4 py-2">${cell}</td>`).join("")}</tr>`
+        ).join("");
+    });
+</script>
+<script>
+    // Manejar el cambio de selección de tabla
+    document.getElementById("table-select").addEventListener("change", async function() {
+        const tableName = this.value;
+
+        // Obtener las columnas de la tabla seleccionada
+        const columnsResponse = await fetch(`/analisis/columnas`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ table_name: tableName })
+        });
+        const columnsData = await columnsResponse.json();
+
+        // Poblar el select de columnas (solo int y bigint)
+        const columnSelect = document.getElementById("column-select");
+        columnSelect.innerHTML = '<option value="" disabled selected>Selecciona una columna...</option>';
+        columnsData.columns
+            .filter(column => ['INTEGER', 'BIGINT'].includes(column.type.toUpperCase()))
+            .forEach(column => {
+                columnSelect.innerHTML += `<option value="${column.name}">${column.name}</option>`;
+            });
+
+        // Poblar el select de campos de fecha (date, datetime, smalldatetime)
+        const dateFieldSelect = document.getElementById("date_field");
+        dateFieldSelect.innerHTML = '<option value="" disabled selected>Selecciona un campo de fecha...</option>';
+        columnsData.columns
+            .filter(column => ['DATE', 'DATETIME', 'SMALLDATETIME'].includes(column.type.toUpperCase()))
+            .forEach(column => {
+                dateFieldSelect.innerHTML += `<option value="${column.name}">${column.name}</option>`;
+            });
+
+        // Poblar el select de campos adicionales (todos los tipos)
+        const additionalFieldsSelects = document.querySelectorAll('select[name="additional_fields[]"]');
+        additionalFieldsSelects.forEach(select => {
+            select.innerHTML = '<option value="" disabled selected>Selecciona un campo...</option>';
             columnsData.columns.forEach(column => {
-                columnSelect.innerHTML += `<option value="${column}">${column}</option>`;
+                select.innerHTML += `<option value="${column.name}">${column.name}</option>`;
             });
         });
-
-        document.getElementById("column-select").addEventListener("change", async function() {
-            const tableName = document.getElementById("table-select").value;
-            const columnName = this.value;
-
-            const response = await fetch(`/analisis/analizar`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ table_name: tableName, column_name: columnName })
-            });
-            const data = await response.json();
-
-            // Actualizar KPIs
-            document.getElementById("total-records").textContent = data.total_registros;
-            document.getElementById("categories").textContent = data.categorias;
-            document.getElementById("last-date").textContent = data.last_date;
-            document.getElementById("first-date").textContent = data.first_date;
-            document.getElementById("max-value").textContent = data.max_value;
-            document.getElementById("min-value").textContent = data.min_value;
-
-            // Mostrar resultados de clustering
-            const clusterResults = document.getElementById("cluster-results");
-            clusterResults.innerHTML = data.clusters.map((cluster, index) => `<li>Registro ${index + 1}: Cluster ${cluster}</li>`).join("");
-
-            // Actualizar gráfico
-            const ctx = document.getElementById('chart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.chart_data.labels,
-                    datasets: [{
-                        label: 'Análisis',
-                        data: data.chart_data.values,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                }
-            });
-
-            // Actualizar tabla detallada
-            const headers = Object.keys(data.table_data[0]);
-            const headerRow = document.getElementById("table-headers");
-            headerRow.innerHTML = headers.map(header => `<th class="border px-4 py-2">${header}</th>`).join("");
-
-            const tableBody = document.getElementById("table-data");
-            tableBody.innerHTML = data.table_data.map(row => 
-                `<tr>${headers.map(header => `<td class="border px-4 py-2">${row[header]}</td>`).join("")}</tr>`
-            ).join("");
-        });
-
-        document.getElementById("show-clustering").addEventListener("click", async () => {
-            const tableName = document.getElementById("table-select").value;
-            const columnName = document.getElementById("column-select").value;
-
-            const response = await fetch(`/analisis/analizar`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ table_name: tableName, column_name: columnName })
-            });
-            const data = await response.json();
-
-            // Mostrar resultados de clustering
-            const clusterResults = document.getElementById("cluster-results");
-            clusterResults.innerHTML = data.clusters.map((cluster, index) => `<li>Registro ${index + 1}: Cluster ${cluster}</li>`).join("");
-        });
-
-        document.getElementById("show-classification").addEventListener("click", async () => {
-            const tableName = document.getElementById("table-select").value;
-            const columnName = document.getElementById("column-select").value;
-
-            const response = await fetch(`/analisis/clasificar`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ table_name: tableName, column_name: columnName })
-            });
-            const data = await response.json();
-
-            // Mostrar precisión del modelo de clasificación
-            alert(`Precisión del modelo de clasificación: ${data.accuracy}`);
-
-            // Mostrar predicciones
-            const clusterResults = document.getElementById("cluster-results");
-            clusterResults.innerHTML = data.predicciones.map((prediccion, index) => `<li>Registro ${index + 1}: Predicción ${prediccion}</li>`).join("");
-        });
-
-        document.getElementById("show-regression").addEventListener("click", async () => {
-            const tableName = document.getElementById("table-select").value;
-            const columnName = document.getElementById("column-select").value;
-
-            const response = await fetch(`/analisis/regresion`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ table_name: tableName, column_name: columnName })
-            });
-            const data = await response.json();
-
-            // Mostrar error cuadrático medio del modelo de regresión
-            alert(`Error cuadrático medio del modelo de regresión: ${data.mse}`);
-
-            // Mostrar predicciones
-            const clusterResults = document.getElementById("cluster-results");
-            clusterResults.innerHTML = data.predicciones.map((prediccion, index) => `<li>Registro ${index + 1}: Predicción ${prediccion}</li>`).join("");
-        });
-    </script>
-</body>
-</html>
+    });
+</script>

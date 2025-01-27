@@ -13,7 +13,7 @@ from db.schemas.Maestro.Usuarios import UserDB
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from db.crud.tablas import get_tables, get_columns
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 import numpy as np
 import json
 import os
@@ -29,15 +29,21 @@ router = APIRouter(
 
 class ColumnasRequest(BaseModel):
     table_name: str
+    
+
+class ColumnasRequest(BaseModel):
+    table_name: str
 
 @router.post("/columnas")
 async def obtener_columnas(request: ColumnasRequest, db: Session = Depends(get_db)):
     table_name = request.table_name
 
     # Obtener las columnas de la tabla seleccionada
-    query = text(f"SELECT TOP 1 * FROM {table_name}")
-    df = pd.read_sql(query, db.bind)
-    columns = df.columns.tolist()
+    inspector = inspect(db.bind)
+    columns_info = inspector.get_columns(table_name)
+
+    # Formatear la información de las columnas
+    columns = [{"name": col["name"], "type": str(col["type"])} for col in columns_info]
 
     return {"columns": columns}
 
@@ -87,12 +93,26 @@ async def analizar_datos(request: AnalisisRequest, db: Session = Depends(get_db)
     if pd.api.types.is_numeric_dtype(df[column_name]):
         max_value = float(df[column_name].max())
         min_value = float(df[column_name].min())
+        total_sum = float(df[column_name].sum())
+        average = float(df[column_name].mean())
     elif pd.api.types.is_datetime64_any_dtype(df[column_name]):
         max_value = df[column_name].max().strftime('%Y-%m-%d %H:%M:%S')
         min_value = df[column_name].min().strftime('%Y-%m-%d %H:%M:%S')
+        total_sum = None
+        average = None
     else:
         max_value = str(df[column_name].max())
         min_value = str(df[column_name].min())
+        total_sum = None
+        average = None
+
+    # Calcular el promedio por fecha si la columna 'fecha' existe
+    if 'fecha' in df.columns and pd.api.types.is_numeric_dtype(df[column_name]):
+        promedio_por_fecha = df.groupby('fecha')[column_name].mean().reset_index()
+        promedio_por_fecha['fecha'] = promedio_por_fecha['fecha'].dt.strftime('%Y-%m-%d %H:%M:%S')
+        promedio_por_fecha = promedio_por_fecha.to_dict(orient='records')
+    else:
+        promedio_por_fecha = []
 
     # Preparar datos para el gráfico utilizando 'fecha_str'
     if 'fecha_str' in df.columns and df['fecha_str'].notnull().any():
@@ -144,6 +164,9 @@ async def analizar_datos(request: AnalisisRequest, db: Session = Depends(get_db)
         "first_date": first_date,
         "max_value": max_value,
         "min_value": min_value,
+        "total_sum": total_sum,
+        "average": average,
+        "promedio_por_fecha": promedio_por_fecha,
         "chart_data": chart_data,
         "table_data": df_copy.to_dict(orient='records'),
         "clusters": clusters
@@ -153,7 +176,7 @@ async def analizar_datos(request: AnalisisRequest, db: Session = Depends(get_db)
     guardar_resultados_json(current_user.usuario, resultados)
 
     return resultados
-
+    
 def guardar_resultados_json(user_id, resultados):
     # Crear el directorio si no existe
     directorio = f"resultados/{user_id}"
@@ -286,12 +309,11 @@ async def regresion_datos(request: AnalisisRequest, db: Session = Depends(get_db
 
     return resultados
 
-
 def limpiar_datos(df):
     # Eliminar duplicados
     df = df.drop_duplicates()
 
-    # Resetear el índice después de eliminar filas
+    # Resetear el índice después de eliminar filas duplicadas
     df.reset_index(drop=True, inplace=True)
 
     # Convertir columnas de fecha a tipo datetime y luego a números

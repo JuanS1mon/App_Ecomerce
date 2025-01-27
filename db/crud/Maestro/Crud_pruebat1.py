@@ -42,11 +42,9 @@ def delete_pruebat1(db: Session, campot1: int):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 def update_pruebat1(db: Session, campot1: int, pruebat1_data: dict):
-    print(f"Actualizando pruebat1 con campot1 = {campot1}")
     try:
         # Obtener el registro existente
         record = db.query(Pruebat1).filter(Pruebat1.campot1 == campot1).first()
-        print(record)
         if not record:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="pruebat1 no encontrado")
 

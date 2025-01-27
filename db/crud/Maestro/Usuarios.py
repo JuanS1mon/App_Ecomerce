@@ -24,7 +24,6 @@ def create_usuario(db: Session, nombre: str, usuario: str, clave: str, mail: str
             raise HTTPException(status_code=403, detail="No se pudo crear el usuario debido a un error de integridad.")
     except Exception as e:
         db.rollback()
-        print(f"Error al insertar el usuario: {e}")
         raise HTTPException(status_code=403, detail="No se pudo crear el usuario.")
     
   
@@ -91,7 +90,6 @@ def user_pass(db: Session, username: str, password: str):
     return {"username": username, "password": hashed_password}
 
 def update_usuario_activate(db: Session, usuario: str):
-    print(usuario, "Activando usuario")
     try:
         result = db.execute(text("""UPDATE Usuarios SET activo = 1  
                                     OUTPUT INSERTED.Codigo,INSERTED.Usuario, INSERTED.Nombre, INSERTED.mail
@@ -104,8 +102,6 @@ def update_usuario_activate(db: Session, usuario: str):
         db.rollback()
         raise HTTPException(status_code=400, detail="No se pudo actualizar el usuario")
     
-    
-
 def get_user_from_db(db: Session, username: str):
     try:
         # Realizar la consulta a la tabla Usuarios usando SQL crudo
@@ -125,11 +121,9 @@ def get_user_from_db(db: Session, username: str):
                 activo=result.activo,
                 clave=result.clave
             )
-            print("db:", user)
             return user
         else:
             return None
     except Exception as e:
         # Manejar posibles excepciones
-        print(f"Error al obtener el usuario: {e}")
         return None

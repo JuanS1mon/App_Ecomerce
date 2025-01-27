@@ -13,13 +13,18 @@ def generate_schema(module_name, field_names, field_types):
     base_fields = field_names[1:]
     base_field_types = field_types[1:]
 
-    schema_code = "from pydantic import BaseModel, ConfigDict\n\n"
+    # Importaciones necesarias
+    schema_code = "from typing import Optional\n"
+    schema_code += "from pydantic import BaseModel, ConfigDict\n\n"
 
     # Definir la clase Base
     base_class_name = f"{module_name_cap}Base"
     schema_code += f"class {base_class_name}(BaseModel):\n"
     for field_name, field_type in zip(base_fields, base_field_types):
-        schema_code += f"    {field_name}: {field_type}\n"
+        if field_type.startswith("Optional["):
+            schema_code += f"    {field_name}: {field_type} = None\n"
+        else:
+            schema_code += f"    {field_name}: {field_type}\n"
     schema_code += "\n"
 
     # Definir la clase Create

@@ -1,15 +1,15 @@
-from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import date
+from pydantic import BaseModel, ConfigDict
 
+class Test2Base(BaseModel):
+    nombre: str
 
-class test2(BaseModel):
+class Test2Create(Test2Base):
+    codigo: int
 
-    campo1: int
-    campo2: str
-    campo3: Optional[float] = 0
+class Test2Update(Test2Base):
+    pass
 
-class test2Read(BaseModel):
-    campo1: int
-    campo2: str
-    campo3: Optional[float] = 0
+class Test2Read(Test2Base):
+    codigo: int
+    model_config = ConfigDict(from_attributes=True)

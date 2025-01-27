@@ -22,7 +22,7 @@ from Services.security.security import crear_access_token, authenticate_user, cu
 from db.database import Base, engine, get_db, create_database, create_tables
 from routers import usuarios as aut_usuario
 from routers import Blog
-from routers.Maestros import Route_Usuarios_roles, Route_test1, Route_test2, Route_pruebat1, Route_products
+from routers.Maestros import  Route_pruebat1,Route_carga,Route_test, Route_test2,Route_test3,Route_test4,Route_test5
 from routers.Configuraciones import Generar, configDB, Migraciones,Analisis
 from Services import mail
 
@@ -108,10 +108,12 @@ app.include_router(mail.router)
 
 # Maestros
 app.include_router(Route_pruebat1.router)
+app.include_router(Route_carga.router)
+app.include_router(Route_test.router)
 app.include_router(Route_test2.router)
-app.include_router(Route_test1.router)
-app.include_router(Route_Usuarios_roles.router)
-app.include_router(Route_products.router)
+app.include_router(Route_test3.router)
+app.include_router(Route_test4.router)
+app.include_router(Route_test5.router)
 
 # Manejadores de errores personalizados
 @app.exception_handler(StarletteHTTPException)
@@ -134,6 +136,21 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
     blog_posts = db.query(BlogPostModel).order_by(BlogPostModel.created_at.desc()).all()
     return templates.TemplateResponse("index.html", {"request": request, "blog_posts": blog_posts})
 
+
+
+# Ruta de términos y condiciones
+@app.get("/terminos", response_class=HTMLResponse)
+async def get_terminos():
+    with open("static/terminos.html", "r", encoding="utf-8") as file:
+        return HTMLResponse(content=file.read(), status_code=200)
+    
+    
+# Ruta de términos y condiciones
+@app.get("/privacidad", response_class=HTMLResponse)
+async def get_terminos():
+    with open("static/privacidad.html", "r", encoding="utf-8") as file:
+        return HTMLResponse(content=file.read(), status_code=200)
+
 # Ejemplo de datos del dashboard
 class Item(BaseModel):
     name: str
@@ -150,3 +167,4 @@ async def say_hello():
 @app.get("/admin")
 async def read_admin(current_user: UserDB = Depends(current_user)):
     return {"message": "Tienes acceso a esta ruta", "user": current_user.usuario}
+

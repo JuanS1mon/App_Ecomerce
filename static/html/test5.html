@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <title>Gestión de Test5</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <script>
+    window.onload = function() {
+      document.documentElement.classList.add('dark');
+      fetchData();
+    };
+
+    async function fetchData() {
+      const response = await fetch('/test5/');
+      const data = await response.json();
+      if (!Array.isArray(data)) {
+        console.error("La respuesta no es un array:", data);
+        return;
+      }
+      const tableBody = document.getElementById('data-table-body');
+      tableBody.innerHTML = '';
+      data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="border px-4 py-2">${item.codigo}</td>
+          <td class="border px-4 py-2">${item.nombre}</td>
+          <td class="border px-4 py-2">${item.fecha}</td>
+          <td class="border px-4 py-2">${item.numerito}</td>
+          <td class="border px-4 py-2">${item.verif}</td>
+          <td class="border px-4 py-2">
+            <button class="bg-blue-500 text-white px-2 py-1" onclick="editItem(${item.codigo})">Editar</button>
+            <button class="bg-red-500 text-white px-2 py-1" onclick="deleteItem(${item.codigo})">Eliminar</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    async function addItem(event) {
+      event.preventDefault();
+      const formData = {
+        codigo: parseInt(document.getElementById('codigo').value),
+        nombre: document.getElementById('nombre').value,
+        fecha: document.getElementById('fecha').value,
+        numerito: parseInt(document.getElementById('numerito').value),
+        verif: document.getElementById('verif').checked
+      };
+      try {
+        const respuesta = await fetch('/test5/', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(formData)
+        });
+        if (!respuesta.ok) {
+          throw new Error("Error al crear Test5");
+        }
+        console.log("Registro creado:", await respuesta.json());
+        document.getElementById('data-form').reset();
+        fetchData();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    function editItem(id) {
+      fetch(`/test5/id/${id}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('edit-codigo').value = data.codigo;
+          document.getElementById('edit-nombre').value = data.nombre;
+          document.getElementById('edit-fecha').value = data.fecha;
+          document.getElementById('edit-numerito').value = data.numerito;
+          document.getElementById('edit-verif').checked = data.verif;
+          document.getElementById('edit-modal').classList.remove('hidden');
+        });
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+    }
+
+    async function updateItem(event) {
+      event.preventDefault();
+      const id = document.getElementById('edit-codigo').value;
+      const updatedData = {
+        nombre: document.getElementById('edit-nombre').value,
+        fecha: document.getElementById('edit-fecha').value,
+        numerito: parseInt(document.getElementById('edit-numerito').value),
+        verif: document.getElementById('edit-verif').checked
+      };
+      await fetch(`/test5/id/${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(updatedData)
+      });
+      closeEditModal();
+      fetchData();
+    }
+
+    async function deleteItem(id) {
+      await fetch(`/test5/id/${id}`, { method: 'DELETE' });
+      fetchData();
+    }
+  </script>
+</head>
+<body class="p-4 bg-gray-900 text-white">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl">Gestión de Test5</h1>
+  </div>
+  <form id="data-form" class="mb-4" onsubmit="addItem(event)">
+    <div class="flex flex-wrap -mx-2">
+      <div class="w-full md:w-1/4 px-2 mb-4">
+        <label class="block">codigo:</label>
+        <input id="codigo" type="number" class="w-full border px-2 py-1 bg-gray-800 text-white" required>
+      </div>
+      <div class="w-full md:w-1/4 px-2 mb-4">
+        <label class="block">nombre:</label>
+        <input id="nombre" type="text" class="w-full border px-2 py-1 bg-gray-800 text-white">
+      </div>
+      <div class="w-full md:w-1/4 px-2 mb-4">
+        <label class="block">fecha:</label>
+        <input id="fecha" type="text" class="w-full border px-2 py-1 bg-gray-800 text-white">
+      </div>
+      <div class="w-full md:w-1/4 px-2 mb-4">
+        <label class="block">numerito:</label>
+        <input id="numerito" type="number" class="w-full border px-2 py-1 bg-gray-800 text-white">
+      </div>
+      <div class="w-full md:w-1/4 px-2 mb-4">
+        <div class="flex items-center">
+          <label class="mr-2">verif:</label>
+          <input id="verif" type="checkbox" class="w-4 h-4">
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="bg-green-500 text-white px-4 py-2">Agregar</button>
+  </form>
+  <table class="table-auto w-full border-collapse">
+    <thead>
+      <tr>
+        <th class="border px-4 py-2">codigo</th>
+        <th class="border px-4 py-2">nombre</th>
+        <th class="border px-4 py-2">fecha</th>
+        <th class="border px-4 py-2">numerito</th>
+        <th class="border px-4 py-2">verif</th>
+        <th class="border px-4 py-2">Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="data-table-body">
+      <!-- Los datos se cargarán aquí -->
+    </tbody>
+  </table>
+  <div id="edit-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-gray-800 p-4 rounded w-96">
+      <h2 class="text-xl mb-4">Editar Test5</h2>
+      <form id="edit-form" onsubmit="updateItem(event)">
+        <input type="hidden" id="edit-codigo">
+        <div class="mb-2">
+          <label>nombre:</label>
+          <input id="edit-nombre" type="text" class="border px-2 py-1 w-full bg-gray-800 text-white">
+        </div>
+        <div class="mb-2">
+          <label>fecha:</label>
+          <input id="edit-fecha" type="text" class="border px-2 py-1 w-full bg-gray-800 text-white">
+        </div>
+        <div class="mb-2">
+          <label>numerito:</label>
+          <input id="edit-numerito" type="number" class="border px-2 py-1 w-full bg-gray-800 text-white">
+        </div>
+        <div class="mb-2">
+          <div class="flex items-center">
+            <label class="mr-2">verif:</label>
+            <input id="edit-verif" type="checkbox" class="w-4 h-4">
+          </div>
+        </div>
+        <div class="flex justify-end">
+          <button type="button" class="mr-2 px-4 py-2" onclick="closeEditModal()">Cancelar</button>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

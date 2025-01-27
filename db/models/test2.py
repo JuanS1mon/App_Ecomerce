@@ -1,10 +1,8 @@
-from sqlalchemy import Column, Integer, NVARCHAR, Boolean, Float
+from sqlalchemy import Column, Integer, String, Boolean, Float
 from ..database import Base
 
-
-class test2(Base):
+class Test2(Base):
     __tablename__ = 'test2'
 
-    campo1 = Column(Integer, primary_key=True, index=True, default=0)
-    campo2 = Column(NVARCHAR(50), default=' ')
-    campo3 = Column(Float, default=0.0)
+    codigo = Column(Integer, primary_key=True, index=True, default=0)
+    nombre = Column(String(50), default=' ')

@@ -38,22 +38,16 @@ def verificar_clave(password: str, hashed_password: str) -> bool:
     return pwd_context.verify(password, hashed_password)
 
 def decodifica_token(token: str):
-    print(f"Token recibido: {token}")
     try:
         # Eliminar caracteres adicionales si están presentes
-        token = token.strip().rstrip('/')
-        print(f"Token procesado: {token}")
-        
+        token = token.strip().rstrip('/')        
         payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
-        print(f"Payload decodificado: {payload}")
         
         usuario = payload.get("sub")
         return usuario
     except jwt.ExpiredSignatureError:
-        print("Token expirado")
         return None
     except jwt.InvalidTokenError:
-        print("Token inválido")
         return None
 
 
@@ -110,14 +104,12 @@ def generar_token_activacion(usuario_id):
 async def get_current_user(request: Request, db: Session = Depends(get_db)):
     # Obtener el token de la cookie
     token = request.cookies.get('access_token')
-    print(f"Token recibido: {token}")
     
     if not token:
         # Intentar obtener el token del encabezado Authorization
         auth_header = request.headers.get('Authorization')
         if auth_header and auth_header.startswith('Bearer '):
             token = auth_header.split(' ')[1]
-            print(f"Token obtenido del encabezado Authorization: {token}")
     
     if not token:
         raise HTTPException(

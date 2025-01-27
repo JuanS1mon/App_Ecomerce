@@ -1,5 +1,6 @@
 # migraciones.py
 
+from io import BytesIO
 import os
 import logging
 from fastapi import APIRouter, Request, status, Depends, File, UploadFile, HTTPException, BackgroundTasks
@@ -13,6 +14,8 @@ from datetime import datetime
 import json
 from sqlalchemy.orm import Session
 from db.crud.tablas import get_tables
+import pandas as pd
+print(type(pd))  # Debería mostrar: <class 'module'>
 
 from sqlalchemy import inspect, Table, MetaData, func, cast, Date
 
@@ -49,7 +52,8 @@ async def migraciones_page(
     request: Request,
     current_user: UserDB = Depends(get_current_user)
 ):
-    return templates.TemplateResponse("migracion.html", {"request": request, "user": current_user})
+    return templates.TemplateResponse("migraciones_nueva.html", {"request": request, "user": current_user})
+
 
 @router.post("/upload")
 async def upload_migracion_file(
@@ -67,7 +71,7 @@ async def upload_migracion_file(
         ]:
             logging.warning(f"Tipo de archivo inválido: {file.content_type}")
             return templates.TemplateResponse(
-                "migracion.html",
+                "migraciones_nueva.html",
                 {
                     "request": request,
                     "user": current_user,
@@ -81,7 +85,7 @@ async def upload_migracion_file(
         # Validar que el archivo no esté vacío
         if not contents:
             return templates.TemplateResponse(
-                "migracion.html",
+                "migraciones_nueva.html",
                 {
                     "request": request,
                     "user": current_user,
@@ -93,14 +97,6 @@ async def upload_migracion_file(
         user_results_dir = os.path.join(RESULTS_DIR, current_user.usuario)
         os.makedirs(user_results_dir, exist_ok=True)
 
-        # Ruta donde se guardará el archivo JSON
-        json_filename = "datos.json"
-        json_path = os.path.join(user_results_dir, json_filename)
-
-        # Ruta donde se guardará el resultado
-        result_filename = f"result_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        result_path = os.path.join(user_results_dir, result_filename)
-
         # Obtener la fecha y hora actual
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 
@@ -108,15 +104,67 @@ async def upload_migracion_file(
         form = await request.form()
         nombre_migracion = form.get('migration_name', 'default_name')
 
-        # Nombre de la tabla
-        table_name = f"migracion_{nombre_migracion}_{timestamp}"
+        # Leer el archivo Excel
+        excel_data = pd.read_excel(BytesIO(contents), sheet_name=None)  # Leer todas las hojas
 
-        # Agregar la tarea en segundo plano
-        background_tasks.add_task(procesar_archivo, contents, json_path, result_path, db, current_user, table_name)
+        # Procesar cada hoja
+        for sheet_name, sheet_data in excel_data.items():            
+            # Nombre de la tabla para cada hoja
+            table_name = f"migracion_{nombre_migracion}_{sheet_name}_{timestamp}"
 
+            # Convertir columnas de tipo datetime a cadenas de texto
+            datetime_columns = sheet_data.select_dtypes(include=['datetime64[ns]', 'datetime']).columns
+            for column in datetime_columns:
+                try:
+                    sheet_data[column] = sheet_data[column].dt.strftime('%Y-%m-%d %H:%M:%S')
+                except Exception as e:
+                    logging.error(f"Error al convertir la columna {column} a cadena de texto: {str(e)}")
+                    sheet_data[column] = sheet_data[column].astype(str)
+
+            # Verificación adicional: Asegurarse de que no queden columnas datetime
+            remaining_datetime_columns = sheet_data.select_dtypes(include=['datetime64[ns]', 'datetime']).columns
+            if len(remaining_datetime_columns) > 0:
+                logging.warning(f"Quedan columnas datetime en la hoja {sheet_name}: {remaining_datetime_columns.tolist()}")
+                for column in remaining_datetime_columns:
+                    sheet_data[column] = sheet_data[column].astype(str)
+
+            # Verificación de tipos después de la conversión
+            for column in sheet_data.columns:
+                if sheet_data[column].dtype == 'object':
+                    sample_value = sheet_data[column].dropna().astype(str).iloc[0] if not sheet_data[column].dropna().empty else ''
+                    logging.info(f"Columna '{column}' tipo object con ejemplo de valor: {sample_value}")
+
+            # Ruta donde se guardará el archivo JSON para cada hoja
+            sheet_json_path = os.path.join(user_results_dir, f"{sheet_name}_datos.json")
+            sheet_data.to_json(sheet_json_path, orient='records', date_format='iso')  # Asegurar formato de fecha
+
+            # Verificación del archivo JSON creado
+            with open(sheet_json_path, 'r', encoding='utf-8') as f:
+                try:
+                    sample_data = json.load(f)
+                    for record in sample_data:
+                        for key, value in record.items():
+                            if isinstance(value, str) and 'T' in value:  # Detectar formato ISO
+                                adjusted_value = value.replace('T', ' ').split('.')[0]
+                                record[key] = adjusted_value
+                except json.JSONDecodeError as jde:
+                    logging.error(f"Error al decodificar JSON para la hoja {sheet_name}: {str(jde)}")
+                    continue  # Saltar a la siguiente hoja en caso de error
+
+            # Guardar el JSON corregido
+            with open(sheet_json_path, 'w', encoding='utf-8') as f:
+                json.dump(sample_data, f, ensure_ascii=False, indent=4)
+
+            # Ruta donde se guardará el resultado para cada hoja
+            result_filename = f"result_{sheet_name}_{timestamp}.json"
+            result_path = os.path.join(user_results_dir, result_filename)
+
+            # Agregar la tarea en segundo plano para procesar cada hoja
+            background_tasks.add_task(procesar_archivo, sheet_json_path, result_path, db, current_user, table_name)
+        
         # Redirigir a la página de resultados
         return templates.TemplateResponse(
-            "migracion.html",
+            "migraciones_nueva.html",
             {
                 "request": request,
                 "user": current_user,
@@ -128,7 +176,7 @@ async def upload_migracion_file(
     except Exception as e:
         logging.error(f"Error en el proceso de migración: {str(e)}")
         return templates.TemplateResponse(
-            "migracion.html",
+            "migraciones_nueva.html",
             {
                 "request": request,
                 "user": current_user,
@@ -152,7 +200,13 @@ async def get_all_results(
                 }
             )
 
-        result_files = [f for f in os.listdir(user_results_dir) if f.startswith("result_") and f.endswith(".json")]
+        # Obtener los archivos de resultados y ordenarlos por fecha de modificación (más reciente primero)
+        result_files = sorted(
+            [f for f in os.listdir(user_results_dir) if f.startswith("result_") and f.endswith(".json")],
+            key=lambda x: os.path.getmtime(os.path.join(user_results_dir, x)),
+            reverse=True
+        )
+
         results = []
         for result_file in result_files:
             result_path = os.path.join(user_results_dir, result_file)
@@ -176,6 +230,7 @@ async def get_all_results(
                 "error": f"Error al obtener los resultados: {str(e)}"
             }
         )
+    
 @router.get("/admin_migraciones")
 async def admin_migraciones_page(
         request: Request,
@@ -220,7 +275,7 @@ async def admin_migraciones_page(
     
         # Renderizar la plantilla
         return templates.TemplateResponse(
-            "admin_migraciones.html",
+            "migraciones_admin.html",
             {
                 "request": request,
                 "user": current_user,
@@ -278,7 +333,8 @@ async def get_table_records(
     # Obtener los primeros 5 registros de la tabla
     metadata = MetaData()
     table = Table(table_name, metadata, autoload_with=db.get_bind())
-    query = db.query(table).limit(5).all()
+    #query = db.query(table).limit(5).all()
+    query = db.query(table).all()
     records = [dict(row._mapping) for row in query]
 
     return {"records": records}
