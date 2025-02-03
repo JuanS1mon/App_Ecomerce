@@ -22,7 +22,7 @@ from Services.security.security import crear_access_token, authenticate_user, cu
 from db.database import Base, engine, get_db, create_database, create_tables
 from routers import usuarios as aut_usuario
 from routers import Blog
-from routers.Maestros import  Route_pruebat1,Route_carga,Route_test, Route_test2,Route_test3,Route_test4,Route_test5
+from routers.Maestros import  Route_pruebat1,Route_carga,Route_test19,Route_test20,Route_test21,Route_test22,Route_test23,Route_planilla_test
 from routers.Configuraciones import Generar, configDB, Migraciones,Analisis
 from Services import mail
 
@@ -109,11 +109,12 @@ app.include_router(mail.router)
 # Maestros
 app.include_router(Route_pruebat1.router)
 app.include_router(Route_carga.router)
-app.include_router(Route_test.router)
-app.include_router(Route_test2.router)
-app.include_router(Route_test3.router)
-app.include_router(Route_test4.router)
-app.include_router(Route_test5.router)
+app.include_router(Route_test19.router)
+app.include_router(Route_test20.router)
+app.include_router(Route_test21.router)
+app.include_router(Route_test22.router)
+app.include_router(Route_test23.router)
+app.include_router(Route_planilla_test.router)
 
 # Manejadores de errores personalizados
 @app.exception_handler(StarletteHTTPException)

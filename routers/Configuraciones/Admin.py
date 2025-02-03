@@ -21,13 +21,11 @@ def create_admin_router(app: FastAPI):
 
     @router.get("/page")
     async def admin_page(request: Request, db: Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)):
-        print("current_user: ", current_user)
         user_count = db.query(usuarios).count()
-        
         # Filtrar actividades de los últimos 7 días
         #seven_days_ago = date.today() - timedelta(days=7)
         activities = db.query(ActivityLog).order_by(ActivityLog.timestamp.desc()).all()
-        print("activities: ", activities)
+
         # Preparar los datos para el gráfico
         chart_data = prepare_activity_data(activities)
     

@@ -257,7 +257,35 @@
         }
     });
 </script>
-
+<!-- Descripción de la app -->
+<div class="flex justify-center p-4">
+    <div class="bg-blue-50 p-6 rounded-lg shadow-md max-w-lg">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-blue-600">Análisis de datos</h2>
+            <button id="toggleButton" class="text-blue-600 hover:underline text-xl ml-2" onclick="toggleDescription()">
+                <i class="fas fa-info-circle"></i>
+            </button>
+        </div>
+        <div id="description" class="hidden">
+            <p class="text-gray-700">
+                En esta página, puedes seleccionar tablas y columnas de una base de datos para realizar análisis de datos. 
+                La aplicación permite definir rangos de fechas y agregar campos adicionales para un análisis más detallado.
+            </p>
+            <p class="text-gray-700 mt-2">
+                La página proporciona varias secciones de análisis, incluyendo indicadores clave de rendimiento (KPIs), 
+                gráficos dinámicos y tablas detalladas. Los usuarios pueden alternar entre estas secciones utilizando botones específicos.
+            </p>
+            <p class="text-gray-700 mt-2">
+                Además, la aplicación permite realizar análisis avanzados como clustering, clasificación y regresión en los datos seleccionados. 
+                Los resultados de estos análisis se muestran en la sección correspondiente.
+            </p>
+            <p class="text-gray-700 mt-2">
+                Utiliza esta herramienta para obtener información valiosa de tus datos de manera eficiente y optimizar tu productividad 
+                en la gestión de información.
+            </p>
+        </div>
+    </div>
+</div>
 <script>
     // Función para mostrar/ocultar la sección de selección
     function toggleSection() {

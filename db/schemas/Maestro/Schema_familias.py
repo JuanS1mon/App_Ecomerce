@@ -1,16 +1,15 @@
 from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
-class Test3Base(BaseModel):
-    fecha: str
-    nombre: str
+class FamiliasBase(BaseModel):
+    descrip: str
 
-class Test3Create(Test3Base):
+class FamiliasCreate(FamiliasBase):
     codigo: int
 
-class Test3Update(Test3Base):
+class FamiliasUpdate(FamiliasBase):
     pass
 
-class Test3Read(Test3Base):
+class FamiliasRead(FamiliasBase):
     codigo: int
     model_config = ConfigDict(from_attributes=True)
