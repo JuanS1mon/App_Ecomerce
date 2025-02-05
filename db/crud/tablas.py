@@ -7,7 +7,7 @@ def get_tables(db: Session):
     tables = inspector.get_table_names()
     
     # Log todas las tablas obtenidas
-    logging.info(f"Todas las tablas: {tables}")
+    #logging.info(f"Todas las tablas: {tables}")
     
     # Filtrar tablas específicas a excluir
     excluded_tables = {"usuarios", "activity_logs","blog_posts","alembic_version"}
@@ -19,8 +19,8 @@ def get_tables(db: Session):
     tabla2 = [table for table in tables if not table.startswith("migracion_") and table not in excluded_tables]
     
     # Log las tablas filtradas
-    logging.info(f"Tablas de migraciones: {tabla1}")
-    logging.info(f"Otras tablas: {tabla2}")
+    #logging.info(f"Tablas de migraciones: {tabla1}")
+    #logging.info(f"Otras tablas: {tabla2}")
     
     return tabla1, tabla2
 

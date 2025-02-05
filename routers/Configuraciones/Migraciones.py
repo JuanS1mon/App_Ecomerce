@@ -15,7 +15,8 @@ import json
 from sqlalchemy.orm import Session
 from db.crud.tablas import get_tables
 import pandas as pd
-from typing import List, Dict
+
+from Services.Analisis.analisis import clean_data
 
 
 from sqlalchemy import inspect, Table, MetaData, func, cast, Date
@@ -341,16 +342,6 @@ async def get_table_records(
     return {"records": records}
 
 
-# Función para limpiar datos duplicados
-def clean_data(data: List[Dict]) -> List[Dict]:
-    seen = set()
-    cleaned_data = []
-    for item in data:
-        tuple_item = tuple(item.items())
-        if tuple_item not in seen:
-            seen.add(tuple_item)
-            cleaned_data.append(item)
-    return cleaned_data
 
 @router.post("/migrate_data")
 async def migrate_data(

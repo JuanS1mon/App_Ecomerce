@@ -230,8 +230,9 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="path/to/your/script.js"></script>
+    <script src="../js/analisis_new.js"></script>
 </body>
+
 </html>
 <script>
     function toggleDescription() {
@@ -257,35 +258,6 @@
         }
     });
 </script>
-<!-- Descripción de la app -->
-<div class="flex justify-center p-4">
-    <div class="bg-blue-50 p-6 rounded-lg shadow-md max-w-lg">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-blue-600">Análisis de datos</h2>
-            <button id="toggleButton" class="text-blue-600 hover:underline text-xl ml-2" onclick="toggleDescription()">
-                <i class="fas fa-info-circle"></i>
-            </button>
-        </div>
-        <div id="description" class="hidden">
-            <p class="text-gray-700">
-                En esta página, puedes seleccionar tablas y columnas de una base de datos para realizar análisis de datos. 
-                La aplicación permite definir rangos de fechas y agregar campos adicionales para un análisis más detallado.
-            </p>
-            <p class="text-gray-700 mt-2">
-                La página proporciona varias secciones de análisis, incluyendo indicadores clave de rendimiento (KPIs), 
-                gráficos dinámicos y tablas detalladas. Los usuarios pueden alternar entre estas secciones utilizando botones específicos.
-            </p>
-            <p class="text-gray-700 mt-2">
-                Además, la aplicación permite realizar análisis avanzados como clustering, clasificación y regresión en los datos seleccionados. 
-                Los resultados de estos análisis se muestran en la sección correspondiente.
-            </p>
-            <p class="text-gray-700 mt-2">
-                Utiliza esta herramienta para obtener información valiosa de tus datos de manera eficiente y optimizar tu productividad 
-                en la gestión de información.
-            </p>
-        </div>
-    </div>
-</div>
 <script>
     // Función para mostrar/ocultar la sección de selección
     function toggleSection() {
@@ -343,20 +315,75 @@
         field.remove();
     }
 </script>
-
+<!-- ...existing code... -->
 <script>
     // Variables para las secciones de KPIs, gráficos y tabla
     const kpiSection = document.getElementById("kpi-section");
     const graphSection = document.getElementById("graph-section");
     const tableSection = document.getElementById("table-section");
 
-    // Mostrar la sección de KPIs
-    document.getElementById("show-kpis").addEventListener("click", () => {
+    // Mostrar la sección de KPIs y cargar datos de /analizar_kpis
+    document.getElementById("show-kpis").addEventListener("click", async () => {
+        try {
+            // Obtener valores desde el formulario
+            const tableName = document.getElementById("table-select").value;
+            const columnName = document.getElementById("column-select").value;
+            const dateField = document.getElementById("date_field").value;
+            const startDate = document.getElementById("start_date").value;
+            const endDate = document.getElementById("end_date").value;
+            
+            // (Ejemplo) Suponiendo que solo tomamos un campo adicional
+            let additionalField = null;
+            const additionalFieldsSelect = document.querySelector('select[name="additional_fields[]"]');
+            if (additionalFieldsSelect) {
+                additionalField = additionalFieldsSelect.value;
+            }
+
+            // Llamada a la API
+            const response = await fetch("/analisis/analizar_kpis", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    table_name: tableName,
+                    column_name: columnName,
+                    date_field: dateField,
+                    start_date: startDate,
+                    end_date: endDate,
+                    additional_field: additionalField
+                })
+            });
+
+            const data = await response.json();
+
+            // Actualizar KPIs en el HTML
+            document.getElementById("total-records").textContent = data.total_registros ?? "-";
+            document.getElementById("categories").textContent = data.categorias ?? "-";
+            document.getElementById("last-date").textContent = data.last_date ?? "-";
+            document.getElementById("first-date").textContent = data.first_date ?? "-";
+            document.getElementById("max-value").textContent = data.max_value ?? "-";
+            document.getElementById("min-value").textContent = data.min_value ?? "-";
+
+            // Suponiendo que 'clusters' sea una lista
+            const clusterUl = document.getElementById("cluster-results");
+            clusterUl.innerHTML = "";
+            if (data.clusters && Array.isArray(data.clusters)) {
+                data.clusters.forEach(cluster => {
+                    const li = document.createElement("li");
+                    li.textContent = cluster;
+                    clusterUl.appendChild(li);
+                });
+            }
+        } catch (err) {
+            console.error("Error al analizar KPIs:", err);
+        }
+
+        // Mostrar la sección de KPIs y ocultar las demás
         kpiSection.classList.remove("hidden");
         graphSection.classList.add("hidden");
         tableSection.classList.add("hidden");
     });
 </script>
+<!-- ...existing code... -->
 
 <script>
     // Mostrar la sección de gráficos

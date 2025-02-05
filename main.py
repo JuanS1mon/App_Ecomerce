@@ -22,7 +22,7 @@ from Services.security.security import crear_access_token, authenticate_user, cu
 from db.database import Base, engine, get_db, create_database, create_tables
 from routers import usuarios as aut_usuario
 from routers import Blog
-from routers.Maestros import  Route_pruebat1,Route_carga,Route_test19,Route_test20,Route_test21,Route_test22,Route_test23,Route_planilla_test
+from routers.Maestros import  Route_planilla_test
 from routers.Configuraciones import Generar, configDB, Migraciones,Analisis
 from Services import mail
 
@@ -107,13 +107,6 @@ app.include_router(Analisis.router)
 app.include_router(mail.router)
 
 # Maestros
-app.include_router(Route_pruebat1.router)
-app.include_router(Route_carga.router)
-app.include_router(Route_test19.router)
-app.include_router(Route_test20.router)
-app.include_router(Route_test21.router)
-app.include_router(Route_test22.router)
-app.include_router(Route_test23.router)
 app.include_router(Route_planilla_test.router)
 
 # Manejadores de errores personalizados
