@@ -1,3 +1,4 @@
+import datetime
 import pandas as pd
 from fastapi import APIRouter, Request, status, Depends, HTTPException,Form
 from fastapi.templating import Jinja2Templates
@@ -34,6 +35,13 @@ class AnalisisRequest(BaseModel):
     start_date: Optional[str] = None
     end_date: Optional[str] = None
     additional_field: Optional[str] = None
+
+class AnalisisDetalleRequest(BaseModel):
+    table_name: str
+    column_name: str
+    date_field: str
+    start_date: str
+    end_date: str
 
 @router.post("/columnas")
 async def obtener_columnas(request: ColumnasRequest, db: Session = Depends(get_db)):
@@ -118,19 +126,38 @@ async def analizar_kpis(request: AnalisisRequest,
     return resultados_kpis
 
 
-
 @router.post("/analizar_detalle", response_class=JSONResponse)
 async def analizar_detalle(analisis_request: AnalisisRequest, 
                            db: Session = Depends(get_db),
                            current_user: UserDB = Depends(get_current_user)):
-    # Obtener los datos de la tabla con o sin filtros de fecha
-    data = get_table_data(analisis_request.table_name, db, analisis_request.date_field, analisis_request.start_date, analisis_request.end_date)
-    df = pd.DataFrame(data)
+    try:
+        # Obtener los datos de la tabla con o sin filtros de fecha
+        data = get_table_data(analisis_request.table_name, db, analisis_request.date_field, analisis_request.start_date, analisis_request.end_date)
+        df = pd.DataFrame(data)
+        
+        # Manejar valores no compatibles con JSON
+        df = df.replace({np.nan: None, np.inf: None, -np.inf: None})
 
-    # Convertir los datos a un formato adecuado para el HTML
-    table_data = df.to_dict(orient="records") if not df.empty else []
+        # Convertir valores de fecha/hora a cadenas
+        def convert_to_serializable(val):
+            if isinstance(val, (pd.Timestamp, datetime.datetime, datetime.date)):
+                return val.isoformat()
+            elif isinstance(val, float) and (np.isnan(val) or np.isinf(val)):
+                return None
+            return val
 
-    return table_data
+        df = df.applymap(convert_to_serializable)
+
+        # Convertir DataFrame a lista de diccionarios
+        table_data = df.to_dict(orient="records") if not df.empty else []
+
+        return JSONResponse(content={"records": table_data})
+    except Exception as e:
+        # Manejar cualquier excepción y devolver un error 500 con el mensaje de error
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+
 
 @router.post("/analizar_clasificacion")
 async def analizar_clasificacion(request: AnalisisRequest, 

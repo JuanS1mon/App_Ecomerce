@@ -6,6 +6,9 @@
     <title>Analizador de Datos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
 </head>
 <body class="bg-gray-100">
 <!-- Barra de navegación -->
@@ -221,7 +224,6 @@
             </div>
         </div>
 
-        <!-- Tabla Detallada -->
         <div id="table-section" class="hidden bg-white p-4 rounded shadow">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-gray-800 font-bold">Datos Detallados</h2>
@@ -229,7 +231,7 @@
                     Ocultar Tabla
                 </button>
             </div>
-            <table class="min-w-full table-auto border-collapse border border-gray-300">
+            <table id="analisis-table" class="min-w-full table-auto border-collapse border border-gray-300">
                 <thead>
                     <tr class="bg-gray-200" id="table-headers">
                         <!-- Encabezados de la tabla -->
@@ -430,61 +432,87 @@
 </script>
 
 <script>
-    // Mostrar la sección de tabla detallada
-    document.getElementById("show-table").addEventListener("click", async () => {
-        // Mostrar el indicador de carga
-        loadingIndicator.classList.remove("hidden");
-        // Obtener valores desde el formulario
-        const tableName = document.getElementById("table-select").value;
-        const columnName = document.getElementById("column-select").value;
-        const dateField = document.getElementById("date_field").value;
-        const startDate = document.getElementById("start_date").value;
-        const endDate = document.getElementById("end_date").value;
+    // Asegúrate de que jQuery y DataTables estén cargados antes de este script
+    document.getElementById("show-table").addEventListener("click", async (event) => {
+        event.preventDefault();
+        $('#loading-indicator').removeClass('hidden');
+
+        // Obtiene los valores de los campos
+        const tableName  = document.getElementById("table-select").value || "";
+        const columnName = document.getElementById("column-select").value || "";
+        const dateField  = document.getElementById("date_field").value  || "";
+        const startDate  = document.getElementById("start_date").value  || "";
+        const endDate    = document.getElementById("end_date").value    || "";
+
+        // Validación básica
+        if (!tableName) {
+            alert("Por favor selecciona una tabla.");
+            $('#loading-indicator').addClass('hidden');
+            return;
+        }
 
         try {
+            // Destruir instancia previa de DataTable
+            if ($.fn.DataTable.isDataTable('#analisis-table')) {
+                $('#analisis-table').DataTable().clear().destroy();
+            }
+
+            // Limpia los encabezados y el cuerpo de la tabla
+            $('#table-headers').empty();
+            $('#table-data').empty();
+
             // Llamada a la API
             const response = await fetch("/analisis/analizar_detalle", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    table_name: tableName,
+                    table_name:  tableName,
                     column_name: columnName,
-                    date_field: dateField,
-                    start_date: startDate,
-                    end_date: endDate
+                    date_field:  dateField,
+                    start_date:  startDate,
+                    end_date:    endDate
                 })
             });
 
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
+
+            // Procesa la respuesta
             const data = await response.json();
+            if (!data || !Array.isArray(data.records) || data.records.length === 0) {
+                alert("La tabla seleccionada no contiene registros.");
+            } else {
+                // Genera encabezados
+                const headers = Object.keys(data.records[0]);
+                headers.forEach(header => {
+                    $('#table-headers').append($('<th>').text(header));
+                });
 
-            // Actualizar la tabla en el HTML
-            const headers = Object.keys(data[0] || {});
-            const rows = data.map(row => Object.values(row));
+                // Genera filas
+                data.records.forEach(record => {
+                    const row = $('<tr>');
+                    headers.forEach(header => {
+                        row.append($('<td>').text(record[header]));
+                    });
+                    $('#table-data').append(row);
+                });
 
-            const headerRow = document.getElementById("table-headers");
-            headerRow.innerHTML = headers.map(header => `<th class="border px-4 py-2">${header}</th>`).join("");
-
-            const tableBody = document.getElementById("table-data");
-            tableBody.innerHTML = rows.map(row => 
-                `<tr>${row.map(cell => `<td class="border px-4 py-2">${cell}</td>`).join("")}</tr>`
-            ).join("");
-        } catch (err) {
-            console.error("Error al obtener los datos de la tabla:", err);
+                // Inicializa DataTables
+                $('#analisis-table').DataTable();
+            }
+        } catch (error) {
+            console.error("Error al obtener los datos de la tabla:", error);
+            alert("Ocurrió un error al obtener los datos de la tabla.");
         } finally {
-            // Ocultar el indicador de carga
-            loadingIndicator.classList.add("hidden");
+            $('#loading-indicator').addClass('hidden');
         }
 
-        // Mostrar la sección de tabla y ocultar las demás
-        kpiSection.classList.add("hidden");
-        graphSection.classList.add("hidden");
-        tableSection.classList.remove("hidden");
+        // Muestra la sección de tabla y oculta las demás
+        $('#kpi-section').addClass('hidden');
+        $('#graph-section').addClass('hidden');
+        $('#table-section').removeClass('hidden');
     });
-        
-        // Ocultar la sección de tabla
-        document.getElementById("hide-table").addEventListener("click", () => {
-            tableSection.classList.add("hidden");
-        });
 </script>
 
 <script>
