@@ -1,6 +1,6 @@
 import logging
 from sqlalchemy.orm import Session
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 
 def get_tables(db: Session):
     inspector = inspect(db.get_bind())
@@ -30,3 +30,22 @@ def get_columns(table_name: str, db: Session):
     columns = inspector.get_columns(table_name)
     column_names = [column['name'] for column in columns]
     return column_names
+
+
+def get_table_data(table_name: str, db: Session, date_field: str = None, start_date: str = None, end_date: str = None):
+    """
+    Función para obtener todos los datos de una tabla, respetando el rango de fechas si se proporciona.
+    """
+    query_string = f"SELECT * FROM {table_name}"
+    filters = []
+
+    # Filtro por rango de fechas
+    if date_field and start_date and end_date:
+        filters.append(f"{date_field} BETWEEN '{start_date}' AND '{end_date}'")
+
+    if filters:
+        query_string += " WHERE " + " AND ".join(filters)
+
+    result = db.execute(text(query_string))
+    data = result.fetchall()
+    return data

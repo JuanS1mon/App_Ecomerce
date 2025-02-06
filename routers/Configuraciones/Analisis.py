@@ -1,18 +1,19 @@
 import pandas as pd
-from fastapi import APIRouter, Request, status, Depends, HTTPException
+from fastapi import APIRouter, Request, status, Depends, HTTPException,Form
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from Services.security.security import get_current_user
 from db.database import get_db
 from db.schemas.Maestro.Usuarios import UserDB
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from db.crud.tablas import get_tables, get_columns
+from db.crud.tablas import get_tables, get_columns, get_table_data
 from sqlalchemy import inspect, text
 import numpy as np
 from typing import Optional
 from collections import Counter
 from Services.Analisis.analisis import convert_types, limpiar_datos, guardar_resultados_sql
+
 
 # Ajustar el directorio de las plantillas
 templates = Jinja2Templates(directory="static/html")
@@ -67,6 +68,11 @@ async def nuevo_analisis_page(request: Request, db: Session = Depends(get_db), c
 async def analizar_kpis(request: AnalisisRequest, 
                         db: Session = Depends(get_db),
                         current_user: UserDB = Depends(get_current_user)):
+
+    # Si no se proporciona la tabla, no hacemos nada
+    if not request.table_name:
+        return {"message": "No se proporcionó la tabla, no se ejecuta la consulta"}
+
     query_string = f"SELECT * FROM {request.table_name}"
     filters = []
 
@@ -84,6 +90,7 @@ async def analizar_kpis(request: AnalisisRequest,
     df = pd.read_sql(text(query_string), db.bind)
     df = limpiar_datos(df)
 
+    # Lógica para contar KPIs
     total_registros = len(df)
     categorias = df[request.column_name].nunique() if request.column_name in df.columns else 0
     last_date = df[request.date_field].max() if request.date_field in df.columns else None
@@ -110,21 +117,20 @@ async def analizar_kpis(request: AnalisisRequest,
     guardar_resultados_sql(db, current_user.usuario, resultados_kpis)
     return resultados_kpis
 
-@router.post("/analizar_detalle")
-async def analizar_detalle(request: AnalisisRequest, 
+
+
+@router.post("/analizar_detalle", response_class=JSONResponse)
+async def analizar_detalle(analisis_request: AnalisisRequest, 
                            db: Session = Depends(get_db),
                            current_user: UserDB = Depends(get_current_user)):
-    # Lógica para tabla detallada
-    # ...
-    return {"message": "Detalle listo"}
+    # Obtener los datos de la tabla con o sin filtros de fecha
+    data = get_table_data(analisis_request.table_name, db, analisis_request.date_field, analisis_request.start_date, analisis_request.end_date)
+    df = pd.DataFrame(data)
 
-@router.post("/analizar_clustering")
-async def analizar_clustering(request: AnalisisRequest, 
-                              db: Session = Depends(get_db),
-                              current_user: UserDB = Depends(get_current_user)):
-    # Lógica sólo de clustering KMeans
-    # ...
-    return {"message": "Clustering listo"}
+    # Convertir los datos a un formato adecuado para el HTML
+    table_data = df.to_dict(orient="records") if not df.empty else []
+
+    return table_data
 
 @router.post("/analizar_clasificacion")
 async def analizar_clasificacion(request: AnalisisRequest, 

@@ -137,8 +137,9 @@
                 <button class="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600" id="show-graph">
                     Gráficos
                 </button>
-                <button class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600" id="show-table">
-                    Tabla Detallada
+                <!-- Botón para mostrar la tabla -->
+                <button id="show-table" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">
+                    Mostrar Tabla
                 </button>
                 <button class="bg-purple-500 text-white px-4 py-2 rounded shadow hover:bg-purple-600" id="show-clustering">
                     Clustering
@@ -212,21 +213,36 @@
             <h2 class="text-gray-800 font-bold mb-4">Análisis Gráfico</h2>
             <canvas id="chart"></canvas>
         </div>
+        
+        <!-- Indicador de Carga -->
+        <div id="loading-indicator" class="hidden flex justify-center items-center">
+            <div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
 
         <!-- Tabla Detallada -->
         <div id="table-section" class="hidden bg-white p-4 rounded shadow">
-            <h2 class="text-gray-800 font-bold mb-4">Datos Detallados</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-gray-800 font-bold">Datos Detallados</h2>
+                <button id="hide-table" class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600">
+                    Ocultar Tabla
+                </button>
+            </div>
             <table class="min-w-full table-auto border-collapse border border-gray-300">
                 <thead>
-                    <tr class="bg-gray-200" id="table-headers"></tr>
+                    <tr class="bg-gray-200" id="table-headers">
+                        <!-- Encabezados de la tabla -->
+                    </tr>
                 </thead>
-                <tbody id="table-data"></tbody>
+                <tbody id="table-data">
+                    <!-- Filas de la tabla -->
+                </tbody>
             </table>
             <button class="mt-4 bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600">
                 Exportar a Excel
             </button>
         </div>
-    </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -247,6 +263,8 @@
         }
     }
 </script>
+
+
 
 <script>
     // Establecer la fecha actual por defecto en el campo end_date
@@ -315,12 +333,14 @@
         field.remove();
     }
 </script>
-<!-- ...existing code... -->
+
 <script>
     // Variables para las secciones de KPIs, gráficos y tabla
     const kpiSection = document.getElementById("kpi-section");
     const graphSection = document.getElementById("graph-section");
     const tableSection = document.getElementById("table-section");
+    const loadingIndicator = document.getElementById("loading-indicator");
+
 
     // Mostrar la sección de KPIs y cargar datos de /analizar_kpis
     document.getElementById("show-kpis").addEventListener("click", async () => {
@@ -383,7 +403,6 @@
         tableSection.classList.add("hidden");
     });
 </script>
-<!-- ...existing code... -->
 
 <script>
     // Mostrar la sección de gráficos
@@ -412,27 +431,62 @@
 
 <script>
     // Mostrar la sección de tabla detallada
-    document.getElementById("show-table").addEventListener("click", () => {
+    document.getElementById("show-table").addEventListener("click", async () => {
+        // Mostrar el indicador de carga
+        loadingIndicator.classList.remove("hidden");
+        // Obtener valores desde el formulario
+        const tableName = document.getElementById("table-select").value;
+        const columnName = document.getElementById("column-select").value;
+        const dateField = document.getElementById("date_field").value;
+        const startDate = document.getElementById("start_date").value;
+        const endDate = document.getElementById("end_date").value;
+
+        try {
+            // Llamada a la API
+            const response = await fetch("/analisis/analizar_detalle", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    table_name: tableName,
+                    column_name: columnName,
+                    date_field: dateField,
+                    start_date: startDate,
+                    end_date: endDate
+                })
+            });
+
+            const data = await response.json();
+
+            // Actualizar la tabla en el HTML
+            const headers = Object.keys(data[0] || {});
+            const rows = data.map(row => Object.values(row));
+
+            const headerRow = document.getElementById("table-headers");
+            headerRow.innerHTML = headers.map(header => `<th class="border px-4 py-2">${header}</th>`).join("");
+
+            const tableBody = document.getElementById("table-data");
+            tableBody.innerHTML = rows.map(row => 
+                `<tr>${row.map(cell => `<td class="border px-4 py-2">${cell}</td>`).join("")}</tr>`
+            ).join("");
+        } catch (err) {
+            console.error("Error al obtener los datos de la tabla:", err);
+        } finally {
+            // Ocultar el indicador de carga
+            loadingIndicator.classList.add("hidden");
+        }
+
+        // Mostrar la sección de tabla y ocultar las demás
         kpiSection.classList.add("hidden");
         graphSection.classList.add("hidden");
         tableSection.classList.remove("hidden");
-
-        // Ejemplo de datos dinámicos
-        const headers = ["Columna 1", "Columna 2", "Columna 3"];
-        const data = [
-            ["Dato 1", "Dato 2", "Dato 3"],
-            ["Dato A", "Dato B", "Dato C"]
-        ];
-
-        const headerRow = document.getElementById("table-headers");
-        headerRow.innerHTML = headers.map(header => `<th class="border px-4 py-2">${header}</th>`).join("");
-
-        const tableBody = document.getElementById("table-data");
-        tableBody.innerHTML = data.map(row => 
-            `<tr>${row.map(cell => `<td class="border px-4 py-2">${cell}</td>`).join("")}</tr>`
-        ).join("");
     });
+        
+        // Ocultar la sección de tabla
+        document.getElementById("hide-table").addEventListener("click", () => {
+            tableSection.classList.add("hidden");
+        });
 </script>
+
 <script>
     // Manejar el cambio de selección de tabla
     document.getElementById("table-select").addEventListener("change", async function() {
