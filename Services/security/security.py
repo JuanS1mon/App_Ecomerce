@@ -100,7 +100,6 @@ def generar_token_activacion(usuario_id):
     }
     token = jwt.encode(payload, SECRET, algorithm=ALGORITHM)
     return token
-
 async def get_current_user(request: Request, db: Session = Depends(get_db)):
     # Obtener el token de la cookie
     token = request.cookies.get('access_token')
@@ -115,7 +114,7 @@ async def get_current_user(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token no proporcionado",
-            headers={"WWW-Authenticate": "Bearer"},
+            headers={"Location": "/loginpage"},
         )
 
     try:
@@ -126,7 +125,7 @@ async def get_current_user(request: Request, db: Session = Depends(get_db)):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token inválido",
-                headers={"WWW-Authenticate": "Bearer"},
+                headers={"Location": "/loginpage"},
             )
         
         # Obtener usuario de la base de datos
@@ -135,7 +134,7 @@ async def get_current_user(request: Request, db: Session = Depends(get_db)):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Usuario no encontrado",
-                headers={"WWW-Authenticate": "Bearer"},
+                headers={"Location": "/loginpage"},
             )
         
         # Verificar si el usuario está activo
@@ -143,7 +142,7 @@ async def get_current_user(request: Request, db: Session = Depends(get_db)):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Usuario deshabilitado",
-                headers={"WWW-Authenticate": "Bearer"},
+                headers={"Location": "/loginpage"},
             )
             
         return user
@@ -151,5 +150,5 @@ async def get_current_user(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Token inválido: {str(e)}",
-            headers={"WWW-Authenticate": "Bearer"},
+            headers={"Location": "/loginpage"},
         )

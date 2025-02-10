@@ -23,9 +23,25 @@ async function fetchData() {
     const tableBody = document.getElementById('data-table-body');
     tableBody.innerHTML = '';
     data.forEach(item => {
+        const prioridadColor = {
+            'Muy Grave': 'bg-red-100',
+            'Grave': 'bg-yellow-100',
+            'Leve': 'bg-green-100'
+        }[item.prioridad] || '';
+        
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td class='border px-4 py-2'>${item.codigo}</td><td class='border px-4 py-2'>${item.fecha}</td><td class='border px-4 py-2'>${item.origen}</td><td class='border px-4 py-2'>${item.tipo}</td><td class='border px-4 py-2'>${item.prioridad}</td><td class='border px-4 py-2'>${item.caratula}</td><td class='border px-4 py-2'>${item.clasificacion}</td><td class='border px-4 py-2'>${item.estado}</td><td class='border px-4 py-2'>${item.localidad}</td><td class='border px-4 py-2'>${item.barrio}</td><td class='border px-4 py-2'>${item.lugar}</td>
+            <td class='border px-4 py-2'>${item.codigo}</td>
+            <td class='border px-4 py-2'>${item.fecha}</td>
+            <td class='border px-4 py-2'>${item.origen}</td>
+            <td class='border px-4 py-2'>${item.tipo}</td>
+            <td class='border px-4 py-2 ${prioridadColor}'>${item.prioridad}</td>
+            <td class='border px-4 py-2'>${item.caratula}</td>
+            <td class='border px-4 py-2'>${item.clasificacion}</td>
+            <td class='border px-4 py-2'>${item.estado}</td>
+            <td class='border px-4 py-2'>${item.localidad}</td>
+            <td class='border px-4 py-2'>${item.barrio}</td>
+            <td class='border px-4 py-2'>${item.lugar}</td>
             <td class='border px-4 py-2'>
                 <button class='bg-blue-500 text-white px-2 py-1' onclick='editItem(${item.codigo})'>Editar</button>
                 <button class='bg-red-500 text-white px-2 py-1' onclick='deleteItem(${item.codigo})'>Eliminar</button>
@@ -188,12 +204,16 @@ function toggleDescription() {
       </label>
       <input class="w-full border px-2 py-1 bg-white-800" id="tipo" type="text"/>
      </div>
-     <div class="w-full md:w-1/4 px-2 mb-4">
-      <label class="block">
-       prioridad:
-      </label>
-      <input class="w-full border px-2 py-1 bg-white-800" id="prioridad" type="text"/>
-     </div>
+        <!-- Reemplazar el input de prioridad existente -->
+    <div class="w-full md:w-1/4 px-2 mb-4">
+        <label class="block">prioridad:</label>
+        <select class="w-full border px-2 py-1 bg-white-800" id="prioridad" required>
+            <option value="">Seleccionar prioridad</option>
+            <option value="Muy Grave">Muy Grave</option>
+            <option value="Grave">Grave</option>
+            <option value="Leve">Leve</option>
+        </select>
+    </div>
      <div class="w-full md:w-1/4 px-2 mb-4">
       <label class="block">
        caratula:
@@ -302,11 +322,14 @@ function toggleDescription() {
          </label>
          <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-tipo" type="text"/>
         </div>
+                <!-- Reemplazar el input de prioridad en el modal de edición -->
         <div class="mb-2">
-         <label class="text-white">
-          prioridad:
-         </label>
-         <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-prioridad" type="text"/>
+            <label class="text-white">prioridad:</label>
+            <select class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-prioridad" required>
+                <option value="Muy Grave">Muy Grave</option>
+                <option value="Grave">Grave</option>
+                <option value="Leve">Leve</option>
+            </select>
         </div>
         <div class="mb-2">
          <label class="text-white">

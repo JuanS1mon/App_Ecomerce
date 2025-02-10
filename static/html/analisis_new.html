@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analizador de Datos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Analizador de Datos</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    </head>
 <body class="bg-gray-100">
 <!-- Barra de navegación -->
 <nav class="bg-gray-800 p-4 relative z-30">
@@ -91,14 +93,21 @@
             <div id="selection-section">
                 <!-- Selección de Tabla -->
                 <div class="mb-6">
-                    <select id="table-select" class="block w-full px-4 py-2 border border-gray-300 rounded-md">
-                        <option value="" disabled selected>Selecciona una tabla...</option>
-                        {% for table in tabla2 %}
-                            <option value="{{ table }}">{{ table }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="flex items-center space-x-2">
+                        <select id="table-select" class="block flex-1 px-4 py-2 border border-gray-300 rounded-md">
+                            <option value="" disabled selected>Selecciona una tabla...</option>
+                            {% for table in tabla2 %}
+                                <option value="{{ table }}">{{ table }}</option>
+                            {% endfor %}
+                        </select>
+                        <button id="go-to-table" 
+                                class="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled>
+                            <i class="fas fa-external-link-alt"></i>
+                        </button>
+                    </div>
                 </div>
-    
+                    
                 <!-- Selección de Columna -->
                 <div class="mb-6">
                     <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona una Columna para el Análisis</h2>
@@ -122,14 +131,47 @@
                     </div>
                 </div>
                 <!-- Campos Adicionales -->
-                <div id="additional-fields" class="mb-6">
-                    <h2 class="text-gray-700 font-bold text-lg mb-4">Campos Adicionales</h2>
-                    <button type="button" onclick="addField()" class="bg-green-500 text-white px-4 py-2 mb-2">Agregar Campo</button>
+                               <!-- Reemplazar el div de "Campos Adicionales" existente por: -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-start">
+                        <!-- Columna izquierda: Campos Adicionales -->
+                        <div class="flex-1 mr-4">
+                            <h2 class="text-gray-700 font-bold text-lg mb-4">Campos Adicionales</h2>
+                            <button type="button" onclick="addField()" class="bg-green-500 text-white px-4 py-2 mb-2">
+                                Agregar Campo
+                            </button>
+                               <!-- Columna derecha: Configuración de Visualización -->
+                        <div class="w-64">
+                            <h2 class="text-gray-700 font-bold text-lg mb-4">Configuración</h2>
+                            <div class="flex items-center">
+                                <label for="limit-values" class="mr-2 text-sm">Mostrar valores:</label>
+                                <select id="limit-values" 
+                                        class="flex-1 px-2 py-1 border border-gray-300 rounded-md text-sm">
+                                    <option value="10">10 valores</option>
+                                    <option value="20">20 valores</option>
+                                    <option value="50">50 valores</option>
+                                    <option value="100">100 valores</option>
+                                    <option value="999999">Todos</option>
+                                </select>
+                            </div>
+                        </div>
+                            <div id="additional-fields">
+                                <!-- Los campos adicionales se agregarán aquí -->
+                            </div>
+                        </div>
+                
+                     
+                    </div>
                 </div>
+                
             </div>
         </div>
     </div>
-
+        <!-- Indicador de Carga -->
+        <div id="loading-indicator" class="hidden flex justify-center items-center">
+            <div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status"></div>
+            <span class="ml-2">Cargando...</span>
+        </div>
         <!-- Opciones de Análisis -->
         <div class="bg-white p-4 rounded shadow mb-6">
             <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona el Tipo de Análisis</h2>
@@ -201,12 +243,27 @@
                     </div>
                     <i class="fas fa-arrow-down text-indigo-500 text-3xl"></i>
                 </div>
+                                <!-- Reemplazar la sección de clusters existente por: -->
+                <div class="bg-white p-4 rounded shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-gray-600 text-lg font-bold">Análisis Temporal</h2>
+                        <i class="fas fa-chart-line text-indigo-500 text-2xl"></i>
+                    </div>
+                    <div id="cluster-results" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Los clusters se insertarán aquí -->
+                    </div>
+                </div>
                 <div class="bg-white p-4 rounded shadow flex items-center">
                     <div class="flex-1">
-                        <h2 class="text-gray-600 text-sm">Clusters</h2>
-                        <ul id="cluster-results" class="list-disc list-inside text-gray-700"></ul>
+                        <h2 class="text-gray-600 text-sm">Categorías</h2>
+                        <p class="text-2xl font-bold text-gray-800" id="categories">-</p>
+                        <!-- Agregar esta nueva sección para el detalle -->
+                        <div class="mt-2">
+                            <h3 class="text-sm text-gray-600">Detalle de Categorías:</h3>
+                            <ul id="categories-detail" class="text-sm text-gray-700 mt-1"></ul>
+                        </div>
                     </div>
-                    <i class="fas fa-project-diagram text-indigo-500 text-3xl"></i>
+                    <i class="fas fa-tags text-indigo-500 text-3xl"></i>
                 </div>
             </div>
         </div>
@@ -214,16 +271,11 @@
         <!-- Gráficos -->
         <div id="graph-section" class="hidden bg-white p-4 rounded shadow mb-6">
             <h2 class="text-gray-800 font-bold mb-4">Análisis Gráfico</h2>
-            <canvas id="chart"></canvas>
-        </div>
-        
-        <!-- Indicador de Carga -->
-        <div id="loading-indicator" class="hidden flex justify-center items-center">
-            <div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status">
-                <span class="visually-hidden">Cargando...</span>
+            <div id="graficos-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Los gráficos se insertarán aquí dinámicamente -->
             </div>
         </div>
-
+        
         <div id="table-section" class="hidden bg-white p-4 rounded shadow">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-gray-800 font-bold">Datos Detallados</h2>
@@ -248,10 +300,25 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../js/analisis_new.js"></script>
 </body>
 
 </html>
+                <!-- Agregar el script para manejar la redirección -->
+                <script>
+                    // Habilitar/deshabilitar el botón según la selección de tabla
+                    document.getElementById("table-select").addEventListener("change", function() {
+                        const goToTableBtn = document.getElementById("go-to-table");
+                        goToTableBtn.disabled = !this.value;
+                    });
+                
+                    // Manejar el click en el botón de redirección
+                    document.getElementById("go-to-table").addEventListener("click", function() {
+                        const selectedTable = document.getElementById("table-select").value;
+                        if (selectedTable) {
+                            window.location.href = `/${selectedTable}/pagina`;
+                        }
+                    });
+</script>
 <script>
     function toggleDescription() {
         const description = document.getElementById('description');
@@ -342,95 +409,453 @@
     const graphSection = document.getElementById("graph-section");
     const tableSection = document.getElementById("table-section");
     const loadingIndicator = document.getElementById("loading-indicator");
+document.getElementById("show-kpis").addEventListener("click", async () => {
+    try {
+        // Obtener valores desde el formulario
+        const tableName = document.getElementById("table-select").value;
+        const columnName = document.getElementById("column-select").value;
+        const dateField = document.getElementById("date_field").value;
+        const startDate = document.getElementById("start_date").value;
+        const endDate = document.getElementById("end_date").value;
+        
+        // Obtener campos adicionales
+        const additionalFields = Array.from(document.querySelectorAll('select[name="additional_fields[]"]'))
+            .map(select => select.value)
+            .filter(value => value)
+            .join(',');
 
+        // Llamada a la API
+        const response = await fetch("/analisis/analizar_kpis", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                table_name: tableName,
+                column_name: columnName,
+                date_field: dateField,
+                start_date: startDate,
+                end_date: endDate,
+                additional_field: additionalFields
+            })
+        });
 
-    // Mostrar la sección de KPIs y cargar datos de /analizar_kpis
-    document.getElementById("show-kpis").addEventListener("click", async () => {
-        try {
-            // Obtener valores desde el formulario
-            const tableName = document.getElementById("table-select").value;
-            const columnName = document.getElementById("column-select").value;
-            const dateField = document.getElementById("date_field").value;
-            const startDate = document.getElementById("start_date").value;
-            const endDate = document.getElementById("end_date").value;
+        const data = await response.json();
+    
+        // Actualizar KPIs básicos
+        document.getElementById("total-records").textContent = data.total_registros ?? "-";
+        document.getElementById("categories").textContent = data.categorias ?? "-";
+        document.getElementById("last-date").textContent = data.last_date ?? "-";
+        document.getElementById("first-date").textContent = data.first_date ?? "-";
+        document.getElementById("max-value").textContent = data.max_value ?? "-";
+        document.getElementById("min-value").textContent = data.min_value ?? "-";
+
+        // Actualizar el detalle de categorías (solo campos adicionales)
+        const categoriesDetailUl = document.getElementById("categories-detail");
+        categoriesDetailUl.innerHTML = "";
+
+        // Modificar la parte del código que muestra los valores
+        if (data.analisis_campos && additionalFields) {
+            const additionalFieldsArray = additionalFields.split(',');
+            const limitValues = parseInt(document.getElementById('limit-values').value) || 10;
             
-            // (Ejemplo) Suponiendo que solo tomamos un campo adicional
-            let additionalField = null;
-            const additionalFieldsSelect = document.querySelector('select[name="additional_fields[]"]');
-            if (additionalFieldsSelect) {
-                additionalField = additionalFieldsSelect.value;
-            }
+            Object.entries(data.analisis_campos)
+                .filter(([tipo, analisis]) => tipo !== 'principal' && additionalFieldsArray.includes(analisis.campo))
+                .forEach(([tipo, analisis]) => {
+                    // Crear contenedor para cada campo
+                    const fieldContainer = document.createElement("div");
+                    fieldContainer.className = "mb-4 bg-gray-50 p-3 rounded-lg";
 
-            // Llamada a la API
-            const response = await fetch("/analisis/analizar_kpis", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    table_name: tableName,
-                    column_name: columnName,
-                    date_field: dateField,
-                    start_date: startDate,
-                    end_date: endDate,
-                    additional_field: additionalField
-                })
-            });
+                    // Crear encabezado para cada campo
+                    const header = document.createElement("div");
+                    header.className = "font-bold text-lg text-indigo-600 mb-2 border-b pb-2";
+                    header.textContent = analisis.campo;
+                    fieldContainer.appendChild(header);
 
-            const data = await response.json();
+                    // Crear grid para la distribución de valores
+                    const distributionGrid = document.createElement("div");
+                    distributionGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-2";
 
-            // Actualizar KPIs en el HTML
-            document.getElementById("total-records").textContent = data.total_registros ?? "-";
-            document.getElementById("categories").textContent = data.categorias ?? "-";
-            document.getElementById("last-date").textContent = data.last_date ?? "-";
-            document.getElementById("first-date").textContent = data.first_date ?? "-";
-            document.getElementById("max-value").textContent = data.max_value ?? "-";
-            document.getElementById("min-value").textContent = data.min_value ?? "-";
+                    // Modificar esta parte para usar el límite configurable
+                    Object.entries(analisis.distribucion)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, limitValues) // Usar el valor configurable
+                        .forEach(([valor, cantidad]) => {
+                            const item = document.createElement("div");
+                            item.className = "flex justify-between items-center p-2 bg-white rounded shadow-sm";
+                            item.innerHTML = `
+                                <span class="font-medium text-gray-700">${valor}</span>
+                                <span class="text-indigo-600 font-semibold">${cantidad}</span>
+                            `;
+                            distributionGrid.appendChild(item);
+                    });
+                    
 
-            // Suponiendo que 'clusters' sea una lista
-            const clusterUl = document.getElementById("cluster-results");
-            clusterUl.innerHTML = "";
-            if (data.clusters && Array.isArray(data.clusters)) {
-                data.clusters.forEach(cluster => {
-                    const li = document.createElement("li");
-                    li.textContent = cluster;
-                    clusterUl.appendChild(li);
+
+            
+                    // Agregar resumen
+                    const totalValues = Object.values(analisis.distribucion).reduce((a, b) => a + b, 0);
+                    const uniqueValues = Object.keys(analisis.distribucion).length;
+                    const totalValuesShown = Math.min(limitValues, Object.keys(analisis.distribucion).length);
+                    const totalValuesAvailable = Object.keys(analisis.distribucion).length;
+                    const summary = document.createElement("div");
+                    summary.className = "mt-3 text-sm text-gray-600 flex flex-col border-t pt-2";
+                    summary.innerHTML = `
+                        <div class="flex justify-between">
+                            <span>Valores únicos: ${uniqueValues}</span>
+                            <span>Total registros: ${totalValues}</span>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">
+                            Mostrando ${totalValuesShown} de ${totalValuesAvailable} valores únicos
+                        </div>
+                    `;
+
+                    fieldContainer.appendChild(distributionGrid);
+                    fieldContainer.appendChild(summary);
+                    categoriesDetailUl.appendChild(fieldContainer);
                 });
+        } else {
+            categoriesDetailUl.innerHTML = `
+                <div class="text-gray-500 text-center p-4">
+                    No hay campos adicionales seleccionados para analizar
+                </div>`;
+        }
+
+
+        // Actualizar clusters temporales
+        const clusterResults = document.getElementById("cluster-results");
+        clusterResults.innerHTML = "";
+
+        if (data.clusters && data.clusters.temporal) {
+            const temporal = data.clusters.temporal;
+            
+            // Función helper para crear una sección de cluster
+            const createClusterSection = (title, data, icon) => {
+                const section = document.createElement("div");
+                section.className = "bg-gray-50 p-3 rounded-lg";
+                
+                const header = document.createElement("div");
+                header.className = "font-bold text-sm text-indigo-600 mb-2 border-b pb-2 flex items-center";
+                header.innerHTML = `<i class="${icon} mr-2"></i>${title}`;
+                section.appendChild(header);
+
+                const list = document.createElement("div");
+                list.className = "space-y-1";
+                
+                Object.entries(data)
+                    .sort((a, b) => b[1] - a[1])
+                    .forEach(([key, value]) => {
+                        const item = document.createElement("div");
+                        item.className = "flex justify-between items-center py-1";
+                        item.innerHTML = `
+                            <span class="text-sm font-medium text-gray-600">${key}</span>
+                            <span class="text-sm text-indigo-600 font-semibold">${value}</span>
+                        `;
+                        list.appendChild(item);
+                    });
+                
+                section.appendChild(list);
+                return section;
+            };
+
+            // Crear secciones para cada tipo de análisis temporal
+            if (temporal.por_año) {
+                clusterResults.appendChild(
+                    createClusterSection("Por Año", temporal.por_año, "fas fa-calendar-alt")
+                );
             }
-        } catch (err) {
-            console.error("Error al analizar KPIs:", err);
+
+            if (temporal.por_mes) {
+                const mesesNombres = {
+                    1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 
+                    5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto',
+                    9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+                };
+                const dataPorMes = Object.fromEntries(
+                    Object.entries(temporal.por_mes).map(([mes, valor]) => [mesesNombres[mes], valor])
+                );
+                clusterResults.appendChild(
+                    createClusterSection("Por Mes", dataPorMes, "fas fa-calendar-day")
+                );
+            }
+
+            if (temporal.por_dia_semana) {
+                clusterResults.appendChild(
+                    createClusterSection("Por Día de Semana", temporal.por_dia_semana, "fas fa-calendar-week")
+                );
+            }
+
+            if (temporal.por_trimestre) {
+                const dataTrimestrales = Object.fromEntries(
+                    Object.entries(temporal.por_trimestre).map(([trim, valor]) => [`Q${trim}`, valor])
+                );
+                clusterResults.appendChild(
+                    createClusterSection("Por Trimestre", dataTrimestrales, "fas fa-chart-pie")
+                );
+            }
+
+            if (temporal.tendencia_12_meses) {
+                clusterResults.appendChild(
+                    createClusterSection("Últimos 12 Meses", temporal.tendencia_12_meses, "fas fa-chart-line")
+                );
+            }
+        } else {
+            clusterResults.innerHTML = `
+                <div class="text-gray-500 text-center p-4 col-span-2">
+                    No hay datos temporales disponibles para analizar
+                </div>`;
+        }
+
+        // No ocultar la sección de clusters
+        const clusterSection = document.getElementById("cluster-results").parentElement;
+        if (clusterSection) {
+            clusterSection.classList.remove("hidden");
         }
 
         // Mostrar la sección de KPIs y ocultar las demás
         kpiSection.classList.remove("hidden");
         graphSection.classList.add("hidden");
         tableSection.classList.add("hidden");
-    });
+
+    } catch (err) {
+        console.error("Error al analizar KPIs:", err);
+        alert("Error al analizar los KPIs. Por favor, revisa la consola para más detalles.");
+    }
+});
 </script>
 
 <script>
-    // Mostrar la sección de gráficos
-    document.getElementById("show-graph").addEventListener("click", () => {
-        kpiSection.classList.add("hidden");
-        graphSection.classList.remove("hidden");
-        tableSection.classList.add("hidden");
+document.getElementById("show-graph").addEventListener("click", async () => {
+    try {
+        // Mostrar indicador de carga si existe
+        const loadingIndicator = document.getElementById("loading-indicator");
+        if (loadingIndicator) loadingIndicator.classList.remove("hidden");
 
-        // Carga de gráfico dinámico
-        const ctx = document.getElementById('chart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Enero', 'Febrero', 'Marzo'],
-                datasets: [{
-                    label: 'Ejemplo',
-                    data: [10, 20, 30],
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            }
+        const requestData = {
+            table_name: document.getElementById("table-select").value,
+            column_name: document.getElementById("column-select").value,
+            date_field: document.getElementById("date_field").value,
+            start_date: document.getElementById("start_date").value,
+            end_date: document.getElementById("end_date").value,
+            additional_field: Array.from(document.querySelectorAll('select[name="additional_fields[]"]'))
+                .map(select => select.value)
+                .filter(Boolean)
+                .join(',')
+        };
+
+        if (!requestData.table_name || !requestData.date_field) {
+            alert("Por favor, selecciona una tabla y un campo de fecha");
+            return;
+        }
+
+        const response = await fetch("/analisis/analizar_grafico", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestData)
         });
-    });
-</script>
 
+        const data = await response.json();
+
+        if (data.status === "success") {
+            const container = document.getElementById("graficos-container");
+            container.innerHTML = '';
+            document.getElementById("graph-section").classList.remove("hidden");
+            
+            // Crear gráficos de manera asíncrona
+            await Promise.all(Object.entries(data.data.series_temporales).map(async ([campo, datos]) => {
+                const canvasId = `chart-${campo.replace(/\s+/g, '-')}`;
+                
+                // Crear estructura del contenedor
+                const chartStructure = `
+                    <div class="bg-white p-4 rounded shadow mb-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-700">${campo}</h3>
+                            <select class="chart-type-selector ml-2 p-2 border rounded-md text-sm">
+                                <option value="line">Línea</option>
+                                <option value="bar">Barras</option>
+                                <option value="pie">Circular</option>
+                                <option value="doughnut">Dona</option>
+                                <option value="radar">Radar</option>
+                            </select>
+                        </div>
+                        <div class="relative" style="height: 400px;">
+                            <canvas id="${canvasId}"></canvas>
+                        </div>
+                    </div>
+                `;
+                
+                container.insertAdjacentHTML('beforeend', chartStructure);
+
+                const canvas = document.getElementById(canvasId);
+                const chartTypeSelector = canvas.closest('.bg-white').querySelector('.chart-type-selector');
+                const resetZoomButton = canvas.closest('.bg-white').querySelector('.reset-zoom');
+
+                const updateChart = (chartType) => {
+                    if (canvas.chart) {
+                        canvas.chart.destroy();
+                    }
+
+                    const ctx = canvas.getContext('2d');
+                    const isCircularChart = chartType === 'pie' || chartType === 'doughnut';
+                    
+                    
+                    // Y modifica la configuración del gráfico eliminando las opciones de zoom
+                    let chartConfig = {
+                        type: chartType,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: `${datos.tipo === "categorico" ? 'Distribución' : 'Análisis'} - ${campo}`
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false
+                                }
+                            }
+                        }
+                    };
+
+                    if (datos.tipo === "categorico") {
+                        const totalsPorCategoria = Object.fromEntries(
+                            Object.entries(datos.valores).map(([categoria, valores]) => [
+                                categoria,
+                                Array.isArray(valores) ? valores.reduce((a, b) => a + b, 0) : valores
+                            ])
+                        );
+
+                        if (isCircularChart) {
+                            chartConfig.data = {
+                                labels: Object.keys(totalsPorCategoria),
+                                datasets: [{
+                                    data: Object.values(totalsPorCategoria),
+                                    backgroundColor: Object.keys(totalsPorCategoria)
+                                        .map((_, i) => getColor(i, 0.8))
+                                }]
+                            };
+
+                            chartConfig.options.plugins.tooltip.callbacks = {
+                                label: (context) => {
+                                    const value = context.raw;
+                                    const total = Object.values(totalsPorCategoria)
+                                        .reduce((a, b) => a + b, 0);
+                                    const percentage = ((value * 100) / total).toFixed(1);
+                                    return `${context.label}: ${value} (${percentage}%)`;
+                                }
+                            };
+                        } else {
+                            chartConfig.data = {
+                                labels: datos.fechas,
+                                datasets: Object.entries(datos.valores).map(([categoria, valores], index) => ({
+                                    label: categoria,
+                                    data: valores,
+                                    borderColor: getColor(index),
+                                    backgroundColor: getColor(index, 0.5),
+                                    tension: 0.1,
+                                    fill: chartType === 'radar'
+                                }))
+                            };
+                        }
+                    } else {
+                        chartConfig.data = {
+                            labels: datos.fechas,
+                            datasets: [
+                                {
+                                    label: `${campo} - Promedio`,
+                                    data: datos.valores.promedio,
+                                    borderColor: getColor(0),
+                                    backgroundColor: getColor(0, 0.5),
+                                    tension: 0.1
+                                },
+                                {
+                                    label: `${campo} - Total`,
+                                    data: datos.valores.suma,
+                                    borderColor: getColor(1),
+                                    backgroundColor: getColor(1, 0.5),
+                                    tension: 0.1
+                                }
+                            ]
+                        };
+                    }
+
+                    if (!isCircularChart) {
+                        chartConfig.options.scales = {
+                            x: {
+                                display: true,
+                                title: { display: true, text: 'Fecha' }
+                            },
+                            y: {
+                                display: true,
+                                title: { display: true, text: datos.tipo === "categorico" ? 'Cantidad' : 'Valor' },
+                                beginAtZero: true
+                            }
+                        };
+                    }
+
+                    canvas.chart = new Chart(ctx, chartConfig);
+                };
+
+                chartTypeSelector.addEventListener('change', (e) => updateChart(e.target.value));
+
+                updateChart('line');
+            }));
+
+            // Ocultar otras secciones
+            ["kpi-section", "table-section"].forEach(id => {
+                document.getElementById(id)?.classList.add("hidden");
+            });
+        }
+
+    } catch (error) {
+        console.error("Error al generar gráficos:", error);
+        alert("Error al generar los gráficos: " + error.message);
+    } finally {
+        // Ocultar indicador de carga si existe
+        if (loadingIndicator) loadingIndicator.classList.add("hidden");
+    }
+});
+
+function getColor(index, alpha = 1) {
+    const colors = [
+        [75, 192, 192],    // Verde azulado
+        [255, 99, 132],    // Rosa
+        [255, 206, 86],    // Amarillo
+        [54, 162, 235],    // Azul
+        [153, 102, 255],   // Morado
+        [255, 159, 64],    // Naranja
+        [201, 203, 207],   // Gris
+        [255, 99, 71],     // Rojo tomate
+        [50, 205, 50],     // Lima
+        [138, 43, 226],    // Azul violeta
+        [255, 215, 0],     // Oro
+        [0, 139, 139],     // Cian oscuro
+        [219, 112, 147],   // Rosa pálido
+        [70, 130, 180],    // Azul acero
+        [244, 164, 96],    // Arena
+        [128, 0, 128],     // Púrpura
+        [46, 139, 87],     // Verde mar
+        [220, 20, 60],     // Carmesí
+        [0, 128, 128],     // Verde azulado
+        [255, 127, 80],    // Coral
+        [186, 85, 211],    // Orquídea medio
+        [0, 206, 209],     // Turquesa oscuro
+        [219, 112, 147],   // Rosa violáceo
+        [255, 140, 0],     // Naranja oscuro
+        [32, 178, 170]     // Verde mar claro
+    ];
+
+    // Si se necesitan más colores, generar dinámicamente
+    if (index >= colors.length) {
+        // Generar un color aleatorio pero consistente basado en el índice
+        const r = Math.sin(index * 1.666) * 127 + 128;
+        const g = Math.sin(index * 3.333) * 127 + 128;
+        const b = Math.sin(index * 5.0) * 127 + 128;
+        return `rgba(${Math.floor(r)},${Math.floor(g)},${Math.floor(b)},${alpha})`;
+    }
+
+    return `rgba(${colors[index % colors.length].join(',')},${alpha})`;
+}
+</script>
 <script>
     // Asegúrate de que jQuery y DataTables estén cargados antes de este script
     document.getElementById("show-table").addEventListener("click", async (event) => {
@@ -474,6 +899,12 @@
                 })
             });
 
+            if (response.status === 401) {
+                alert("Tu sesión ha expirado, por favor inicia sesión de nuevo.");
+                window.location.href = "/loginpage";
+                return;
+            }
+
             if (!response.ok) {
                 throw new Error(`Error HTTP: ${response.status}`);
             }
@@ -503,7 +934,7 @@
             }
         } catch (error) {
             console.error("Error al obtener los datos de la tabla:", error);
-            alert("Ocurrió un error al obtener los datos de la tabla.");
+            alert(`Ocurrió un error al obtener los datos de la tabla: ${error.message}`);
         } finally {
             $('#loading-indicator').addClass('hidden');
         }
@@ -533,6 +964,7 @@
         // Poblar el select de columnas (solo int y bigint)
         const columnSelect = document.getElementById("column-select");
         columnSelect.innerHTML = '<option value="" disabled selected>Selecciona una columna...</option>';
+        // Dentro del event listener de "table-select"
         columnsData.columns
             .filter(column => ['INTEGER', 'BIGINT'].includes(column.type.toUpperCase()))
             .forEach(column => {

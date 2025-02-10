@@ -1,3 +1,4 @@
+import datetime
 from typing import List, Dict
 import pandas as pd
 import numpy as np
@@ -33,12 +34,11 @@ def limpiar_datos(df: pd.DataFrame) -> pd.DataFrame:
     columnas_fecha = [col for col in df.columns if 'fecha' in col.lower()]
     for col in columnas_fecha:
         if col in df.columns:
-            # Convertir a datetime
-            df[col] = pd.to_datetime(df[col], errors='coerce')
-            # Extraer características de fecha si lo deseas
-            # df[col + '_year'] = df[col].dt.year
-            # df[col + '_month'] = df[col].dt.month
-            # df[col + '_day'] = df[col].dt.day
+            # Especificar el formato de la fecha si es conocido
+            try:
+                df[col] = pd.to_datetime(df[col], format='%Y-%m-%d', errors='coerce')
+            except ValueError:
+                df[col] = pd.to_datetime(df[col], errors='coerce')
 
     return df
 
@@ -50,9 +50,9 @@ def convert_types(obj):
         return int(obj)
     if isinstance(obj, np.float64):
         return float(obj)
-    if isinstance(obj, pd.Timestamp):
+    if isinstance(obj, (np.datetime64, datetime.datetime, datetime.date)):
         return obj.isoformat()
-    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+    return obj
 
 def guardar_resultados_sql(db: Session, usuario: str, resultados: Dict):
     """

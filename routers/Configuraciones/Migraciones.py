@@ -1,5 +1,4 @@
 # migraciones.py
-
 from io import BytesIO
 import os
 import logging
@@ -15,6 +14,8 @@ import json
 from sqlalchemy.orm import Session
 from db.crud.tablas import get_tables
 import pandas as pd
+from tenacity import retry, stop_after_attempt, wait_exponential
+from fastapi.responses import JSONResponse
 
 from Services.Analisis.analisis import clean_data
 
@@ -22,6 +23,57 @@ from Services.Analisis.analisis import clean_data
 from sqlalchemy import inspect, Table, MetaData, func, cast, Date
 
 from db.models.activityLog import ActivityLog
+
+
+
+
+progress_storage = {}
+# Agregamos una clase para manejar el estado de la migración
+class MigracionProgress:
+    def __init__(self):
+        self.total_sheets = 0
+        self.processed_sheets = 0
+        self.current_sheet = ""
+        self.status = "iniciando"
+        self.errors = []
+        self.progress_percentage = 0
+        self.retry_count = 0
+        self.max_retries = 3
+
+    def update(self, sheet_name: str, status: str, error: str = None):
+        self.current_sheet = sheet_name
+        self.status = status
+        if error:
+            self.errors.append({"sheet": sheet_name, "error": error})
+        if status == "completado":
+            self.processed_sheets += 1
+            self.progress_percentage = (self.processed_sheets / self.total_sheets) * 100
+
+    def to_dict(self):
+        """Convierte el objeto a un diccionario para serialización JSON"""
+        return {
+            "total_sheets": self.total_sheets,
+            "processed_sheets": self.processed_sheets,
+            "current_sheet": self.current_sheet,
+            "status": self.status,
+            "errors": self.errors,
+            "progress_percentage": self.progress_percentage,
+            "retry_count": self.retry_count
+        }
+
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+async def process_sheet_with_retry(sheet_data, sheet_name, timestamp, user_results_dir):
+    """Procesa una hoja con sistema de reintentos"""
+    try:
+        # Convertir columnas datetime
+        datetime_columns = sheet_data.select_dtypes(include=['datetime64[ns]', 'datetime']).columns
+        for column in datetime_columns:
+            sheet_data[column] = sheet_data[column].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+        return sheet_data
+    except Exception as e:
+        logging.error(f"Error procesando hoja {sheet_name}: {str(e)}")
+        raise
 
 # Configuración de logging
 logging.basicConfig(
@@ -43,11 +95,19 @@ os.makedirs('logs', exist_ok=True)
 # Ajustar el directorio de las plantillas
 templates = Jinja2Templates(directory="static/html")
 
+
 router = APIRouter(
     prefix="/migraciones",
     tags=["Migraciones"],
     responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
 )
+
+@router.get("/check_progress")
+async def check_progress(
+    current_user: UserDB = Depends(get_current_user)
+):
+    user_progress = progress_storage.get(current_user.usuario, MigracionProgress())
+    return JSONResponse(content=user_progress.to_dict())
 
 @router.get("/nueva_migracion")
 async def migraciones_page(
@@ -65,125 +125,120 @@ async def upload_migracion_file(
     db: Session = Depends(get_db),
     current_user: UserDB = Depends(get_current_user)
 ):
+    progress = MigracionProgress()
+    progress_storage[current_user.usuario] = progress
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # Agregar esta línea
+    
     try:
-        # Validaciones iniciales
-        if file.content_type not in [
-            "application/vnd.ms-excel",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ]:
-            logging.warning(f"Tipo de archivo inválido: {file.content_type}")
-            return templates.TemplateResponse(
-                "migraciones_nueva.html",
-                {
-                    "request": request,
-                    "user": current_user,
-                    "error": "Tipo de archivo inválido. Solo se aceptan archivos Excel (.xls, .xlsx)."
-                }
-            )
-
-        # Leer archivo
         contents = await file.read()
-
-        # Validar que el archivo no esté vacío
         if not contents:
-            return templates.TemplateResponse(
-                "migraciones_nueva.html",
-                {
-                    "request": request,
-                    "user": current_user,
-                    "error": "El archivo está vacío."
-                }
+            return JSONResponse(
+                content={
+                    "error": "El archivo está vacío.",
+                    "progress": progress.to_dict()
+                },
+                status_code=400
             )
 
-        # Crear directorio del usuario si no existe
+        # Configuración inicial
         user_results_dir = os.path.join(RESULTS_DIR, current_user.usuario)
         os.makedirs(user_results_dir, exist_ok=True)
-
-        # Obtener la fecha y hora actual
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-
-        # Nombre de la migración (obtenido del request)
         form = await request.form()
         nombre_migracion = form.get('migration_name', 'default_name')
-
-        # Leer el archivo Excel
-        excel_data = pd.read_excel(BytesIO(contents), sheet_name=None)  # Leer todas las hojas
-
-        # Procesar cada hoja
-        for sheet_name, sheet_data in excel_data.items():            
-            # Nombre de la tabla para cada hoja
-            table_name = f"migracion_{nombre_migracion}_{sheet_name}_{timestamp}"
-
-            # Convertir columnas de tipo datetime a cadenas de texto
-            datetime_columns = sheet_data.select_dtypes(include=['datetime64[ns]', 'datetime']).columns
-            for column in datetime_columns:
-                try:
-                    sheet_data[column] = sheet_data[column].dt.strftime('%Y-%m-%d %H:%M:%S')
-                except Exception as e:
-                    logging.error(f"Error al convertir la columna {column} a cadena de texto: {str(e)}")
-                    sheet_data[column] = sheet_data[column].astype(str)
-
-            # Verificación adicional: Asegurarse de que no queden columnas datetime
-            remaining_datetime_columns = sheet_data.select_dtypes(include=['datetime64[ns]', 'datetime']).columns
-            if len(remaining_datetime_columns) > 0:
-                logging.warning(f"Quedan columnas datetime en la hoja {sheet_name}: {remaining_datetime_columns.tolist()}")
-                for column in remaining_datetime_columns:
-                    sheet_data[column] = sheet_data[column].astype(str)
-
-            # Verificación de tipos después de la conversión
-            for column in sheet_data.columns:
-                if sheet_data[column].dtype == 'object':
-                    sample_value = sheet_data[column].dropna().astype(str).iloc[0] if not sheet_data[column].dropna().empty else ''
-                    logging.info(f"Columna '{column}' tipo object con ejemplo de valor: {sample_value}")
-
-            # Ruta donde se guardará el archivo JSON para cada hoja
-            sheet_json_path = os.path.join(user_results_dir, f"{sheet_name}_datos.json")
-            sheet_data.to_json(sheet_json_path, orient='records', date_format='iso')  # Asegurar formato de fecha
-
-            # Verificación del archivo JSON creado
-            with open(sheet_json_path, 'r', encoding='utf-8') as f:
-                try:
-                    sample_data = json.load(f)
-                    for record in sample_data:
-                        for key, value in record.items():
-                            if isinstance(value, str) and 'T' in value:  # Detectar formato ISO
-                                adjusted_value = value.replace('T', ' ').split('.')[0]
-                                record[key] = adjusted_value
-                except json.JSONDecodeError as jde:
-                    logging.error(f"Error al decodificar JSON para la hoja {sheet_name}: {str(jde)}")
-                    continue  # Saltar a la siguiente hoja en caso de error
-
-            # Guardar el JSON corregido
-            with open(sheet_json_path, 'w', encoding='utf-8') as f:
-                json.dump(sample_data, f, ensure_ascii=False, indent=4)
-
-            # Ruta donde se guardará el resultado para cada hoja
-            result_filename = f"result_{sheet_name}_{timestamp}.json"
-            result_path = os.path.join(user_results_dir, result_filename)
-
-            # Agregar la tarea en segundo plano para procesar cada hoja
-            background_tasks.add_task(procesar_archivo, sheet_json_path, result_path, db, current_user, table_name)
         
-        # Redirigir a la página de resultados
-        return templates.TemplateResponse(
-            "migraciones_nueva.html",
-            {
-                "request": request,
-                "user": current_user,
-                "message": "Archivo recibido. El procesamiento se realizará en segundo plano.",
-                "result_url": f"/migraciones/control_migraciones"
-            }
-        )
+        # Detectar tipo de archivo y procesar
+        if file.content_type in ALLOWED_EXTENSIONS['EXCEL']:
+            # Procesar Excel
+            excel_data = pd.read_excel(BytesIO(contents), sheet_name=None)
+            progress.total_sheets = len(excel_data)
+
+            for sheet_name, sheet_data in excel_data.items():
+                progress.update(sheet_name, "procesando")
+                table_name = f"migracion_{nombre_migracion}_{sheet_name}_{timestamp}"
+
+                try:
+                    processed_data = await process_sheet_with_retry(
+                        sheet_data, sheet_name, timestamp, user_results_dir
+                    )
+
+                    sheet_json_path = os.path.join(user_results_dir, f"{sheet_name}_datos.json")
+                    processed_data.to_json(sheet_json_path, orient='records', date_format='iso')
+
+                    with open(sheet_json_path, 'r', encoding='utf-8') as f:
+                        sample_data = json.load(f)
+                        for record in sample_data:
+                            for key, value in record.items():
+                                if isinstance(value, str) and 'T' in value:
+                                    record[key] = value.replace('T', ' ').split('.')[0]
+
+                    with open(sheet_json_path, 'w', encoding='utf-8') as f:
+                        json.dump(sample_data, f, ensure_ascii=False, indent=4)
+
+                    result_filename = f"result_{sheet_name}_{timestamp}.json"
+                    result_path = os.path.join(user_results_dir, result_filename)
+                    background_tasks.add_task(
+                        procesar_archivo,
+                        sheet_json_path,
+                        result_path,
+                        db,
+                        current_user,
+                        table_name
+                    )
+
+                    progress.update(sheet_name, "completado")
+
+                except Exception as e:
+                    error_msg = f"Error en hoja {sheet_name}: {str(e)}"
+                    progress.update(sheet_name, "error", error_msg)
+                    logging.error(error_msg)
+                    continue
+
+        elif file.content_type in ALLOWED_EXTENSIONS['CSV']:
+            # Procesar CSV
+            try:
+                result = await process_csv_file(
+                    contents,
+                    nombre_migracion,
+                    user_results_dir,
+                    current_user,
+                    db,
+                    background_tasks,
+                    progress
+                )
+                return JSONResponse(content=result)
+            except Exception as e:
+                return JSONResponse(
+                    content={
+                        "error": f"Error procesando CSV: {str(e)}",
+                        "progress": progress.to_dict()
+                    },
+                    status_code=500
+                )
+
+        else:
+            return JSONResponse(
+                content={
+                    "error": f"Tipo de archivo no soportado: {file.content_type}",
+                    "progress": progress.to_dict()
+                },
+                status_code=400
+            )
+
+        return JSONResponse(content={
+            "message": "Archivo recibido. El procesamiento se realizará en segundo plano.",
+            "result_url": "/migraciones/control_migraciones",
+            "progress": progress.to_dict()
+        })
 
     except Exception as e:
-        logging.error(f"Error en el proceso de migración: {str(e)}")
-        return templates.TemplateResponse(
-            "migraciones_nueva.html",
-            {
-                "request": request,
-                "user": current_user,
-                "error": f"Error en el proceso: {str(e)}"
-            }
+        error_msg = f"Error en el proceso de migración: {str(e)}"
+        logging.error(error_msg)
+        return JSONResponse(
+            content={
+                "error": error_msg,
+                "progress": progress.to_dict()
+            },
+            status_code=500
         )
     
 @router.get("/control_migraciones")
@@ -395,3 +450,67 @@ async def migrate_data(
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al migrar datos: {str(e)}")
+    
+# Primero, definimos los tipos de archivo permitidos
+ALLOWED_EXTENSIONS = {
+    'EXCEL': [
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ],
+    'CSV': [
+        "text/csv",
+        "application/csv",
+        "text/plain"  # Algunos navegadores envían CSV como text/plain
+    ]
+}
+
+# Función para procesar archivos CSV
+async def process_csv_file(
+    contents: bytes,
+    nombre_migracion: str,
+    user_results_dir: str,
+    current_user: UserDB,
+    db: Session,
+    background_tasks: BackgroundTasks,
+    progress: MigracionProgress
+) -> dict:
+    try:
+        # Leer el archivo CSV
+        df = pd.read_csv(BytesIO(contents))
+        progress.total_sheets = 1
+        progress.update("csv_data", "procesando")
+        
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        table_name = f"migracion_{nombre_migracion}_csv_{timestamp}"
+        
+        # Convertir a JSON
+        json_path = os.path.join(user_results_dir, f"datos_csv_{timestamp}.json")
+        df.to_json(json_path, orient='records', date_format='iso')
+
+        # Configurar tarea en segundo plano
+        result_filename = f"result_csv_{timestamp}.json"
+        result_path = os.path.join(user_results_dir, result_filename)
+        
+        background_tasks.add_task(
+            procesar_archivo,
+            json_path,
+            result_path,
+            db,
+            current_user,
+            table_name
+        )
+
+        progress.update("csv_data", "completado")
+        return {
+            "status": "success",
+            "message": "Archivo CSV procesado correctamente",
+            "progress": progress.to_dict()
+        }
+    except Exception as e:
+        error_msg = f"Error procesando CSV: {str(e)}"
+        progress.update("csv_data", "error", error_msg)
+        logging.error(error_msg)
+        raise
+    
+
+ 
