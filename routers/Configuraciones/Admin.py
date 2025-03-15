@@ -14,6 +14,7 @@ templates = Jinja2Templates(directory="static/html")  # Ajusta el directorio seg
 
 def create_admin_router(app: FastAPI):
     router = APIRouter(
+        include_in_schema=False,  # Oculta todas las rutas de este router en la documentación
         prefix="/admin",
         tags=["Admin"],
         responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}

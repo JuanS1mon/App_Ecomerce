@@ -10,7 +10,18 @@
         <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
         <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+        <style>
+            .copy-button {
+                cursor: pointer;
+                margin-left: 8px;
+                font-size: 0.9em;
+                color: #4f46e5;
+                transition: color 0.2s;
+            }
+            .copy-button:hover {
+                color: #6366f1;
+            }
+            </style>
     </head>
 <body class="bg-gray-100">
 <!-- Barra de navegación -->
@@ -130,8 +141,17 @@
                         <input type="date" id="end_date" name="end_date" class="w-full border px-4 py-2 border-gray-300 rounded-md">
                     </div>
                 </div>
+                <!-- Sección de Filtros Personalizados -->
+                <div class="mb-6">
+                    <h2 class="text-gray-700 font-bold text-lg mb-4">Filtros Personalizados</h2>
+                    <button type="button" onclick="addCustomFilter()" class="bg-blue-500 text-white px-4 py-2 rounded mb-2">
+                        <i class="fas fa-filter mr-1"></i> Agregar Filtro
+                    </button>
+                    <div id="custom-filters" class="space-y-3">
+                        <!-- Los filtros personalizados se agregarán aquí -->
+                    </div>
+                </div>
                 <!-- Campos Adicionales -->
-                               <!-- Reemplazar el div de "Campos Adicionales" existente por: -->
                 <div class="mb-6">
                     <div class="flex justify-between items-start">
                         <!-- Columna izquierda: Campos Adicionales -->
@@ -369,7 +389,12 @@
                     <!-- Opciones de campos adicionales se cargarán aquí -->
                 </select>
             </div>
-            <button type="button" onclick="removeField(this)" class="ml-4 bg-red-500 text-white px-4 py-2 rounded-md self-end">Eliminar</button>
+            <div class="min-w-[50px]">
+                    <label class="block text-gray-700 font-bold mb-2 opacity-0">Acción</label>
+                    <button type="button" onclick="removeField(this)" class="bg-red-500 text-white p-2 rounded-md hover:bg-red-600">
+                        <i class="fas fa-trash"></i>
+                    </button>
+            </div>
         `;
         container.appendChild(field);
 
@@ -396,13 +421,84 @@
 </script>
 
 <script>
-    // Función para eliminar un campo adicional
+// Función para eliminar un campo adicional
     function removeField(button) {
-        const field = button.parentElement;
+        const field = button.closest('.mb-4.flex');
         field.remove();
     }
 </script>
 
+<script>
+        // Función mejorada para copiar el contenido de un elemento al portapapeles
+    function copiarContenido(elementId, elementName) {
+        const elemento = document.getElementById(elementId);
+        if (!elemento) return;
+        
+        // Obtener datos de los elementos dentro de la grid
+        let textoCopiado = `** DATOS DE ${elementName} **\n\n`;
+        
+        // Para cada item en la grid
+        const items = elemento.querySelectorAll('.flex.justify-between');
+        items.forEach(item => {
+            const clave = item.querySelector('span:first-child').textContent.trim();
+            const valor = item.querySelector('span:last-child').textContent.trim();
+            textoCopiado += `${clave}: ${valor}\n`;
+        });
+        
+        // Información de resumen si existe
+        const resumen = elemento.parentNode.querySelector('.text-sm.text-gray-600');
+        if (resumen) {
+            textoCopiado += "\n** RESUMEN **\n";
+            resumen.querySelectorAll('.flex.justify-between').forEach(item => {
+                textoCopiado += item.textContent.trim() + "\n";
+            });
+        }
+        
+        // Método alternativo para copiar al portapapeles
+        try {
+            // Crear un elemento temporal
+            const tempElement = document.createElement("textarea");
+            tempElement.value = textoCopiado;
+            document.body.appendChild(tempElement);
+            
+            // Seleccionar y copiar el texto
+            tempElement.select();
+            document.execCommand("copy");
+            
+            // Eliminar el elemento temporal
+            document.body.removeChild(tempElement);
+            
+            // Mostrar confirmación visual
+            const button = document.querySelector(`[data-copy="${elementId}"]`);
+            if (button) {
+                button.style.position = 'relative';
+                
+                // Crear tooltip
+                const tooltip = document.createElement('div');
+                tooltip.className = 'bg-gray-800 text-white text-xs rounded px-2 py-1 absolute z-50';
+                tooltip.style.right = '0';
+                tooltip.style.top = '-25px';
+                tooltip.textContent = '¡Copiado!';
+                button.appendChild(tooltip);
+                
+                // Cambiar icono temporalmente
+                const originalIcon = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i>';
+                
+                // Restaurar después de un tiempo
+                setTimeout(() => {
+                    button.innerHTML = originalIcon;
+                    if (tooltip.parentNode) {
+                        tooltip.parentNode.removeChild(tooltip);
+                    }
+                }, 1500);
+            }
+        } catch (err) {
+            console.error('Error al copiar al portapapeles:', err);
+            alert("No se pudo copiar al portapapeles. Por favor, intenta con otro navegador.");
+        }
+    }
+</script>
 <script>
     // Variables para las secciones de KPIs, gráficos y tabla
     const kpiSection = document.getElementById("kpi-section");
@@ -434,7 +530,8 @@ document.getElementById("show-kpis").addEventListener("click", async () => {
                 date_field: dateField,
                 start_date: startDate,
                 end_date: endDate,
-                additional_field: additionalFields
+                additional_field: additionalFields,
+                custom_filters: getCustomFilters() // Añadir esta línea
             })
         });
 
@@ -454,50 +551,56 @@ document.getElementById("show-kpis").addEventListener("click", async () => {
 
         // Modificar la parte del código que muestra los valores
         if (data.analisis_campos && additionalFields) {
-            const additionalFieldsArray = additionalFields.split(',');
-            const limitValues = parseInt(document.getElementById('limit-values').value) || 10;
-            
-            Object.entries(data.analisis_campos)
-                .filter(([tipo, analisis]) => tipo !== 'principal' && additionalFieldsArray.includes(analisis.campo))
-                .forEach(([tipo, analisis]) => {
-                    // Crear contenedor para cada campo
-                    const fieldContainer = document.createElement("div");
-                    fieldContainer.className = "mb-4 bg-gray-50 p-3 rounded-lg";
+        const additionalFieldsArray = additionalFields.split(',');
+        const limitValues = parseInt(document.getElementById('limit-values').value) || 10;
+        
+        Object.entries(data.analisis_campos)
+            .filter(([tipo, analisis]) => tipo !== 'principal' && additionalFieldsArray.includes(analisis.campo))
+            .forEach(([tipo, analisis], index) => {
+                                    // Crear ID único para este campo
+                const fieldId = `field-grid-${index}-${Date.now()}`;
+                
+                // Crear contenedor para cada campo
+                const fieldContainer = document.createElement("div");
+                fieldContainer.className = "mb-4 bg-gray-50 p-3 rounded-lg";
 
-                    // Crear encabezado para cada campo
-                    const header = document.createElement("div");
-                    header.className = "font-bold text-lg text-indigo-600 mb-2 border-b pb-2";
-                    header.textContent = analisis.campo;
-                    fieldContainer.appendChild(header);
+                // Crear encabezado con botón de copiar
+                const header = document.createElement("div");
+                header.className = "font-bold text-lg text-indigo-600 mb-2 border-b pb-2 flex justify-between items-center";
+                header.innerHTML = `
+                    <span>${analisis.campo}</span>
+                    <span class="copy-button" data-copy="${fieldId}" onclick="copiarContenido('${fieldId}', '${analisis.campo}')">
+                        <i class="fas fa-copy"></i>
+                    </span>
+                `;
+                fieldContainer.appendChild(header);
 
-                    // Crear grid para la distribución de valores
-                    const distributionGrid = document.createElement("div");
-                    distributionGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-2";
+                // Crear grid para la distribución de valores
+                const distributionGrid = document.createElement("div");
+                distributionGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-2";
+                distributionGrid.id = fieldId; // Asignar el ID para referencia
 
-                    // Modificar esta parte para usar el límite configurable
-                    Object.entries(analisis.distribucion)
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, limitValues) // Usar el valor configurable
-                        .forEach(([valor, cantidad]) => {
-                            const item = document.createElement("div");
-                            item.className = "flex justify-between items-center p-2 bg-white rounded shadow-sm";
-                            item.innerHTML = `
-                                <span class="font-medium text-gray-700">${valor}</span>
-                                <span class="text-indigo-600 font-semibold">${cantidad}</span>
-                            `;
-                            distributionGrid.appendChild(item);
-                    });
-                    
-
-
-            
-                    // Agregar resumen
-                    const totalValues = Object.values(analisis.distribucion).reduce((a, b) => a + b, 0);
-                    const uniqueValues = Object.keys(analisis.distribucion).length;
-                    const totalValuesShown = Math.min(limitValues, Object.keys(analisis.distribucion).length);
-                    const totalValuesAvailable = Object.keys(analisis.distribucion).length;
-                    const summary = document.createElement("div");
-                    summary.className = "mt-3 text-sm text-gray-600 flex flex-col border-t pt-2";
+                // Agregar contenido como antes
+                Object.entries(analisis.distribucion)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, limitValues)
+                    .forEach(([valor, cantidad]) => {
+                        const item = document.createElement("div");
+                        item.className = "flex justify-between items-center p-2 bg-white rounded shadow-sm";
+                        item.innerHTML = `
+                            <span class="font-medium text-gray-700">${valor}</span>
+                            <span class="text-indigo-600 font-semibold">${cantidad}</span>
+                        `;
+                        distributionGrid.appendChild(item);
+                });
+                
+                // Resto del código como estaba antes
+                const totalValues = Object.values(analisis.distribucion).reduce((a, b) => a + b, 0);
+                const uniqueValues = Object.keys(analisis.distribucion).length;
+                const totalValuesShown = Math.min(limitValues, Object.keys(analisis.distribucion).length);
+                const totalValuesAvailable = Object.keys(analisis.distribucion).length;
+                const summary = document.createElement("div");
+                summary.className = "mt-3 text-sm text-gray-600 flex flex-col border-t pt-2";
                     summary.innerHTML = `
                         <div class="flex justify-between">
                             <span>Valores únicos: ${uniqueValues}</span>
@@ -525,35 +628,41 @@ document.getElementById("show-kpis").addEventListener("click", async () => {
         clusterResults.innerHTML = "";
 
         if (data.clusters && data.clusters.temporal) {
-            const temporal = data.clusters.temporal;
+        const temporal = data.clusters.temporal;
+        
+        // Función helper modificada para crear una sección de cluster con botón de copia
+        const createClusterSection = (title, data, icon) => {
+            const clusterId = `cluster-${title.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
+            const section = document.createElement("div");
+            section.className = "bg-gray-50 p-3 rounded-lg";
             
-            // Función helper para crear una sección de cluster
-            const createClusterSection = (title, data, icon) => {
-                const section = document.createElement("div");
-                section.className = "bg-gray-50 p-3 rounded-lg";
-                
-                const header = document.createElement("div");
-                header.className = "font-bold text-sm text-indigo-600 mb-2 border-b pb-2 flex items-center";
-                header.innerHTML = `<i class="${icon} mr-2"></i>${title}`;
-                section.appendChild(header);
+            const header = document.createElement("div");
+            header.className = "font-bold text-sm text-indigo-600 mb-2 border-b pb-2 flex justify-between items-center";
+            header.innerHTML = `
+                <div><i class="${icon} mr-2"></i>${title}</div>
+                <span class="copy-button" data-copy="${clusterId}" onclick="copiarContenido('${clusterId}', '${title}')">
+                    <i class="fas fa-copy"></i>
+                </span>`;
+            section.appendChild(header);
 
-                const list = document.createElement("div");
-                list.className = "space-y-1";
-                
-                Object.entries(data)
-                    .sort((a, b) => b[1] - a[1])
-                    .forEach(([key, value]) => {
-                        const item = document.createElement("div");
-                        item.className = "flex justify-between items-center py-1";
-                        item.innerHTML = `
-                            <span class="text-sm font-medium text-gray-600">${key}</span>
-                            <span class="text-sm text-indigo-600 font-semibold">${value}</span>
-                        `;
-                        list.appendChild(item);
-                    });
-                
-                section.appendChild(list);
-                return section;
+            const list = document.createElement("div");
+            list.className = "space-y-1";
+            list.id = clusterId; // Asignar ID para referencia
+            
+            Object.entries(data)
+                .sort((a, b) => b[1] - a[1])
+                .forEach(([key, value]) => {
+                    const item = document.createElement("div");
+                    item.className = "flex justify-between items-center py-1";
+                    item.innerHTML = `
+                        <span class="text-sm font-medium text-gray-600">${key}</span>
+                        <span class="text-sm text-indigo-600 font-semibold">${value}</span>
+                    `;
+                    list.appendChild(item);
+                });
+            
+            section.appendChild(list);
+            return section;
             };
 
             // Crear secciones para cada tipo de análisis temporal
@@ -989,4 +1098,129 @@ function getColor(index, alpha = 1) {
             });
         });
     });
+</script>
+<script>
+    // Función para agregar un filtro personalizado
+    function addCustomFilter() {
+        const container = document.getElementById('custom-filters');
+        const filterIndex = container.children.length;
+        const filter = document.createElement('div');
+        filter.className = 'flex flex-wrap items-center gap-2 p-3 bg-gray-50 rounded-lg';
+        filter.innerHTML = `
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Campo</label>
+                <select name="filter_field[]" class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                    <option value="" disabled selected>Selecciona un campo...</option>
+                </select>
+            </div>
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Operador</label>
+                <select name="filter_operator[]" class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                    <option value="=" selected>=</option>
+                    <option value="!=">≠</option>
+                    <option value=">">&gt;</option>
+                    <option value=">=">&ge;</option>
+                    <option value="<">&lt;</option>
+                    <option value="<=">&le;</option>
+                    <option value="LIKE">Contiene</option>
+                    <option value="NOT LIKE">No contiene</option>
+                    <option value="IS NULL">Es nulo</option>
+                    <option value="IS NOT NULL">No es nulo</option>
+                </select>
+            </div>
+            <div class="flex-1 min-w-[200px]" id="value-container-${filterIndex}">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Valor</label>
+                <input type="text" name="filter_value[]" class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            </div>
+            <div class="min-w-[50px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1 opacity-0">Acción</label>
+                <button type="button" onclick="removeFilter(this)" class="bg-red-500 text-white p-2 rounded-md hover:bg-red-600">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(filter);
+
+        // Actualizar el select con las columnas disponibles
+        const tableName = document.getElementById("table-select").value;
+        if (tableName) {
+            const filterField = filter.querySelector('select[name="filter_field[]"]');
+            const operatorField = filter.querySelector('select[name="filter_operator[]"]');
+            
+            // Cargar las columnas
+            fetch(`/analisis/columnas`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ table_name: tableName })
+            })
+            .then(response => response.json())
+            .then(columnsData => {
+                filterField.innerHTML = '<option value="" disabled selected>Selecciona un campo...</option>';
+                columnsData.columns.forEach(column => {
+                    filterField.innerHTML += `<option value="${column.name}" data-type="${column.type}">${column.name}</option>`;
+                });
+            });
+            
+            // Manejar cambio de operador para mostrar/ocultar campo de valor
+            operatorField.addEventListener('change', function() {
+                const valueContainer = document.getElementById(`value-container-${filterIndex}`);
+                const needsValue = !['IS NULL', 'IS NOT NULL'].includes(this.value);
+                valueContainer.style.display = needsValue ? 'block' : 'none';
+            });
+        }
+    }
+
+    // Función para eliminar un filtro
+    function removeFilter(button) {
+        const filter = button.closest('.flex.flex-wrap');
+        filter.remove();
+    }
+    
+    // Modificar el event listener existente para que cargue también los filtros
+    const originalTableSelectListener = document.getElementById("table-select").onchange;
+    document.getElementById("table-select").addEventListener("change", function() {
+        const tableName = this.value;
+        
+        // Actualizar todos los selectores de filtros existentes
+        const filterFields = document.querySelectorAll('select[name="filter_field[]"]');
+        filterFields.forEach(select => {
+            fetch(`/analisis/columnas`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ table_name: tableName })
+            })
+            .then(response => response.json())
+            .then(columnsData => {
+                select.innerHTML = '<option value="" disabled selected>Selecciona un campo...</option>';
+                columnsData.columns.forEach(column => {
+                    select.innerHTML += `<option value="${column.name}" data-type="${column.type}">${column.name}</option>`;
+                });
+            });
+        });
+    });
+    
+    // Función para recopilar filtros al enviar solicitudes
+    function getCustomFilters() {
+        const filters = [];
+        const fields = document.querySelectorAll('select[name="filter_field[]"]');
+        const operators = document.querySelectorAll('select[name="filter_operator[]"]');
+        const values = document.querySelectorAll('input[name="filter_value[]"]');
+        
+        for (let i = 0; i < fields.length; i++) {
+            if (fields[i].value) {
+                const needsValue = !['IS NULL', 'IS NOT NULL'].includes(operators[i].value);
+                filters.push({
+                    field: fields[i].value,
+                    operator: operators[i].value,
+                    value: needsValue ? values[i].value : null
+                });
+            }
+        }
+        
+        return filters;
+    }
 </script>

@@ -10,6 +10,13 @@ from dotenv import load_dotenv
 from datetime import timedelta
 import logging
 
+# Instancias de FastAPI y dependencias
+router = APIRouter(
+    include_in_schema=False,  # Oculta todas las rutas de este router en la documentación,
+    tags=["usuario"],
+    responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
+)
+
 from Services.security.security import (
     authenticate_user,
     current_user,
@@ -47,11 +54,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 BASE_URL = os.getenv("BASE_URL")
 
-# Instancias de FastAPI y dependencias
-router = APIRouter(
-    tags=["usuario"],
-    responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
-)
+
 
 activation_token_expires = timedelta(minutes=10)
 

@@ -99,7 +99,6 @@ templates = Jinja2Templates(directory="static/html")
 
 
 router = APIRouter(
-    include_in_schema=False,  # Oculta todas las rutas de este router en la documentación
     prefix="/migraciones",
     tags=["Migraciones"],
     responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
@@ -130,53 +129,74 @@ async def upload_migracion_file(
 ):
     progress = MigracionProgress()
     progress_storage[current_user.usuario] = progress
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # Agregar esta línea
     
     try:
+        contents = await file.read()
+        if not contents:
+            return JSONResponse(
+                content={
+                    "error": "El archivo está vacío.",
+                    "progress": progress.to_dict()
+                },
+                status_code=400
+            )
+
         # Configuración inicial
         user_results_dir = os.path.join(RESULTS_DIR, current_user.usuario)
         os.makedirs(user_results_dir, exist_ok=True)
         form = await request.form()
         nombre_migracion = form.get('migration_name', 'default_name')
         
-        # Verificar el tipo de archivo sin leer todo el contenido
+        # Detectar tipo de archivo y procesar
         if file.content_type in ALLOWED_EXTENSIONS['EXCEL']:
-            # Guardar temporalmente el archivo (evita cargarlo completamente en memoria)
-            temp_file_path = os.path.join(user_results_dir, f"temp_{timestamp}_{file.filename}")
-            
-            # Leer y escribir por chunks para archivos grandes
-            CHUNK_SIZE = 1024 * 1024  # 1MB por chunk
-            with open(temp_file_path, 'wb') as f:
-                while chunk := await file.read(CHUNK_SIZE):
-                    if not chunk:
-                        break
-                    f.write(chunk)
-            
-            # Procesar Excel eficientemente
-            await background_tasks.add_task(
-                process_excel_file_in_background,
-                temp_file_path,
-                nombre_migracion,
-                timestamp,
-                user_results_dir,
-                db,
-                current_user,
-                progress
-            )
-            
+            # Procesar Excel
+            excel_data = pd.read_excel(BytesIO(contents), sheet_name=None,engine='openpyxl') 
+            progress.total_sheets = len(excel_data)
+
+            for sheet_name, sheet_data in excel_data.items():
+                progress.update(sheet_name, "procesando")
+                table_name = f"migracion_{nombre_migracion}_{sheet_name}_{timestamp}"
+
+                try:
+                    processed_data = await process_sheet_with_retry(
+                        sheet_data, sheet_name, timestamp, user_results_dir
+                    )
+
+                    sheet_json_path = os.path.join(user_results_dir, f"{sheet_name}_datos.json")
+                    processed_data.to_json(sheet_json_path, orient='records', date_format='iso')
+
+                    with open(sheet_json_path, 'r', encoding='utf-8') as f:
+                        sample_data = json.load(f)
+                        for record in sample_data:
+                            for key, value in record.items():
+                                if isinstance(value, str) and 'T' in value:
+                                    record[key] = value.replace('T', ' ').split('.')[0]
+
+                    with open(sheet_json_path, 'w', encoding='utf-8') as f:
+                        json.dump(sample_data, f, ensure_ascii=False, indent=4)
+
+                    result_filename = f"result_{sheet_name}_{timestamp}.json"
+                    result_path = os.path.join(user_results_dir, result_filename)
+                    background_tasks.add_task(
+                        procesar_archivo,
+                        sheet_json_path,
+                        result_path,
+                        db,
+                        current_user,
+                        table_name
+                    )
+
+                    progress.update(sheet_name, "completado")
+
+                except Exception as e:
+                    error_msg = f"Error en hoja {sheet_name}: {str(e)}"
+                    progress.update(sheet_name, "error", error_msg)
+                    logging.error(error_msg)
+                    continue
+
         elif file.content_type in ALLOWED_EXTENSIONS['CSV']:
-            # Para CSV, leer con una estrategia diferente por chunks
-            contents = await file.read()
-            if not contents:
-                return JSONResponse(
-                    content={
-                        "error": "El archivo está vacío.",
-                        "progress": progress.to_dict()
-                    },
-                    status_code=400
-                )
-            
-            # Procesar CSV en segundo plano
+            # Procesar CSV
             try:
                 result = await process_csv_file(
                     contents,
@@ -196,6 +216,7 @@ async def upload_migracion_file(
                     },
                     status_code=500
                 )
+
         else:
             return JSONResponse(
                 content={
@@ -812,129 +833,3 @@ async def _handle_date_conversion(request: ChangeFieldTypeRequest, db: Session, 
             content={"success": False, "message": error_msg},
             status_code=500
         )
-    
-async def process_excel_file_in_background(
-    file_path: str,
-    nombre_migracion: str,
-    timestamp: str,
-    user_results_dir: str,
-    db: Session,
-    current_user: UserDB,
-    progress: MigracionProgress
-):
-    try:
-        # Usar ExcelFile para leer las hojas bajo demanda
-        with pd.ExcelFile(file_path, engine='openpyxl') as xls:
-            sheet_names = xls.sheet_names
-            progress.total_sheets = len(sheet_names)
-            
-            # Procesar cada hoja individualmente
-            for sheet_name in sheet_names:
-                progress.update(sheet_name, "procesando")
-                table_name = f"migracion_{nombre_migracion}_{sheet_name}_{timestamp}"
-                
-                try:
-                    # Leer solo esta hoja y liberar memoria después
-                    df = pd.read_excel(
-                        file_path, 
-                        sheet_name=sheet_name, 
-                        engine='openpyxl', 
-                        # Optimizaciones para archivos grandes
-                        dtype='object',  # Usa tipos inferidos más tarde en smaller chunks
-                        na_filter=False,  # Desactivar el filtro NA para aumentar velocidad
-                    )
-                    
-                    # Convertir columnas datetime de manera más eficiente
-                    datetime_columns = df.select_dtypes(include=['datetime64[ns]', 'datetime']).columns
-                    for column in datetime_columns:
-                        df[column] = df[column].dt.strftime('%Y-%m-%d %H:%M:%S')
-                    
-                    # Guardar directamente a JSON en disco
-                    sheet_json_path = os.path.join(user_results_dir, f"{sheet_name}_datos.json")
-                    
-                    # Dividir el DataFrame en chunks para procesar archivos grandes
-                    ROWS_PER_CHUNK = 10000
-                    total_rows = len(df)
-                    
-                    # Si es un archivo pequeño, procesarlo directamente
-                    if total_rows <= ROWS_PER_CHUNK:
-                        df.to_json(sheet_json_path, orient='records', date_format='iso')
-                        
-                        # Limpiar formato de fechas (procesar archivo JSON ya generado)
-                        with open(sheet_json_path, 'r', encoding='utf-8') as f:
-                            sample_data = json.load(f)
-                            for record in sample_data:
-                                for key, value in record.items():
-                                    if isinstance(value, str) and 'T' in value:
-                                        record[key] = value.replace('T', ' ').split('.')[0]
-                                        
-                        with open(sheet_json_path, 'w', encoding='utf-8') as f:
-                            json.dump(sample_data, f, ensure_ascii=False, indent=4)
-                    else:
-                        # Para archivos grandes, procesar por chunks
-                        with open(sheet_json_path, 'w', encoding='utf-8') as f:
-                            # Escribir inicio del array JSON
-                            f.write('[\n')
-                            
-                            for chunk_start in range(0, total_rows, ROWS_PER_CHUNK):
-                                chunk_end = min(chunk_start + ROWS_PER_CHUNK, total_rows)
-                                chunk = df.iloc[chunk_start:chunk_end]
-                                
-                                # Convertir chunk a JSON y limpiar
-                                chunk_json = chunk.to_json(orient='records', date_format='iso')
-                                chunk_data = json.loads(chunk_json)
-                                
-                                # Limpiar formato de fechas
-                                for record in chunk_data:
-                                    for key, value in record.items():
-                                        if isinstance(value, str) and 'T' in value:
-                                            record[key] = value.replace('T', ' ').split('.')[0]
-                                
-                                # Escribir cada registro con formato apropiado
-                                for i, record in enumerate(chunk_data):
-                                    json_str = json.dumps(record, ensure_ascii=False)
-                                    # Añadir coma si no es el último chunk y no es el último registro
-                                    if chunk_end < total_rows or i < len(chunk_data) - 1:
-                                        f.write(f"  {json_str},\n")
-                                    else:
-                                        f.write(f"  {json_str}\n")
-                            
-                            # Cerrar el array JSON
-                            f.write(']')
-                    
-                    # Configurar tarea de procesamiento para este JSON
-                    result_filename = f"result_{sheet_name}_{timestamp}.json"
-                    result_path = os.path.join(user_results_dir, result_filename)
-                    
-                    # Aquí usamos run_in_threadpool para no bloquear mientras se procesa
-                    from fastapi.concurrency import run_in_threadpool
-                    await run_in_threadpool(
-                        procesar_archivo,
-                        sheet_json_path,
-                        result_path,
-                        db,
-                        current_user,
-                        table_name
-                    )
-                    
-                    progress.update(sheet_name, "completado")
-                    
-                    # Limpiar memoria explícitamente
-                    del df
-                    import gc
-                    gc.collect()
-                    
-                except Exception as e:
-                    error_msg = f"Error en hoja {sheet_name}: {str(e)}"
-                    progress.update(sheet_name, "error", error_msg)
-                    logging.error(error_msg)
-                    continue
-            
-        # Eliminar archivo temporal
-        os.remove(file_path)
-        
-    except Exception as e:
-        error_msg = f"Error procesando archivo Excel: {str(e)}"
-        logging.error(error_msg)
-        progress.status = "error"
-        progress.errors.append({"sheet": "general", "error": error_msg})

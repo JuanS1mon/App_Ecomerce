@@ -10,6 +10,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 router = APIRouter(
+    include_in_schema=False,  # Oculta todas las rutas de este router en la documentación
     prefix="/generar",
     tags=["generar"],
     responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}

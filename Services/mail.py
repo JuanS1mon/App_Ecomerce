@@ -27,6 +27,7 @@ PASSWORD = os.getenv('PASSWORDmail')
 
 # Crear el router de FastAPI
 router = APIRouter(
+    include_in_schema=False ,  # Oculta todas las rutas de este router en la documentación
     prefix="/envios",
     tags=["envios"],
     responses={404: {"description": "Not Found"}},

@@ -1,5 +1,5 @@
 # sql_app/routers/blog.py
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from fastapi import APIRouter, Depends, Form, HTTPException, Request,status
 from sqlalchemy.orm import Session
 from db.database import get_db
 from db.models.Blog import BlogPost as BlogPostModel
@@ -8,7 +8,11 @@ from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse, RedirectResponse
 
 
-router = APIRouter()
+router = APIRouter(
+    include_in_schema=False,  # Oculta todas las rutas de este router en la documentación,
+    tags=["Blog"],
+    responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
+)
 
 @router.post("/blog/", response_model=BlogPost)
 def create_blog_post(blog_post: BlogPostCreate, db: Session = Depends(get_db)):

@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from db.crud.tablas import get_tables, get_columns, get_table_data
 from sqlalchemy import inspect, text
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from collections import Counter
 from Services.Analisis.analisis import convert_types, limpiar_datos, guardar_resultados_sql
 
@@ -20,6 +20,7 @@ from Services.Analisis.analisis import convert_types, limpiar_datos, guardar_res
 templates = Jinja2Templates(directory="static/html")
 
 router = APIRouter(
+    include_in_schema=False,  # Oculta todas las rutas de este router en la documentación
     prefix="/analisis",
     tags=["Analisis"],
     responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
@@ -28,6 +29,7 @@ router = APIRouter(
 class ColumnasRequest(BaseModel):
     table_name: str
 
+
 class AnalisisRequest(BaseModel):
     table_name: str
     column_name: str
@@ -35,6 +37,7 @@ class AnalisisRequest(BaseModel):
     start_date: Optional[str] = None
     end_date: Optional[str] = None
     additional_field: Optional[str] = None  # Campos adicionales separados por comas
+    custom_filters: Optional[List[Dict[str, Any]]] = None  # Lista de filtros personalizados
 
 class AnalisisDetalleRequest(BaseModel):
     table_name: str
@@ -100,6 +103,32 @@ async def analizar_kpis(request: AnalisisRequest,
             campos_adicionales = [campo.strip() for campo in request.additional_field.split(',') if campo.strip()]
             for campo in campos_adicionales:
                 filters.append(f"{escape_column(campo)} IS NOT NULL")
+        
+        # Procesar filtros personalizados
+        if request.custom_filters:
+            for filtro in request.custom_filters:
+                field = filtro.get('field')
+                operator = filtro.get('operator')
+                value = filtro.get('value')
+                
+                if field and operator:
+                    escaped_field = escape_column(field)
+                    
+                    # Manejar operadores especiales
+                    if operator in ['IS NULL', 'IS NOT NULL']:
+                        filters.append(f"{escaped_field} {operator}")
+                    elif operator in ['LIKE', 'NOT LIKE']:
+                        filters.append(f"{escaped_field} {operator} '%{value}%'")
+                    else:
+                        # Para operadores regulares con valores
+                        if value is not None:
+                            # Si el valor parece ser numérico, no lo rodeamos con comillas
+                            try:
+                                float_value = float(value)
+                                filters.append(f"{escaped_field} {operator} {value}")
+                            except (ValueError, TypeError):
+                                # Si no es numérico, escapar como cadena con comillas simples
+                                filters.append(f"{escaped_field} {operator} '{value}'")
 
         if filters:
             query_string += " WHERE " + " AND ".join(filters)
@@ -244,9 +273,57 @@ async def analizar_detalle(analisis_request: AnalisisRequest,
                            db: Session = Depends(get_db),
                            current_user: UserDB = Depends(get_current_user)):
     try:
-        # Obtener los datos de la tabla con o sin filtros de fecha
-        data = get_table_data(analisis_request.table_name, db, analisis_request.date_field, analisis_request.start_date, analisis_request.end_date)
-        df = pd.DataFrame(data)
+        # Función auxiliar para escapar nombres de columnas
+        def escape_column(column_name):
+            return f"[{column_name}]"
+
+        # Construir consulta SQL con todos los campos
+        query_string = f"SELECT * FROM {escape_column(analisis_request.table_name)}"
+        
+        # Lista para almacenar todos los filtros
+        filters = []
+        
+        # Filtro de fecha (si está presente)
+        if analisis_request.date_field and analisis_request.start_date and analisis_request.end_date:
+            filters.append(
+                f"{escape_column(analisis_request.date_field)} BETWEEN '{analisis_request.start_date}' AND '{analisis_request.end_date}'"
+            )
+        
+        # Procesar filtros personalizados
+        if analisis_request.custom_filters:
+            for filtro in analisis_request.custom_filters:
+                field = filtro.get('field')
+                operator = filtro.get('operator')
+                value = filtro.get('value')
+                
+                if field and operator:
+                    escaped_field = escape_column(field)
+                    
+                    # Manejar operadores especiales
+                    if operator in ['IS NULL', 'IS NOT NULL']:
+                        filters.append(f"{escaped_field} {operator}")
+                    elif operator in ['LIKE', 'NOT LIKE']:
+                        filters.append(f"{escaped_field} {operator} '%{value}%'")
+                    else:
+                        # Para operadores regulares con valores
+                        if value is not None:
+                            # Si el valor parece ser numérico, no lo rodeamos con comillas
+                            try:
+                                float_value = float(value)
+                                filters.append(f"{escaped_field} {operator} {value}")
+                            except (ValueError, TypeError):
+                                # Si no es numérico, escapar como cadena con comillas simples
+                                filters.append(f"{escaped_field} {operator} '{value}'")
+        
+        # Agregar filtros a la consulta
+        if filters:
+            query_string += " WHERE " + " AND ".join(filters)
+            
+        print(f"Query para análisis detallado: {query_string}")  # Para debugging
+        
+        # Ejecutar consulta
+        df = pd.read_sql(text(query_string), db.bind)
+        df = limpiar_datos(df)
         
         # Manejar valores no compatibles con JSON
         df = df.replace({np.nan: None, np.inf: None, -np.inf: None})
@@ -266,6 +343,7 @@ async def analizar_detalle(analisis_request: AnalisisRequest,
 
         return JSONResponse(content={"records": table_data})
     except Exception as e:
+        print(f"Error en análisis detallado: {str(e)}")
         # Manejar cualquier excepción y devolver un error 500 con el mensaje de error
         return JSONResponse(status_code=500, content={"error": str(e)})
 
@@ -296,9 +374,44 @@ async def analizar_grafico(request: AnalisisRequest,
         # Construir query con nombres escapados
         query_string = f"SELECT {', '.join(campos_select)} FROM {escape_column(request.table_name)}"
         
-        # Filtros de fecha con nombre escapado
+        # Crear lista de filtros
+        filters = []
+        
+        # Filtro por rango de fechas
         if request.start_date and request.end_date:
-            query_string += f" WHERE {escape_column(request.date_field)} BETWEEN '{request.start_date}' AND '{request.end_date}'"
+            filters.append(
+                f"{escape_column(request.date_field)} BETWEEN '{request.start_date}' AND '{request.end_date}'"
+            )
+            
+        # Procesar filtros personalizados
+        if request.custom_filters:
+            for filtro in request.custom_filters:
+                field = filtro.get('field')
+                operator = filtro.get('operator')
+                value = filtro.get('value')
+                
+                if field and operator:
+                    escaped_field = escape_column(field)
+                    
+                    # Manejar operadores especiales
+                    if operator in ['IS NULL', 'IS NOT NULL']:
+                        filters.append(f"{escaped_field} {operator}")
+                    elif operator in ['LIKE', 'NOT LIKE']:
+                        filters.append(f"{escaped_field} {operator} '%{value}%'")
+                    else:
+                        # Para operadores regulares con valores
+                        if value is not None:
+                            # Si el valor parece ser numérico, no lo rodeamos con comillas
+                            try:
+                                float_value = float(value)
+                                filters.append(f"{escaped_field} {operator} {value}")
+                            except (ValueError, TypeError):
+                                # Si no es numérico, escapar como cadena con comillas simples
+                                filters.append(f"{escaped_field} {operator} '{value}'")
+        
+        # Agregar los filtros a la consulta
+        if filters:
+            query_string += " WHERE " + " AND ".join(filters)
 
         print(f"Query ejecutada: {query_string}")  # Para debugging
 

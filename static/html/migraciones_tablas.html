@@ -143,14 +143,97 @@
      <div class="mx-200" id="general">
         <div class="flex flex-col md:flex-row justify-center mb-8 relative w-full max-w-4xl mx-auto" id="tables-container">
             <div class="mx-4 w-full md:w-1/2" id="table1-container">
-                <h2 class="text-2xl font-semibold text-center mb-4 text-gray-700">
+                <!-- Agregar este botón junto al selector de la tabla 1 -->
+                <h2 class="text-2xl font-semibold text-center mb-4 text-gray-700 flex items-center justify-center">
                     <select id="table1-select" class="bg-gray-200 p-2 rounded w-full" onchange="fetchTableFields('table1')">
                         <option value="">Seleccione una tabla</option>
                         {% for table in tables1 %}
                             <option value="{{ table }}">{{ table }}</option>
                         {% endfor %}
                     </select>
+                    <button id="edit-table-name" class="ml-2 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md"
+                            onclick="openEditModal()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" 
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                    </button>
                 </h2>
+                
+                <!-- Modal para editar nombre de tabla  -->
+                <div id="edit-table-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+                    <div class="bg-white p-6 rounded-lg shadow-lg w-96 max-w-full">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Editar Nombre de Tabla</h3>
+                        
+                        <div class="mb-4">
+                            <label for="current-table-name" class="block text-gray-700 mb-2">Nombre Actual:</label>
+                            <input type="text" id="current-table-name" readonly 
+                                   class="w-full p-2 border border-gray-300 rounded bg-gray-100" value="">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="new-table-name" class="block text-gray-700 mb-2">Nuevo Nombre:</label>
+                            <input type="text" id="new-table-name" 
+                                   class="w-full p-2 border border-gray-300 rounded" value="">
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3">
+                            <button onclick="closeEditModal()" 
+                                    class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded text-gray-800">
+                                Cancelar
+                            </button>
+                            <button onclick="saveTableName()" 
+                                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded text-white">
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal para editar tipo de campo -->
+                <div id="edit-field-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+                    <div class="bg-white p-6 rounded-lg shadow-lg w-96 max-w-full">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Editar Tipo de Campo</h3>
+                        
+                        <div class="mb-4">
+                            <label for="field-name" class="block text-gray-700 mb-2">Campo:</label>
+                            <input type="text" id="field-name" readonly 
+                                   class="w-full p-2 border border-gray-300 rounded bg-gray-100" value="">
+                            <input type="hidden" id="table-name" value="">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="current-field-type" class="block text-gray-700 mb-2">Tipo Actual:</label>
+                            <input type="text" id="current-field-type" readonly 
+                                   class="w-full p-2 border border-gray-300 rounded bg-gray-100" value="">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="new-field-type" class="block text-gray-700 mb-2">Nuevo Tipo:</label>
+                            <select id="new-field-type" class="w-full p-2 border border-gray-300 rounded">
+                                <option value="VARCHAR">VARCHAR</option>
+                                <option value="INT">INT</option>
+                                <option value="DATE">DATE</option>
+                            </select>
+                            <p id="type-warning" class="text-red-500 mt-1 text-xs hidden">
+                                ¡Advertencia! No se puede convertir VARCHAR a INT.
+                            </p>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3">
+                            <button onclick="closeFieldTypeModal()" 
+                                    class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded text-gray-800">
+                                Cancelar
+                            </button>
+                            <button onclick="saveFieldType()" 
+                                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded text-white">
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+        
+
                 <ul class="fields" id="table1-fields">
                     <!-- Campos de la tabla 1 se cargarán aquí -->
                 </ul>
@@ -207,6 +290,65 @@
         </table>
     </div>
 </div>
+<script>
+    // Funciones para el modal de edición de nombre de tabla
+    function openEditModal() {
+        const tableSelect = document.getElementById('table1-select');
+        const currentTableName = tableSelect.value;
+        
+        if (!currentTableName) {
+            alert('Por favor, seleccione una tabla primero');
+            return;
+        }
+        
+        document.getElementById('current-table-name').value = currentTableName;
+        document.getElementById('new-table-name').value = currentTableName;
+        document.getElementById('edit-table-modal').classList.remove('hidden');
+    }
+    
+    function closeEditModal() {
+        document.getElementById('edit-table-modal').classList.add('hidden');
+    }
+    
+    function saveTableName() {
+        const currentName = document.getElementById('current-table-name').value;
+        const newName = document.getElementById('new-table-name').value;
+        
+        if (!newName.trim()) {
+            alert('El nuevo nombre no puede estar vacío');
+            return;
+        }
+        
+        // Enviar solicitud al servidor
+        fetch('/migraciones/rename_table', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                current_name: currentName,
+                new_name: newName
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Nombre de tabla actualizado correctamente');
+                // Refrescar la página para mostrar los cambios
+                window.location.reload();
+            } else {
+                alert('Error al actualizar el nombre de la tabla: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al procesar la solicitud');
+        })
+        .finally(() => {
+            closeEditModal();
+        });
+    }
+</script>
 <script>
     const table1Fields = document.getElementById('table1-fields');
     const table2Fields = document.getElementById('table2-fields');
@@ -363,64 +505,86 @@
         return fullType.split(' ')[0];
     }
 
-    async function fetchTableFields(tableId) {
+        async function fetchTableFields(tableId) {
         const tableSelect = document.getElementById(`${tableId}-select`);
         const tableName = tableSelect.value;
         const fieldsContainer = document.getElementById(`${tableId}-fields`);
         const tableHead = document.getElementById(`${tableId}-head`);
         const tableBody = document.getElementById(`${tableId}-body`);
-
+    
         if (!tableName) {
             fieldsContainer.innerHTML = '';
             tableHead.innerHTML = '';
             tableBody.innerHTML = '';
             return;
         }
-
+    
         try {
             const response = await fetch(`/migraciones/get_table_fields/${tableName}`);
             const data = await response.json();
-
+    
             // Limpiar campos y datos anteriores
             fieldsContainer.innerHTML = '';
             tableHead.innerHTML = '';
             tableBody.innerHTML = '';
-
+    
             // Crear encabezados de la tabla
             createTableHeaders(tableHead);
-
+    
             // Cargar campos y tipos en el cuerpo de la tabla y en la lista de campos
             data.fields.forEach(field => {
                 const baseType = extractBaseType(field.type);
-
+    
                 // Crear item para drag and drop
                 const fieldItem = document.createElement('li');
                 fieldItem.className = `field-item p-2 m-2 ${tableId === 'table2' ? 'table2' : ''}`;
                 fieldItem.setAttribute('draggable', 'true');
                 fieldItem.setAttribute('data-field', field.name);
-                fieldItem.textContent = `${field.name} (${baseType})`;
-
+                fieldItem.setAttribute('data-type', baseType);
+                
+                // Crear contenedor flexible para el texto y el botón (si es table1)
+                const flexContainer = document.createElement('div');
+                flexContainer.className = 'flex justify-between items-center w-full';
+                
+                // Texto del campo
+                const fieldText = document.createElement('span');
+                fieldText.textContent = `${field.name} (${baseType})`;
+                flexContainer.appendChild(fieldText);
+                
+                // Botón de edición (solo para table1)
+                if (tableId === 'table1') {
+                    const editButton = document.createElement('button');
+                    editButton.className = 'ml-2 text-blue-500 hover:text-blue-700';
+                    editButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>';
+                    editButton.onclick = (e) => {
+                        e.stopPropagation(); // Evitar que se active el evento de clic del fieldItem
+                        openFieldTypeModal(field.name, baseType, tableName);
+                    };
+                    flexContainer.appendChild(editButton);
+                }
+                
+                fieldItem.appendChild(flexContainer);
                 fieldsContainer.appendChild(fieldItem);
-
+    
                 // Agregar eventos de arrastrar y soltar y clic
                 addDragAndDropEvents(fieldItem, tableId);
-
+    
                 // Crear fila en la tabla inferior
                 const row = document.createElement('tr');
-
+    
                 const tdCampo = document.createElement('td');
                 tdCampo.className = 'px-6 py-4 whitespace-nowrap';
                 tdCampo.textContent = field.name;
                 row.appendChild(tdCampo);
-
+    
                 const tdTipo = document.createElement('td');
                 tdTipo.className = 'px-6 py-4 whitespace-nowrap';
                 tdTipo.textContent = baseType;
                 row.appendChild(tdTipo);
-
+    
                 tableBody.appendChild(row);
             });
-
+    
         } catch (error) {
             console.error('Error al obtener los campos de la tabla:', error);
         }
@@ -471,6 +635,154 @@
             alert('Error al migrar datos.');
         }
     });
+</script>
+<script>
+    // Funciones para el modal de edición de nombre de tabla
+    function openEditModal() {
+        const tableSelect = document.getElementById('table1-select');
+        const currentTableName = tableSelect.value;
+        
+        if (!currentTableName) {
+            alert('Por favor, seleccione una tabla primero');
+            return;
+        }
+        
+        document.getElementById('current-table-name').value = currentTableName;
+        document.getElementById('new-table-name').value = currentTableName;
+        document.getElementById('edit-table-modal').classList.remove('hidden');
+    }
+    
+    function closeEditModal() {
+        document.getElementById('edit-table-modal').classList.add('hidden');
+    }
+    
+    function saveTableName() {
+        const currentName = document.getElementById('current-table-name').value;
+        const newName = document.getElementById('new-table-name').value;
+        
+        if (!newName.trim()) {
+            alert('El nuevo nombre no puede estar vacío');
+            return;
+        }
+        
+        // Enviar solicitud al servidor
+        fetch('/migraciones/rename_table', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                current_name: currentName,
+                new_name: newName
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Nombre de tabla actualizado correctamente');
+                // Refrescar la página para mostrar los cambios
+                window.location.reload();
+            } else {
+                alert('Error al actualizar el nombre de la tabla: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al procesar la solicitud');
+        })
+        .finally(() => {
+            closeEditModal();
+        });
+    }
+</script>
+<script>
+// Funciones para el modal de edición de tipo de campo
+function openFieldTypeModal(fieldName, currentType, tableName) {
+    document.getElementById('field-name').value = fieldName;
+    document.getElementById('table-name').value = tableName;
+    document.getElementById('current-field-type').value = currentType;
+    
+    // Establecer el tipo actual en el selector
+    const typeSelector = document.getElementById('new-field-type');
+    for (let i = 0; i < typeSelector.options.length; i++) {
+        if (typeSelector.options[i].value === currentType) {
+            typeSelector.selectedIndex = i;
+            break;
+        }
+    }
+    
+    // Ocultar el mensaje de advertencia inicialmente
+    document.getElementById('type-warning').classList.add('hidden');
+    
+    // Añadir listener para detectar cambios en el tipo
+    typeSelector.onchange = validateTypeConversion;
+    
+    // Mostrar el modal
+    document.getElementById('edit-field-modal').classList.remove('hidden');
+}
+
+function validateTypeConversion() {
+    const currentType = document.getElementById('current-field-type').value;
+    const newType = document.getElementById('new-field-type').value;
+    const warningElement = document.getElementById('type-warning');
+    
+    // Validar conversiones no permitidas
+    if (currentType === 'VARCHAR' && newType === 'INT') {
+        warningElement.classList.remove('hidden');
+        document.querySelector('#edit-field-modal button[onclick="saveFieldType()"]').disabled = true;
+    } else {
+        warningElement.classList.add('hidden');
+        document.querySelector('#edit-field-modal button[onclick="saveFieldType()"]').disabled = false;
+    }
+}
+
+function closeFieldTypeModal() {
+    document.getElementById('edit-field-modal').classList.add('hidden');
+}
+
+function saveFieldType() {
+    const fieldName = document.getElementById('field-name').value;
+    const tableName = document.getElementById('table-name').value;
+    const currentType = document.getElementById('current-field-type').value;
+    const newType = document.getElementById('new-field-type').value;
+    
+    // Validar que no se está cambiando de VARCHAR a INT
+    if (currentType === 'VARCHAR' && newType === 'INT') {
+        alert('Error: No se puede convertir VARCHAR a INT');
+        return;
+    }
+    
+    // Enviar solicitud al servidor
+    fetch('/migraciones/change_field_type', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            table_name: tableName,
+            field_name: fieldName,
+            current_type: currentType,
+            new_type: newType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Tipo de campo actualizado correctamente');
+            // Refrescar la tabla para mostrar los cambios
+            fetchTableFields('table1');
+        } else {
+            alert('Error al actualizar el tipo de campo: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ocurrió un error al procesar la solicitud');
+    })
+    .finally(() => {
+        closeFieldTypeModal();
+    });
+}
 </script>
         {% include 'footer.html' %}
 </body>

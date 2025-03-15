@@ -7,6 +7,7 @@ from db.crud.modelo import get,gets,create,delete,update,get_descripcion
 
 
 router = APIRouter(
+    include_in_schema=False,  # Oculta todas las rutas de este router en la documentación
     prefix="/modelo",
     tags=["modelo"],
     responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}

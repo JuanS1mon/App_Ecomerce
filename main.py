@@ -22,8 +22,8 @@ from Services.security.security import crear_access_token, authenticate_user, cu
 from db.database import Base, engine, get_db, create_database, create_tables
 from routers import usuarios as aut_usuario
 from routers import Blog
-from routers.Maestros import  Route_planilla_test
-from routers.Configuraciones import Generar, configDB, Migraciones,Analisis
+from routers.Maestros import  Route_planilla_test, Route_articulos
+from routers.Configuraciones import Generar, configDB, Migraciones,Analisis,Scraping
 from Services import mail
 
 from routers.Configuraciones.Admin import create_admin_router
@@ -105,9 +105,11 @@ app.include_router(Blog.router)
 app.include_router(Migraciones.router)
 app.include_router(Analisis.router)
 app.include_router(mail.router)
+app.include_router(Scraping.router)
 
 # Maestros
 app.include_router(Route_planilla_test.router)
+app.include_router(Route_articulos.router)
 
 # Manejadores de errores personalizados
 @app.exception_handler(StarletteHTTPException)
@@ -124,8 +126,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 
 # Ruta de inicio
-@app.get("/index", response_class=HTMLResponse)
-@app.get("/", response_class=HTMLResponse)
+@app.get("/index", response_class=HTMLResponse, include_in_schema=False)
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def read_root(request: Request, db: Session = Depends(get_db)):
     blog_posts = db.query(BlogPostModel).order_by(BlogPostModel.created_at.desc()).all()
     return templates.TemplateResponse("index.html", {"request": request, "blog_posts": blog_posts})
@@ -133,32 +135,19 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
 
 
 # Ruta de términos y condiciones
-@app.get("/terminos", response_class=HTMLResponse)
+@app.get("/terminos", response_class=HTMLResponse, include_in_schema=False)
 async def get_terminos():
     with open("static/terminos.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read(), status_code=200)
     
     
 # Ruta de términos y condiciones
-@app.get("/privacidad", response_class=HTMLResponse)
+@app.get("/privacidad", response_class=HTMLResponse, include_in_schema=False)
 async def get_terminos():
     with open("static/privacidad.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read(), status_code=200)
 
-# Ejemplo de datos del dashboard
-class Item(BaseModel):
-    name: str
-    value: int
-
-@app.get("/dashboard_data")
-async def get_dashboard_data():
-    return [Item(name="Item 1", value=123), Item(name="Item 2", value=456), Item(name="Item 3", value=789)]
-
-@app.get("/hello")
-async def say_hello():
-    return {"message": "Hola"}
-
-@app.get("/admin")
+@app.get("/admin" , include_in_schema=False)
 async def read_admin(current_user: UserDB = Depends(current_user)):
     return {"message": "Tienes acceso a esta ruta", "user": current_user.usuario}
 

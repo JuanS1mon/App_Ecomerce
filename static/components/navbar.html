@@ -1,0 +1,89 @@
+<nav class="bg-gray-800 p-4">
+    <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <a href="/index">
+            </a>
+            <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
+            <span class="text-gray-400">/</span>
+            <a href="/admin" class="text-white text-lg font-semibold hover:text-gray-300" id="admin-link">Admin</a>
+            <span class="text-gray-400 path-separator">/</span>
+            <span class="text-gray-300" id="page-title">Configuración</span>
+        </div>
+        <div class="relative">
+            <button id="perfil" class="flex items-center focus:outline-none">
+                <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white" id="user-initial">
+                    U
+                </div>
+                <svg class="ml-2 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
+                <a href="/admin/perfil" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Perfil de usuario</a>
+                <form action="/logout" method="post">
+                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    // Configuración del menú desplegable de perfil
+    document.getElementById('perfil').addEventListener('click', function(event) {
+        event.preventDefault();
+        document.getElementById('menu-perfil').classList.toggle('hidden');
+    });
+
+    // Cerrar menú cuando se hace clic fuera
+    document.addEventListener('click', function(event) {
+        const perfilBtn = document.getElementById('perfil');
+        const perfilMenu = document.getElementById('menu-perfil');
+        
+        if (perfilBtn && perfilMenu) {
+            if (!perfilBtn.contains(event.target) && !perfilMenu.contains(event.target)) {
+                perfilMenu.classList.add('hidden');
+            }
+        }
+    });
+
+    // Actualizar la navegación según la página actual
+    function updateNavigation() {
+        const currentPath = window.location.pathname;
+        const pageTitleElement = document.getElementById('page-title');
+        const adminLink = document.getElementById('admin-link');
+        const pathSeparator = document.querySelector('.path-separator');
+        
+        // Determinar el título de la página actual
+        let pageTitle = "Dashboard";
+        
+        if (currentPath.includes('configdb')) {
+            pageTitle = "Configuración DB";
+        } else if (currentPath.includes('migraciones')) {
+            pageTitle = "Migraciones";
+        } else if (currentPath.includes('generar')) {
+            pageTitle = "Generar API";}
+
+        
+        // Si estamos en la página de inicio, ocultar el separador y título de página
+        if (currentPath === '/' || currentPath === '/index') {
+            pageTitleElement.style.display = 'none';
+            pathSeparator.style.display = 'none';
+            adminLink.style.display = 'none';
+        } else {
+            pageTitleElement.style.display = 'inline';
+            pathSeparator.style.display = 'inline';
+            adminLink.style.display = 'inline';
+            
+
+            
+            if (pageTitleElement) {
+                pageTitleElement.textContent = pageTitle;
+            }
+        }
+    }
+    
+    
+    // Llamar a las funciones al cargar
+    updateNavigation();
+</script>
