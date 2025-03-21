@@ -121,3 +121,20 @@ dmypy.json
 
 # Ignore init files
 __init__.py
+
+# Carpetas específicas
+results/
+**/results/
+routers/Configuraciones/results/
+uploads/
+logs/
+env/
+venv/
+__pycache__/
+.vscode/
+
+
+# Excluir archivos grandes
+*.zip
+*.rar
+*.7z

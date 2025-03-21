@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Gestión de Planilla_test
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <script>
+   window.onload = function() {
+    fetchData();
+};
+
+async function fetchData() {
+    const response = await fetch('/planilla_test/');
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+        console.error("La respuesta no es un array:", data);
+        return;
+    }
+    const tableBody = document.getElementById('data-table-body');
+    tableBody.innerHTML = '';
+    data.forEach(item => {
+        const prioridadColor = {
+            'Muy Grave': 'bg-red-100',
+            'Grave': 'bg-yellow-100',
+            'Leve': 'bg-green-100'
+        }[item.prioridad] || '';
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class='border px-4 py-2'>${item.codigo}</td>
+            <td class='border px-4 py-2'>${item.fecha}</td>
+            <td class='border px-4 py-2'>${item.origen}</td>
+            <td class='border px-4 py-2'>${item.tipo}</td>
+            <td class='border px-4 py-2 ${prioridadColor}'>${item.prioridad}</td>
+            <td class='border px-4 py-2'>${item.caratula}</td>
+            <td class='border px-4 py-2'>${item.clasificacion}</td>
+            <td class='border px-4 py-2'>${item.estado}</td>
+            <td class='border px-4 py-2'>${item.localidad}</td>
+            <td class='border px-4 py-2'>${item.barrio}</td>
+            <td class='border px-4 py-2'>${item.lugar}</td>
+            <td class='border px-4 py-2'>
+                <button class='bg-blue-500 text-white px-2 py-1' onclick='editItem(${item.codigo})'>Editar</button>
+                <button class='bg-red-500 text-white px-2 py-1' onclick='deleteItem(${item.codigo})'>Eliminar</button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+async function addItem(event) {
+    event.preventDefault();
+    const formData = {
+        codigo: parseInt(document.getElementById('codigo').value), fecha: document.getElementById('fecha').value, origen: document.getElementById('origen').value, tipo: document.getElementById('tipo').value, prioridad: document.getElementById('prioridad').value, caratula: document.getElementById('caratula').value, clasificacion: document.getElementById('clasificacion').value, estado: document.getElementById('estado').value, localidad: document.getElementById('localidad').value, barrio: document.getElementById('barrio').value, lugar: document.getElementById('lugar').value
+    };
+    try {
+        const respuesta = await fetch('/planilla_test/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        if (!respuesta.ok) {
+            throw new Error("Error al crear planilla_test");
+        }
+        console.log("Registro creado:", await respuesta.json());
+        document.getElementById('data-form').reset();
+        fetchData();
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function editItem(id) {
+    fetch(`/planilla_test/id/${id}`)
+      .then(response => response.json())
+      .then(data => {
+          document.getElementById('edit-codigo').value = data.codigo;
+          document.getElementById('edit-fecha').value = data.fecha;document.getElementById('edit-origen').value = data.origen;document.getElementById('edit-tipo').value = data.tipo;document.getElementById('edit-prioridad').value = data.prioridad;document.getElementById('edit-caratula').value = data.caratula;document.getElementById('edit-clasificacion').value = data.clasificacion;document.getElementById('edit-estado').value = data.estado;document.getElementById('edit-localidad').value = data.localidad;document.getElementById('edit-barrio').value = data.barrio;document.getElementById('edit-lugar').value = data.lugar;
+          document.getElementById('edit-modal').classList.remove('hidden');
+      });
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').classList.add('hidden');
+}
+
+async function updateItem(event) {
+    event.preventDefault();
+    const id = document.getElementById('edit-codigo').value;
+    const updatedData = {
+        fecha: document.getElementById('edit-fecha').value, origen: document.getElementById('edit-origen').value, tipo: document.getElementById('edit-tipo').value, prioridad: document.getElementById('edit-prioridad').value, caratula: document.getElementById('edit-caratula').value, clasificacion: document.getElementById('edit-clasificacion').value, estado: document.getElementById('edit-estado').value, localidad: document.getElementById('edit-localidad').value, barrio: document.getElementById('edit-barrio').value, lugar: document.getElementById('edit-lugar').value
+    };
+    await fetch(`/planilla_test/id/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+    });
+    closeEditModal();
+    fetchData();
+}
+
+async function deleteItem(id) {
+    await fetch(`/planilla_test/id/${id}`, { method: 'DELETE' });
+    fetchData();
+};
+
+// Función para mostrar/ocultar la sección de descripción
+function toggleDescription() {
+    const description = document.getElementById('description');
+    description.classList.toggle('hidden');
+}
+  </script>
+ </head>
+ <body class="bg-gray-100 min-h-screen">
+  <nav class="bg-gray-800 p-4 relative z-30">
+   <div class="container mx-auto flex justify-between items-center">
+    <div class="flex items-center space-x-4">
+     <a href="">
+      <img alt="Logo" class="h-8 w-auto" src="../static/img/logo_mapache.gif"/>
+     </a>
+     <a class="text-white text-lg font-semibold hover:text-gray-300" href="/index">
+      Inicio
+     </a>
+     <span class="text-gray-400">
+      /
+     </span>
+     <span class="text-white text-lg font-semibold">
+      planilla_test
+     </span>
+    </div>
+    <div class="flex items-center space-x-4 relative">
+     <a class="text-white hover:text-gray-300" href="/docs">
+      Documentación
+     </a>
+     <a class="text-white hover:text-gray-300" href="/generar">
+      Generar API
+     </a>
+     <a class="text-white hover:text-gray-300" href="/migraciones/admin_migraciones">
+      Migraciones
+     </a>
+    </div>
+   </div>
+  </nav>
+  <div class="flex justify-center p-4">
+   <!-- Descripción de la app -->
+   <div class="bg-blue-50 p-6 rounded-lg shadow-md max-w-lg text-center">
+    <div class="flex justify-between items-center mb-4">
+     <h2 class="text-xl font-bold text-blue-600">
+      Gestión de Datos
+     </h2>
+     <button class="text-blue-600 hover:underline text-xl ml-2" id="toggleButton" onclick="toggleDescription()">
+      <i class="fas fa-info-circle">
+      </i>
+     </button>
+    </div>
+    <div class="hidden" id="description">
+     <p class="text-gray-700">
+      Este formulario HTML permite la carga de datos en una tabla. Puedes agregar nuevos registros utilizando el formulario de entrada.
+     </p>
+     <p class="text-gray-700 mt-2">
+      La tabla muestra los datos ingresados y permite editar todos los campos excepto el primer campo, que actúa como identificador único.
+     </p>
+     <p class="text-gray-700 mt-2">
+      Además, puedes eliminar cualquier registro de la tabla utilizando el botón de eliminar correspondiente.
+     </p>
+     <p class="text-gray-700 mt-2">
+      Utiliza esta herramienta para gestionar tus datos de manera eficiente, permitiendo agregar, editar y eliminar registros según sea necesario.
+     </p>
+    </div>
+   </div>
+  </div>
+  <div class="p-4">
+   <div class="flex justify-center mb-4">
+    <h1 class="text-2xl text-center">
+     Gestión de Planilla_test
+    </h1>
+   </div>
+   <form class="mb-4" id="data-form" onsubmit="addItem(event)">
+    <div class="flex flex-wrap -mx-2">
+     <div class="w-full md:w-1/4 px-2 mb-4">
+      <label class="block">
+       codigo:
+      </label>
+      <input class="w-full border px-2 py-1 bg-white-800" id="codigo" required="required" type="number"/>
+     </div>
+     <div class="w-full md:w-1/4 px-2 mb-4">
+      <label class="block">
+       fecha:
+      </label>
+      <input class="w-full border px-2 py-1 bg-white-800" id="fecha" type="text"/>
+     </div>
+     <div class="w-full md:w-1/4 px-2 mb-4">
+      <label class="block">
+       origen:
+      </label>
+      <input class="w-full border px-2 py-1 bg-white-800" id="origen" type="text"/>
+     </div>
+     <div class="w-full md:w-1/4 px-2 mb-4">
+      <label class="block">
+       tipo:
+      </label>
+      <input class="w-full border px-2 py-1 bg-white-800" id="tipo" type="text"/>
+     </div>
+        <!-- Reemplazar el input de prioridad existente -->
+    <div class="w-full md:w-1/4 px-2 mb-4">
+        <label class="block">prioridad:</label>
+        <select class="w-full border px-2 py-1 bg-white-800" id="prioridad" required>
+            <option value="">Seleccionar prioridad</option>
+            <option value="Muy Grave">Muy Grave</option>
+            <option value="Grave">Grave</option>
+            <option value="Leve">Leve</option>
+        </select>
+    </div>
+     <div class="w-full md:w-1/4 px-2 mb-4">
+      <label class="block">
+       caratula:
+      </label>
+      <input class="w-full border px-2 py-1 bg-white-800" id="caratula" type="text"/>
+     </div>
+     <div class="w-full md:w-1/4 px-2 mb-4">
+      <label class="block">
+       clasificacion:
+      </label>
+      <input class="w-full border px-2 py-1 bg-white-800" id="clasificacion" type="text"/>
+     </div>
+     <div class="w-full md:w-1/4 px-2 mb-4">
+      <label class="block">
+       estado:
+      </label>
+      <input class="w-full border px-2 py-1 bg-white-800" id="estado" type="text"/>
+     </div>
+     <div class="w-full md:w-1/4 px-2 mb-4">
+      <label class="block">
+       localidad:
+      </label>
+      <input class="w-full border px-2 py-1 bg-white-800" id="localidad" type="text"/>
+     </div>
+     <div class="w-full md:w-1/4 px-2 mb-4">
+      <label class="block">
+       barrio:
+      </label>
+      <input class="w-full border px-2 py-1 bg-white-800" id="barrio" type="text"/>
+     </div>
+     <div class="w-full md:w-1/4 px-2 mb-4">
+      <label class="block">
+       lugar:
+      </label>
+      <input class="w-full border px-2 py-1 bg-white-800" id="lugar" type="text"/>
+     </div>
+    </div>
+    <button class="bg-green-500 text-white px-4 py-2" type="submit">
+     Agregar
+    </button>
+   </form>
+   <table class="table-auto w-full border-collapse">
+    <thead>
+     <tr>
+      <th class="border px-4 py-2">
+       codigo
+      </th>
+      <th class="border px-4 py-2">
+       fecha
+      </th>
+      <th class="border px-4 py-2">
+       origen
+      </th>
+      <th class="border px-4 py-2">
+       tipo
+      </th>
+      <th class="border px-4 py-2">
+       prioridad
+      </th>
+      <th class="border px-4 py-2">
+       caratula
+      </th>
+      <th class="border px-4 py-2">
+       clasificacion
+      </th>
+      <th class="border px-4 py-2">
+       estado
+      </th>
+      <th class="border px-4 py-2">
+       localidad
+      </th>
+      <th class="border px-4 py-2">
+       barrio
+      </th>
+      <th class="border px-4 py-2">
+       lugar
+      </th>
+      <th class="border px-4 py-2">
+       Acciones
+      </th>
+     </tr>
+    </thead>
+    <tbody id="data-table-body">
+     <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden" id="edit-modal">
+      <div class="bg-gray-800 p-4 rounded w-96">
+       <h2 class="text-xl mb-4 text-white">
+        Editar Planilla_test
+       </h2>
+       <form id="edit-form" onsubmit="updateItem(event)">
+        <input id="edit-codigo" type="hidden"/>
+        <div class="mb-2">
+         <label class="text-white">
+          fecha:
+         </label>
+         <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-fecha" type="text"/>
+        </div>
+        <div class="mb-2">
+         <label class="text-white">
+          origen:
+         </label>
+         <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-origen" type="text"/>
+        </div>
+        <div class="mb-2">
+         <label class="text-white">
+          tipo:
+         </label>
+         <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-tipo" type="text"/>
+        </div>
+                <!-- Reemplazar el input de prioridad en el modal de edición -->
+        <div class="mb-2">
+            <label class="text-white">prioridad:</label>
+            <select class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-prioridad" required>
+                <option value="Muy Grave">Muy Grave</option>
+                <option value="Grave">Grave</option>
+                <option value="Leve">Leve</option>
+            </select>
+        </div>
+        <div class="mb-2">
+         <label class="text-white">
+          caratula:
+         </label>
+         <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-caratula" type="text"/>
+        </div>
+        <div class="mb-2">
+         <label class="text-white">
+          clasificacion:
+         </label>
+         <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-clasificacion" type="text"/>
+        </div>
+        <div class="mb-2">
+         <label class="text-white">
+          estado:
+         </label>
+         <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-estado" type="text"/>
+        </div>
+        <div class="mb-2">
+         <label class="text-white">
+          localidad:
+         </label>
+         <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-localidad" type="text"/>
+        </div>
+        <div class="mb-2">
+         <label class="text-white">
+          barrio:
+         </label>
+         <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-barrio" type="text"/>
+        </div>
+        <div class="mb-2">
+         <label class="text-white">
+          lugar:
+         </label>
+         <input class="border px-2 py-1 w-full bg-gray-800 text-white" id="edit-lugar" type="text"/>
+        </div>
+        <div class="flex justify-end">
+         <button class="mr-2 px-4 py-2 bg-red-500 text-white" onclick="closeEditModal()" type="button">
+          Cancelar
+         </button>
+         <button class="bg-blue-500 text-white px-4 py-2" type="submit">
+          Guardar
+         </button>
+        </div>
+       </form>
+      </div>
+     </div>
+    </tbody>
+   </table>
+  </div>
+ </body>
+</html>

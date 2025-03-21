@@ -4,12 +4,14 @@ import logging
 import pandas as pd
 from io import BytesIO
 import json
-from datetime import datetime
+from datetime import date, datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import MetaData, Table, Column, Integer, String, Float, DateTime, Boolean, BigInteger
-from db.models.activityLog import ActivityLog
-from db.models.usuarios import usuarios
+from db.models.config.activityLog import ActivityLog
+from db.models.config.usuarios import usuarios
+from typing import List, Dict, Any, Union
 
+# Funciones de utilidad
 def eanCheck(ean):
     """Validación mejorada de códigos EAN"""
     try:
@@ -26,6 +28,28 @@ def eanCheck(ean):
     except Exception as e:
         logging.error(f"Error en validación EAN: {str(e)}")
         return False
+
+def convertir_a_int(valor):
+    """Convierte valores numéricos a enteros si es posible"""
+    try:
+        return int(valor)
+    except (ValueError, TypeError):
+        return valor
+
+def convertir_a_float(valor):
+    """Convierte valores numéricos a flotantes si es posible"""
+    try:
+        return float(valor)
+    except (ValueError, TypeError):
+        return valor
+
+def verificar_no_datetime(data, context=""):
+    """Función para verificar y registrar si hay objetos datetime en los datos."""
+    for idx, record in enumerate(data):
+        for key, value in record.items():
+            if isinstance(value, datetime):
+                logging.error(f"Objeto datetime encontrado en {context}, registro {idx}, campo {key}: {value}")
+                record[key] = value.strftime('%Y-%m-%d %H:%M:%S')
 
 def modificar_ean(valor):
     """Función mejorada para modificar códigos EAN"""
@@ -51,178 +75,246 @@ def modificar_ean(valor):
         logging.error(f"Error procesando EAN: {str(e)}")
         return None
 
-def limpiar_datos(df):
-    """Limpia y valida los datos del DataFrame"""
-    for column in df.select_dtypes(include=['float64']).columns:
-        df[column] = df[column].apply(lambda x: 0 if pd.isna(x) else x)
-    for column in df.select_dtypes(include=['object']).columns:
-        df[column] = df[column].apply(lambda x: '' if pd.isna(x) else str(x).strip())
-    for column in df.select_dtypes(include=['int64']).columns:
-        df[column] = df[column].apply(lambda x: 0 if pd.isna(x) else x)
-    return df
+def determinar_tipo_predominante(data: List[Dict[str, Any]]) -> Dict[str, Union[type, str]]:
+    """
+    Determina el tipo de datos predominante para cada columna en una lista de diccionarios.
+    
+    Parámetros:
+        data (List[Dict[str, Any]]): Lista de registros a analizar.
+    
+    Retorna:
+        Dict[str, Union[type, str]]: Diccionario con el tipo de datos predominante para cada columna.
+    """
+    tipo_predominante = {}
+    for key in data[0].keys():
+        tipos = [type(record[key]) for record in data if record[key] is not None]
+        if not tipos:
+            tipo_predominante[key] = str
+        else:
+            tipo_mas_comun = max(set(tipos), key=tipos.count)
+            if tipo_mas_comun in [int, float]:
+                tipo_predominante[key] = int if tipos.count(int) > tipos.count(float) else float
+            elif tipo_mas_comun == datetime:
+                tipo_predominante[key] = 'datetime'
+            else:
+                tipo_predominante[key] = str
+    return tipo_predominante
 
-def convertir_a_int(valor):
-    """Convierte valores numéricos a enteros si es posible"""
-    try:
-        return int(valor)
-    except (ValueError, TypeError):
-        return valor
-
-def convertir_a_float(valor):
-    """Convierte valores numéricos a flotantes si es posible"""
-    try:
-        return float(valor)
-    except (ValueError, TypeError):
-        return valor
+def limpiar_datos(data: List[Dict[str, Any]], esquema_tipos: Dict[str, Union[type, str]]) -> List[Dict[str, Any]]:
+    """
+    Limpia y valida los datos de una lista de diccionarios según el esquema definido.
+    
+    Parámetros:
+        data (List[Dict[str, Any]]): Lista de registros a limpiar.
+        esquema_tipos (Dict[str, Union[type, str]]): Diccionario con el tipo de datos predominante para cada columna.
+    
+    Retorna:
+        List[Dict[str, Any]]: Lista de registros limpios.
+    """
+    registros_limpios = []
+    registros_invalidos = []
+    
+    for idx, record in enumerate(data):
+        limpio = {}
+        registro_valido = True  # Flag para determinar si el registro es válido
         
+        for key, expected_type in esquema_tipos.items():
+            value = record.get(key, None)
+            try:
+                if pd.isna(value):
+                    limpio[key] = None
+                elif expected_type == int:
+                    limpio[key] = int(value)
+                elif expected_type == float:
+                    limpio[key] = float(value)
+                elif expected_type == 'datetime':
+                    if isinstance(value, (pd.Timestamp, datetime)):
+                        limpio[key] = value.strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        limpio[key] = pd.to_datetime(value).strftime('%Y-%m-%d %H:%M:%S')
+                elif expected_type == str:
+                    limpio[key] = value.strip() if isinstance(value, str) else str(value).strip()
+                else:
+                    limpio[key] = str(value).strip()
+            except (ValueError, TypeError) as e:
+                logging.error(f"Error en registro {idx}, campo '{key}': {e}")
+                limpio[key] = None
+                registro_valido = False
+        
+        registros_limpios.append(limpio)
+        
+        if not registro_valido:
+            registros_invalidos.append(limpio)
+    
+    if registros_invalidos:
+        invalid_json_path = f"logs/invalidos_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        try:
+            with open(invalid_json_path, 'w', encoding='utf-8') as f:
+                json.dump(registros_invalidos, f, ensure_ascii=False, indent=4)
+            logging.warning(f"Se encontraron {len(registros_invalidos)} registros inválidos. Ver archivo: {invalid_json_path}")
+        except Exception as e:
+            logging.error(f"Error al guardar registros inválidos: {e}")
+    
+    return registros_limpios
 
-def procesar_archivo(contents, json_path, result_path, db: Session, current_user, table_name):
+def procesar_archivo(sheet_json_path, result_path, db: Session, current_user, table_name: str):
     try:
-        # Leer el archivo Excel
-        df = pd.read_excel(BytesIO(contents))
-
-        # Validar que el DataFrame no esté vacío
-        if df.empty:
-            logging.error("El archivo Excel no contiene datos.")
+        # Leer los datos del archivo JSON
+        with open(sheet_json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        # Validar que los datos no estén vacíos
+        if not data:
+            logging.error(f"El archivo JSON {sheet_json_path} no contiene datos.")
             result = {
                 "status": "error",
-                "message": "El archivo Excel no contiene datos."
+                "message": "El archivo JSON no contiene datos."
             }
             with open(result_path, 'w', encoding='utf-8') as f:
-                json.dump(result, f, ensure_ascii=False, indent=4)
+                json.dump(result, f, ensure_ascii=False, indent=4, default=str)
             return
-
-        # Convertir objetos de tipo Timestamp a strings
-        for column in df.select_dtypes(include=['datetime64[ns]', 'datetime64[ns, UTC]']):
-            df[column] = df[column].astype(str)
-
-        # Convertir DataFrame a una lista de diccionarios
-        data = df.to_dict(orient='records')
-
-        # Guardar datos en un archivo JSON
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-
-        logging.info("Archivo procesado y datos guardados exitosamente en formato JSON.")
-
+        
         # Contador de registros originales
-        total_registros = len(df)
-
+        total_registros = len(data)
+        
+        # Determinar el tipo predominante de cada columna
+        esquema_tipos = determinar_tipo_predominante(data)
+        
         # Limpiar y validar datos
-        df = limpiar_datos(df)
-
+        data = limpiar_datos(data, esquema_tipos)
+        
+        # Verificar no hay datetime
+        verificar_no_datetime(data, context="después de limpiar_datos")
+        
         # Inicializar contadores
         registros_no_guardados = []
         registros_procesados = 0
-
-        # Procesar EAN si la columna existe
-        if 'EAN' in df.columns:
-            df['EAN'] = pd.to_numeric(df['EAN'], errors='coerce')
-            
-            # Registros no numéricos
-            registros_no_numericos = df[df['EAN'].isna()]
-            if not registros_no_numericos.empty:
-                registros_no_guardados.extend(registros_no_numericos.to_dict(orient='records'))
-                df = df.drop(registros_no_numericos.index)
-
-            # Procesar EAN válidos
-            df['EAN_MODIFICADO'] = df['EAN'].apply(modificar_ean)
-            
-            # Registros con EAN inválidos
-            registros_ean_invalidos = df[df['EAN_MODIFICADO'].isna()]
-            if not registros_ean_invalidos.empty:
-                registros_no_guardados.extend(registros_ean_invalidos.to_dict(orient='records'))
-                df = df.drop(registros_ean_invalidos.index)
-
-            df['EAN'] = df['EAN_MODIFICADO']
-            df = df.drop(columns=['EAN_MODIFICADO'])
-
-        # Convertir valores numéricos a enteros o flotantes si es posible
-        for record in df.to_dict(orient='records'):
+        
+        # Procesar EAN si existe
+        if any('EAN' in record for record in data):
+            # Procesar EAN en cada registro
+            for record in data:
+                if 'EAN' in record:
+                    try:
+                        # Intentar convertir EAN a número
+                        record['EAN'] = int(float(record['EAN']))
+                    except:
+                        registros_no_guardados.append(record)
+                        continue
+        
+            # Filtrar registros válidos
+            data = [record for record in data if 'EAN' in record]
+        
+            # Modificar EAN
+            for record in data:
+                record['EAN_MODIFICADO'] = modificar_ean(record['EAN'])
+        
+            # Filtrar registros con EAN inválidos
+            registros_ean_invalidos = [record for record in data if record['EAN_MODIFICADO'] is None]
+            registros_no_guardados.extend(registros_ean_invalidos)
+            data = [record for record in data if record['EAN_MODIFICADO'] is not None]
+        
+            # Actualizar EAN y eliminar campo temporal
+            for record in data:
+                record['EAN'] = record['EAN_MODIFICADO']
+                del record['EAN_MODIFICADO']
+        
+        # Convertir valores numéricos si es posible
+        for record in data:
             for key, value in record.items():
                 if isinstance(value, float):
                     record[key] = convertir_a_float(value)
-                else:
+                elif isinstance(value, int):
                     record[key] = convertir_a_int(value)
-
+        
+        # Verificar nuevamente
+        verificar_no_datetime(data, context="después de convertir valores numéricos")
+        
         # Crear tabla dinámica
         metadata = MetaData()
         columns = [Column('id', BigInteger, primary_key=True, autoincrement=True)]
         
-        type_mapping = {
-            'int64': BigInteger,
-            'float64': Float,
-            'object': String,
-            'bool': Boolean,
-            'datetime64[ns]': DateTime,
-            'biginteger': BigInteger  # Ajustar para EAN
-        }
-
-        for column_name in df.columns:
-            pandas_type = str(df[column_name].dtype)
+        if not data:
+            logging.error("No hay datos válidos para insertar.")
+            result = {
+                "status": "error",
+                "message": "No hay datos válidos para insertar."
+            }
+            with open(result_path, 'w', encoding='utf-8') as f:
+                json.dump(result, f, ensure_ascii=False, indent=4, default=str)
+            return
+        
+        # Asumiendo que todos los registros tienen las mismas claves
+        first_record = data[0]
+        for column_name, value in first_record.items():
+            # Determinar el tipo de columna basado en el valor de los datos
             if column_name == 'EAN':
-                column_type = BigInteger  # Ajustar para EAN
+                column_type = BigInteger
             elif column_name in ['Codigo_DUN', 'Cantidad_DUN']:
-                column_type = BigInteger  # Ajustar para valores grandes
+                column_type = BigInteger
             else:
-                column_type = type_mapping.get(pandas_type, String)
+                # Mapeo basado en el tipo en los datos
+                if isinstance(value, int):
+                    column_type = BigInteger
+                elif isinstance(value, float):
+                    column_type = Float
+                elif isinstance(value, bool):
+                    column_type = Boolean
+                elif isinstance(value, str):
+                    column_type = String
+                else:
+                    column_type = String  # Por defecto
+            
             columns.append(Column(column_name, column_type))
-
-        # Crear tabla
+        
+        # Crear la tabla
         dynamic_table = Table(table_name, metadata, *columns)
         metadata.create_all(db.get_bind(), tables=[dynamic_table])
-
-        # Insertar datos
-        records = df.to_dict(orient='records')
-        registros_procesados = 0
         
-        for record in records:
+        # Insertar datos
+        for record in data:
             try:
-                db.execute(dynamic_table.insert(), [record])
+                db.execute(dynamic_table.insert(), record)
                 registros_procesados += 1
             except Exception as e:
                 logging.error(f"Error al insertar registro: {str(e)}")
                 registros_no_guardados.append(record)
-
+        
         # Guardar registros no válidos
         if registros_no_guardados:
-            invalid_json_path = os.path.join(os.path.dirname(json_path), f"invalidos_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+            # Verificar si hay datetime en registros_no_guardados
+            verificar_no_datetime(registros_no_guardados, context="registros_no_guardados")
+            
+            invalid_json_path = os.path.join(os.path.dirname(sheet_json_path), f"invalidos_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
             with open(invalid_json_path, 'w', encoding='utf-8') as f:
-                json.dump(registros_no_guardados, f, ensure_ascii=False, indent=4)
+                json.dump(registros_no_guardados, f, ensure_ascii=False, indent=4, default=str)
             
             logging.warning(f"Registros no guardados: {len(registros_no_guardados)}")
-
+        
         # Calcular porcentaje de registros cargados
-        porcentaje_cargados = (registros_procesados / total_registros) * 100
-
+        porcentaje_cargados = (registros_procesados / total_registros) * 100 if total_registros > 0 else 0
+        
         # Log del resultado
-        logging.info(f"Migración completada: {registros_procesados} registros procesados, "
-                    f"{len(registros_no_guardados)} registros inválidos, "
-                    f"{porcentaje_cargados:.2f}% de registros cargados")
-
-        # Buscar el usuario por nombre de usuario
-        usuario = db.query(usuarios).filter(usuarios.usuario == current_user.usuario).first()
-        if not usuario:
-            logging.error("Usuario no encontrado")
-            raise Exception("Usuario no encontrado")
-
+        logging.info(f"Migración completada: {registros_procesados} registros procesados, {len(registros_no_guardados)} registros inválidos, {porcentaje_cargados:.2f}% de registros cargados")
+        
+        # Obtener el ID del usuario según si es diccionario u objeto
+        user_id = current_user["codigo"] if isinstance(current_user, dict) else current_user.codigo
+        
         # Registrar la actividad
         new_activity = ActivityLog(
-            usuario_id=usuario.codigo,
-            action=f"Realizó una migración de datos el {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            user_id=user_id,  # Usar user_id en lugar de usuario_id
+            action=f"Realizó una migración a la tabla '{table_name}'. Registros procesados: {registros_procesados}, inválidos: {len(registros_no_guardados)}"
         )
         db.add(new_activity)
         db.commit()
-
+        
         # Guardar resultado
         result = {
             "status": "success",
-            "message": f"Migración completada: {registros_procesados} registros procesados, "
-                       f"{len(registros_no_guardados)} registros inválidos, "
-                       f"{porcentaje_cargados:.2f}% de registros cargados"
+            "message": f"Migración completada: {registros_procesados} registros procesados, {len(registros_no_guardados)} registros inválidos, {porcentaje_cargados:.2f}% de registros cargados"
         }
         with open(result_path, 'w', encoding='utf-8') as f:
-            json.dump(result, f, ensure_ascii=False, indent=4)
+            json.dump(result, f, ensure_ascii=False, indent=4, default=str)
 
     except Exception as e:
         logging.error(f"Ocurrió un error al procesar el archivo: {str(e)}")
@@ -231,4 +323,5 @@ def procesar_archivo(contents, json_path, result_path, db: Session, current_user
             "message": f"Ocurrió un error al procesar el archivo: {str(e)}"
         }
         with open(result_path, 'w', encoding='utf-8') as f:
-            json.dump(result, f, ensure_ascii=False, indent=4)
+            json.dump(result, f, ensure_ascii=False, indent=4, default=str)
+

@@ -6,325 +6,693 @@
     <title>Analizador de Datos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+        }
+        .copy-button {
+            cursor: pointer;
+            margin-left: 8px;
+            font-size: 0.9em;
+            color: #4f46e5;
+            transition: color 0.2s;
+        }
+        .copy-button:hover {
+            color: #6366f1;
+        }
+        .card-hover {
+            transition: transform 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+        }
+        .btn-primary {
+            background-image: linear-gradient(135deg, #4f46e5, #3b82f6);
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .btn-secondary {
+            background-image: linear-gradient(135deg, #059669, #10b981);
+            transition: all 0.2s ease;
+        }
+        .btn-secondary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .stats-card {
+            border-left: 4px solid transparent;
+            transition: transform 0.3s ease;
+        }
+        .stats-card:hover {
+            transform: translateY(-4px);
+        }
+        .stats-card-primary {
+            border-left-color: #4f46e5;
+        }
+        .stats-card-secondary {
+            border-left-color: #10b981;
+        }
+        .stats-card-warning {
+            border-left-color: #f59e0b;
+        }
+        .stats-card-danger {
+            border-left-color: #ef4444;
+        }
+        .stats-card-info {
+            border-left-color: #3b82f6;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #4f46e5, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <!-- Navegación -->
-    <nav class="bg-gray-800 p-4">
+<body class="bg-gray-50">
+    <!-- Barra de navegación -->
+    <nav class="bg-gray-800 p-4 shadow-lg relative z-30">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-white text-xl font-bold">Analizador de Datos</h1>
+            <div class="flex items-center space-x-4">
+                <a href="/index" class="flex items-center space-x-2">
+                    <img src="../static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
+                    <span class="text-white text-lg font-bold hidden md:inline">SQL App Studio</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="/index" class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition-colors">Inicio</a>
+                    <span class="text-gray-400">/</span>
+                    <a href="/admin" class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition-colors">Admin</a>
+                    <span class="text-gray-400">/</span>
+                    <a href="/analisis/admin" class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition-colors">Analisis de datos</a>
+                    <span class="text-gray-400">/</span>
+                    <span class="text-white px-3 py-2 rounded-md text-sm font-medium">Nuevo Analisis</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4 relative">
+                <a href="/docs" class="text-white hover:text-gray-300 text-sm font-medium hidden md:block">
+                    <i class="fas fa-book mr-1"></i> Documentación
+                </a>
+                <a href="/generar" class="text-white hover:text-gray-300 text-sm font-medium hidden md:block">
+                    <i class="fas fa-code mr-1"></i> Generar API
+                </a>
+                <a href="/migraciones/admin_migraciones" class="text-white hover:text-gray-300 text-sm font-medium hidden md:block">
+                    <i class="fas fa-database mr-1"></i> Migraciones
+                </a>
+                <div class="relative">
+                    <button id="perfil" class="flex items-center focus:outline-none">
+                        <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white">
+                            {{ user.nombre[0]|upper }}
+                        </div>
+                        <svg class="ml-2 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50">
+                        <a href="/admin/perfil" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-user mr-2"></i> Perfil de usuario
+                        </a>
+                        <a href="/admin/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-cog mr-2"></i> Configuración
+                        </a>
+                        <div class="border-t border-gray-100"></div>
+                        <form action="/logout" method="post">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
+    <!-- Descripción de la app -->
+    <div class="container mx-auto px-4 pt-6">
+        <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-xl shadow-md border border-blue-100">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold gradient-text">Análisis de datos</h2>
+                <button id="toggleButton" class="text-indigo-600 hover:text-indigo-800 text-xl ml-2 focus:outline-none" onclick="toggleDescription()">
+                    <i class="fas fa-info-circle"></i>
+                </button>
+            </div>
+            <div id="description" class="hidden space-y-3">
+                <p class="text-gray-700">
+                    En esta página, puedes seleccionar tablas y columnas de una base de datos para realizar análisis de datos. 
+                    La aplicación permite definir rangos de fechas y agregar campos adicionales para un análisis más detallado.
+                </p>
+                <p class="text-gray-700">
+                    La página proporciona varias secciones de análisis, incluyendo indicadores clave de rendimiento (KPIs), 
+                    gráficos dinámicos y tablas detalladas. Los usuarios pueden alternar entre estas secciones utilizando botones específicos.
+                </p>
+                <p class="text-gray-700">
+                    Además, la aplicación permite realizar análisis avanzados como clustering, clasificación y regresión en los datos seleccionados. 
+                    Los resultados de estos análisis se muestran en la sección correspondiente.
+                </p>
+                <p class="text-gray-700">
+                    <span class="font-medium text-indigo-600">Consejo:</span> Utiliza esta herramienta para obtener información valiosa de tus datos de manera eficiente y optimizar tu productividad 
+                    en la gestión de información.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- Contenedor Principal -->
-    <div class="container mx-auto px-4 py-8">
-        <!-- Selección de Tabla -->
-        <div class="bg-white p-4 rounded shadow mb-6">
-            <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona una Tabla</h2>
-            <select id="table-select" class="block w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="" disabled selected>Selecciona una tabla...</option>
-                {% for table in tabla2 %}
-                    <option value="{{ table }}">{{ table }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- Selección de Columna -->
-        <div class="bg-white p-4 rounded shadow mb-6">
-            <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona una Columna para el Análisis</h2>
-            <select id="column-select" class="block w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="" disabled selected>Selecciona una columna...</option>
-            </select>
-        </div>
-
-        <!-- Opciones de Análisis -->
-        <div class="bg-white p-4 rounded shadow mb-6">
-            <h2 class="text-gray-700 font-bold text-lg mb-4">Selecciona el Tipo de Análisis</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600" id="show-kpis">
-                    KPIs
+    <div class="container mx-auto px-4 py-6">
+            <!-- Sección de Configuración del Análisis -->
+        <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+            <div class="flex justify-between items-center mb-4 border-b pb-4">
+                <h2 class="text-lg font-bold gradient-text flex items-center">
+                    <i class="fas fa-cog text-indigo-500 mr-2"></i> Configuración del Análisis
+                </h2>
+                <button onclick="toggleSection()" class="bg-indigo-100 text-indigo-600 hover:bg-indigo-200 px-3 py-2 rounded-md transition-colors focus:outline-none">
+                    <i id="toggle-icon" class="fas fa-minus"></i>
                 </button>
-                <button class="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600" id="show-graph">
-                    Gráficos
-                </button>
-                <button class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600" id="show-table">
-                    Tabla Detallada
-                </button>
-                <button class="bg-purple-500 text-white px-4 py-2 rounded shadow hover:bg-purple-600" id="show-clustering">
-                    Clustering
-                </button>
-                <button class="bg-yellow-500 text-white px-4 py-2 rounded shadow hover:bg-yellow-600" id="show-classification">
-                    Clasificación
-                </button>
-                <button class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600" id="show-regression">
-                    Regresión
-                </button>
+            </div>
+        
+            <div id="selection-section" class="space-y-6">
+                <!-- Selección de Tabla y Columna -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Selección de Tabla -->
+                    <div class="bg-gradient-to-r from-gray-50 to-white p-5 rounded-lg shadow-sm border border-gray-200 hover:border-indigo-200 transition-colors">
+                        <h3 class="text-md font-semibold text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-table text-indigo-500 mr-2"></i> Selección de Tabla
+                        </h3>
+                        <div class="flex items-center space-x-2">
+                            <select id="table-select" class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                                <option value="" disabled selected>Selecciona una tabla...</option>
+                                {% for table in tabla2 %}
+                                    <option value="{{ table }}">{{ table }}</option>
+                                {% endfor %}
+                            </select>
+                            <button id="go-to-table" 
+                                    class="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition-all transform hover:scale-105">
+                                <i class="fas fa-external-link-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                        
+                    <!-- Selección de Columna -->
+                    <div class="bg-gradient-to-r from-gray-50 to-white p-5 rounded-lg shadow-sm border border-gray-200 hover:border-indigo-200 transition-colors">
+                        <h3 class="text-md font-semibold text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-columns text-green-500 mr-2"></i> Columna para Análisis
+                        </h3>
+                        <select id="column-select" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                            <option value="" disabled selected>Selecciona una columna...</option>
+                        </select>
+                        <p class="text-sm text-gray-500 mt-2 flex items-center">
+                            <i class="fas fa-info-circle text-indigo-400 mr-1"></i> Solo se muestran columnas numéricas
+                        </p>
+                    </div>
+                </div>
+        
+                <!-- Selección de Campo de Fecha y Rango de Fechas -->
+                <div class="bg-gradient-to-r from-blue-50 to-white p-5 rounded-lg shadow-sm border border-blue-100">
+                    <h3 class="text-md font-semibold text-gray-700 mb-4 flex items-center border-b border-blue-100 pb-2">
+                        <i class="fas fa-calendar-alt text-blue-500 mr-2"></i> Configuración Temporal
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Campo de Fecha -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-2">Campo de Fecha:</label>
+                            <select id="date_field" name="date_field" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                                <option value="" disabled selected>Selecciona un campo de fecha...</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1 italic">
+                                Solo campos tipo fecha (DATE, DATETIME)
+                            </p>
+                        </div>
+                        
+                        <!-- Fecha Inicial -->
+                        <div>
+                            <label for="start_date" class="block text-sm font-medium text-gray-600 mb-2">
+                                <i class="far fa-calendar mr-1"></i> Fecha Inicial:
+                            </label>
+                            <input type="date" id="start_date" name="start_date" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        </div>
+                        
+                        <!-- Fecha Final -->
+                        <div>
+                            <label for="end_date" class="block text-sm font-medium text-gray-600 mb-2">
+                                <i class="far fa-calendar-check mr-1"></i> Fecha Final:
+                            </label>
+                            <input type="date" id="end_date" name="end_date" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Agrupación de filtros y campos adicionales -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Sección de Filtros Personalizados -->
+                    <div class="bg-gradient-to-r from-purple-50 to-white p-5 rounded-lg shadow-sm border border-purple-100">
+                        <div class="flex justify-between items-center mb-4 border-b border-purple-100 pb-2">
+                            <h3 class="text-md font-semibold text-gray-700 flex items-center">
+                                <i class="fas fa-filter text-purple-500 mr-2"></i> Filtros Personalizados
+                            </h3>
+                            <button type="button" onclick="addCustomFilter()" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded-md shadow-sm transition-all transform hover:scale-105 flex items-center">
+                                <i class="fas fa-plus mr-1"></i> Agregar
+                            </button>
+                        </div>
+                        <div id="custom-filters" class="space-y-3 max-h-64 overflow-y-auto pr-2">
+                            <!-- Los filtros personalizados se agregarán aquí -->
+                            <div class="text-sm text-gray-500 text-center py-4">
+                                No hay filtros configurados. Haz clic en "Agregar" para crear un filtro.
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!-- Campos Adicionales -->
+                    <div class="bg-gradient-to-r from-green-50 to-white p-5 rounded-lg shadow-sm border border-green-100">
+                        <div class="flex justify-between items-center mb-4 border-b border-green-100 pb-2">
+                            <h3 class="text-md font-semibold text-gray-700 flex items-center">
+                                <i class="fas fa-plus-circle text-green-500 mr-2"></i> Campos Adicionales
+                            </h3>
+                            <button type="button" onclick="addField()" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md shadow-sm transition-all transform hover:scale-105 flex items-center">
+                                <i class="fas fa-plus mr-1"></i> Agregar
+                            </button>
+                        </div>
+                        <div id="additional-fields" class="space-y-3 max-h-64 overflow-y-auto pr-2">
+                            <!-- Los campos adicionales se agregarán aquí -->
+                            <div class="text-sm text-gray-500 text-center py-4">
+                                No hay campos adicionales. Haz clic en "Agregar" para añadir campos.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Configuración de Visualización -->
+                <div class="bg-gradient-to-r from-yellow-50 to-white p-5 rounded-lg shadow-sm border border-yellow-100">
+                    <h3 class="text-md font-semibold text-gray-700 mb-3 flex items-center border-b border-yellow-100 pb-2">
+                        <i class="fas fa-sliders-h text-yellow-500 mr-2"></i> Opciones de Visualización
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label for="limit-values" class="block text-sm font-medium text-gray-600 mb-2">Mostrar valores:</label>
+                            <select id="limit-values" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500 bg-white">
+                                <option value="10">10 valores</option>
+                                <option value="20">20 valores</option>
+                                <option value="50">50 valores</option>
+                                <option value="100">100 valores</option>
+                                <option value="999999">Todos</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="chart-type" class="block text-sm font-medium text-gray-600 mb-2">Tipo de gráfico:</label>
+                            <select id="chart-type" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500 bg-white">
+                                <option value="line">Línea</option>
+                                <option value="bar">Barras</option>
+                                <option value="pie">Circular</option>
+                                <option value="radar">Radar</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="theme-select" class="block text-sm font-medium text-gray-600 mb-2">Tema de colores:</label>
+                            <select id="theme-select" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500 bg-white">
+                                <option value="default">Predeterminado</option>
+                                <option value="pastel">Pastel</option>
+                                <option value="vibrant">Vibrante</option>
+                                <option value="monochrome">Monocromo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="grouping-interval" class="block text-sm font-medium text-gray-600 mb-2">Agrupación temporal:</label>
+                            <select id="grouping-interval" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500 bg-white">
+                                <option value="day">Por día</option>
+                                <option value="week">Por semana</option>
+                                <option value="month" selected>Por mes</option>
+                                <option value="quarter">Por trimestre</option>
+                                <option value="year">Por año</option>
+                            </select>
+                        </div>
+                    </div>
+        
+                    <!-- Opciones avanzadas plegables -->
+                    <div class="mt-4">
+                        <button type="button" 
+                                onclick="document.getElementById('advanced-options').classList.toggle('hidden')"
+                                class="text-sm text-gray-600 hover:text-indigo-600 flex items-center focus:outline-none transition-colors">
+                            <i class="fas fa-cog mr-1"></i> 
+                            <span>Opciones avanzadas</span>
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        
+                        <div id="advanced-options" class="hidden mt-3 pt-3 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                                <label for="decimal-places" class="block text-sm font-medium text-gray-600 mb-2">Decimales:</label>
+                                <input type="number" id="decimal-places" min="0" max="6" value="2" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500 bg-white">
+                            </div>
+                            <div>
+                                <label for="null-handling" class="block text-sm font-medium text-gray-600 mb-2">Valores nulos:</label>
+                                <select id="null-handling" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500 bg-white">
+                                    <option value="omit">Omitir</option>
+                                    <option value="zero">Mostrar como 0</option>
+                                    <option value="interpolate">Interpolar</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="animation-speed" class="block text-sm font-medium text-gray-600 mb-2">Animación:</label>
+                                <select id="animation-speed" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500 bg-white">
+                                    <option value="fast">Rápida</option>
+                                    <option value="normal" selected>Normal</option>
+                                    <option value="slow">Lenta</option>
+                                    <option value="off">Desactivada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="data-labels" class="block text-sm font-medium text-gray-600 mb-2">Etiquetas:</label>
+                                <div class="flex items-center mt-2">
+                                    <input type="checkbox" id="data-labels" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                    <label for="data-labels" class="ml-2 block text-sm text-gray-600">
+                                        Mostrar etiquetas de datos
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="resetForm()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-undo mr-1"></i> Restablecer
+                    </button>
+                    <button type="button" id="apply-config" class="px-6 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-md hover:opacity-90 transition-all shadow-md transform hover:-translate-y-1">
+                        <i class="fas fa-check mr-1"></i> Aplicar configuración
+                    </button>
+                </div>
             </div>
         </div>
 
+                </div>
+            </div>
+        </div>
+
+        <!-- Indicador de Carga -->
+        <div id="loading-indicator" class="hidden flex justify-center items-center p-10">
+            <div class="relative">
+                <div class="w-12 h-12 rounded-full absolute border-4 border-gray-200"></div>
+                <div class="w-12 h-12 rounded-full animate-spin absolute border-4 border-indigo-600 border-t-transparent"></div>
+            </div>
+            <span class="ml-4 text-lg font-medium text-gray-700">Analizando datos...</span>
+        </div>
+
+            <!-- Opciones de Análisis -->
+        <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-chart-bar text-indigo-500 mr-2"></i> Selecciona el Tipo de Análisis
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- KPIs -->
+                <button id="show-kpis" class="group relative bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1 overflow-hidden">
+                    <div class="absolute inset-0 bg-indigo-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-indigo-100 text-indigo-600">
+                            <i class="fas fa-chart-pie fa-lg"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">Indicadores KPI</h3>
+                            <p class="text-sm text-gray-500 mt-1">Ver métricas clave y distribuciones</p>
+                        </div>
+                    </div>
+                </button>
+                
+                <!-- Gráficos -->
+                <button id="show-graph" class="group relative bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1 overflow-hidden">
+                    <div class="absolute inset-0 bg-green-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-green-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-green-100 text-green-600">
+                            <i class="fas fa-chart-line fa-lg"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-gray-800 group-hover:text-green-600 transition-colors">Gráficos</h3>
+                            <p class="text-sm text-gray-500 mt-1">Visualizar tendencias y patrones</p>
+                        </div>
+                    </div>
+                </button>
+                
+                <!-- Tabla -->
+                <button id="show-table" class="group relative bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1 overflow-hidden">
+                    <div class="absolute inset-0 bg-blue-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-blue-100 text-blue-600">
+                            <i class="fas fa-table fa-lg"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">Mostrar Tabla</h3>
+                            <p class="text-sm text-gray-500 mt-1">Ver registros detallados</p>
+                        </div>
+                    </div>
+                </button>
+                
+                <!-- Clustering -->
+                <button id="show-clustering" class="group relative bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1 overflow-hidden">
+                    <div class="absolute inset-0 bg-purple-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-purple-100 text-purple-600">
+                            <i class="fas fa-project-diagram fa-lg"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">Clustering</h3>
+                            <p class="text-sm text-gray-500 mt-1">Agrupar datos por similitud</p>
+                        </div>
+                    </div>
+                </button>
+                
+                <!-- Clasificación -->
+                <button id="show-classification" class="group relative bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1 overflow-hidden">
+                    <div class="absolute inset-0 bg-yellow-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-yellow-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-yellow-100 text-yellow-600">
+                            <i class="fas fa-filter fa-lg"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-gray-800 group-hover:text-yellow-600 transition-colors">Clasificación</h3>
+                            <p class="text-sm text-gray-500 mt-1">Categorizar datos automáticamente</p>
+                        </div>
+                    </div>
+                </button>
+                
+                <!-- Regresión -->
+                <button id="show-regression" class="group relative bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1 overflow-hidden">
+                    <div class="absolute inset-0 bg-red-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-red-100 text-red-600">
+                            <i class="fas fa-chart-area fa-lg"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-gray-800 group-hover:text-red-600 transition-colors">Regresión</h3>
+                            <p class="text-sm text-gray-500 mt-1">Predecir tendencias futuras</p>
+                        </div>
+                    </div>
+                </button>
+            </div>
+        </div>
+        
         <!-- KPIs -->
         <div id="kpi-section" class="hidden">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="bg-white p-4 rounded shadow flex items-center">
-                    <div class="flex-1">
-                        <h2 class="text-gray-600 text-sm">Total de Registros</h2>
-                        <p class="text-2xl font-bold text-gray-800" id="total-records">0</p>
-                    </div>
-                    <i class="fas fa-database text-indigo-500 text-3xl"></i>
+            <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-chart-pie text-indigo-500 mr-2"></i> Indicadores Clave
+                    </h2>
+                    <button onclick="document.getElementById('kpi-section').classList.add('hidden')" 
+                            class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <div class="bg-white p-4 rounded shadow flex items-center">
-                    <div class="flex-1">
-                        <h2 class="text-gray-600 text-sm">Categorías</h2>
-                        <p class="text-2xl font-bold text-gray-800" id="categories">-</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <!-- Total Registros -->
+                    <div class="bg-gradient-to-br from-indigo-50 to-white p-5 rounded-lg shadow-sm border border-indigo-100 stats-card stats-card-primary card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-gray-600 text-sm font-medium">Total de Registros</h2>
+                                <p class="text-3xl font-bold text-indigo-700 mt-2" id="total-records">0</p>
+                            </div>
+                            <div class="bg-indigo-100 p-3 rounded-full">
+                                <i class="fas fa-database text-indigo-500 text-2xl"></i>
+                            </div>
+                        </div>
                     </div>
-                    <i class="fas fa-tags text-indigo-500 text-3xl"></i>
-                </div>
-                <div class="bg-white p-4 rounded shadow flex items-center">
-                    <div class="flex-1">
-                        <h2 class="text-gray-600 text-sm">Última Fecha</h2>
-                        <p class="text-2xl font-bold text-gray-800" id="last-date">-</p>
+                    
+                    <!-- Categorías -->
+                    <div class="bg-gradient-to-br from-green-50 to-white p-5 rounded-lg shadow-sm border border-green-100 stats-card stats-card-secondary card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-gray-600 text-sm font-medium">Categorías</h2>
+                                <p class="text-3xl font-bold text-green-600 mt-2" id="categories">-</p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <i class="fas fa-tags text-green-500 text-2xl"></i>
+                            </div>
+                        </div>
                     </div>
-                    <i class="fas fa-calendar-alt text-indigo-500 text-3xl"></i>
-                </div>
-                <div class="bg-white p-4 rounded shadow flex items-center">
-                    <div class="flex-1">
-                        <h2 class="text-gray-600 text-sm">Primera Fecha</h2>
-                        <p class="text-2xl font-bold text-gray-800" id="first-date">-</p>
+                    
+                    <!-- Última Fecha -->
+                    <div class="bg-gradient-to-br from-blue-50 to-white p-5 rounded-lg shadow-sm border border-blue-100 stats-card stats-card-info card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-gray-600 text-sm font-medium">Última Fecha</h2>
+                                <p class="text-3xl font-bold text-blue-600 mt-2" id="last-date">-</p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <i class="fas fa-calendar-alt text-blue-500 text-2xl"></i>
+                            </div>
+                        </div>
                     </div>
-                    <i class="fas fa-calendar-alt text-indigo-500 text-3xl"></i>
-                </div>
-                <div class="bg-white p-4 rounded shadow flex items-center">
-                    <div class="flex-1">
-                        <h2 class="text-gray-600 text-sm">Valor Máximo</h2>
-                        <p class="text-2xl font-bold text-gray-800" id="max-value">-</p>
+                    
+                    <!-- Primera Fecha -->
+                    <div class="bg-gradient-to-br from-blue-50 to-white p-5 rounded-lg shadow-sm border border-blue-100 stats-card stats-card-info card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-gray-600 text-sm font-medium">Primera Fecha</h2>
+                                <p class="text-3xl font-bold text-blue-600 mt-2" id="first-date">-</p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <i class="fas fa-calendar-alt text-blue-500 text-2xl"></i>
+                            </div>
+                        </div>
                     </div>
-                    <i class="fas fa-arrow-up text-indigo-500 text-3xl"></i>
-                </div>
-                <div class="bg-white p-4 rounded shadow flex items-center">
-                    <div class="flex-1">
-                        <h2 class="text-gray-600 text-sm">Valor Mínimo</h2>
-                        <p class="text-2xl font-bold text-gray-800" id="min-value">-</p>
+                    
+                    <!-- Valor Máximo -->
+                    <div class="bg-gradient-to-br from-red-50 to-white p-5 rounded-lg shadow-sm border border-red-100 stats-card stats-card-danger card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-gray-600 text-sm font-medium">Valor Máximo</h2>
+                                <p class="text-3xl font-bold text-red-600 mt-2" id="max-value">-</p>
+                            </div>
+                            <div class="bg-red-100 p-3 rounded-full">
+                                <i class="fas fa-arrow-up text-red-500 text-2xl"></i>
+                            </div>
+                        </div>
                     </div>
-                    <i class="fas fa-arrow-down text-indigo-500 text-3xl"></i>
-                </div>
-                <div class="bg-white p-4 rounded shadow flex items-center">
-                    <div class="flex-1">
-                        <h2 class="text-gray-600 text-sm">Clusters</h2>
-                        <ul id="cluster-results" class="list-disc list-inside text-gray-700"></ul>
+                    
+                    <!-- Valor Mínimo -->
+                    <div class="bg-gradient-to-br from-indigo-50 to-white p-5 rounded-lg shadow-sm border border-indigo-100 stats-card stats-card-primary card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-gray-600 text-sm font-medium">Valor Mínimo</h2>
+                                <p class="text-3xl font-bold text-indigo-700 mt-2" id="min-value">-</p>
+                            </div>
+                            <div class="bg-indigo-100 p-3 rounded-full">
+                                <i class="fas fa-arrow-down text-indigo-500 text-2xl"></i>
+                            </div>
+                        </div>
                     </div>
-                    <i class="fas fa-project-diagram text-indigo-500 text-3xl"></i>
                 </div>
+                
+                <!-- Análisis Temporal y Categorías -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <!-- Análisis Temporal -->
+                    <div class="md:col-span-2 bg-white border border-gray-200 rounded-xl p-5 shadow-sm card-hover">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-bold text-gray-700 flex items-center">
+                                <i class="fas fa-chart-line text-indigo-500 mr-2"></i> Análisis Temporal
+                            </h2>
+                            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Agrupación por periodos</span>
+                        </div>
+                        <div id="cluster-results" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Los clusters se insertarán aquí -->
+                        </div>
+                    </div>
+                    
+                    <!-- Distribución de Categorías -->
+                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm card-hover">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-bold text-gray-700 flex items-center">
+                                <i class="fas fa-tags text-indigo-500 mr-2"></i> Distribución
+                            </h2>
+                            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Categorías</span>
+                        </div>
+                        <div id="categories-detail" class="space-y-3">
+                            <!-- Detalles de categorías aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                
+                
             </div>
         </div>
 
         <!-- Gráficos -->
-        <div id="graph-section" class="hidden bg-white p-4 rounded shadow mb-6">
-            <h2 class="text-gray-800 font-bold mb-4">Análisis Gráfico</h2>
-            <canvas id="chart"></canvas>
+        <div id="graph-section" class="hidden bg-white p-6 rounded-xl shadow-md mb-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-gray-800">Análisis Gráfico</h2>
+                <button class="bg-gray-200 text-gray-700 hover:bg-gray-300 px-3 py-1 rounded-md transition-colors" 
+                        onclick="document.getElementById('graph-section').classList.add('hidden')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="graficos-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Los gráficos se insertarán aquí dinámicamente -->
+            </div>
+        </div>
+        
+        <!-- Tabla de Datos -->
+        <div id="table-section" class="hidden bg-white p-6 rounded-xl shadow-md mb-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-gray-800">Datos Detallados</h2>
+                <div class="flex space-x-3">
+                    <button class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors flex items-center">
+                        <i class="fas fa-file-excel mr-2"></i> Exportar a Excel
+                    </button>
+                    <button id="hide-table" class="bg-gray-200 text-gray-700 hover:bg-gray-300 px-3 py-1 rounded-md transition-colors"
+                            onclick="document.getElementById('table-section').classList.add('hidden')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table id="analisis-table" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <thead class="bg-gray-100">
+                        <tr id="table-headers">
+                            <!-- Encabezados de la tabla -->
+                        </tr>
+                    </thead>
+                    <tbody id="table-data">
+                        <!-- Filas de la tabla -->
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- Tabla Detallada -->
-        <div id="table-section" class="hidden bg-white p-4 rounded shadow">
-            <h2 class="text-gray-800 font-bold mb-4">Datos Detallados</h2>
-            <table class="min-w-full table-auto border-collapse border border-gray-300">
-                <thead>
-                    <tr class="bg-gray-200" id="table-headers"></tr>
-                </thead>
-                <tbody id="table-data"></tbody>
-            </table>
-            <button class="mt-4 bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600">
-                Exportar a Excel
-            </button>
-        </div>
     </div>
+    
+    <!-- Footer con información básica -->
+    <footer class="bg-white border-t border-gray-200 py-4 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-600 text-sm">© 2025 SQL App Studio. Todos los derechos reservados.</p>
+                <div class="mt-2 md:mt-0 flex items-center space-x-4">
+                    <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">v1.2.5</span>
+                    <a href="/docs/changelog" class="text-sm text-indigo-600 hover:underline">Novedades</a>
+                    <a href="/support" class="text-sm text-indigo-600 hover:underline">Soporte</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-    <!-- Scripts -->
+    <!-- Los scripts se mantendrán iguales pero se agregarán en un segundo paso -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const kpiSection = document.getElementById("kpi-section");
-        const graphSection = document.getElementById("graph-section");
-        const tableSection = document.getElementById("table-section");
-
-        document.getElementById("show-kpis").addEventListener("click", () => {
-            kpiSection.classList.remove("hidden");
-            graphSection.classList.add("hidden");
-            tableSection.classList.add("hidden");
-        });
-
-        document.getElementById("show-graph").addEventListener("click", () => {
-            kpiSection.classList.add("hidden");
-            graphSection.classList.remove("hidden");
-            tableSection.classList.add("hidden");
-
-            // Carga de gráfico dinámico
-            const ctx = document.getElementById('chart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Enero', 'Febrero', 'Marzo'],
-                    datasets: [{
-                        label: 'Ejemplo',
-                        data: [10, 20, 30],
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                }
-            });
-        });
-
-        document.getElementById("show-table").addEventListener("click", () => {
-            kpiSection.classList.add("hidden");
-            graphSection.classList.add("hidden");
-            tableSection.classList.remove("hidden");
-
-            // Ejemplo de datos dinámicos
-            const headers = ["Columna 1", "Columna 2", "Columna 3"];
-            const data = [
-                ["Dato 1", "Dato 2", "Dato 3"],
-                ["Dato A", "Dato B", "Dato C"]
-            ];
-
-            const headerRow = document.getElementById("table-headers");
-            headerRow.innerHTML = headers.map(header => `<th class="border px-4 py-2">${header}</th>`).join("");
-
-            const tableBody = document.getElementById("table-data");
-            tableBody.innerHTML = data.map(row => 
-                `<tr>${row.map(cell => `<td class="border px-4 py-2">${cell}</td>`).join("")}</tr>`
-            ).join("");
-        });
-
-        document.getElementById("table-select").addEventListener("change", async function() {
-            const tableName = this.value;
-
-            // Obtener las columnas de la tabla seleccionada
-            const columnsResponse = await fetch(`/analisis/columnas`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ table_name: tableName })
-            });
-            const columnsData = await columnsResponse.json();
-
-            // Poblar el select de columnas
-            const columnSelect = document.getElementById("column-select");
-            columnSelect.innerHTML = '<option value="" disabled selected>Selecciona una columna...</option>';
-            columnsData.columns.forEach(column => {
-                columnSelect.innerHTML += `<option value="${column}">${column}</option>`;
-            });
-        });
-
-        document.getElementById("column-select").addEventListener("change", async function() {
-            const tableName = document.getElementById("table-select").value;
-            const columnName = this.value;
-
-            const response = await fetch(`/analisis/analizar`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ table_name: tableName, column_name: columnName })
-            });
-            const data = await response.json();
-
-            // Actualizar KPIs
-            document.getElementById("total-records").textContent = data.total_registros;
-            document.getElementById("categories").textContent = data.categorias;
-            document.getElementById("last-date").textContent = data.last_date;
-            document.getElementById("first-date").textContent = data.first_date;
-            document.getElementById("max-value").textContent = data.max_value;
-            document.getElementById("min-value").textContent = data.min_value;
-
-            // Mostrar resultados de clustering
-            const clusterResults = document.getElementById("cluster-results");
-            clusterResults.innerHTML = data.clusters.map((cluster, index) => `<li>Registro ${index + 1}: Cluster ${cluster}</li>`).join("");
-
-            // Actualizar gráfico
-            const ctx = document.getElementById('chart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.chart_data.labels,
-                    datasets: [{
-                        label: 'Análisis',
-                        data: data.chart_data.values,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                }
-            });
-
-            // Actualizar tabla detallada
-            const headers = Object.keys(data.table_data[0]);
-            const headerRow = document.getElementById("table-headers");
-            headerRow.innerHTML = headers.map(header => `<th class="border px-4 py-2">${header}</th>`).join("");
-
-            const tableBody = document.getElementById("table-data");
-            tableBody.innerHTML = data.table_data.map(row => 
-                `<tr>${headers.map(header => `<td class="border px-4 py-2">${row[header]}</td>`).join("")}</tr>`
-            ).join("");
-        });
-
-        document.getElementById("show-clustering").addEventListener("click", async () => {
-            const tableName = document.getElementById("table-select").value;
-            const columnName = document.getElementById("column-select").value;
-
-            const response = await fetch(`/analisis/analizar`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ table_name: tableName, column_name: columnName })
-            });
-            const data = await response.json();
-
-            // Mostrar resultados de clustering
-            const clusterResults = document.getElementById("cluster-results");
-            clusterResults.innerHTML = data.clusters.map((cluster, index) => `<li>Registro ${index + 1}: Cluster ${cluster}</li>`).join("");
-        });
-
-        document.getElementById("show-classification").addEventListener("click", async () => {
-            const tableName = document.getElementById("table-select").value;
-            const columnName = document.getElementById("column-select").value;
-
-            const response = await fetch(`/analisis/clasificar`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ table_name: tableName, column_name: columnName })
-            });
-            const data = await response.json();
-
-            // Mostrar precisión del modelo de clasificación
-            alert(`Precisión del modelo de clasificación: ${data.accuracy}`);
-
-            // Mostrar predicciones
-            const clusterResults = document.getElementById("cluster-results");
-            clusterResults.innerHTML = data.predicciones.map((prediccion, index) => `<li>Registro ${index + 1}: Predicción ${prediccion}</li>`).join("");
-        });
-
-        document.getElementById("show-regression").addEventListener("click", async () => {
-            const tableName = document.getElementById("table-select").value;
-            const columnName = document.getElementById("column-select").value;
-
-            const response = await fetch(`/analisis/regresion`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ table_name: tableName, column_name: columnName })
-            });
-            const data = await response.json();
-
-            // Mostrar error cuadrático medio del modelo de regresión
-            alert(`Error cuadrático medio del modelo de regresión: ${data.mse}`);
-
-            // Mostrar predicciones
-            const clusterResults = document.getElementById("cluster-results");
-            clusterResults.innerHTML = data.predicciones.map((prediccion, index) => `<li>Registro ${index + 1}: Predicción ${prediccion}</li>`).join("");
-        });
-    </script>
+    <script src="../static/js/analisis_new.js"></script>
 </body>
 </html>

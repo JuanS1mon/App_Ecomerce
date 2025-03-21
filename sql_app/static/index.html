@@ -3,80 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>appapp</title>
+    <title>SQL App Studio</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="static/css/styles.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .parallax {
-            background-attachment: fixed;
-            background-size: cover;
-            background-position: center;
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         }
-        .overlay {
-            background: rgba(9, 98, 110, 50); /* Overlay oscuro */
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
+        .card-hover {
+            transition: all 0.3s ease;
         }
-        .content {
-            position: relative;
-            z-index: 2;
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        .fixed-section {
-            position: relative;
-            z-index: 2;
+        .gradient-text {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .feature-card {
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
         .back-to-top {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background-color: #1a202c;
+            background-color: #2563eb;
             color: white;
-            padding: 10px 15px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            display: none;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
             z-index: 1000;
-            transition: opacity 0.3s;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
         }
         
         .back-to-top:hover {
-            background-color: #2d3748;
-        }
-        .custom-green {
-            background-color: rgba(9, 98, 110, 1);
-        }
-        .custom-green:hover {
-            background-color: rgba(9, 98, 110, 0.8);
-        }
-        .custom-greenbg {
-            background-color: rgb(22, 81, 88);
-        }
-
-        .bg-pastel-yellow {
-            background-color: #f7d7c5; /* Light pastel yellow */
-        }
-        .bg-pastel-darkblue {
-            background-color: #17183b; /* Light pastel yellow */
-        }
-        .bg-pastel-blue {
-            background-color: hsl(226, 67%, 55%); /* Light pastel blue */
-        }
-        .bg-pastel-green {
-            background-color: #98FB98; /* Light pastel green */
-        }
-    
-        .bg-pastel-pink {
-            background-color: #f5e2f2; /* Light pastel pink */
+            transform: translateY(-5px);
         }
         
+        .sending-message {
+            display: none;
+            align-items: center;
+            font-size: 16px;
+            color: #1a202c;
+            margin-left: 10px;
+            animation: fly 2s infinite;
+        }
+
+        @keyframes fly {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+
+        .hero-bg {
+            background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%232563eb" fill-opacity="0.08" d="M0,224L48,208C96,192,192,160,288,160C384,160,480,192,576,197.3C672,203,768,181,864,181.3C960,181,1056,203,1152,192C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"%3E%3C/path%3E%3C/svg%3E');
+            background-size: cover;
+            background-position: center bottom;
+            background-repeat: no-repeat;
+        }
     </style>
 </head>
-<body class="bg-gray-100">
+
+<body class="bg-gray-50 min-h-screen">
     <!-- Barra de navegación -->
     <nav class="bg-gray-800 p-4 w-full z-10">
         <div class="container mx-auto flex justify-between items-center">
@@ -85,215 +92,645 @@
                     <img src="static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
                 </a>
                 <span class="text-gray-400">/</span>
-                <a href="#about" class="text-white hover:text-gray-300">Sobre la App</a>
+                <a href="/index" class="text-white hover:text-gray-300">Inicio</a>
                 <span class="text-gray-400">/</span>
-                <a href="#noticias" class="text-white hover:text-gray-300">Noticias</a>
+                <a href="/news" class="text-white hover:text-gray-300">Noticias</a>
                 <span class="text-gray-400">/</span>
-                <a href="#testimonials" class="text-white hover:text-gray-300">Testimonios</a>
-                <span class="text-gray-400">/</span>
-                <a href="#Contacto" class="text-white hover:text-gray-300">Contacto</a>
+                <a href="/index#contact" class="text-white hover:text-gray-300">Contacto</a>
             </div>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="flex space-x-4">
-                    <li class="nav-item">
-                        <a class="nav-link text-gray-300 hover:text-white" href="/admin/page">Administracion</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-gray-300 hover:text-white" href="/news">Noticias</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-gray-300 hover:text-white" href="/loginpage">Iniciar Sesión</a>
-                    </li>
-                </ul>
+            <div class="flex items-center space-x-4">
+                <a href="/loginpage" class="text-white hover:text-gray-300">Iniciar Sesión</a>
             </div>
         </div>
     </nav>
 
-    <section id="Generadora de apps" class="h-screen flex flex-col items-center justify-center bg-pastel-pink text-gray-800 relative">
-        <img src="static/img/logo.jpg" alt="Generadora de apps" class="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none">
-        <h1 class="text-4xl font-bold mb-4 z-10">Generadora de apps</h1>
-        <p class="text-lg mb-6 text-center px-4 z-10">es una app para hacer apps, en python!</p>
-        <div class="flex flex-wrap justify-center z-10">
-            <button class="bg-blue-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 mx-2 mb-2" onclick="location.href='#about'">Saber más</button>
-            <button class="bg-green-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-600 transition duration-300 mx-2 mb-2" onclick="location.href='#Contacto'">Contactar</button>
-        </div>
+    <!-- Hero Section -->
+    <section class="relative bg-white hero-bg">
+        <div class="container mx-auto px-6 py-16 md:py-24 lg:py-32">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4">
+                        <span class="block">SQL App</span>
+                        <span class="block gradient-text">Studio</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-600 mb-8">
+                        Herramienta avanzada para desarrolladores y administradores de bases de datos. Simplifica y automatiza la creación de APIs, migración de datos y análisis con inteligencia artificial.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#features" class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                            <i class="fas fa-info-circle mr-2"></i>Conocer más
+                        </a>
+                        <a href="#contact" class="inline-block px-6 py-3 bg-white text-blue-600 font-medium rounded-lg shadow-md border border-blue-600 hover:bg-blue-50 transition duration-300">
+                            <i class="fas fa-envelope mr-2"></i>Contactar
+                        </a>
+                    </div>
+                </div>
+                                <div class="md:w-1/2 flex justify-center">
+                    <div class="relative">
+                        <!-- Círculo decorativo de fondo -->
+                        <div class="absolute inset-0 bg-blue-100 rounded-full transform scale-95"></div>
+                        
+                        <!-- Imagen circular con borde -->
+                        <img src="/static/img/th.jpg" alt="SQL App Studio Dashboard" 
+                             class="relative z-10 h-64 w-64 md:h-80 md:w-80 object-cover rounded-full border-4 border-white shadow-xl">
+                        
+                        <!-- Elemento decorativo -->
+                        <div class="absolute -bottom-4 -right-4 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full h-20 w-20 flex items-center justify-center text-white shadow-lg">
+                            <i class="fas fa-database text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
     </section>
-    
-    <section id="about" class="min-h-screen flex items-center justify-center bg-gray-800 text-white fixed-section">
-        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
-            <!-- Columna izquierda: Texto -->
-            <div class="md:w-1/2 text-left">
-                <h2 class="text-3xl font-bold mb-12">Sobre la Aplicación</h2>
-                <p class="mt-4">
-                    Sobre la Aplicación
-                    Una herramienta avanzada para desarrolladores y administradores de bases de datos, diseñada para simplificar y automatizar la creación de APIs, la migración de datos y el análisis con inteligencia artificial.
-                    Backend Robusto: Construida con FastAPI, soporta SQL Server y PostgreSQL (próximamente MySQL). Totalmente dockerizada para despliegue rápido y escalable.
-                    Automatización de Componentes: Genera rutas, modelos, esquemas, pruebas, y archivos HTML con JavaScript para una gestión eficiente.
-                    Migración de Datos: Importa datos desde Excel (.xls y .xlsx) hacia bases de datos SQL con validaciones que garantizan su calidad.
-                    Análisis de Datos con IA: Integra modelos de inteligencia artificial para el análisis avanzado de datos, ofreciendo insights clave para la toma de decisiones.
-                    Interfaz Intuitiva: Un entorno web basado en Jinja2, Bootstrap y SQLAlchemy para configuraciones rápidas y experiencia responsiva, sin necesidad de modificar código.
-                    Esta solución innovadora combina automatización, análisis avanzado y un entorno intuitivo, permitiendo a los equipos centrarse en crear valor y mejorar su productividad.</p>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Características Principales</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    Descubre todas las herramientas avanzadas que te ofrece SQL App Studio para optimizar tu trabajo con bases de datos.
+                </p>
             </div>
-            <!-- Columna derecha: Imagen -->
-            <div class="md:w-1/2 mt-8 md:mt-0 flex justify-center">
-                <img src="static/img/diagrama_app.jpg" alt="Diagrama de Flujo" class="max-w-full h-auto">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-white p-6">
+                    <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-server text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Backend Robusto</h3>
+                    <p class="text-gray-600">
+                        Construido con FastAPI, soporta SQL Server y PostgreSQL (próximamente MySQL). Totalmente dockerizado para despliegue rápido y escalable.
+                    </p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card bg-white p-6">
+                    <div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-cogs text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Automatización Total</h3>
+                    <p class="text-gray-600">
+                        Genera rutas, modelos, esquemas, pruebas y archivos HTML con JavaScript para una gestión eficiente y rápida.
+                    </p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card bg-white p-6">
+                    <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-exchange-alt text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Migración de Datos</h3>
+                    <p class="text-gray-600">
+                        Importa datos desde Excel (.xls y .xlsx) hacia bases de datos SQL con validaciones que garantizan su calidad.
+                    </p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="feature-card bg-white p-6">
+                    <div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-brain text-red-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Análisis con IA</h3>
+                    <p class="text-gray-600">
+                        Integra modelos de inteligencia artificial para análisis avanzado de datos, ofreciendo insights clave para la toma de decisiones.
+                    </p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="feature-card bg-white p-6">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-desktop text-yellow-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Interfaz Intuitiva</h3>
+                    <p class="text-gray-600">
+                        Entorno web basado en Jinja2, Bootstrap y SQLAlchemy para configuraciones rápidas y experiencia responsiva.
+                    </p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="feature-card bg-white p-6">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-lock text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Seguridad Avanzada</h3>
+                    <p class="text-gray-600">
+                        Implementa prácticas seguras para gestión de datos y autenticación, protegiendo tu información sensible en todo momento.
+                    </p>
+                </div>
             </div>
         </div>
     </section>
 
-    <section id="noticias" class="min-h-screen flex items-center justify-center parallax bg-cover bg-center relative fixed-section" style="background-image: url('https://source.unsplash.com/random/1600x900?news');">
-        <div class="overlay"></div>
-        <div class="content text-center text-white relative z-10 p-8">
-            <h2 class="text-4xl font-bold mb-4 relative inline-block">
-                Noticias
-                <span class="absolute bottom-0 left-0 h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500"></span>
-            </h2>
-            <p class="text-lg text-gray-300 mb-12">Mantente informado con nuestras últimas actualizaciones.</p>
+    <!-- Diagrama Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <h2 class="text-3xl font-bold mb-6">Cómo Funciona</h2>
+                    <p class="text-gray-600 mb-4">
+                        SQL App Studio simplifica el flujo de trabajo desde la configuración de la base de datos hasta la implementación de APIs. Nuestro enfoque modular permite una integración perfecta con sistemas existentes.
+                    </p>
+                    <p class="text-gray-600 mb-6">
+                        La plataforma automatiza tareas repetitivas y proporciona herramientas avanzadas para la manipulación y análisis de datos, ahorrando tiempo valioso en el desarrollo.
+                    </p>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Configuración de conexiones a diversas fuentes de datos</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Generación automática de código y endpoints API</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Procesos de ETL para transformación de datos</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Análisis predictivo mediante modelos pre-entrenados</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="/static/img/diagrama_app.jpg" alt="Diagrama de Arquitectura" class="rounded-lg shadow-lg">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section id="news" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Últimas Noticias</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    Mantente actualizado con las últimas novedades y mejoras en nuestra plataforma.
+                </p>
+            </div>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for post in blog_posts %}
-                    <div class="news-card bg-white bg-opacity-90 p-6 rounded-lg shadow-lg text-black transition transform hover:scale-105">
-                        <h3 class="text-2xl font-semibold mb-2">{{ post.title }}</h3>
-                        <p class="mt-2 text-justify">{{ post.content | truncate(150) }}...</p>
-                        <p class="mt-2 text-sm text-gray-600">
-                            <i class="fas fa-calendar-alt text-blue-500"></i> Publicado el {{ post.created_at.strftime('%d/%m/%Y') }}
-                        </p>
+                <div class="card-hover bg-white rounded-lg overflow-hidden shadow-md">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2">{{ post.title }}</h3>
+                        <p class="text-gray-600 mb-4">{{ post.content | truncate(150) }}...</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                {{ post.created_at.strftime('%d/%m/%Y') }}
+                            </span>
+                            <a href="/news/{{ post.id }}" class="text-blue-600 hover:text-blue-800">
+                                Leer más <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                            </a>
+                        </div>
                     </div>
+                </div>
                 {% endfor %}
             </div>
-            <div class="mt-12">
-                <button  onclick="location.href='/news'" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 px-6 rounded-lg shadow-lg hover:opacity-90 transition">
-                    Ver más noticias
-                </button>
+            
+            <div class="mt-12 text-center">
+                <a href="/news" class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                    Ver todas las noticias
+                </a>
             </div>
         </div>
     </section>
-    
 
-    <section id="testimonials" class="min-h-screen flex items-center justify-center bg-pastel-darkblue text-white fixed-section">
-        <div class="text-center">
-            <h2 class="text-3xl font-bold">Testimonios</h2>
-            <p class="mt-4">Lo que nuestros clientes dicen sobre nosotros.</p>
-        </div>
-    </section><!-- Formulario de contacto -->
-       <section id="Contacto" class="min-h-screen flex items-center justify-center parallax bg-cover bg-center relative fixed-section" style="background-image: url('https://source.unsplash.com/random/1600x900?contact');">
-        <div class="overlay"></div>
-        <div class="content text-center text-white relative z-10 p-8">
-            <h2 class="text-4xl font-bold mb-4">Contáctanos</h2>
-            <p class="text-lg text-gray-300 mb-8">Envíanos tus consultas o comentarios. Estaremos encantados de atenderte.</p>
-            <form id="contact-form" class="max-w-2xl mx-auto bg-white bg-opacity-90 p-6 rounded-lg shadow-lg text-black">
-                <div class="mb-4">
-                    <label for="nombre" class="block text-gray-700 font-semibold">Nombre:</label>
-                    <input type="text" id="nombre" name="nombre" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Lo Que Dicen Nuestros Usuarios</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    Descubre cómo SQL App Studio ha transformado los flujos de trabajo de nuestros clientes.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 flex">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic mb-4">
+                        "Esta herramienta ha reducido nuestro tiempo de desarrollo en un 60%. La capacidad de generar APIs automáticamente nos ha permitido centrarnos en la lógica de negocio."
+                    </p>
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            <i class="fas fa-user text-gray-600"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-medium">Carlos Martínez</h4>
+                            <p class="text-sm text-gray-500">CTO, TechSolutions</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="email" class="block text-gray-700 font-semibold">Correo electrónico:</label>
-                    <input type="email" id="email" name="email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 flex">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic mb-4">
+                        "La migración de datos nunca había sido tan sencilla. Ahora podemos transferir información entre sistemas heterogéneos con total confianza en la integridad de los datos."
+                    </p>
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            <i class="fas fa-user text-gray-600"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-medium">Laura Gómez</h4>
+                            <p class="text-sm text-gray-500">Data Analyst, Fintech Inc.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="mensaje" class="block text-gray-700 font-semibold">Mensaje:</label>
-                    <textarea id="mensaje" name="mensaje" rows="5" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"></textarea>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 flex">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic mb-4">
+                        "Los insights generados por la IA han sido cruciales para nuestras decisiones estratégicas. La interfaz intuitiva permite que incluso los no técnicos puedan aprovecharlo."
+                    </p>
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            <i class="fas fa-user text-gray-600"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-medium">Alejandro Torres</h4>
+                            <p class="text-sm text-gray-500">CEO, DataDriven Co.</p>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600 transition">Enviar mensaje</button>
-                </div>
-            </form>
+            </div>
         </div>
     </section>
-        <!-- Botón de flecha para ir arriba -->
-        <div id="back-to-top" class="back-to-top">
-            &#8679;
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-1/2 gradient-bg p-10 text-white">
+                        <h2 class="text-3xl font-bold mb-6">Ponte en contacto</h2>
+                        <p class="mb-8">
+                            Estamos aquí para ayudarte. Envíanos tus preguntas o comentarios y te responderemos a la brevedad.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-xl mr-4"></i>
+                                <span>123 Business Avenue, Ciudad Tecnológica</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-phone text-xl mr-4"></i>
+                                <span>+123 456 7890</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-envelope text-xl mr-4"></i>
+                                <span>info@sqlappstudio.com</span>
+                            </div>
+                        </div>
+                        <div class="mt-10">
+                            <h3 class="font-semibold mb-3">Síguenos en redes sociales</h3>
+                            <div class="flex space-x-4">
+                                <a href="#" class="bg-white bg-opacity-20 p-3 rounded-full hover:bg-opacity-30 transition">
+                                    <i class="fab fa-twitter text-white"></i>
+                                </a>
+                                <a href="#" class="bg-white bg-opacity-20 p-3 rounded-full hover:bg-opacity-30 transition">
+                                    <i class="fab fa-linkedin-in text-white"></i>
+                                </a>
+                                <a href="#" class="bg-white bg-opacity-20 p-3 rounded-full hover:bg-opacity-30 transition">
+                                    <i class="fab fa-github text-white"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 p-10">
+                        <h3 class="text-2xl font-semibold mb-6">Envíanos un mensaje</h3>
+                        <form id="contact-form" class="space-y-6">
+                            <div>
+                                <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+                                <input type="text" id="nombre" name="nombre" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
+                                <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="mensaje" class="block text-sm font-medium text-gray-700 mb-1">Mensaje</label>
+                                <textarea id="mensaje" name="mensaje" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+                            </div>
+                            <div class="flex items-center">
+                                <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition">
+                                    Enviar mensaje
+                                </button>
+                                <div id="sending-message" class="sending-message ml-3">
+                                    <i class="fa fa-paper-plane mr-2" aria-hidden="true"></i>
+                                    <span>Enviando...</span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
+    </section>
 
-    {% include 'footer.html' %}
-<!-- Scripts -->
-<script>
-    document.getElementById('contact-form').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevenir comportamiento predeterminado
+    <!-- Footer -->
+    <div id="footer-container"></div>
 
-        const nombre = document.getElementById('nombre').value;
-        const emailUsuario = document.getElementById('email').value;
-        const mensajeUsuario = document.getElementById('mensaje').value;
-
-        // Mensaje de agradecimiento al usuario
-        const asuntoUsuario = "Gracias por contactarte con nosotros";
-        const mensajeAUsuario = `Hola ${nombre},
-
-Gracias por contactarte con nosotros. Enseguida te responderemos.
-
-Saludos cordiales,
-El equipo`;
-
-        // Enviar correo al usuario
-        enviarCorreo(emailUsuario, asuntoUsuario, mensajeAUsuario)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(response.mensaje);
+           <!-- Back to top button -->
+        <div id="back-to-top" class="back-to-top">
+            <i class="fas fa-arrow-up"></i>
+        </div>
+    
+        <!-- Scripts -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="/static/js/components.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Cargar componentes
+                loadNavbar();
+                loadFooter();
+                setupScrollToTop();
+                setupContactForm();
+                setupSmoothScroll();
+                
+                // Inicializar animaciones
+                initAnimations();
+            });
+    
+            // Cargar el navbar
+            function loadNavbar() {
+                fetch('/static/html/navbar.html')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al cargar el navbar');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        document.getElementById('navbar-container').innerHTML = html;
+                        
+                        // Activar el ítem de inicio en el navbar
+                        const navItems = document.querySelectorAll('#navbar-container .nav-link');
+                        navItems.forEach(item => {
+                            if (item.getAttribute('href') === '/' || item.getAttribute('href') === '/index.html') {
+                                item.classList.add('active', 'text-blue-600');
+                                item.classList.remove('text-gray-600');
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('navbar-container').innerHTML = `
+                            <div class="bg-red-100 text-red-700 p-4">Error al cargar el navbar</div>
+                        `;
+                    });
             }
-            return response.json();
-        })
-        .then(() => {
-            // Enviar correo al propietario con el mensaje del usuario
-            const emailPropietario = "fjuansimon@gmail.com"; // Pasa esta variable desde tu backend
-            const asuntoPropietario = `Nuevo mensaje de ${nombre}`;
-            const mensajeAPropietario = `Has recibido un nuevo mensaje de ${nombre} (${emailUsuario}):${mensajeUsuario}`;
-
-            return enviarCorreo(emailPropietario, asuntoPropietario, mensajeAPropietario);
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la solicitud al enviar correo al propietario: ' + response);
+    
+            // Cargar el footer
+            function loadFooter() {
+                fetch('/static/html/footer.html')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al cargar el footer');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        document.getElementById('footer-container').innerHTML = html;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('footer-container').innerHTML = `
+                            <div class="bg-red-100 text-red-700 p-4">Error al cargar el footer</div>
+                        `;
+                    });
             }
-            return response.json();
-        })
-        .then(() => {
-            alert('Gracias por contactarte con nosotros, enseguida te responderemos.');
-            document.getElementById('contact-form').reset();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ocurrió un error al enviar el mensaje: ' + error.message);
-        });
-    });
-
-    function enviarCorreo(destinatario, asunto, mensaje) {
-        return fetch('/envios/enviar_correo', { // Actualizado con el prefijo /envios
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                destinatario: destinatario,
-                asunto: asunto,
-                mensaje: mensaje
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la solicitud: ' + response.statusText);
+    
+            // Configurar el botón de volver arriba
+            function setupScrollToTop() {
+                const backToTopButton = document.getElementById('back-to-top');
+                
+                // Mostrar/ocultar el botón según el scroll
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 300) {
+                        backToTopButton.classList.add('visible');
+                    } else {
+                        backToTopButton.classList.remove('visible');
+                    }
+                });
+                
+                // Acción de volver arriba al hacer clic
+                backToTopButton.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
             }
-            return response.json();
-        });
-    }
-</script>
-
-
-
-<script>
-    // Mostrar el botón de flecha cuando el usuario se desplaza hacia abajo
-    window.addEventListener('scroll', function() {
-        const backToTopButton = document.getElementById('back-to-top');
-        if (window.scrollY > 300) {
-            backToTopButton.style.display = 'block';
-        } else {
-            backToTopButton.style.display = 'none';
-        }
-    });
-
-    // Desplazar hacia arriba cuando se hace clic en el botón de flecha
-    document.getElementById('back-to-top').addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-</script>
-</body>
-</html>
+    
+            // Configurar el formulario de contacto
+            function setupContactForm() {
+                const contactForm = document.getElementById('contact-form');
+                const sendingMessage = document.getElementById('sending-message');
+                
+                if (contactForm) {
+                    contactForm.addEventListener('submit', async function(event) {
+                        event.preventDefault();
+                        
+                        // Mostrar indicador de envío
+                        sendingMessage.style.display = 'flex';
+                        
+                        // Obtener los datos del formulario
+                        const formData = {
+                            nombre: document.getElementById('nombre').value,
+                            email: document.getElementById('email').value,
+                            mensaje: document.getElementById('mensaje').value
+                        };
+                        
+                        try {
+                            // Simulación de envío (reemplazar con tu endpoint real)
+                            await new Promise(resolve => setTimeout(resolve, 1500));
+                            
+                            // Limpiar formulario
+                            contactForm.reset();
+                            
+                            // Ocultar indicador de envío
+                            sendingMessage.style.display = 'none';
+                            
+                            // Mostrar mensaje de éxito
+                            showToast('¡Mensaje enviado correctamente! Nos pondremos en contacto pronto.', 'success');
+                        } catch (error) {
+                            console.error('Error al enviar el formulario:', error);
+                            sendingMessage.style.display = 'none';
+                            showToast('Hubo un error al enviar el mensaje. Por favor, inténtalo nuevamente.', 'error');
+                        }
+                    });
+                }
+            }
+    
+            // Configurar scroll suave para los enlaces internos
+            function setupSmoothScroll() {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        const targetId = this.getAttribute('href');
+                        if (targetId === '#') return;
+                        
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+            }
+    
+            // Inicializar animaciones de entrada
+            function initAnimations() {
+                // Animación para las tarjetas de características
+                const featureCards = document.querySelectorAll('.feature-card');
+                animateElementsOnScroll(featureCards, 'transform: translateY(20px); opacity: 0', 'transform: translateY(0); opacity: 1', 100);
+                
+                // Animación para los testimonios
+                const testimonials = document.querySelectorAll('#testimonials .bg-gray-50');
+                animateElementsOnScroll(testimonials, 'transform: scale(0.9); opacity: 0', 'transform: scale(1); opacity: 1', 150);
+            }
+    
+            // Función para animar elementos al hacer scroll
+            function animateElementsOnScroll(elements, initialStyle, finalStyle, delay = 0) {
+                if (!elements || elements.length === 0) return;
+                
+                // Configurar estilos iniciales
+                elements.forEach((el, index) => {
+                    el.style.transition = 'all 0.6s ease-out';
+                    el.style.transitionDelay = `${delay * index}ms`;
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+                });
+                
+                // Función para verificar si un elemento está en el viewport
+                function isElementInViewport(el) {
+                    const rect = el.getBoundingClientRect();
+                    return (
+                        rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.85 &&
+                        rect.bottom >= 0
+                    );
+                }
+                
+                // Función para mostrar elementos visibles
+                function showVisibleElements() {
+                    elements.forEach(el => {
+                        if (isElementInViewport(el) && el.style.opacity === '0') {
+                            el.style.opacity = '1';
+                            el.style.transform = 'translateY(0)';
+                        }
+                    });
+                }
+                
+                // Verificar elementos visibles al cargar y en scroll
+                showVisibleElements();
+                window.addEventListener('scroll', showVisibleElements);
+            }
+    
+            // Mostrar un mensaje toast
+            function showToast(message, type = 'info') {
+                // Crear el toast si no existe
+                let toast = document.getElementById('toast');
+                
+                if (!toast) {
+                    toast = document.createElement('div');
+                    toast.id = 'toast';
+                    toast.style.position = 'fixed';
+                    toast.style.bottom = '20px';
+                    toast.style.left = '50%';
+                    toast.style.transform = 'translateX(-50%)';
+                    toast.style.padding = '12px 24px';
+                    toast.style.borderRadius = '8px';
+                    toast.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+                    toast.style.zIndex = '1000';
+                    toast.style.transition = 'all 0.3s ease-in-out';
+                    toast.style.opacity = '0';
+                    document.body.appendChild(toast);
+                }
+                
+                // Establecer estilos según el tipo
+                switch (type) {
+                    case 'success':
+                        toast.style.backgroundColor = '#10B981';
+                        toast.style.color = 'white';
+                        break;
+                    case 'error':
+                        toast.style.backgroundColor = '#EF4444';
+                        toast.style.color = 'white';
+                        break;
+                    case 'warning':
+                        toast.style.backgroundColor = '#F59E0B';
+                        toast.style.color = 'white';
+                        break;
+                    default:
+                        toast.style.backgroundColor = '#3B82F6';
+                        toast.style.color = 'white';
+                }
+                
+                // Establecer el mensaje
+                toast.textContent = message;
+                
+                // Mostrar el toast
+                toast.style.opacity = '1';
+                
+                // Ocultar después de 5 segundos
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    
+                    // Eliminar el elemento después de la transición
+                    setTimeout(() => {
+                        if (document.body.contains(toast)) {
+                            document.body.removeChild(toast);
+                        }
+                    }, 300);
+                }, 5000);
+            }
+            
+            // Opción para precargar imágenes
+            function preloadImages(images) {
+                for (const src of images) {
+                    const img = new Image();
+                    img.src = src;
+                }
+            }
+            
+            // Precargar imágenes importantes
+            preloadImages([
+                '/static/img/dashboard_illustration.svg',
+                '/static/img/diagrama_app.jpg'
+            ]);
+        </script>
+    </body>
+    </html>

@@ -102,8 +102,8 @@
                     console.log('Token de acceso recibido:', data.access_token);  // Imprimir el token en la consola
                     // Almacenar el token en localStorage
                     localStorage.setItem('access_token', data.access_token);
-                    // Redirigir al usuario a '/admin/page'
-                    window.location.href = '/admin/page';
+                    // Redirigir al usuario a '/admin/'
+                    window.location.href = '/admin';
                 } else {
                     document.getElementById('message').textContent = 'Nombre de usuario o contraseña incorrectos';
                 }
