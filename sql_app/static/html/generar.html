@@ -60,46 +60,254 @@
             </div>
         </div>
       
-        <!-- Panel de generación de aplicaciones -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mb-6">
-            <div class="border-b border-gray-200">
-                <nav class="flex flex-wrap">
-                    <button class="px-6 py-4 text-gray-700 font-medium border-b-2 border-indigo-500 focus:outline-none">
-                        <i class="fas fa-plus-circle mr-2 text-indigo-500"></i>
-                        Nueva Aplicación
-                    </button>
-                    <button class="px-6 py-4 text-gray-500 hover:text-gray-700 font-medium border-b-2 border-transparent hover:border-gray-300 focus:outline-none">
-                        <i class="fas fa-file-code mr-2"></i>
-                        Plantillas
-                    </button>
-                    <button class="px-6 py-4 text-gray-500 hover:text-gray-700 font-medium border-b-2 border-transparent hover:border-gray-300 focus:outline-none">
-                        <i class="fas fa-history mr-2"></i>
-                        Historial
-                    </button>
-                </nav>
+          <!-- Modificar la sección de navegación para habilitar las pestañas -->
+        <div class="border-b border-gray-200">
+            <nav class="flex flex-wrap">
+                <button id="tab-nueva-app" class="tab-button px-6 py-4 text-gray-700 font-medium border-b-2 border-indigo-500 focus:outline-none active">
+                    <i class="fas fa-plus-circle mr-2 text-indigo-500"></i>
+                    Nueva Aplicación
+                </button>
+                <button id="tab-plantillas" class="tab-button px-6 py-4 text-gray-500 hover:text-gray-700 font-medium border-b-2 border-transparent hover:border-gray-300 focus:outline-none">
+                    <i class="fas fa-file-code mr-2"></i>
+                    Plantillas
+                </button>
+                <button id="tab-historial" class="tab-button px-6 py-4 text-gray-500 hover:text-gray-700 font-medium border-b-2 border-transparent hover:border-gray-300 focus:outline-none">
+                    <i class="fas fa-history mr-2"></i>
+                    Historial
+                </button>
+            </nav>
+        </div>
+        
+        <div class="p-6">
+            <!-- Tab de Nueva Aplicación - Contenido existente -->
+            <div id="content-nueva-app" class="tab-content block">
+                <form id="generador" action="/generar/generate" method="post" class="space-y-6">
+                    <!-- Contenido del formulario existente -->
+                    <!-- ... -->
+                </form>
             </div>
             
-            <div class="p-6">
-                <form id="generador" action="/generar/generate" method="post" class="space-y-6">
-                    <!-- Nombre del módulo -->
-                    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                                <i class="fas fa-cube text-indigo-600"></i>
-                            </div>
-                            <h2 class="text-xl font-bold text-gray-800">Información del Módulo</h2>
-                        </div>
-                        
+            <!-- Tab de Plantillas - Nuevo contenido -->
+            <div id="content-plantillas" class="tab-content hidden">
+                <div class="mb-6">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-gray-800">Plantillas disponibles</h2>
                         <div>
-                            <label for="module_name" class="block text-gray-700 font-medium mb-2">Nombre del módulo:</label>
-                            <input type="text" id="module_name" name="module_name" placeholder="Ej: productos, usuarios, ventas..." 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
-                            <p class="mt-2 text-sm text-gray-500">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                El nombre debe ser en plural y en minúsculas sin espacios.
-                            </p>
+                            <button class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-md hover:bg-indigo-200 flex items-center">
+                                <i class="fas fa-file-import mr-2"></i>
+                                Importar plantilla
+                            </button>
                         </div>
                     </div>
+                    <p class="text-gray-500 mt-1">Utiliza estas plantillas predefinidas para generar módulos comunes rápidamente</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <!-- Plantilla de Usuarios -->
+                    <div class="card-hover bg-white border border-gray-200 rounded-lg p-5 relative">
+                        <span class="absolute top-3 right-3 bg-blue-500 text-white text-xs px-2 py-1 rounded">Administración</span>
+                        <div class="flex items-center mb-3">
+                            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Gestión de Usuarios</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">Un módulo completo para administrar usuarios con autenticación.</p>
+                        <div class="mt-2 text-xs text-gray-500 flex flex-wrap gap-1 mb-4">
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">id (int)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">username (str)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">email (str)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">password (str)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">role (str)</span>
+                        </div>
+                        <button class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors flex items-center justify-center">
+                            <i class="fas fa-file-import mr-2"></i> Usar plantilla
+                        </button>
+                    </div>
+                    
+                    <!-- Plantilla de Productos -->
+                    <div class="card-hover bg-white border border-gray-200 rounded-lg p-5 relative">
+                        <span class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded">Inventario</span>
+                        <div class="flex items-center mb-3">
+                            <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Catálogo de Productos</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">Gestión completa de productos con categorías y precios.</p>
+                        <div class="mt-2 text-xs text-gray-500 flex flex-wrap gap-1 mb-4">
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">id (int)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">name (str)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">description (str)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">price (float)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">stock (int)</span>
+                        </div>
+                        <button class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors flex items-center justify-center">
+                            <i class="fas fa-file-import mr-2"></i> Usar plantilla
+                        </button>
+                    </div>
+                    
+                    <!-- Plantilla de Ventas -->
+                    <div class="card-hover bg-white border border-gray-200 rounded-lg p-5 relative">
+                        <span class="absolute top-3 right-3 bg-yellow-500 text-white text-xs px-2 py-1 rounded">Comercial</span>
+                        <div class="flex items-center mb-3">
+                            <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 mr-3">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Sistema de Ventas</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">Registro completo de ventas con relaciones a clientes y productos.</p>
+                        <div class="mt-2 text-xs text-gray-500 flex flex-wrap gap-1 mb-4">
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">id (int)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">date (date)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">client_id (int)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">total (float)</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded-full">status (str)</span>
+                        </div>
+                        <button class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors flex items-center justify-center">
+                            <i class="fas fa-file-import mr-2"></i> Usar plantilla
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-5">
+                    <h2 class="text-lg font-bold text-gray-800 mb-2">Mis plantillas guardadas</h2>
+                    <p class="text-gray-500">Plantillas que has creado y guardado para uso futuro</p>
+                </div>
+                
+                <div class="border border-dashed border-gray-300 rounded-lg p-10 flex flex-col items-center justify-center bg-gray-50">
+                    <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mb-4">
+                        <i class="fas fa-save text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-600 mb-2">No hay plantillas guardadas</h3>
+                    <p class="text-gray-500 text-center mb-4">Las configuraciones que guardes aparecerán aquí para reutilizarlas</p>
+                    <button class="px-4 py-2 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded flex items-center">
+                        <i class="fas fa-plus-circle mr-2"></i>
+                        Guardar configuración actual como plantilla
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Tab de Historial - Nuevo contenido -->
+            <div id="content-historial" class="tab-content hidden">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Historial de generación</h2>
+                    <p class="text-gray-500 mt-1">Registro de todas las generaciones realizadas recientemente</p>
+                </div>
+                
+                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
+                    <div class="p-4 border-b border-gray-200 bg-gray-50">
+                        <div class="flex flex-col md:flex-row md:justify-between md:items-center">
+                            <div class="flex items-center mb-4 md:mb-0">
+                                <h3 class="font-medium text-gray-700">Módulos generados recientemente</h3>
+                                <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">10 entradas</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" placeholder="Buscar..." class="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                <select class="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                    <option value="all">Todos los tipos</option>
+                                    <option value="crud">CRUD</option>
+                                    <option value="service">Servicio</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Módulo</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Campos</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">21/03/2025 14:30</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">productos</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Servicio</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">5</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <button class="text-indigo-600 hover:text-indigo-900">Ver</button>
+                                        <button class="text-green-600 hover:text-green-900">Regenerar</button>
+                                        <button class="text-blue-600 hover:text-blue-900">Guardar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">21/03/2025 12:15</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">usuarios</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">CRUD</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <button class="text-indigo-600 hover:text-indigo-900">Ver</button>
+                                        <button class="text-green-600 hover:text-green-900">Regenerar</button>
+                                        <button class="text-blue-600 hover:text-blue-900">Guardar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">20/03/2025 09:45</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">ventas</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Servicio</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">6</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <button class="text-indigo-600 hover:text-indigo-900">Ver</button>
+                                        <button class="text-green-600 hover:text-green-900">Regenerar</button>
+                                        <button class="text-blue-600 hover:text-blue-900">Guardar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="bg-gray-50 px-4 py-3 border-t border-gray-200 sm:px-6">
+                        <div class="flex justify-between items-center">
+                            <div class="text-sm text-gray-700">
+                                Mostrando <span class="font-medium">1</span> a <span class="font-medium">3</span> de <span class="font-medium">10</span> resultados
+                            </div>
+                            <div>
+                                <nav class="relative z-0 inline-flex shadow-sm -space-x-px" aria-label="Pagination">
+                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Anterior</span>
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600 hover:bg-gray-50">
+                                        1
+                                    </a>
+                                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        2
+                                    </a>
+                                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        3
+                                    </a>
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                                        ...
+                                    </span>
+                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Siguiente</span>
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+     
 
                     <!-- Campos del módulo -->
                     <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
@@ -312,6 +520,64 @@
                     return;
                 }
             }
+        });
+    </script>
+       <!-- Agregar al script existente para manejar el cambio de pestañas -->
+       <script>
+        // Código existente...
+        
+        // Funcionalidad de pestañas
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            function switchTab(tabId) {
+                // Ocultar todos los contenidos
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                    content.classList.remove('block');
+                });
+                
+                // Mostrar el contenido seleccionado
+                document.getElementById('content-' + tabId).classList.remove('hidden');
+                document.getElementById('content-' + tabId).classList.add('block');
+                
+                // Actualizar estilos de los botones
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('border-indigo-500', 'text-gray-700');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                });
+                
+                document.getElementById('tab-' + tabId).classList.remove('border-transparent', 'text-gray-500');
+                document.getElementById('tab-' + tabId).classList.add('border-indigo-500', 'text-gray-700');
+            }
+            
+            // Asignar eventos de clic a los botones de pestañas
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.id.replace('tab-', '');
+                    switchTab(tabId);
+                });
+            });
+            
+            // Inicializar en la primera pestaña
+            switchTab('nueva-app');
+            
+            // Funcionalidad para los botones de usar plantilla
+            document.querySelectorAll('#content-plantillas button').forEach(btn => {
+                if (btn.textContent.includes('Usar plantilla')) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const templateTitle = this.closest('.card-hover').querySelector('h3').textContent;
+                        
+                        // Aquí puedes implementar la lógica para cargar la plantilla
+                        alert('Cargando plantilla: ' + templateTitle);
+                        
+                        // Cambiar a la pestaña de nueva aplicación
+                        switchTab('nueva-app');
+                    });
+                }
+            });
         });
     </script>
 </body>

@@ -120,7 +120,7 @@ async def migraciones_page(
     request: Request,
     current_user = Depends(get_current_user)  # Eliminada la anotación de tipo
 ):
-    return templates.TemplateResponse("migraciones_nueva.html", {"request": request, "user": current_user})
+    return templates.TemplateResponse("/migraciones/migraciones_nueva.html", {"request": request, "user": current_user})
 @router.post("/upload")
 async def upload_migracion_file(
     request: Request,
@@ -240,7 +240,7 @@ async def get_all_results(
         # El resto del código permanece igual...
         if not os.path.exists(user_results_dir):
             return templates.TemplateResponse(
-                "migraciones_results.html",
+                "/migraciones/migraciones_results.html",
                 {
                     "request": request,
                     "message": "No se encontraron resultados para este usuario."
@@ -262,7 +262,7 @@ async def get_all_results(
                 results.append(result)
 
         return templates.TemplateResponse(
-            "migraciones_results.html",
+            "/migraciones/migraciones_results.html",
             {
                 "request": request,
                 "results": results
@@ -271,7 +271,7 @@ async def get_all_results(
     except Exception as e:
         logging.error(f"Error al obtener los resultados: {str(e)}")
         return templates.TemplateResponse(
-            "migraciones_results.html",
+            "/migraciones/migraciones_results.html",
             {
                 "request": request,
                 "error": f"Error al obtener los resultados: {str(e)}"
@@ -324,7 +324,7 @@ async def admin_migraciones_page(
     
         # Renderizar la plantilla
         return templates.TemplateResponse(
-            "migraciones_admin.html",
+            "/migraciones/migraciones_admin.html",
             {
                 "request": request,
                 "user": current_user,
@@ -347,7 +347,7 @@ async def migraciones_tablas(
     tables1, tables2 = get_tables(db)
 
     return templates.TemplateResponse(
-        "migraciones_tablas.html",
+        "/migraciones/migraciones_tablas.html",
         {
             "request": request,
             "user": current_user,

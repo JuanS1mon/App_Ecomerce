@@ -59,7 +59,183 @@
             color: #1e40af !important;
             border: 1px solid #bfdbfe;
         }
+        
     </style>
+        <style>
+            /* Estilos existentes... */
+            
+            /* Mejoras para la tabla de datos */
+            #data-table {
+                border-collapse: separate;
+                border-spacing: 0;
+                width: 100%;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+            
+            #data-table thead th {
+                background-color: #f9fafb;
+                color: #111827;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                padding: 12px 16px;
+                border-bottom: 2px solid #e5e7eb;
+            }
+            
+            #data-table tbody tr {
+                transition: all 0.2s ease;
+            }
+            
+            #data-table tbody tr:hover {
+                background-color: rgba(59, 130, 246, 0.05);
+                transform: translateY(-1px);
+            }
+            
+            #data-table tbody td {
+                padding: 12px 16px;
+                vertical-align: middle;
+            }
+            
+            /* Estilos para los controles de DataTables */
+            .dataTables_wrapper .dataTables_length select {
+                border-radius: 0.375rem;
+                padding: 4px 24px 4px 8px;
+                border: 1px solid #d1d5db;
+                background-color: white;
+            }
+            
+            .dataTables_wrapper .dataTables_filter input {
+                border-radius: 0.375rem;
+                padding: 6px 10px;
+                border: 1px solid #d1d5db;
+                background-color: white;
+                margin-left: 8px;
+            }
+            
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                border-radius: 0.375rem;
+                padding: 6px 12px;
+                margin: 0 2px;
+                transition: all 0.2s;
+            }
+            
+            /* Estado vacío personalizado */
+            .empty-state {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 3rem 1rem;
+                text-align: center;
+            }
+            
+            .empty-state-icon {
+                font-size: 3rem;
+                color: #9ca3af;
+                margin-bottom: 1rem;
+            }
+            
+            /* Personalización del selector de tablas */
+            .select2-container .select2-selection--single {
+                height: 45px;
+                border: 1px solid #d1d5db;
+                border-radius: 0.5rem;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                transition: all 0.2s;
+            }
+            
+            .select2-container .select2-selection--single:focus {
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+            }
+            
+            .select2-container .select2-selection--single .select2-selection__rendered {
+                line-height: 45px;
+                padding-left: 15px;
+                padding-right: 30px;
+            }
+            
+            .select2-container .select2-selection--single .select2-selection__arrow {
+                height: 45px;
+                width: 30px;
+            }
+            
+            .select2-dropdown {
+                border-radius: 0.5rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                border: 1px solid #e5e7eb;
+                overflow: hidden;
+            }
+            
+            .select2-container--default .select2-results__option--highlighted[aria-selected] {
+                background-color: #3b82f6;
+            }
+            
+            /* Indicador de carga más elegante */
+            .fancy-spinner {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .fancy-spinner div {
+                position: absolute;
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+            }
+            
+            .fancy-spinner div.ring {
+                border: 3px solid transparent;
+                border-top-color: #3b82f6;
+                animation: spin 0.8s linear infinite;
+            }
+            
+            .fancy-spinner div.ring:nth-child(1) {
+                width: 45px;
+                height: 45px;
+                border-width: 3px;
+                animation-delay: 0s;
+            }
+            
+            .fancy-spinner div.ring:nth-child(2) {
+                width: 35px;
+                height: 35px;
+                border-width: 2px;
+                border-top-color: #60a5fa;
+                animation-delay: 0.2s;
+            }
+            
+            .fancy-spinner div.dot {
+                width: 15px;
+                height: 15px;
+                background: #3b82f6;
+            }
+            
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+            
+            /* Celdas con valores numéricos */
+            .numeric-cell {
+                text-align: right;
+                font-family: 'Roboto Mono', monospace;
+                font-variant-numeric: tabular-nums;
+            }
+            
+            /* Estilizado de filas alternantes */
+            #data-table tbody tr:nth-child(even) {
+                background-color: #fafafa;
+            }
+        </style>
+
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navbar - Se cargará dinámicamente -->
