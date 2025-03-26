@@ -9,6 +9,18 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 import logging
+from Services.security.security import (ACCESS_TOKEN_DURATION,authenticate_user,current_user,encriptar_clave,verificar_clave,crear_access_token,access_token_expires,decodifica_token)
+from Services.mail.mail import enviar_correo, validar_email
+from Services.comunicacion.whassap import enviar_mensaje_whatsapp, validar_telefono
+
+from db.crud.config.Usuarios import (get_usuario,create_usuario,update_usuario_activate)
+from db.database import get_db
+from db.schemas.config.Usuarios import (UserDB,PasswordReset,PasswordResetRequest)
+from db.models.config.usuarios import usuarios as UsuariosModel
+
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
+from starlette.requests import Request
 
 # Instancias de FastAPI y dependencias
 router = APIRouter(
@@ -17,35 +29,7 @@ router = APIRouter(
     responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
 )
 
-from Services.security.security import (
-    ACCESS_TOKEN_DURATION,
-    authenticate_user,
-    current_user,
-    encriptar_clave,
-    verificar_clave,
-    crear_access_token,
-    access_token_expires,
-    decodifica_token
-)
-from Services.mail import enviar_correo, validar_email
-from Services.whassap import enviar_mensaje_whatsapp, validar_telefono
 
-from db.crud.config.Usuarios import (
-    get_usuario,
-    create_usuario,
-    update_usuario_activate
-)
-from db.database import get_db
-from db.schemas.config.Usuarios import (
-    UserDB,
-    PasswordReset,
-    PasswordResetRequest
-)
-from db.models.config.usuarios import usuarios as UsuariosModel
-
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
-from starlette.requests import Request
 
 # Configuración de logging
 logging.basicConfig(level=logging.INFO)

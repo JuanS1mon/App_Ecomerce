@@ -626,3 +626,211 @@ async def listar_roles(
             })
     
     return roles_response
+
+@router.get("/rol/tecnico", response_model=List[Dict[str, Any]])
+async def obtener_lista_tecnicos(
+    db: Session = Depends(get_db),
+    user: UserSchema = Depends(current_user)
+):
+    """
+    Retorna una lista básica de usuarios técnicos (compatibilidad con versión anterior)
+    """
+    # Redirigir a la nueva función más genérica
+    return await obtener_usuarios_por_rol(db=db, user=user, rol="tecnico")
+
+@router.get("/usuarios-por-rol/", response_model=List[Dict[str, Any]])
+async def obtener_usuarios_por_rol(
+    db: Session = Depends(get_db),
+    user: UserSchema = Depends(current_user),
+    rol: Optional[str] = None
+):
+    """
+    Retorna una lista básica de usuarios para selectores (sin información sensible)
+    Filtra por rol especificado como parámetro de consulta (opcional)
+    """
+    try:
+        # Importar modelos necesarios
+        from db.models.config.usuarios import usuarios as UsuariosModel
+        from db.models.config.roles import roles as RolesModel
+        from db.models.config.usuarios_rol import usuarios_rol as UsuariosRolModel
+        from sqlalchemy import text
+        
+        usuarios_filtrados = []
+        
+        # Si se especifica un rol, filtrar por ese rol
+        if rol:
+            print(f"Buscando usuarios con rol: {rol}")
+            query = text("""
+                SELECT u.codigo, u.usuario, u.nombre, u.mail
+                FROM usuarios u
+                JOIN UsuariosRol ur ON u.codigo = ur.usuario_id
+                JOIN Roles r ON ur.rol_id = r.id
+                WHERE r.nombre = :rol AND u.activo = 1
+                ORDER BY u.nombre, u.usuario
+            """)
+            
+            result = db.execute(query, {"rol": rol})
+            
+            for row in result:
+                usuarios_filtrados.append({
+                    "id": row[0],
+                    "usuario": row[1],
+                    "nombre": row[2] or row[1],
+                    "email": row[3]
+                })
+                
+            # Si no encontramos usuarios con ese rol pero el rol es 'tecnico',
+            # podemos buscar roles similares como soporte, helpdesk, etc.
+            if not usuarios_filtrados and rol.lower() == "tecnico":
+                print("Buscando roles alternativos para soporte técnico...")
+                query = text("""
+                    SELECT u.codigo, u.usuario, u.nombre, u.mail
+                    FROM usuarios u
+                    JOIN UsuariosRol ur ON u.codigo = ur.usuario_id
+                    JOIN Roles r ON ur.rol_id = r.id
+                    WHERE r.nombre IN ('soporte', 'helpdesk', 'it', 'support') AND u.activo = 1
+                    ORDER BY u.nombre, u.usuario
+                """)
+                
+                result = db.execute(query)
+                
+                for row in result:
+                    usuarios_filtrados.append({
+                        "id": row[0],
+                        "usuario": row[1],
+                        "nombre": row[2] or row[1],
+                        "email": row[3]
+                    })
+            
+        # Si no se especificó rol o no se encontraron usuarios con ese rol,
+        # devolver todos los usuarios activos
+        if not usuarios_filtrados:
+            if rol:
+                print(f"No se encontraron usuarios con rol '{rol}'. Devolviendo todos los usuarios activos.")
+            else:
+                print("No se especificó rol. Devolviendo todos los usuarios activos.")
+                
+            query = text("""
+                SELECT u.codigo, u.usuario, u.nombre, u.mail
+                FROM usuarios u
+                WHERE u.activo = 1
+                ORDER BY u.nombre, u.usuario
+            """)
+            
+            result = db.execute(query)
+            
+            for row in result:
+                usuarios_filtrados.append({
+                    "id": row[0],
+                    "usuario": row[1],
+                    "nombre": row[2] or row[1],
+                    "email": row[3]
+                })
+        
+        # Si aún no encontramos usuarios, devolver una lista predeterminada
+        if not usuarios_filtrados:
+            print("No se encontraron usuarios activos. Devolviendo lista predeterminada.")
+            if rol and rol.lower() == "tecnico":
+                usuarios_filtrados = [
+                    {"id": 1, "usuario": "soporte", "nombre": "Soporte Nivel 1", "email": "soporte@example.com"},
+                    {"id": 2, "usuario": "tecnico", "nombre": "Técnico Nivel 2", "email": "tecnico@example.com"}
+                ]
+            else:
+                usuarios_filtrados = [
+                    {"id": 1, "usuario": "soporte", "nombre": "Soporte Nivel 1", "email": "soporte@example.com"},
+                    {"id": 2, "usuario": "tecnico", "nombre": "Técnico Nivel 2", "email": "tecnico@example.com"},
+                    {"id": 3, "usuario": "admin", "nombre": "Administrador", "email": "admin@example.com"}
+                ]
+        
+        return usuarios_filtrados
+    
+    except Exception as e:
+        print(f"Error al obtener lista de usuarios: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        # En caso de error, devolver una lista predeterminada
+        if rol and rol.lower() == "tecnico":
+            return [
+                {"id": 1, "usuario": "soporte", "nombre": "Soporte Nivel 1", "email": "soporte@example.com"},
+                {"id": 2, "usuario": "tecnico", "nombre": "Técnico Nivel 2", "email": "tecnico@example.com"}
+            ]
+        else:
+            return [
+                {"id": 1, "usuario": "soporte", "nombre": "Soporte Nivel 1", "email": "soporte@example.com"},
+                {"id": 2, "usuario": "tecnico", "nombre": "Técnico Nivel 2", "email": "tecnico@example.com"},
+                {"id": 3, "usuario": "admin", "nombre": "Administrador", "email": "admin@example.com"}
+            ]
+@router.get("/usuario-rol", response_model=Dict[str, Any])
+async def get_current_user_roles(
+    current_user: UserSchema = Depends(current_user)
+):
+    """Devuelve los roles del usuario actualmente autenticado"""
+    try:
+        # Acceso a la base de datos
+        db = next(get_db())
+        
+        # Importar modelos necesarios
+        from db.models.config.roles import roles as RolesModel
+        from db.models.config.usuarios_rol import usuarios_rol as UsuariosRolModel
+        
+        # Consultar los roles del usuario actual usando SQL directo para mayor compatibilidad
+        from sqlalchemy import text
+        
+        query = text("""
+            SELECT r.id, r.nombre, r.descripcion
+            FROM Roles r
+            JOIN UsuariosRol ur ON r.id = ur.rol_id
+            WHERE ur.usuario_id = :user_id
+        """)
+        
+        result = db.execute(query, {"user_id": current_user.codigo})
+        
+        roles = []
+        for row in result:
+            roles.append({
+                "id": row[0],
+                "nombre": row[1],
+                "descripcion": row[2] if row[2] else ""
+            })
+        
+        # Si no se encontraron roles, verificar si el usuario es administrador por otro medio
+        if not roles and hasattr(current_user, "es_admin") and current_user.es_admin:
+            roles.append({
+                "id": 1,
+                "nombre": "admin",
+                "descripcion": "Administrador del sistema"
+            })
+        
+        # Lista plana de nombres de roles para simplificar verificaciones en el frontend
+        role_names = [role["nombre"] for role in roles]
+        
+        return {
+            "roles": role_names,
+            "roles_detalle": roles,
+            "user_id": current_user.codigo,
+            "username": current_user.usuario
+        }
+    except Exception as e:
+        print(f"Error al obtener roles del usuario actual: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        # En caso de error, determinar si el usuario tiene acceso de administrador
+        # a través de la información disponible en el token
+        admin_access = False
+        if hasattr(current_user, "es_admin"):
+            admin_access = current_user.es_admin
+        
+        # Proporcionar una respuesta por defecto basada en información disponible
+        role_names = ["usuario"]
+        if admin_access:
+            role_names.append("admin")
+            
+        return {
+            "roles": role_names,
+            "roles_detalle": [{"id": 0, "nombre": role, "descripcion": ""} for role in role_names],
+            "user_id": getattr(current_user, "codigo", 0),
+            "username": getattr(current_user, "usuario", "usuario"),
+            "error": f"Error al consultar roles: {str(e)}"
+        }

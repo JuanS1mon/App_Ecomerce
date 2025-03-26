@@ -13,32 +13,23 @@ import os
 import httpx
 import traceback
 import importlib
-import logging
 
-# Configurar logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger("main")
-
-# Importamos nuestro gestor de servicios
-from Services.services_manager import ServicesManager
-from routers.config import service_manager
 
 # Importa lógica y módulos
 from db.database import Base, engine, get_db, create_database, create_tables
 from routers import usuarios as aut_usuario
 from routers import Blog
-from routers.config import Generar, configDB, Migraciones, Analisis, Scraping, usuarios_admin
+from routers.config import Generar, configDB, Migraciones,Analisis,Scraping, usuarios_admin
 
-# Rutas de los servicios core
+# Rutas de las app que agregamos
+from routers.Maestros import  Route_planilla_test, Route_articulos
+
+# Rutas de los servicios
 from Services.security.admin_roles import router as roles_router
-from Services.security.security import current_user
+from Services.security.security import  current_user
 from Services.mail import mail
+from Services.rubros  import route_rubros
+from Services.ticket import route_ticket
 
 from routers.config.Admin import create_admin_router
 
@@ -83,7 +74,7 @@ class CustomErrorMiddleware(BaseHTTPMiddleware):
         elif response.status_code == 401:
             return FileResponse('static/401.html', status_code=401)
         elif response.status_code == 403:
-            return FileResponse('static/403.html', status_code=403)
+            return FileResponse('static/403.html', status_code=403)  # Corregido: status_code=403
         return response
 
 # Agregar middlewares a la app
@@ -138,7 +129,7 @@ def create_all_tables():
 create_database()
 create_all_tables()
 
-# Rutas de API Core (no gestionadas dinámicamente)
+# Rutas de API
 app.include_router(aut_usuario.router)
 app.include_router(usuarios_admin.router)
 app.include_router(Generar.router)
@@ -151,56 +142,16 @@ app.include_router(mail.router)
 app.include_router(Scraping.router)
 app.include_router(roles_router)
 
-# Inicializar el gestor de servicios antes de incluir sus rutas
-services_manager = ServicesManager(app)
-service_manager.initialize_services_manager(services_manager)
-app.include_router(service_manager.router)
 
-# Verificar y crear directorios necesarios
-def ensure_directories():
-    """Asegura que existan los directorios necesarios para los servicios y maestros."""
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    directories = [
-        os.path.join(base_dir, "Services"),
-        os.path.join(base_dir, "routers", "Maestros")
-    ]
-    
-    for directory in directories:
-        if not os.path.exists(directory):
-            logger.info(f"Creando directorio: {directory}")
-            os.makedirs(directory, exist_ok=True)
+# Maestros
+app.include_router(Route_planilla_test.router)
+app.include_router(Route_articulos.router)
 
-# Cargar automáticamente servicios y maestros al inicio con manejo de errores
-@app.on_event("startup")
-async def startup_event():
-    """Eventos a ejecutar en el inicio de la aplicación."""
-    try:
-        # Asegurar que existan los directorios necesarios
-        ensure_directories()
-        
-        # Cargar servicios
-        logger.info("Iniciando carga de servicios dinámicos...")
-        
-        # Registrar servicios (con manejo de excepciones)
-        try:
-            service_results = services_manager.register_all_services()
-            logger.info(f"Servicios registrados: {len(service_results)} encontrados")
-        except Exception as e:
-            logger.error(f"Error al registrar servicios: {str(e)}")
-            logger.error(traceback.format_exc())
-        
-        # Registrar maestros (con manejo de excepciones)
-        try:
-            maestro_results = services_manager.register_all_maestros()
-            logger.info(f"Maestros registrados: {len(maestro_results)} encontrados")
-        except Exception as e:
-            logger.error(f"Error al registrar maestros: {str(e)}")
-            logger.error(traceback.format_exc())
-            
-        logger.info("Carga de servicios dinámicos completada.")
-    except Exception as e:
-        logger.error(f"Error durante el inicio de la aplicación: {str(e)}")
-        logger.error(traceback.format_exc())
+#Servicios
+app.include_router(route_ticket.router)
+app.include_router(route_rubros.router)
+
+
 
 # Ruta de inicio
 @app.get("/index", response_class=HTMLResponse, include_in_schema=False)
@@ -209,18 +160,22 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
     blog_posts = db.query(BlogPostModel).order_by(BlogPostModel.created_at.desc()).all()
     return templates.TemplateResponse("index.html", {"request": request, "blog_posts": blog_posts})
 
+
+
 # Ruta de términos y condiciones
 @app.get("/terminos", response_class=HTMLResponse, include_in_schema=False)
 async def get_terminos():
     with open("static/terminos.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read(), status_code=200)
     
-# Ruta de privacidad
+    
+# Ruta de términos y condiciones
 @app.get("/privacidad", response_class=HTMLResponse, include_in_schema=False)
-async def get_privacidad():
+async def get_terminos():
     with open("static/privacidad.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read(), status_code=200)
 
-@app.get("/admin", include_in_schema=False)
+@app.get("/admin" , include_in_schema=False)
 async def read_admin(current_user: UserDB = Depends(current_user)):
     return {"message": "Tienes acceso a esta ruta", "user": current_user.usuario}
+
