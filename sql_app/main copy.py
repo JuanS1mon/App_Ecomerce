@@ -22,14 +22,13 @@ from routers import Blog
 from routers.config import Generar, configDB, Migraciones,Analisis,Scraping, usuarios_admin
 
 # Rutas de las app que agregamos
-from routers.Maestros import  Route_planilla_test, Route_articulos
+from routers.Maestros import  Route_planilla_test
 
 # Rutas de los servicios
 from Services.security.admin_roles import router as roles_router
 from Services.security.security import  current_user
 from Services.mail import mail
-from Services.rubros  import route_rubros
-from Services.ticket import route_ticket
+
 
 from routers.config.Admin import create_admin_router
 
@@ -145,11 +144,10 @@ app.include_router(roles_router)
 
 # Maestros
 app.include_router(Route_planilla_test.router)
-app.include_router(Route_articulos.router)
+
 
 #Servicios
-app.include_router(route_ticket.router)
-app.include_router(route_rubros.router)
+
 
 
 

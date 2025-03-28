@@ -35,12 +35,15 @@ from routers import usuarios as aut_usuario
 from routers import Blog
 from routers.config import Generar, configDB, Migraciones, Analisis, Scraping, usuarios_admin
 
+
 # Rutas de los servicios core
 from Services.security.admin_roles import router as roles_router
 from Services.security.security import current_user
 from Services.mail import mail
-
+from Services.facu import  route_facu
 from routers.config.Admin import create_admin_router
+from Services.tickets import route_ticket
+
 
 from db.schemas.config.Usuarios import UserDB
 from db.models.Blog import BlogPost as BlogPostModel
@@ -150,13 +153,20 @@ app.include_router(Analisis.router)
 app.include_router(mail.router)
 app.include_router(Scraping.router)
 app.include_router(roles_router)
+app.include_router(route_facu.router)
+app.include_router(route_ticket.router)
 
 # Inicializar el gestor de servicios antes de incluir sus rutas
 services_manager = ServicesManager(app)
+# Importar modelos y crear tablas automáticamente
+services_manager.import_models()
+# Activar los servicios que estaban activos anteriormente
+services_manager.activate_saved_services()
+# Inicializar en el servicio service_manager
 service_manager.initialize_services_manager(services_manager)
 app.include_router(service_manager.router)
 
-# Verificar y crear directorios necesarios
+# Mover esta función antes del startup_event
 def ensure_directories():
     """Asegura que existan los directorios necesarios para los servicios y maestros."""
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -174,33 +184,25 @@ def ensure_directories():
 @app.on_event("startup")
 async def startup_event():
     """Eventos a ejecutar en el inicio de la aplicación."""
+    # Primero verificar directorios necesarios
+    ensure_directories()
+    
+    # Importar todos los modelos y crear tablas
     try:
-        # Asegurar que existan los directorios necesarios
-        ensure_directories()
-        
-        # Cargar servicios
-        logger.info("Iniciando carga de servicios dinámicos...")
-        
-        # Registrar servicios (con manejo de excepciones)
-        try:
-            service_results = services_manager.register_all_services()
-            logger.info(f"Servicios registrados: {len(service_results)} encontrados")
-        except Exception as e:
-            logger.error(f"Error al registrar servicios: {str(e)}")
-            logger.error(traceback.format_exc())
-        
-        # Registrar maestros (con manejo de excepciones)
-        try:
-            maestro_results = services_manager.register_all_maestros()
-            logger.info(f"Maestros registrados: {len(maestro_results)} encontrados")
-        except Exception as e:
-            logger.error(f"Error al registrar maestros: {str(e)}")
-            logger.error(traceback.format_exc())
-            
-        logger.info("Carga de servicios dinámicos completada.")
+        services_manager.import_models()
+        logger.info("Modelos importados y tablas creadas correctamente")
     except Exception as e:
-        logger.error(f"Error durante el inicio de la aplicación: {str(e)}")
-        logger.error(traceback.format_exc())
+        logger.error(f"Error al importar modelos: {str(e)}")
+    
+    # Activar servicios guardados
+    try:
+        activated = services_manager.activate_saved_services()
+        if activated:
+            logger.info("Servicios activados correctamente desde el estado guardado")
+        else:
+            logger.info("No hay servicios guardados para activar")
+    except Exception as e:
+        logger.error(f"Error al activar servicios guardados: {str(e)}")
 
 # Ruta de inicio
 @app.get("/index", response_class=HTMLResponse, include_in_schema=False)

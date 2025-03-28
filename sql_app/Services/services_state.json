@@ -1,0 +1,1 @@
+{"services": {"facu.route_facu": true, "facu_gay.route_facu_gay": true, "familias.route_familias": false, "prueba2.route_prueba2": true, "prueba3.route_prueba3": true, "test1.route_test1": true, "tickets.route_ticket": true}, "maestros": {"Route_facu": false, "Route_familias": false, "Route_planilla_test": false, "Route_test": false}}
