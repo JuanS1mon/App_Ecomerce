@@ -1,8 +1,11 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, MetaData, Table, inspect
 from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.ext.declarative import DeferredReflection
 from dotenv import load_dotenv
 import os
-from sqlalchemy.exc import OperationalError, InterfaceError, ProgrammingError
+import importlib
+import sys
+from sqlalchemy.exc import OperationalError, InterfaceError, ProgrammingError, NoReferencedTableError
 from fastapi import HTTPException
 
 # Cargar variables de entorno
@@ -111,14 +114,86 @@ def create_database():
     except (OperationalError, InterfaceError, ProgrammingError) as e:
         print(f"Error al crear la base de datos: {e}")
 
+# Función para cargar el modelo Roles primero
+def ensure_roles_model():
+    try:
+        # Intentar importar el modelo Roles existente
+        try:
+            importlib.import_module("db.models.roles")
+            print("Modelo Roles importado correctamente.")
+        except ImportError:
+            # Si no existe, crearlo
+            import os
+            models_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'db', 'models')
+            os.makedirs(models_dir, exist_ok=True)
+            
+            roles_file_path = os.path.join(models_dir, 'roles.py')
+            
+            if not os.path.exists(roles_file_path):
+                with open(roles_file_path, 'w') as f:
+                    f.write("""from sqlalchemy import Column, Integer, String
+from db.database import Base
+
+class Roles(Base):
+    __tablename__ = "Roles"
+    __table_args__ = {'extend_existing': True}
+    
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(50), unique=True)
+    descripcion = Column(String(255), nullable=True)
+""")
+                print(f"Modelo Roles creado en: {roles_file_path}")
+                # Recargar el módulo después de crearlo
+                importlib.import_module("db.models.roles")
+        
+        # Crear solo la tabla Roles primero
+        from sqlalchemy import MetaData
+        temp_metadata = MetaData()
+        for table_name, table in Base.metadata.tables.items():
+            if table_name == "Roles":
+                table.tometadata(temp_metadata)
+                temp_metadata.create_all(bind=engine)
+                print("Tabla Roles creada exitosamente.")
+                break
+                
+    except Exception as e:
+        print(f"Error al asegurar el modelo Roles: {e}")
+        import traceback
+        traceback.print_exc()
+
 # Crear las tablas en la base de datos
 def create_tables():
     try:
-        Base.metadata.create_all(bind=engine)
+        # Primero asegurar que exista la tabla Roles
+        ensure_roles_model()
+        
+        # Ahora crear el resto de las tablas
+        tables_to_create = []
+        for table_name, table in Base.metadata.tables.items():
+            if table_name != "Roles":  # Ya creamos Roles antes
+                tables_to_create.append(table)
+        
+        if tables_to_create:
+            # Crear todas las demás tablas
+            metadata = MetaData()
+            for table in tables_to_create:
+                table.tometadata(metadata)
+            metadata.create_all(bind=engine)
+            
         print("Tablas creadas exitosamente.")
+    except NoReferencedTableError as e:
+        print(f"Error de tabla referenciada: {e}")
+        # Si falla porque falta una tabla referenciada, intenta manejar caso por caso
+        if "Roles" in str(e):
+            ensure_roles_model()
+            # Intentar crear tablas nuevamente
+            Base.metadata.create_all(bind=engine)
     except (OperationalError, InterfaceError, ProgrammingError) as e:
         print(f"Error al crear tablas: {e}")
+        import traceback
+        traceback.print_exc()
 
-# Inicialización condicional
+# La base de datos se crea pero las tablas no se crean automáticamente
+# para evitar problemas de orden de creación
 create_database()  # Se omitirá en Heroku
-create_tables()    # Siempre se ejecuta
+# Las tablas se crearán explícitamente desde main.py

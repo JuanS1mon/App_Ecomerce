@@ -40,7 +40,6 @@ from routers.config import Generar, configDB, Migraciones, Analisis, Scraping, u
 from Services.security.admin_roles import router as roles_router
 from Services.security.security import current_user
 from Services.mail import mail
-from Services.facu import  route_facu
 from routers.config.Admin import create_admin_router
 from Services.tickets import route_ticket
 
@@ -153,7 +152,6 @@ app.include_router(Analisis.router)
 app.include_router(mail.router)
 app.include_router(Scraping.router)
 app.include_router(roles_router)
-app.include_router(route_facu.router)
 app.include_router(route_ticket.router)
 
 # Inicializar el gestor de servicios antes de incluir sus rutas
