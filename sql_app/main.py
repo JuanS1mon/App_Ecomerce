@@ -154,13 +154,10 @@ app.include_router(Scraping.router)
 app.include_router(roles_router)
 app.include_router(route_ticket.router)
 
-# Inicializar el gestor de servicios antes de incluir sus rutas
+# Crear el gestor de servicios ANTES de importar otros módulos
 services_manager = ServicesManager(app)
-# Importar modelos y crear tablas automáticamente
-services_manager.import_models()
-# Activar los servicios que estaban activos anteriormente
-services_manager.activate_saved_services()
-# Inicializar en el servicio service_manager
+
+# Importar y configurar servicio manager
 service_manager.initialize_services_manager(services_manager)
 app.include_router(service_manager.router)
 
@@ -178,29 +175,42 @@ def ensure_directories():
             logger.info(f"Creando directorio: {directory}")
             os.makedirs(directory, exist_ok=True)
 
-# Cargar automáticamente servicios y maestros al inicio con manejo de errores
+
 @app.on_event("startup")
 async def startup_event():
     """Eventos a ejecutar en el inicio de la aplicación."""
-    # Primero verificar directorios necesarios
-    ensure_directories()
+    logger.info("Iniciando aplicación...")
     
-    # Importar todos los modelos y crear tablas
+    # Importar modelos primero
     try:
         services_manager.import_models()
-        logger.info("Modelos importados y tablas creadas correctamente")
+        logger.info("Modelos importados correctamente.")
     except Exception as e:
         logger.error(f"Error al importar modelos: {str(e)}")
     
-    # Activar servicios guardados
+    # Activar servicios manualmente uno por uno 
     try:
-        activated = services_manager.activate_saved_services()
-        if activated:
-            logger.info("Servicios activados correctamente desde el estado guardado")
-        else:
-            logger.info("No hay servicios guardados para activar")
+        active_services = [s for s, active in services_manager.active_services.items() if active]
+        for service_id in active_services:
+            logger.info(f"Activando servicio: {service_id}")
+            try:
+                # Cargar el router directamente
+                router = services_manager.load_service(service_id)
+                if router:
+                    app.include_router(router)
+                    logger.info(f"Servicio {service_id} activado correctamente")
+                else:
+                    logger.error(f"No se pudo cargar el router para {service_id}")
+            except Exception as e:
+                logger.error(f"Error activando {service_id}: {str(e)}")
     except Exception as e:
-        logger.error(f"Error al activar servicios guardados: {str(e)}")
+        logger.error(f"Error al activar servicios: {str(e)}")
+        
+    logger.info("Verificando estado final de servicios...")
+    services_manager.check_services_state()
+    services_manager.diagnose_routes()
+
+    logger.info("Aplicación iniciada correctamente.")
 
 # Ruta de inicio
 @app.get("/index", response_class=HTMLResponse, include_in_schema=False)

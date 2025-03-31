@@ -1,1 +1,20 @@
-{"services": {"app_stock.route_stock_admin": true, "app_stock.articulos.route_articulos": false, "app_stock.articulos_series.route_articulos_series": false, "app_stock.articulos_tipos.route_articulos_tipos": false, "app_stock.depositos.route_depositos": false, "app_stock.depositos_tipo.route_depositos_tipo": false, "app_stock.empleados.route_empleados": false, "app_stock.stock_current.route_stock_current": false, "app_stock.stock_historico.route_stock_historico": false, "tickets.route_ticket": true}, "maestros": {"Route_facu": false, "Route_familias": false, "Route_planilla_test": false, "Route_test": false}}
+{
+    "services": {
+        "app_stock.route_stock_admin": true,
+        "app_stock.articulos.route_articulos": false,
+        "app_stock.articulos_series.route_articulos_series": false,
+        "app_stock.articulos_tipos.route_articulos_tipos": false,
+        "app_stock.depositos.route_depositos": false,
+        "app_stock.depositos_tipo.route_depositos_tipo": false,
+        "app_stock.empleados.route_empleados": false,
+        "app_stock.stock_current.route_stock_current": false,
+        "app_stock.stock_historico.route_stock_historico": false,
+        "tickets.route_ticket": true
+    },
+    "maestros": {
+        "Route_facu": false,
+        "Route_familias": false,
+        "Route_planilla_test": false,
+        "Route_test": false
+    }
+}

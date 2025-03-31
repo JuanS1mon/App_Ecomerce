@@ -65,21 +65,12 @@ def activate_saved_services(self):
     logger.info(f"Activados {activated_services} servicios y {activated_maestros} maestros según el estado guardado")
     return activated_services + activated_maestros > 0
 # Añade esta función para inicializar el gestor de servicios
-def initialize_services_manager(manager):
-    """Inicializa el gestor de servicios y carga todos los modelos automáticamente."""
+def initialize_services_manager(manager: ServicesManager):
+    """Inicializa el gestor de servicios global."""
     global services_manager
     services_manager = manager
-    
-    # Importar todos los modelos de servicios
-    import_service_models()
-    
-    # Crear tablas después de importar todos los modelos
-    from db.database import Base, engine
-    Base.metadata.create_all(bind=engine)
-    
     logger.info("Gestor de servicios inicializado correctamente")
-    
-    return services_manager
+    # No iniciar servicios ni importar modelos aquí
 
 def import_service_models():
     """Importa automáticamente todos los modelos de servicios."""
@@ -177,37 +168,124 @@ async def list_components_admin():
             detail=f"Error al listar componentes: {str(e)}"
         )
 
-@router.post("/{service_id}/activar", response_model=ServiceResponse)
-async def activate_service(service_id: str, background_tasks: BackgroundTasks):
-    """Activa un servicio específico."""
+@router.post("/{service_id}/force_activate", response_model=ServiceResponse)
+async def force_activate_service(service_id: str):
+    """Activa un servicio específico forzando su registro."""
     manager = get_services_manager()
     
     try:
-        # Activar en segundo plano para no bloquear la respuesta
-        def activate():
-            try:
-                success = manager.register_service(service_id)
-                logger.info(f"Servicio {service_id} {'activado' if success else 'no se pudo activar'}")
-            except Exception as e:
-                logger.error(f"Error al activar servicio {service_id}: {str(e)}")
-                
-        background_tasks.add_task(activate)
+        # Registrar el servicio con force=True para garantizar que se active
+        success = manager.register_service(service_id, force=True)
         
-        # Marcar como activo en la configuración
-        manager.active_services[service_id] = True
-        manager.save_state()
-        
-        return ServiceResponse(
-            status="success",
-            message=f"Servicio {service_id} marcado para activación"
-        )
+        if success:
+            # Verificar que realmente esté en app.routes
+            service_registered = False
+            if service_id in manager.services and "router" in manager.services[service_id]:
+                router = manager.services[service_id]["router"]
+                service_registered = any(
+                    getattr(route, "router", None) == router
+                    for route in manager.app.routes
+                )
+            
+            if service_registered:
+                logger.info(f"✅ Servicio {service_id} activado y verificado correctamente")
+                return ServiceResponse(
+                    status="success",
+                    message=f"Servicio {service_id} activado correctamente"
+                )
+            else:
+                logger.warning(f"⚠️ Error: El servicio {service_id} no se detectó en app.routes después del registro")
+                return ServiceResponse(
+                    status="warning",
+                    message=f"Servicio marcado como activo pero no registrado correctamente"
+                )
+        else:
+            logger.warning(f"❌ No se pudo activar el servicio {service_id}")
+            return ServiceResponse(
+                status="error",
+                message=f"No se pudo activar el servicio {service_id}"
+            )
     except Exception as e:
-        logger.error(f"Error al activar servicio {service_id}: {str(e)}")
+        logger.error(f"❌ Error al activar servicio {service_id}: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al activar servicio: {str(e)}"
         )
-
+    
+@router.post("/{service_id}/activar", response_model=ServiceResponse)
+async def activate_service(service_id: str):
+    """Activa un servicio específico."""
+    manager = get_services_manager()
+    
+    try:
+        # USAR force=True igual que en refresh_service
+        success = manager.register_service(service_id, force=True)
+        
+        if success:
+            # Verificar que realmente esté en app.routes
+            service_registered = False
+            if service_id in manager.services and "router" in manager.services[service_id]:
+                router = manager.services[service_id]["router"]
+                service_registered = any(
+                    getattr(route, "router", None) == router
+                    for route in manager.app.routes
+                )
+            
+            if service_registered:
+                logger.info(f"✅ Servicio {service_id} activado correctamente")
+                return ServiceResponse(
+                    status="success",
+                    message=f"Servicio {service_id} activado correctamente"
+                )
+            else:
+                logger.warning(f"⚠️ Servicio {service_id} marcado como activo pero no registrado en rutas")
+                return ServiceResponse(
+                    status="warning",
+                    message=f"Servicio marcado como activo pero puede requerir reiniciar la aplicación"
+                )
+        else:
+            logger.warning(f"❌ No se pudo activar el servicio {service_id}")
+            return ServiceResponse(
+                status="error",
+                message=f"No se pudo activar el servicio {service_id}"
+            )
+    except Exception as e:
+        logger.error(f"❌ Error al activar servicio {service_id}: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al activar servicio: {str(e)}"
+        )
+@router.post("/diagnostico", response_model=ServiceResponse)
+async def diagnosticar_rutas():
+    """Realiza un diagnóstico completo de las rutas registradas."""
+    manager = get_services_manager()
+    
+    try:
+        # Ejecutar diagnóstico detallado
+        manager.diagnose_routes()
+        
+        # Intentar refrescar todos los servicios marcados como activos
+        active_services = [s for s, active in manager.active_services.items() if active]
+        for service_id in active_services:
+            manager.refresh_service(service_id)
+        
+        # Verificar estado final
+        manager.check_services_state()
+        
+        return ServiceResponse(
+            status="success", 
+            message="Diagnóstico completado y servicios refrescados"
+        )
+    except Exception as e:
+        logger.error(f"Error en diagnóstico: {str(e)}")
+        return ServiceResponse(
+            status="error",
+            message=f"Error en diagnóstico: {str(e)}"
+        )
 @router.post("/{service_id}/refrescar", response_model=ServiceResponse)
 async def refresh_service(service_id: str, background_tasks: BackgroundTasks):
     """Refresca un servicio específico."""
@@ -246,32 +324,36 @@ async def refresh_service(service_id: str, background_tasks: BackgroundTasks):
             message=f"Error al refrescar servicio: {str(e)}"
         )
 
+
 @router.post("/{service_id}/desactivar", response_model=ServiceResponse)
-async def deactivate_service(service_id: str, background_tasks: BackgroundTasks):
+async def deactivate_service(service_id: str):
     """Desactiva un servicio específico."""
     manager = get_services_manager()
     
     try:
-        # Desactivar en segundo plano
-        def deactivate():
-            try:
-                success = manager.unregister_service(service_id)
-                logger.info(f"Servicio {service_id} {'desactivado' if success else 'no se pudo desactivar'}")
-            except Exception as e:
-                logger.error(f"Error al desactivar servicio {service_id}: {str(e)}")
+        # Primero desactivar realmente el servicio
+        success = manager.unregister_service(service_id)
         
-        background_tasks.add_task(deactivate)
+        if not success:
+            return ServiceResponse(
+                status="error",
+                message=f"No se pudo desactivar el servicio {service_id}"
+            )
         
-        # Marcar como inactivo en la configuración
+        # Una vez desactivado con éxito, marcar como inactivo y guardar 
+        # (aunque unregister_service ya debería haberlo marcado como inactivo)
         manager.active_services[service_id] = False
         manager.save_state()
         
+        logger.info(f"✅ Servicio {service_id} desactivado correctamente")
+        
         return ServiceResponse(
             status="success",
-            message=f"Servicio {service_id} marcado para desactivación"
+            message=f"Servicio {service_id} desactivado correctamente"
         )
     except Exception as e:
-        logger.error(f"Error al desactivar servicio {service_id}: {str(e)}")
+        logger.error(f"❌ Error al desactivar servicio {service_id}: {str(e)}")
+        logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al desactivar servicio: {str(e)}"
