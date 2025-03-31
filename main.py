@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Request, status, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, FileResponse
-from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,27 +13,45 @@ import os
 import httpx
 import traceback
 import importlib
-from pydantic import BaseModel
-from datetime import timedelta
+import logging
+
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger("main")
+
+# Importamos nuestro gestor de servicios
+from Services.services_manager import ServicesManager
+from routers.config import service_manager
 
 # Importa lógica y módulos
-from Services.security.security import crear_access_token, authenticate_user, current_user, ACCESS_TOKEN_DURATION
 from db.database import Base, engine, get_db, create_database, create_tables
 from routers import usuarios as aut_usuario
 from routers import Blog
-from routers.Maestros import  Route_planilla_test, Route_articulos
-from routers.Configuraciones import Generar, configDB, Migraciones,Analisis,Scraping
-from Services import mail
+from routers.config import Generar, configDB, Migraciones, Analisis, Scraping, usuarios_admin
 
-from routers.Configuraciones.Admin import create_admin_router
 
-from db.schemas.Maestro.Usuarios import UserDB
+# Rutas de los servicios core
+from Services.security.admin_roles import router as roles_router
+from Services.security.security import current_user
+from Services.mail import mail
+from routers.config.Admin import create_admin_router
+from Services.tickets import route_ticket
+
+
+from db.schemas.config.Usuarios import UserDB
 from db.models.Blog import BlogPost as BlogPostModel
 from sqlalchemy.orm import Session
 # Configuración de entorno
 load_dotenv()
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 ORIGINS = os.getenv("ORIGINS", "*").split()
+STATIC_DIR = "static"
 
 # Inicializar aplicación
 app = FastAPI()
@@ -67,10 +84,13 @@ class CustomErrorMiddleware(BaseHTTPMiddleware):
             return FileResponse('static/404.html', status_code=404)
         elif response.status_code == 401:
             return FileResponse('static/401.html', status_code=401)
+        elif response.status_code == 403:
+            return FileResponse('static/403.html', status_code=403)
         return response
 
 # Agregar middlewares a la app
-
+app.add_middleware(CustomErrorMiddleware)
+app.add_middleware(FrontendRedirectMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Permite todos los orígenes en desarrollo
@@ -78,6 +98,30 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Manejadores de errores personalizados
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        return FileResponse(os.path.join(STATIC_DIR, '404.html'), status_code=404)
+    elif exc.status_code == 401:
+        return FileResponse(os.path.join(STATIC_DIR, '401.html'), status_code=401)
+    elif exc.status_code == 403:
+        return FileResponse(os.path.join(STATIC_DIR, '403.html'), status_code=403)
+    return JSONResponse(status_code=exc.status_code, content=jsonable_encoder({"detail": exc.detail}))
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=jsonable_encoder({"detail": "Se produjo un error de validación.", "errors": exc.errors()}))
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    if exc.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(url="/loginpage")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail}
+    )
 
 # Crear todas las tablas en la base de datos
 def create_all_tables():
@@ -96,8 +140,9 @@ def create_all_tables():
 create_database()
 create_all_tables()
 
-# Rutas de API
+# Rutas de API Core (no gestionadas dinámicamente)
 app.include_router(aut_usuario.router)
+app.include_router(usuarios_admin.router)
 app.include_router(Generar.router)
 app.include_router(configDB.router)
 app.include_router(create_admin_router(app))
@@ -106,24 +151,66 @@ app.include_router(Migraciones.router)
 app.include_router(Analisis.router)
 app.include_router(mail.router)
 app.include_router(Scraping.router)
+app.include_router(roles_router)
+app.include_router(route_ticket.router)
 
-# Maestros
-app.include_router(Route_planilla_test.router)
-app.include_router(Route_articulos.router)
+# Crear el gestor de servicios ANTES de importar otros módulos
+services_manager = ServicesManager(app)
 
-# Manejadores de errores personalizados
-@app.exception_handler(StarletteHTTPException)
-async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
-    if exc.status_code == 404:
-        return FileResponse('static/404.html', status_code=404)
-    elif exc.status_code == 401:
-        return FileResponse('static/401.html', status_code=401)
-    return JSONResponse(status_code=exc.status_code, content=jsonable_encoder({"detail": exc.detail}))
+# Importar y configurar servicio manager
+service_manager.initialize_services_manager(services_manager)
+app.include_router(service_manager.router)
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=jsonable_encoder({"detail": "Se produjo un error de validación.", "errors": exc.errors()}))
+# Mover esta función antes del startup_event
+def ensure_directories():
+    """Asegura que existan los directorios necesarios para los servicios y maestros."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    directories = [
+        os.path.join(base_dir, "Services"),
+        os.path.join(base_dir, "routers", "Maestros")
+    ]
+    
+    for directory in directories:
+        if not os.path.exists(directory):
+            logger.info(f"Creando directorio: {directory}")
+            os.makedirs(directory, exist_ok=True)
 
+
+@app.on_event("startup")
+async def startup_event():
+    """Eventos a ejecutar en el inicio de la aplicación."""
+    logger.info("Iniciando aplicación...")
+    
+    # Importar modelos primero
+    try:
+        services_manager.import_models()
+        logger.info("Modelos importados correctamente.")
+    except Exception as e:
+        logger.error(f"Error al importar modelos: {str(e)}")
+    
+    # Activar servicios manualmente uno por uno 
+    try:
+        active_services = [s for s, active in services_manager.active_services.items() if active]
+        for service_id in active_services:
+            logger.info(f"Activando servicio: {service_id}")
+            try:
+                # Cargar el router directamente
+                router = services_manager.load_service(service_id)
+                if router:
+                    app.include_router(router)
+                    logger.info(f"Servicio {service_id} activado correctamente")
+                else:
+                    logger.error(f"No se pudo cargar el router para {service_id}")
+            except Exception as e:
+                logger.error(f"Error activando {service_id}: {str(e)}")
+    except Exception as e:
+        logger.error(f"Error al activar servicios: {str(e)}")
+        
+    logger.info("Verificando estado final de servicios...")
+    services_manager.check_services_state()
+    services_manager.diagnose_routes()
+
+    logger.info("Aplicación iniciada correctamente.")
 
 # Ruta de inicio
 @app.get("/index", response_class=HTMLResponse, include_in_schema=False)
@@ -132,22 +219,18 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
     blog_posts = db.query(BlogPostModel).order_by(BlogPostModel.created_at.desc()).all()
     return templates.TemplateResponse("index.html", {"request": request, "blog_posts": blog_posts})
 
-
-
 # Ruta de términos y condiciones
 @app.get("/terminos", response_class=HTMLResponse, include_in_schema=False)
 async def get_terminos():
     with open("static/terminos.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read(), status_code=200)
     
-    
-# Ruta de términos y condiciones
+# Ruta de privacidad
 @app.get("/privacidad", response_class=HTMLResponse, include_in_schema=False)
-async def get_terminos():
+async def get_privacidad():
     with open("static/privacidad.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read(), status_code=200)
 
-@app.get("/admin" , include_in_schema=False)
+@app.get("/admin", include_in_schema=False)
 async def read_admin(current_user: UserDB = Depends(current_user)):
     return {"message": "Tienes acceso a esta ruta", "user": current_user.usuario}
-

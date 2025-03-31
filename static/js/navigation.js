@@ -1,9 +1,3 @@
-/**
- * Sistema de navegación dinámica
- * Este archivo maneja la lógica de navegación y la actualización de componentes
- * basados en la ruta actual del usuario.
- */
-
 // Estructura de la navegación - Define todas las rutas de la aplicación
 const navigationItems = [
     { 
@@ -13,39 +7,54 @@ const navigationItems = [
         parent: null,
         icon: 'fa-home' 
     },
-    { 
+    {
         path: '/admin', 
-        title: 'Admin', 
-        visible: true, 
+        title: 'Panel Admin',  // Cambiado de "Admin" a "Panel Admin" para unificar
+        visible: false,  // Oculto en menús
         parent: '/index',
-        icon: 'fa-cogs'
+        redirect: '/admin/page',
+        icon: 'fa-tachometer-alt'
+    },
+    {
+        path: '/admin/page',
+        title: 'Panel Admin', 
+        visible: true,  // Cambiado a true para que sea visible en menús
+        parent: '/index',  // Hijo directo de Inicio
+        icon: 'fa-tachometer-alt'
+    },
+    {
+        path: '/usuarios_admin/page',
+        title: 'Gestión de Usuarios',
+        visible: true,
+        parent: '/admin/page',  // Hijo de Panel Admin
+        icon: 'fa-users'
     },
     { 
         path: '/configdb', 
         title: 'Configuración DB', 
         visible: true, 
-        parent: '/admin',
+        parent: '/admin/page',  // También hijo de Panel Admin
         icon: 'fa-database'
     },
     { 
         path: '/migraciones/admin_migraciones', 
         title: 'Migraciones', 
         visible: true, 
-        parent: '/admin',
+        parent: '/admin/page',  // Cambiado a hijo de Panel Admin
         icon: 'fa-exchange-alt'
     },
     { 
         path: '/generar', 
         title: 'Generar API', 
         visible: true, 
-        parent: '/admin',
+        parent: '/admin/page',  // Cambiado a hijo de Panel Admin
         icon: 'fa-code'
     },
     { 
         path: '/admin/perfil', 
         title: 'Perfil de Usuario', 
         visible: false,  // No se muestra en menú principal
-        parent: '/admin',
+        parent: '/admin/page',  // Cambiado a hijo de Panel Admin
         icon: 'fa-user'
     },
     { 
@@ -69,275 +78,274 @@ const navigationItems = [
         parent: null,
         icon: 'fa-file-contract'
     }
-    // Puedes añadir más rutas aquí conforme las vayas creando
 ];
-
-/**
- * Inicializa la navegación cuando se carga la página
- */
-function initNavigation() {
-    // Asegurarse de que el DOM está completamente cargado
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupNavigation);
-    } else {
-        setupNavigation();
-    }
-}
-
-/**
- * Configura todos los elementos de navegación
- */
-function setupNavigation() {
-    updateBreadcrumb();
-    highlightActiveLink();
-    updatePageTitle();
-    setupDropdownMenus();
-}
-
-/**
- * Actualiza la ruta de migas de pan basada en la URL actual
- */
-function updateBreadcrumb() {
-    const currentPath = window.location.pathname;
-    const breadcrumbContainer = document.getElementById('breadcrumb-container');
-    
-    if (!breadcrumbContainer) return;
-
-    // Encontrar el ítem de navegación actual
-    const currentItem = findNavigationItem(currentPath);
-    if (!currentItem) return;
-    
-    // Construir la cadena de migas de pan
-    const breadcrumbs = [];
-    let item = currentItem;
-    
-    // Agregar el ítem actual primero
-    breadcrumbs.push(item);
-    
-    // Luego buscar todos los padres recursivamente
-    while (item.parent) {
-        const parentItem = findNavigationItem(item.parent);
-        if (parentItem) {
-            breadcrumbs.push(parentItem);
-            item = parentItem;
-        } else {
-            break;
-        }
-    }
-    
-    // Invertir el array para mostrar desde el más general al más específico
-    breadcrumbs.reverse();
-    
-    // Construir el HTML
-    let breadcrumbHtml = '';
-    breadcrumbs.forEach((item, index) => {
-        if (index === breadcrumbs.length - 1) {
-            // Último elemento (actual) - sin enlace
-            breadcrumbHtml += `<span class="text-white font-semibold">${item.title}</span>`;
-        } else {
-            // Elementos anteriores - con enlace
-            breadcrumbHtml += `<a href="${item.path}" class="text-gray-300 hover:text-white">${item.title}</a>`;
-            breadcrumbHtml += `<span class="text-gray-500 mx-2">/</span>`;
-        }
-    });
-    
-    breadcrumbContainer.innerHTML = breadcrumbHtml;
-}
 
 /**
  * Encuentra un ítem de navegación basado en la ruta
  */
 function findNavigationItem(path) {
-    // Buscar coincidencia exacta
-    let item = navigationItems.find(item => item.path === path);
+    console.log("Buscando ítem de navegación para:", path);
     
-    // Si no hay coincidencia exacta, buscar coincidencia parcial
-    if (!item) {
-        for (const navItem of navigationItems) {
-            if (path.startsWith(navItem.path) && navItem.path !== '/index') {
-                item = navItem;
-                break;
+    // Mapeo de rutas especiales
+    const specialPathMapping = {
+        '/admin': '/admin/page'
+    };
+    
+    // Si es una ruta especial, usar su equivalente
+    if (specialPathMapping[path]) {
+        path = specialPathMapping[path];
+        console.log("Ruta reasignada a:", path);
+    }
+    
+    // 1. Buscar coincidencia exacta primero
+    let item = navigationItems.find(item => item.path === path);
+    if (item) {
+        console.log("Encontrada coincidencia exacta:", item.title);
+        return item;
+    }
+    
+    // 2. Para rutas que comienzan con usuarios_admin, configurar manualmente
+    if (path.startsWith('/usuarios_admin')) {
+        item = navigationItems.find(item => item.path === '/usuarios_admin/page');
+        if (item) {
+            console.log("Ruta de usuarios_admin encontrada manualmente:", item.title);
+            return item;
+        }
+    }
+    
+    // 3. Si es una subsección admin, intentar mapear a una subsección conocida
+    if (path.includes('/admin/') || 
+        path.includes('/configdb') || 
+        path.includes('/migraciones') || 
+        path.includes('/generar')) {
+        
+        // Ordenar los items por longitud de path para encontrar la coincidencia más específica
+        const sortedItems = [...navigationItems]
+            .filter(item => item.parent === '/admin/page')
+            .sort((a, b) => b.path.length - a.path.length);
+        
+        for (const navItem of sortedItems) {
+            if (path.includes(navItem.path)) {
+                console.log("Encontrada coincidencia para subsección admin:", navItem.title);
+                return navItem;
             }
         }
     }
     
-    // Si aún no hay coincidencia y no estamos en la raíz, usar la página de inicio
-    if (!item && path !== '/') {
-        item = navigationItems.find(item => item.path === '/index');
-    }
+    // 4. Buscar coincidencia parcial por longitud de ruta (más específica primero)
+    const sortedItems = [...navigationItems].sort((a, b) => b.path.length - a.path.length);
     
-    return item;
-}
-
-/**
- * Resalta el enlace activo en la barra de navegación
- */
-function highlightActiveLink() {
-    const currentPath = window.location.pathname;
-    
-    document.querySelectorAll('nav a').forEach(link => {
-        const href = link.getAttribute('href');
-        if (!href) return;
-        
-        // Resetear estilos primero
-        link.classList.remove('active-link', 'border-b-2', 'border-white', 'font-bold');
-        
-        // Comprobar si la ruta actual coincide con este enlace
-        if ((currentPath === href) || 
-            (href !== '/index' && currentPath.startsWith(href))) {
-            link.classList.add('active-link', 'border-b-2', 'border-white', 'font-bold');
+    for (const navItem of sortedItems) {
+        if (path.startsWith(navItem.path) && 
+            navItem.path !== '/' && 
+            navItem.path !== '/index') {
+            
+            console.log("Encontrada coincidencia parcial:", navItem.title);
+            return navItem;
         }
-    });
-}
-
-/**
- * Actualiza el título de la página basado en la ruta actual
- */
-function updatePageTitle() {
-    const currentPath = window.location.pathname;
-    const pageTitleElement = document.getElementById('page-title');
-    
-    if (!pageTitleElement) return;
-    
-    const currentItem = findNavigationItem(currentPath);
-    if (currentItem) {
-        pageTitleElement.textContent = currentItem.title;
-        
-        // También actualizar el título del documento
-        document.title = `${currentItem.title} | SQL App`;
     }
+    
+    // 5. Fallback a página de inicio
+    item = navigationItems.find(item => item.path === '/index');
+    if (item) {
+        console.log("Usando página de inicio como fallback");
+        return item;
+    }
+    
+    console.warn("No se encontró ningún ítem de navegación para:", path);
+    return null;
 }
 
 /**
- * Configura los menús desplegables en la navegación
+ * Carga la barra de navegación
  */
-function setupDropdownMenus() {
-    const dropdownButtons = document.querySelectorAll('[data-dropdown]');
+function loadNavbar(containerId = 'navbar-container') {
+    const navbarContainer = document.getElementById(containerId);
+    if (!navbarContainer) return;
     
-    dropdownButtons.forEach(button => {
-        const targetId = button.getAttribute('data-dropdown');
-        const dropdownMenu = document.getElementById(targetId);
+    // Obtener datos del usuario actual
+    getUserData().then(userData => {
+        const userName = userData ? (userData.nombre || userData.usuario || 'U') : 'U';
+        const userInitial = userName.charAt(0).toUpperCase();
         
-        if (dropdownMenu) {
-            button.addEventListener('click', (e) => {
-                e.stopPropagation();
-                dropdownMenu.classList.toggle('hidden');
+        // Determinar la ruta actual
+        const currentPath = window.location.pathname;
+        console.log("Cargando navbar para ruta:", currentPath);
+        
+        // Construir navegación jerárquica
+        let navItems = [];
+        
+        // Añadir siempre Inicio
+        navItems.push({
+            title: 'Inicio',
+            path: '/index',
+            isLink: true
+        });
+        
+        // Obtener el ítem actual
+        let currentItem = findNavigationItem(currentPath);
+        
+        // Si es un ítem de la sección admin...
+        if (currentItem && (
+            currentPath.includes('/admin') || 
+            currentPath.includes('/usuarios_admin') || 
+            currentPath.includes('/configdb') || 
+            currentPath.includes('/migraciones') || 
+            currentPath.includes('/generar'))) {
+            
+            // Si no es la página principal de admin, mostrar "Panel Admin" como enlace intermedio
+            if (currentPath !== '/admin' && currentPath !== '/admin/page') {
+                const adminItem = navigationItems.find(item => item.path === '/admin/page');
+                
+                // Añadir Panel Admin como enlace intermedio
+                if (adminItem) {
+                    navItems.push({
+                        title: adminItem.title,
+                        path: adminItem.path,
+                        isLink: true
+                    });
+                }
+                
+                // Añadir la página actual como texto (no enlace)
+                navItems.push({
+                    title: currentItem.title,
+                    path: currentItem.path,
+                    isLink: false
+                });
+            } 
+            // Si es la página principal de admin, mostrarla como destino final
+            else {
+                navItems.push({
+                    title: 'Panel Admin',
+                    path: '/admin/page',
+                    isLink: false
+                });
+            }
+        }
+        // Para otras secciones que no son admin
+        else if (currentItem && currentItem.path !== '/index') {
+            navItems.push({
+                title: currentItem.title,
+                path: currentItem.path,
+                isLink: false
             });
         }
-    });
-    
-    // Cerrar todos los dropdown al hacer clic en otra parte del documento
-    document.addEventListener('click', () => {
-        document.querySelectorAll('[id$="-dropdown"]').forEach(menu => {
-            menu.classList.add('hidden');
-        });
-    });
-}
-
-/**
- * Genera un menú dinámico basado en la estructura de navegación
- * @param {string} containerId - ID del contenedor donde se insertará el menú
- * @param {string|null} parent - Ruta padre para filtrar ítems (null para raíz)
- */
-function generateMenu(containerId, parent = null) {
-    const menuContainer = document.getElementById(containerId);
-    if (!menuContainer) return;
-    
-    const visibleItems = navigationItems.filter(item => 
-        item.visible && item.parent === parent
-    );
-    
-    if (visibleItems.length === 0) return;
-    
-    let menuHtml = '<ul class="menu-list">';
-    
-    visibleItems.forEach(item => {
-        const hasChildren = navigationItems.some(child => child.parent === item.path);
-        const iconHtml = item.icon ? `<i class="fas ${item.icon} mr-2"></i>` : '';
         
-        if (hasChildren) {
-            menuHtml += `
-                <li class="menu-item has-submenu">
-                    <a href="${item.path}" class="menu-link">
-                        ${iconHtml}${item.title}
-                        <i class="fas fa-chevron-down ml-2"></i>
-                    </a>
-                    <div class="submenu hidden">
-                        <ul>`;
-            
-            // Añadir ítems hijos
-            navigationItems.filter(child => child.visible && child.parent === item.path)
-                .forEach(child => {
-                    const childIconHtml = child.icon ? `<i class="fas ${child.icon} mr-2"></i>` : '';
-                    menuHtml += `
-                        <li>
-                            <a href="${child.path}" class="submenu-link">
-                                ${childIconHtml}${child.title}
-                            </a>
-                        </li>`;
-                });
-            
-            menuHtml += `
-                        </ul>
-                    </div>
-                </li>`;
-        } else {
-            menuHtml += `
-                <li class="menu-item">
-                    <a href="${item.path}" class="menu-link">
-                        ${iconHtml}${item.title}
-                    </a>
-                </li>`;
-        }
-    });
-    
-    menuHtml += '</ul>';
-    menuContainer.innerHTML = menuHtml;
-    
-    // Configurar interactividad para submenús
-    document.querySelectorAll('.has-submenu').forEach(item => {
-        const link = item.querySelector('.menu-link');
-        const submenu = item.querySelector('.submenu');
+        // Generar HTML de navegación
+        let navigationHTML = '';
         
-        link.addEventListener('click', (e) => {
-            if (window.innerWidth < 1024) {  // Solo en móvil/tablet
-                e.preventDefault();
-                submenu.classList.toggle('hidden');
+        navItems.forEach((item, index) => {
+            if (index > 0) {
+                navigationHTML += `<span class="text-gray-400">/</span>`;
+            }
+            
+            if (item.isLink) {
+                navigationHTML += `<a href="${item.path}" class="text-white text-lg font-semibold hover:text-gray-300">${item.title}</a>`;
+            } else {
+                navigationHTML += `<span class="text-white text-lg font-semibold">${item.title}</span>`;
             }
         });
+        
+        // Filtrar elementos para la barra superior (sección derecha)
+        let topNavHTML = '';
+        
+        // Para las páginas de admin y subsecciones, mostrar los enlaces de subsecciones de admin
+        if (currentPath.includes('/admin') || 
+            currentPath.includes('/usuarios_admin') || 
+            currentPath.includes('/configdb') || 
+            currentPath.includes('/migraciones') || 
+            currentPath.includes('/generar')) {
+            
+            // Mostrar enlaces a módulos admin
+            const adminModules = navigationItems.filter(item => 
+                item.visible && item.parent === '/admin/page'
+            );
+            
+            adminModules.forEach(item => {
+                const path = item.redirect || item.path;
+                const icon = item.icon ? `<i class="fas ${item.icon} mr-2"></i>` : '';
+                topNavHTML += `<a href="${path}" class="text-white hover:text-gray-300">${icon}${item.title}</a>`;
+            });
+        } 
+        // Para otras páginas, mostrar enlaces de primer nivel
+        else {
+            const topItems = navigationItems.filter(item => 
+                item.visible && item.parent === null && item.path !== '/index'
+            );
+            
+            topItems.forEach(item => {
+                const path = item.redirect || item.path;
+                const icon = item.icon ? `<i class="fas ${item.icon} mr-2"></i>` : '';
+                topNavHTML += `<a href="${path}" class="text-white hover:text-gray-300">${icon}${item.title}</a>`;
+            });
+        }
+        
+        // Asegurar que la documentación API siempre esté visible
+        const docsItem = navigationItems.find(item => item.path === '/docs');
+        if (docsItem && docsItem.visible && !topNavHTML.includes('/docs')) {
+            const icon = docsItem.icon ? `<i class="fas ${docsItem.icon} mr-2"></i>` : '';
+            // Insertar al principio
+            topNavHTML = `<a href="/docs" class="text-white hover:text-gray-300">${icon}${docsItem.title}</a> ` + topNavHTML;
+        }
+        
+        // HTML completo de la navbar
+        const navbarHTML = `
+            <nav class="bg-gray-800 p-4 relative z-30">
+                <div class="container mx-auto flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <a href="/index">
+                            <img src="/static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
+                        </a>
+                        ${navigationHTML}
+                    </div>
+                    <div class="flex items-center space-x-4 relative">
+                        ${topNavHTML}
+                        <div class="relative">
+                            <button id="perfil" class="flex items-center focus:outline-none">
+                                <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white">
+                                    ${userInitial}
+                                </div>
+                                <svg class="ml-2 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
+                                <a href="/admin/perfil" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Perfil de usuario</a>
+                                <form action="/logout" method="post">
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">Logout</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        `;
+        
+        navbarContainer.innerHTML = navbarHTML;
+        
+        // Configurar interactividad del menú de perfil
+        const perfilButton = document.getElementById('perfil');
+        const menuPerfil = document.getElementById('menu-perfil');
+        
+        if (perfilButton && menuPerfil) {
+            perfilButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menuPerfil.classList.toggle('hidden');
+            });
+            
+            // Cerrar el menú al hacer clic en cualquier otra parte
+            document.addEventListener('click', () => {
+                menuPerfil.classList.add('hidden');
+            });
+        }
+    }).catch(error => {
+        console.error('Error al cargar la navbar:', error);
+        navbarContainer.innerHTML = `
+            <nav class="bg-gray-800 p-4">
+                <div class="container mx-auto">
+                    <a href="/index" class="text-white text-lg font-semibold">Inicio</a>
+                </div>
+            </nav>
+        `;
     });
 }
-
-/**
- * Verifica los permisos del usuario para la página actual
- * @returns {boolean} true si tiene permisos, false en caso contrario
- */
-function checkPagePermissions() {
-    const currentPath = window.location.pathname;
-    const userData = JSON.parse(localStorage.getItem('user') || '{}');
-    
-    // Si no hay datos de usuario, redirigir al login
-    if (!userData.id) {
-        // Solo redirigir si no estamos ya en la página de login
-        if (!currentPath.includes('/login')) {
-            window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
-            return false;
-        }
-    }
-    
-    // Implementar aquí la lógica de verificación de permisos basada en roles
-    // Por ahora devolvemos true para simplificar
-    return true;
-}
-
-// Inicializar navegación al cargar la página
-initNavigation();
-
-// Exportar funciones para uso en otros archivos
-window.Navigation = {
-    init: initNavigation,
-    updateBreadcrumb,
-    highlightActiveLink,
-    generateMenu,
-    checkPagePermissions
-};

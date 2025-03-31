@@ -7,8 +7,8 @@ import json
 from datetime import date, datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import MetaData, Table, Column, Integer, String, Float, DateTime, Boolean, BigInteger
-from db.models.activityLog import ActivityLog
-from db.models.usuarios import usuarios
+from db.models.config.activityLog import ActivityLog
+from db.models.config.usuarios import usuarios
 from typing import List, Dict, Any, Union
 
 # Funciones de utilidad
@@ -157,7 +157,7 @@ def limpiar_datos(data: List[Dict[str, Any]], esquema_tipos: Dict[str, Union[typ
     
     return registros_limpios
 
-def procesar_archivo(sheet_json_path, result_path, db: Session, current_user: usuarios, table_name: str):
+def procesar_archivo(sheet_json_path, result_path, db: Session, current_user, table_name: str):
     try:
         # Leer los datos del archivo JSON
         with open(sheet_json_path, 'r', encoding='utf-8') as f:
@@ -297,16 +297,13 @@ def procesar_archivo(sheet_json_path, result_path, db: Session, current_user: us
         # Log del resultado
         logging.info(f"Migración completada: {registros_procesados} registros procesados, {len(registros_no_guardados)} registros inválidos, {porcentaje_cargados:.2f}% de registros cargados")
         
-        # Buscar el usuario por nombre de usuario
-        usuario = db.query(usuarios).filter(usuarios.usuario == current_user.usuario).first()
-        if not usuario:
-            logging.error("Usuario no encontrado")
-            raise Exception("Usuario no encontrado")
+        # Obtener el ID del usuario según si es diccionario u objeto
+        user_id = current_user["codigo"] if isinstance(current_user, dict) else current_user.codigo
         
         # Registrar la actividad
         new_activity = ActivityLog(
-            usuario_id=usuario.codigo,
-            action=f"Realizó una migración de datos el {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            user_id=user_id,  # Usar user_id en lugar de usuario_id
+            action=f"Realizó una migración a la tabla '{table_name}'. Registros procesados: {registros_procesados}, inválidos: {len(registros_no_guardados)}"
         )
         db.add(new_activity)
         db.commit()

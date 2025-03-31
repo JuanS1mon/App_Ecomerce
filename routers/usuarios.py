@@ -9,6 +9,18 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 import logging
+from Services.security.security import (ACCESS_TOKEN_DURATION,authenticate_user,current_user,encriptar_clave,verificar_clave,crear_access_token,access_token_expires,decodifica_token)
+from Services.mail.mail import enviar_correo, validar_email
+from Services.comunicacion.whassap import enviar_mensaje_whatsapp, validar_telefono
+
+from db.crud.config.Usuarios import (get_usuario,create_usuario,update_usuario_activate)
+from db.database import get_db
+from db.schemas.config.Usuarios import (UserDB,PasswordReset,PasswordResetRequest)
+from db.models.config.usuarios import usuarios as UsuariosModel
+
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
+from starlette.requests import Request
 
 # Instancias de FastAPI y dependencias
 router = APIRouter(
@@ -17,34 +29,7 @@ router = APIRouter(
     responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
 )
 
-from Services.security.security import (
-    authenticate_user,
-    current_user,
-    encriptar_clave,
-    verificar_clave,
-    crear_access_token,
-    access_token_expires,
-    decodifica_token
-)
-from Services.mail import enviar_correo, validar_email
-from Services.whassap import enviar_mensaje_whatsapp, validar_telefono
 
-from db.crud.Maestro.Usuarios import (
-    get_usuario,
-    create_usuario,
-    update_usuario_activate
-)
-from db.database import get_db
-from db.schemas.Maestro.Usuarios import (
-    UserDB,
-    PasswordReset,
-    PasswordResetRequest
-)
-from db.models.usuarios import usuarios as UsuariosModel
-
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
-from starlette.requests import Request
 
 # Configuración de logging
 logging.basicConfig(level=logging.INFO)
@@ -115,29 +100,80 @@ async def registrar_usuario(usuario: UserRegistration, db: Session = Depends(get
     
     return result
 
+# Reemplaza la clase Token existente con esta versión mejorada
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+    expires_in: int  # Duración en segundos
+    
+# Puedes mantener la clase Token original por compatibilidad
 class Token(BaseModel):
     access_token: str
     token_type: str
     
-@router.post("/login", response_model=Token)
-async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuario o contraseña incorrectos",
-            headers={"WWW-Authenticate": "Bearer"},
+@router.post("/login")
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Autentica al usuario y devuelve un token de acceso en cookie y respuesta JSON"""
+    try:
+        # Intentar autenticar al usuario
+        user = authenticate_user(db, form_data.username, form_data.password)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Nombre de usuario o contraseña incorrectos",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # Verificar si el usuario está activo
+        if not user.get("activo", True):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Cuenta de usuario inactiva. Por favor, contacte al administrador."
+            )
+        
+        # Crear token de acceso
+        access_token = crear_access_token(data={"sub": user["username"]})
+        
+        # Crear la respuesta JSON
+        response = JSONResponse(content={
+            "access_token": access_token,
+            "token_type": "bearer",
+            "expires_in": ACCESS_TOKEN_DURATION * 60,
+            "usuario": user["username"],
+            "nombre": user.get("nombre", ""),
+            "email": user.get("mail", ""),
+            "success": True
+        })
+        
+        # Configurar la cookie de forma segura
+        # Nota: en desarrollo local, cambia secure=False si no usas HTTPS
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,           # Previene acceso desde JavaScript
+            secure=False,            # Cambiar a True en producción con HTTPS
+            samesite="lax",          # Protección contra CSRF
+            max_age=ACCESS_TOKEN_DURATION * 60,  # Duración en segundos
+            path="/"                 # Disponible en todo el sitio
         )
-    access_token_expires = timedelta(minutes=30)
-    access_token = crear_access_token(data={"sub": user["username"]}, expires_delta=access_token_expires)
-    response.set_cookie(
-        key="access_token",
-        value=f"{access_token}",
-        httponly=True,
-        secure=False,  # Cambiar a False en desarrollo
-        samesite="Lax"
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
+        
+        # Registrar el login exitoso
+        print(f"✅ Login exitoso para usuario: {user['username']}")
+        
+        return response
+        
+    except HTTPException as e:
+        # Re-lanzar excepciones HTTP
+        print(f"❌ Error de autenticación: {e.detail}")
+        raise
+        
+    except Exception as e:
+        # Capturar cualquier otro error y dar una respuesta genérica
+        print(f"❌ Error inesperado en login: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor durante la autenticación"
+        )
 
 @router.get("/ruta-protegida")
 async def protected_route(user: UserDB = Depends(current_user)):
@@ -192,6 +228,50 @@ async def register_page(request: Request):
 
 @router.post("/logout")
 async def logout(response: Response):
-    response = RedirectResponse(url="/index", status_code=303)
-    response.delete_cookie("access_token")
+    logger.info("Iniciando proceso de logout")
+    response = RedirectResponse(url="/loginpage", status_code=status.HTTP_303_SEE_OTHER)
+    response.delete_cookie(key="access_token", path="/")
+    logger.info("Logout exitoso - Cookie eliminada")
     return response
+
+@router.get("/check-auth")
+async def check_auth(request: Request):
+    """Endpoint para verificar el estado de la autenticación"""
+    cookies = dict(request.cookies)
+    headers = {k: v for k, v in request.headers.items() if k.lower() in ["authorization", "host", "user-agent"]}
+    
+    # Verificar si hay token en la cookie
+    token_present = "access_token" in cookies
+    
+    # Si hay token, ocultar el valor completo
+    if token_present:
+        cookies["access_token"] = f"***PRESENTE*** (longitud: {len(cookies['access_token'])})"
+    
+    return {
+        "token_present": token_present,
+        "auth_header_present": "authorization" in [k.lower() for k in headers.keys()],
+        "cookies": cookies,
+        "headers": headers,
+        "url": str(request.url),
+        "secure_context": request.url.scheme == "https",
+        "path": request.url.path
+    }
+
+@router.post("/token", response_model=TokenResponse)
+async def get_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Endpoint JSON puro para obtener token (para APIs)"""
+    user = authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Credenciales incorrectas",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token = crear_access_token(data={"sub": user["username"]})
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expires_in": ACCESS_TOKEN_DURATION * 60  # segundos
+    }

@@ -367,4 +367,20 @@ nav {
 }
 
 /* Script para manejar el botón de volver arriba */
-/* Moved to a separate JavaScript file */
+   /* Estilos para el breadcrumb */
+   .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    display: inline-block;
+    padding: 0 0.5rem;
+    color: #6b7280;
+}
+
+.breadcrumb-item.active {
+    color: #6b7280;
+}

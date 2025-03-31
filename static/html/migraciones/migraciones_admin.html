@@ -1,0 +1,565 @@
+ -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Migraciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Script para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Script para jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Script para DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <!-- Script para Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        /* Personalización de Select2 */
+        .select2-container--default .select2-selection--single {
+            height: 42px;
+            padding: 6px;
+            border-color: #d1d5db;
+            border-radius: 0.375rem;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px;
+        }
+        /* Personalización de DataTables */
+        .dataTables_wrapper .dataTables_length, 
+        .dataTables_wrapper .dataTables_filter, 
+        .dataTables_wrapper .dataTables_info, 
+        .dataTables_wrapper .dataTables_paginate {
+            margin-bottom: 10px;
+            color: #4b5563;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: #3b82f6 !important;
+            color: white !important;
+            border: 1px solid #3b82f6;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #bfdbfe !important;
+            color: #1e40af !important;
+            border: 1px solid #bfdbfe;
+        }
+        
+    </style>
+        <style>
+            /* Estilos existentes... */
+            
+            /* Mejoras para la tabla de datos */
+            #data-table {
+                border-collapse: separate;
+                border-spacing: 0;
+                width: 100%;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+            
+            #data-table thead th {
+                background-color: #f9fafb;
+                color: #111827;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                padding: 12px 16px;
+                border-bottom: 2px solid #e5e7eb;
+            }
+            
+            #data-table tbody tr {
+                transition: all 0.2s ease;
+            }
+            
+            #data-table tbody tr:hover {
+                background-color: rgba(59, 130, 246, 0.05);
+                transform: translateY(-1px);
+            }
+            
+            #data-table tbody td {
+                padding: 12px 16px;
+                vertical-align: middle;
+            }
+            
+            /* Estilos para los controles de DataTables */
+            .dataTables_wrapper .dataTables_length select {
+                border-radius: 0.375rem;
+                padding: 4px 24px 4px 8px;
+                border: 1px solid #d1d5db;
+                background-color: white;
+            }
+            
+            .dataTables_wrapper .dataTables_filter input {
+                border-radius: 0.375rem;
+                padding: 6px 10px;
+                border: 1px solid #d1d5db;
+                background-color: white;
+                margin-left: 8px;
+            }
+            
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                border-radius: 0.375rem;
+                padding: 6px 12px;
+                margin: 0 2px;
+                transition: all 0.2s;
+            }
+            
+            /* Estado vacío personalizado */
+            .empty-state {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 3rem 1rem;
+                text-align: center;
+            }
+            
+            .empty-state-icon {
+                font-size: 3rem;
+                color: #9ca3af;
+                margin-bottom: 1rem;
+            }
+            
+            /* Personalización del selector de tablas */
+            .select2-container .select2-selection--single {
+                height: 45px;
+                border: 1px solid #d1d5db;
+                border-radius: 0.5rem;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                transition: all 0.2s;
+            }
+            
+            .select2-container .select2-selection--single:focus {
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+            }
+            
+            .select2-container .select2-selection--single .select2-selection__rendered {
+                line-height: 45px;
+                padding-left: 15px;
+                padding-right: 30px;
+            }
+            
+            .select2-container .select2-selection--single .select2-selection__arrow {
+                height: 45px;
+                width: 30px;
+            }
+            
+            .select2-dropdown {
+                border-radius: 0.5rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                border: 1px solid #e5e7eb;
+                overflow: hidden;
+            }
+            
+            .select2-container--default .select2-results__option--highlighted[aria-selected] {
+                background-color: #3b82f6;
+            }
+            
+            /* Indicador de carga más elegante */
+            .fancy-spinner {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .fancy-spinner div {
+                position: absolute;
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+            }
+            
+            .fancy-spinner div.ring {
+                border: 3px solid transparent;
+                border-top-color: #3b82f6;
+                animation: spin 0.8s linear infinite;
+            }
+            
+            .fancy-spinner div.ring:nth-child(1) {
+                width: 45px;
+                height: 45px;
+                border-width: 3px;
+                animation-delay: 0s;
+            }
+            
+            .fancy-spinner div.ring:nth-child(2) {
+                width: 35px;
+                height: 35px;
+                border-width: 2px;
+                border-top-color: #60a5fa;
+                animation-delay: 0.2s;
+            }
+            
+            .fancy-spinner div.dot {
+                width: 15px;
+                height: 15px;
+                background: #3b82f6;
+            }
+            
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+            
+            /* Celdas con valores numéricos */
+            .numeric-cell {
+                text-align: right;
+                font-family: 'Roboto Mono', monospace;
+                font-variant-numeric: tabular-nums;
+            }
+            
+            /* Estilizado de filas alternantes */
+            #data-table tbody tr:nth-child(even) {
+                background-color: #fafafa;
+            }
+        </style>
+
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+   
+    <!-- Contenido principal -->
+    <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">   
+        <!-- Header con información de la página -->
+        <div class="mb-8">
+            <div class="gradient-bg text-white rounded-lg shadow-lg p-6 sm:p-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Panel de Migraciones</h1>
+                        <p class="text-white text-opacity-90">
+                            Gestione migraciones de base de datos, monitoree estados y visualice datos desde este panel.
+                        </p>
+                    </div>
+                    <div class="mt-4 md:mt-0 bg-white bg-opacity-20 p-3 rounded-lg">
+                        <div class="text-sm font-medium">
+                            <div class="flex items-center">
+                                <i class="fas fa-database mr-2"></i>
+                                <span>Total de Migraciones: <span class="font-bold">{{ total_migraciones }}</span></span>
+                            </div>
+                            <div class="flex items-center mt-1">
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                <span id="currentDate">19 de marzo, 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accesos directos -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <a href="/migraciones/nueva_migracion" class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100 flex items-center p-4 group">
+                <div class="flex-shrink-0 bg-green-500 rounded-full p-3">
+                    <i class="fas fa-plus text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900 group-hover:text-green-600 transition-colors">Nueva Migración</h3>
+                    <p class="text-sm text-gray-500">Crear nueva tarea de migración de datos</p>
+                </div>
+            </a>
+            
+            <a href="/migraciones/control_migraciones" class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100 flex items-center p-4 group">
+                <div class="flex-shrink-0 bg-yellow-500 rounded-full p-3">
+                    <i class="fas fa-tasks text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900 group-hover:text-yellow-600 transition-colors">Resultados de Migraciones</h3>
+                    <p class="text-sm text-gray-500">Ver resultados de migraciones ejecutadas</p>
+                </div>
+            </a>
+            
+            <a href="/migraciones/tablas_migraciones" class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100 flex items-center p-4 group">
+                <div class="flex-shrink-0 bg-blue-500 rounded-full p-3">
+                    <i class="fas fa-table text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors">Mapeo de Campos</h3>
+                    <p class="text-sm text-gray-500">Configurar mapeos entre tablas y campos</p>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Sección de estadísticas -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Gráfico de migraciones -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        <i class="fas fa-chart-line mr-2 text-blue-500"></i>
+                        Historial de Migraciones
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <canvas id="migracionesChart" height="250"></canvas>
+                </div>
+            </div>
+            
+            <!-- Últimas actividades -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        <i class="fas fa-history mr-2 text-indigo-500"></i>
+                        Últimas Actividades
+                    </h3>
+                    <button class="text-gray-400 hover:text-gray-600" id="refresh-activities">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="p-6 max-h-96 overflow-y-auto">
+                    <ul class="space-y-4" id="actividades">
+                        {% for actividad in actividades %}
+                        <li class="pb-3 border-b border-gray-100 last:border-0 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">{{ actividad }}</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                        {% if not actividades %}
+                        <li class="text-center py-4 text-gray-500">
+                            No hay actividades recientes
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección de selección de tabla mejorada -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-table mr-2 text-green-500"></i>
+                    Explorador de Tablas
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="mb-6">
+                    <label for="table-select" class="block text-sm font-medium text-gray-700 mb-2">Selecciona una tabla para visualizar:</label>
+                    <div class="relative">
+                        <select id="table-select" class="block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="" disabled selected>Escribe o selecciona una tabla...</option>
+                            {% for table in tables1 %}
+                                <option value="{{ table }}">{{ table }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <p id="table-description" class="mt-2 text-sm text-gray-500">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Selecciona la tabla que deseas visualizar. Puedes buscar escribiendo su nombre.
+                    </p>
+                </div>
+
+                <!-- Indicador de carga -->
+                <div id="loading-indicator" class="hidden flex items-center justify-center my-4 py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    <span class="ml-3 text-gray-700">Cargando datos...</span>
+                </div>
+
+                <!-- Tabla de datos -->
+                <div class="overflow-x-auto">
+                    <table id="data-table" class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr id="table-head">
+                                <!-- Encabezados de la tabla se cargarán aquí -->
+                            </tr>
+                        </thead>
+                        <tbody id="table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Datos de la tabla se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer - Se cargará dinámicamente -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script>
+        $(document).ready(function() {
+            // Actualizar fecha en el header
+            function updateDateTime() {
+                const now = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('currentDate').textContent = now.toLocaleDateString('es-ES', options);
+            }
+            updateDateTime();
+
+            // Inicializar Select2 para el select de tablas
+            $('#table-select').select2({
+                placeholder: "Escribe o selecciona una tabla...",
+                allowClear: true
+            });
+            
+            // Personalización adicional de Select2
+            $('.select2-container--default').addClass('rounded-md shadow-sm');
+    
+            // Manejar el cambio de selección de la tabla
+            $('#table-select').on('change', function() {
+                const tableName = $(this).val();
+                console.log(`Tabla seleccionada: ${tableName}`);
+                if (tableName) {
+                    fetchTableData(tableName);
+                }
+            });
+    
+            async function fetchTableData(tableName) {
+                try {
+                    $('#loading-indicator').removeClass('hidden');
+                    console.log(`Obteniendo datos para la tabla: ${tableName}`);
+            
+                    // Destruir la instancia anterior de DataTable si existe
+                    if ($.fn.DataTable.isDataTable('#data-table')) {
+                        $('#data-table').DataTable().clear().destroy();
+                    }
+            
+                    // Limpiar los encabezados y el cuerpo de la tabla
+                    const tableHead = $('#table-head');
+                    const tableBody = $('#table-body');
+                    tableHead.empty();
+                    tableBody.empty();
+            
+                    const response = await fetch(`/migraciones/get_table_records/${encodeURIComponent(tableName)}`);
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP: ${response.status}`);
+                    }
+                    const data = await response.json();
+            
+                    if (data.records && data.records.length > 0) {
+                        const headers = Object.keys(data.records[0]);
+                        headers.forEach(header => {
+                            const th = $('<th>').addClass('px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider').text(header);
+                            tableHead.append(th);
+                        });
+            
+                        data.records.forEach(record => {
+                            const row = $('<tr>').addClass('hover:bg-gray-50');
+                            headers.forEach(header => {
+                                const td = $('<td>').addClass('px-6 py-4 whitespace-nowrap text-sm text-gray-500').text(record[header] || '-');
+                                row.append(td);
+                            });
+                            tableBody.append(row);
+                        });
+            
+                        // Inicializar DataTable con opciones personalizadas
+                        $('#data-table').DataTable({
+                            responsive: true,
+                            language: {
+                                search: "Buscar:",
+                                lengthMenu: "Mostrar _MENU_ registros por página",
+                                zeroRecords: "No se encontraron resultados",
+                                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                                infoEmpty: "Mostrando 0 a 0 de 0 registros",
+                                infoFiltered: "(filtrado de _MAX_ registros totales)",
+                                paginate: {
+                                    first: "Primero",
+                                    last: "Último",
+                                    next: "Siguiente",
+                                    previous: "Anterior"
+                                }
+                            }
+                        });
+                    } else {
+                        console.warn('La tabla no tiene registros.');
+                        tableBody.html('<tr><td colspan="100%" class="px-6 py-12 text-center text-gray-500">No hay registros disponibles para esta tabla.</td></tr>');
+                    }
+                } catch (error) {
+                    console.error('Error al obtener los datos de la tabla:', error);
+                    tableBody.html('<tr><td colspan="100%" class="px-6 py-12 text-center text-red-500">Error al cargar los datos. Por favor, verifica el servidor o la conexión.</td></tr>');
+                } finally {
+                    $('#loading-indicator').addClass('hidden');
+                }
+            }
+    
+            // Código para el gráfico
+            const ctx = document.getElementById('migracionesChart').getContext('2d');
+            const migracionesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: JSON.parse('{{ labels | tojson | safe }}'),
+                    datasets: [{
+                        label: 'Migraciones',
+                        data: JSON.parse('{{ data | tojson | safe }}'),
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1f2937',
+                            bodyColor: '#4b5563',
+                            borderColor: 'rgba(203, 213, 225, 1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false
+                        }
+                    }
+                }
+            });
+            
+            // Manejar el botón de actualizar actividades
+            $('#refresh-activities').on('click', function() {
+                // Aquí iría una petición para actualizar las actividades
+                // Como ejemplo, mostramos una animación de rotación
+                $(this).addClass('animate-spin');
+                setTimeout(() => {
+                    $(this).removeClass('animate-spin');
+                    // Aquí se actualizaría la lista de actividades
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>

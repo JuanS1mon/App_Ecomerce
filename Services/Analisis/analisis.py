@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Dict
+from typing import Any, List, Dict
 import pandas as pd
 import numpy as np
 import json
@@ -44,42 +44,72 @@ def limpiar_datos(df: pd.DataFrame) -> pd.DataFrame:
 
 def convert_types(obj):
     """
-    Función para convertir tipos de datos no serializables a tipos serializables.
+    Convierte objetos complejos (pandas Timestamp, datetime, etc) a formatos serializables
     """
-    if isinstance(obj, np.int64):
-        return int(obj)
-    if isinstance(obj, np.float64):
-        return float(obj)
-    if isinstance(obj, (np.datetime64, datetime.datetime, datetime.date)):
+    if obj is None:
+        return None
+    elif isinstance(obj, (pd.Timestamp, datetime.datetime, datetime.date)):
         return obj.isoformat()
+    elif isinstance(obj, float) and (np.isnan(obj) or np.isinf(obj)):
+        return None
+    elif isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {k: convert_types(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [convert_types(i) for i in obj]
+    elif isinstance(obj, pd.Series):
+        return convert_types(obj.to_dict())
+    elif isinstance(obj, pd.DataFrame):
+        return convert_types(obj.to_dict(orient="records"))
+    elif hasattr(obj, "__str__"):
+        return str(obj)
     return obj
 
-def guardar_resultados_sql(db: Session, usuario: str, resultados: Dict):
+def guardar_resultados_sql(db: Session, usuario: str, resultados: Dict[str, Any]):
     """
-    Función para guardar los resultados en la base de datos.
+    Guarda los resultados del análisis KPI en la base de datos.
+    
+    Args:
+        db: Sesión de base de datos
+        usuario: Nombre de usuario que realizó el análisis
+        resultados: Diccionario con los resultados del análisis
     """
     try:
-        # Convertir clusters a string si es necesario
-        clusters_str = json.dumps(resultados.get("clusters", []))
-
-        resultado_kpi = ResultadoKPI(
+        # Verificar si el usuario es válido
+        if not usuario:
+            print("Error: Nombre de usuario no válido")
+            return
+        
+        # Crear un nuevo registro utilizando ResultadoKPI
+        nuevo_analisis = ResultadoKPI(
             usuario=usuario,
-            total_registros=int(resultados.get("total_registros", 0)),
-            categorias=int(resultados.get("categorias", 0)),
-            last_date=pd.to_datetime(resultados.get("last_date")).to_pydatetime() if resultados.get("last_date") else None,
-            first_date=pd.to_datetime(resultados.get("first_date")).to_pydatetime() if resultados.get("first_date") else None,
-            max_value=float(resultados.get("max_value", 0)),
-            min_value=float(resultados.get("min_value", 0)),
-            clusters=clusters_str
+            total_registros=resultados.get("total_registros"),
+            categorias=resultados.get("categorias"),
+            last_date=resultados.get("last_date"),
+            first_date=resultados.get("first_date"),
+            max_value=resultados.get("max_value"),
+            min_value=resultados.get("min_value"),
+            clusters=resultados.get("clusters")
         )
-
-        db.add(resultado_kpi)
+        
+        # Agregar y guardar en la base de datos
+        db.add(nuevo_analisis)
         db.commit()
-        db.refresh(resultado_kpi)
+        print(f"Resultados guardados para el usuario {usuario}")
+        return True
+        
     except Exception as e:
         db.rollback()
-        raise e
-
+        print(f"Error al guardar resultados: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+        return False
+    
 def guardar_resultados_json(usuario: str, resultados: Dict):
     """
     Función para guardar los resultados en un archivo JSON.

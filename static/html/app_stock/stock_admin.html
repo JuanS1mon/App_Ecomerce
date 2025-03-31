@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración de Stock</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+   
+    <!-- Contenido principal -->
+    <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">   
+        <!-- Header con información de la página -->
+        <div class="mb-8">
+            <div class="gradient-bg text-white rounded-lg shadow-lg p-6 sm:p-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Panel de Administración de Stock</h1>
+                        <p class="text-white text-opacity-90">
+                            Bienvenido, <span class="font-semibold">{{ user.nombre }}</span>. Administra productos, movimientos y reportes desde este panel.
+                        </p>
+                    </div>
+                    <div class="mt-4 md:mt-0 bg-white bg-opacity-20 p-3 rounded-lg">
+                        <div class="text-sm font-medium">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                <span id="currentDate">29 de marzo, 2025</span>
+                            </div>
+                            <div class="flex items-center mt-1">
+                                <i class="fas fa-clock mr-2"></i>
+                                <span id="currentTime">10:30 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas en tarjetas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Tarjeta de productos -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-blue-500 rounded-full p-3">
+                            <i class="fas fa-boxes text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Total Artículos</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">{{ producto_count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="/app_stock/productos" class="text-sm text-blue-500 font-medium hover:text-blue-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tarjeta de depósitos -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-purple-500 rounded-full p-3">
+                            <i class="fas fa-warehouse text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Depósitos</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">{{ categoria_count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="/app_stock/categorias" class="text-sm text-purple-500 font-medium hover:text-purple-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tarjeta de empleados -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-green-500 rounded-full p-3">
+                            <i class="fas fa-users text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Empleados</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">8</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="/app_stock/empleados" class="text-sm text-green-500 font-medium hover:text-green-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tarjeta de movimientos -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-indigo-500 rounded-full p-3">
+                            <i class="fas fa-exchange-alt text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Movimientos</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">{{ movimiento_count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="/app_stock/movimientos" class="text-sm text-indigo-500 font-medium hover:text-indigo-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accesos rápidos -->
+        <div class="bg-white rounded-xl shadow-md mb-8 overflow-hidden border border-gray-100">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-bolt mr-2 text-yellow-500"></i>
+                    Accesos rápidos
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- ARTÍCULOS -->
+                    <a href="/app_stock/articulos" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Artículos</h4>
+                            <p class="mt-1 text-sm text-gray-500">Gestión de productos</p>
+                        </div>
+                    </a>
+
+                    <!-- ARTÍCULOS TIPO -->
+                    <a href="/app_stock/articulos_tipo" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-sitemap"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Tipos de Artículos</h4>
+                            <p class="mt-1 text-sm text-gray-500">Categorización de productos</p>
+                        </div>
+                    </a>
+                    
+                    <!-- ARTÍCULOS SERIE -->
+                    <a href="/app_stock/articulos_serie" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-barcode"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Artículos con Serie</h4>
+                            <p class="mt-1 text-sm text-gray-500">Control con números de serie</p>
+                        </div>
+                    </a>
+                    
+                    <!-- DEPÓSITOS -->
+                    <a href="/app_stock/depositos" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-warehouse"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Depósitos</h4>
+                            <p class="mt-1 text-sm text-gray-500">Gestión de ubicaciones</p>
+                        </div>
+                    </a>
+                    
+                    <!-- DEPÓSITOS TIPO -->
+                    <a href="/app_stock/depositos_tipo" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-th-large"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Tipos de Depósito</h4>
+                            <p class="mt-1 text-sm text-gray-500">Clasificación de almacenes</p>
+                        </div>
+                    </a>
+                    
+                    <!-- EMPLEADOS -->
+                    <a href="/app_stock/empleados" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-green-100 text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-user-hard-hat"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Empleados</h4>
+                            <p class="mt-1 text-sm text-gray-500">Personal de almacén</p>
+                        </div>
+                    </a>
+                    
+                    <!-- STOCK ACTUAL -->
+                    <a href="/app_stock/stock_current" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-yellow-100 text-yellow-600 group-hover:bg-yellow-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Stock Actual</h4>
+                            <p class="mt-1 text-sm text-gray-500">Inventario disponible</p>
+                        </div>
+                    </a>
+
+                    <!-- STOCK HISTÓRICO -->
+                    <a href="/app_stock/stock_historico" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-yellow-100 text-yellow-600 group-hover:bg-yellow-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Stock Histórico</h4>
+                            <p class="mt-1 text-sm text-gray-500">Movimientos anteriores</p>
+                        </div>
+                    </a>
+
+                    <!-- INFORMES -->
+                    <a href="/app_stock/informes" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-red-100 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Informes</h4>
+                            <p class="mt-1 text-sm text-gray-500">Reportes y estadísticas</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Últimas actividades y gráfico -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Stock bajo -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        <i class="fas fa-exclamation-circle mr-2 text-red-500"></i>
+                        Artículos con Stock Bajo
+                    </h3>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="p-6 max-h-96 overflow-y-auto">
+                    <ul class="space-y-4">
+                        {% for producto in stock_bajo %}
+                        <li class="pb-3 border-b border-gray-100 last:border-0 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-medium">{{ producto.nombre }}</span> - Solo quedan <span class="font-bold">{{ producto.existencias }}</span> unidades
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Código: {{ producto.codigo }}
+                                </p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                        
+                        <!-- Mensaje si no hay stock bajo -->
+                        {% if not stock_bajo %}
+                        <li class="py-6 text-center">
+                            <div class="text-sm text-gray-500">No hay artículos con stock bajo actualmente.</div>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
+                    <a href="/app_stock/stock_current" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Ver todo el inventario</a>
+                </div>
+            </div>
+
+            <!-- Gráfico de movimientos -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        <i class="fas fa-chart-line mr-2 text-indigo-500"></i>
+                        Actividad de Stock
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <canvas id="activityChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div id="footer-container"></div>
+</body>
+</html>

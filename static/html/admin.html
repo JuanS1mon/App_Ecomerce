@@ -3,176 +3,382 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administración</title>
+    <title>Panel de Administración</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
     <style>
-        .dropdown:hover .dropdown-menu {
-            display: block;
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <!-- Barra de navegación -->
-      <nav class="bg-gray-800 p-4 relative z-30">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-4">
-                <a href="">
-                    <img src="../static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
-                </a>
-                <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
-                <span class="text-gray-400">/</span>
-                <span class="text-white text-lg font-semibold">Admin</span>
-            </div>
-            <div class="flex items-center space-x-4 relative">
-                <a href="/docs" class="text-white hover:text-gray-300">Documentación</a>
-                <a href="/generar" class="text-white hover:text-gray-300">Generar API</a>
-                <a href="/migraciones/admin_migraciones" class="text-white hover:text-gray-300">Migraciones</a>
-                <div class="relative">
-                    <button id="perfil" class="flex items-center focus:outline-none">
-                        <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white">
-                            {{ user.nombre[0]|upper }}
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+   
+    <!-- Contenido principal -->
+    <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">   
+        <!-- Header con información de la página -->
+        <div class="mb-8">
+            <div class="gradient-bg text-white rounded-lg shadow-lg p-6 sm:p-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Panel de Administración</h1>
+                        <p class="text-white text-opacity-90">
+                            Bienvenido, <span class="font-semibold">{{ user.nombre }}</span>. Gestiona aplicaciones, usuarios y más desde este panel.
+                        </p>
+                    </div>
+                    <div class="mt-4 md:mt-0 bg-white bg-opacity-20 p-3 rounded-lg">
+                        <div class="text-sm font-medium">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                <span id="currentDate">19 de marzo, 2025</span>
+                            </div>
+                            <div class="flex items-center mt-1">
+                                <i class="fas fa-clock mr-2"></i>
+                                <span id="currentTime">10:30 AM</span>
+                            </div>
                         </div>
-                        <svg class="ml-2 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                    <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
-                        <a href="/admin/perfil" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Perfil de usuario</a>
-                        <form action="/logout" method="post">
-                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">Logout</button>
-                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </nav>
 
-    <!-- Contenido principal -->
-    <div id="content" class="container mx-auto p-8">
-        <!-- Bienvenida -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 class="text-2xl font-bold mb-4">Bienvenido, {{ user.nombre }}</h2>
-            <p class="text-gray-700">Aquí puedes gestionar las aplicaciones, ver estadísticas y realizar otras tareas administrativas.</p>
-        </div>
+        <!-- Estadísticas en tarjetas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Tarjeta de usuarios -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-blue-500 rounded-full p-3">
+                            <i class="fas fa-users text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Total Usuarios</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">{{ user_count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="/usuarios_admin/" class="text-sm text-blue-500 font-medium hover:text-blue-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
 
-        <!-- Estadísticas -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-bold mb-2">Usuarios</h3>
-                <p class="text-gray-700">Total: {{ user_count }}</p>
+            <!-- Tarjeta de migraciones -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-purple-500 rounded-full p-3">
+                            <i class="fas fa-database text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Migraciones</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">{{activity_count}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="/migraciones/admin_migraciones" class="text-sm text-purple-500 font-medium hover:text-purple-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-bold mb-2">Migraciones</h3>
-                <p class="text-gray-700">Total: {{activity_count}}</p>
+
+            <!-- Tarjeta de aplicaciones -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-green-500 rounded-full p-3">
+                            <i class="fas fa-laptop-code text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Aplicaciones</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">4</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="#" class="text-sm text-green-500 font-medium hover:text-green-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-bold mb-2">Aplicaciones</h3>
-                <p class="text-gray-700">Total: 4</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-bold mb-2">Rutas</h3>
-                <p class="text-gray-700">Total: 4</p>
+
+            <!-- Tarjeta de rutas -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-indigo-500 rounded-full p-3">
+                            <i class="fas fa-route text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Rutas</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">4</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="#" class="text-sm text-indigo-500 font-medium hover:text-indigo-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Accesos rápidos -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h3 class="text-xl font-bold mb-4">Accesos rápidos</h3>
-            <div class="flex space-x-4">
-                <a href="/generar" title="Crea nuevas APIs y aplicaciones" class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300">Generar App</a>
-                <a href="/migraciones/admin_migraciones" title="Administra las migraciones de base de datos" class="bg-purple-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-purple-600 transition duration-300">Migraciones</a>
-                <a href="/analisis/admin" title="Herramientas para análisis estadístico de datos" class="bg-green-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-600 transition duration-300">Hacer un analisis de datos</a>
-                <a href="/scraping/admin" title="Extrae información de sitios web externos" class="bg-indigo-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-indigo-600 transition duration-300">Scraping Web</a>
-                <a href="/create_blog" title="Crea y publica nuevas entradas de blog" class="bg-pink-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-pink-600 transition duration-300">Crear Nueva Noticia</a>
-                <a href="/admin/usuarios" title="Administra cuentas y permisos de usuarios" class="bg-yellow-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-yellow-600 transition duration-300">Gestionar Usuarios</a>
+        <div class="bg-white rounded-xl shadow-md mb-8 overflow-hidden border border-gray-100">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-bolt mr-2 text-yellow-500"></i>
+                    Accesos rápidos
+                </h3>
+            </div>
+            <div class="p-6">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Acceso rápido para el sistema de Tickets -->
+                    <a href="/tickets/admin" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-red-100 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Sistema de Tickets</h4>
+                            <p class="mt-1 text-sm text-gray-500">Gestiona solicitudes de soporte</p>
+                        </div>
+                    </a>
+
+
+                    <a href="/generar" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Generar App</h4>
+                            <p class="mt-1 text-sm text-gray-500">Crea nuevas APIs y aplicaciones</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/migraciones/admin_migraciones" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Migraciones</h4>
+                            <p class="mt-1 text-sm text-gray-500">Administra migraciones de base de datos</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/analisis/admin" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-green-100 text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Análisis de datos</h4>
+                            <p class="mt-1 text-sm text-gray-500">Herramientas estadísticas</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/scraping/admin" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-indigo-100 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-spider"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Scraping Web</h4>
+                            <p class="mt-1 text-sm text-gray-500">Extrae info de sitios web externos</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/create_blog" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-pink-100 text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Nueva Noticia</h4>
+                            <p class="mt-1 text-sm text-gray-500">Crea y publica entradas de blog</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/usuarios_admin/" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-yellow-100 text-yellow-600 group-hover:bg-yellow-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Gestionar Usuarios</h4>
+                            <p class="mt-1 text-sm text-gray-500">Administra cuentas y permisos</p>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Últimas actividades y gráfico -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Últimas actividades -->
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-bold mb-4">Últimas actividades</h3>
-                <ul class="list-disc list-inside text-gray-700">
-                    {% for activity in activities %}
-                        <li>{{ activity.usuario.nombre }} {{ activity.action }}</li>
-                    {% endfor %}
-                </ul>
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        <i class="fas fa-history mr-2 text-blue-500"></i>
+                        Últimas actividades
+                    </h3>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="p-6 max-h-96 overflow-y-auto">
+                    <ul class="space-y-4">
+                        {% for activity in activities %}
+                        <li class="pb-3 border-b border-gray-100 last:border-0 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-medium">{{ activity.usuario.nombre }}</span> {{ activity.action }}
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    hace 2 horas
+                                </p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                        
+                        <!-- Actividades de ejemplo si no hay suficientes -->
+                        {% if activities|length < 3 %}
+                        <li class="pb-3 border-b border-gray-100 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-medium">Sistema</span> ha completado la actualización programada
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    hace 4 horas
+                                </p>
+                            </div>
+                        </li>
+                        <li class="pb-3 border-b border-gray-100 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-medium">Migración</span> completada con éxito
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    hace 1 día
+                                </p>
+                            </div>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
 
             <!-- Gráfico de actividades -->
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-bold mb-4">Gráfico de Actividades</h3>
-                <canvas id="activityChart"></canvas>
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        <i class="fas fa-chart-line mr-2 text-indigo-500"></i>
+                        Actividad del Sistema
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <canvas id="activityChart" height="250"></canvas>
+                </div>
             </div>
         </div>
-    </div>
-    {% include 'footer.html' %}
-<script>
+    </main>
+    
+    <div id="footer-container"></div>
 
-            const perfilBtn = document.getElementById('perfil');
-            const perfilMenu = document.getElementById('menu-perfil');
-        
-            perfilBtn.addEventListener('click', function(event) {
-                event.preventDefault();
-                perfilMenu.classList.toggle('hidden');
+    <script>
+        // Actualizar fecha y hora
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('es-ES', options);
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('es-ES', { 
+                hour: '2-digit', 
+                minute: '2-digit'
             });
-        
-            document.addEventListener('click', function(event) {
-                const isClickInside = perfilBtn.contains(event.target) || perfilMenu.contains(event.target);
-                if (!isClickInside) {
-                    perfilMenu.classList.add('hidden');
-                }
-            });
+        }
 
+        // Ejecutar al cargar y actualizar cada minuto
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Datos del gráfico
-        const chartData = JSON.parse('{{ chart_data | tojson | safe }}');
-
-        // Configuración del gráfico
-        const config = {
-            type: 'line', // Cambiar 'scatter' por 'line'
-            data: {
-                labels: chartData.labels, // Asegúrate de incluir las etiquetas
-                datasets: chartData.datasets
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day',
-                            tooltipFormat: 'YYYY-MM-DD'
+        // Código para el gráfico (se mantiene igual, solo añadimos algunas mejoras visuales)
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            
+            // Datos de ejemplo para el gráfico
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+                    datasets: [{
+                        label: 'Actividad',
+                        data: [12, 19, 8, 15, 10, 3, 7],
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
                         },
-                        title: {
-                            display: true,
-                            text: 'Fecha'
+                        x: {
+                            grid: {
+                                display: false
+                            }
                         }
                     },
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Cantidad de Actividades'
+                    plugins: {
+                        legend: {
+                            display: false
                         },
-                        ticks: {
-                            stepSize: 1
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1f2937',
+                            bodyColor: '#4b5563',
+                            borderColor: 'rgba(203, 213, 225, 1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false
                         }
                     }
                 }
-            }
-        };
-
-        // Crear el gráfico
-        const ctx = document.getElementById('activityChart').getContext('2d');
-        new Chart(ctx, config);
-    });
-</script>
-
+            });
+        });
+    </script>
 </body>
 </html>

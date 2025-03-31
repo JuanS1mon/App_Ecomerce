@@ -119,22 +119,51 @@ dmypy.json
 # PyCharm
 .idea/
 
-# Ignore init files
-__init__.py
-
 # Carpetas específicas
+# Resultados generados - carpetas results en cualquier ubicación
 results/
 **/results/
+*results*/
 routers/Configuraciones/results/
+routers/*/results/
+Services/*/results/
+
+# Carpetas de carga y logs
 uploads/
 logs/
+**/logs/
+
+# Entornos virtuales
 env/
 venv/
 __pycache__/
-.vscode/
+**/__pycache__/
 
+# Configuración de IDE
+.vscode/
+**/.vscode/
 
 # Excluir archivos grandes
 *.zip
 *.rar
 *.7z
+*.gz
+*.tar
+*.bz2
+*.xz
+*.pdf
+*.docx
+*.xlsx
+*.pptx
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tif
+*.tiff
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv

@@ -1,31 +1,440 @@
-<!-- templates/edit_blog.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Blog</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <!-- Estilos -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        
+        /* Animaciones */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Mejoras para el editor */
+        .content-editor {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+        
+        .content-editor:focus-within {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        /* Botones mejorados */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        /* Mejoras para entrada de texto */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        textarea {
+            min-height: 180px;
+            resize: vertical;
+        }
+    </style>
 </head>
-<body>
-    <!-- Incluir la barra de navegación -->
-    {% include 'head.html' %}
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+    
+    <!-- Contenido principal -->
+    <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
+        <!-- Header con información de la página -->
+        <div class="mb-8">
+            <div class="gradient-bg text-white rounded-lg shadow-lg p-6 sm:p-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Editar Blog</h1>
+                        <p class="text-white text-opacity-90">
+                            Actualiza el contenido de tu publicación para mejorar su alcance e impacto.
+                        </p>
+                    </div>
+                    <div class="mt-4 md:mt-0 bg-white bg-opacity-20 p-3 rounded-lg">
+                        <div class="text-sm font-medium">
+                            <div class="flex items-center">
+                                <i class="fas fa-history mr-2"></i>
+                                <span>Última actualización: <span class="font-bold">{{ post.updated_at|default(post.created_at)|default('Ahora') }}</span></span>
+                            </div>
+                            <div class="flex items-center mt-1">
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                <span id="currentDate">21 de marzo, 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div class="container">
-        <h1 class="mt-5">Editar Blog</h1>
-        <form action="/edit_blog/{{ post.id }}" method="post">
-            <div class="form-group">
-                <label for="title">Título</label>
-                <input type="text" class="form-control" id="title" name="title" value="{{ post.title }}" required>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Panel izquierdo - Estadísticas y consejos -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 animate-fadeIn mb-6">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800">
+                            <i class="fas fa-chart-bar mr-2 text-indigo-500"></i>
+                            Estadísticas del Blog
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Publicado el:</span>
+                                <span class="font-medium text-gray-800">{{ post.created_at }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Visualizaciones:</span>
+                                <span class="font-medium text-gray-800">{{ post.views|default('0') }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Comentarios:</span>
+                                <span class="font-medium text-gray-800">{{ post.comments|default('0') }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Reacciones:</span>
+                                <span class="font-medium text-gray-800">{{ post.likes|default('0') }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 px-4 py-3 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+                            <p class="text-sm text-yellow-700">
+                                <i class="fas fa-exclamation-circle mr-2"></i>
+                                Las ediciones se reflejarán inmediatamente para todos los lectores.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 animate-fadeIn" style="animation-delay: 0.1s">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800">
+                            <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>
+                            Consejos para Edición
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Revisa la ortografía y gramática antes de guardar cambios.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Utiliza párrafos cortos para mejorar la legibilidad.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Destaca los puntos principales con formato adecuado.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Mantén el contenido relevante y conciso.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="content">Contenido</label>
-                <textarea class="form-control" id="content" name="content" rows="5" maxlength="250" required>{{ post.content }}</textarea>
-                <small class="form-text text-muted">Máximo 250 caracteres.</small>
+            
+            <!-- Panel derecho - Formulario -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 animate-fadeIn" style="animation-delay: 0.2s">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800">
+                            <i class="fas fa-edit mr-2 text-blue-500"></i>
+                            Editar Contenido
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        {% if message %}
+                            <div class="mb-6 bg-green-100 border-l-4 border-green-500 p-4 rounded">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-check-circle text-green-500"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-green-700">{{ message }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if error %}
+                            <div class="mb-6 bg-red-100 border-l-4 border-red-500 p-4 rounded">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-red-700">{{ error }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <form action="/edit_blog/{{ post.id }}" method="post" class="space-y-6">
+                            <div class="space-y-2">
+                                <label for="title" class="block text-sm font-medium text-gray-700">
+                                    <i class="fas fa-heading mr-1"></i> Título
+                                </label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-font text-gray-400"></i>
+                                    </div>
+                                    <input 
+                                        type="text" 
+                                        id="title" 
+                                        name="title" 
+                                        value="{{ post.title }}" 
+                                        class="form-input pl-10 focus:border-indigo-500 focus:ring-indigo-500" 
+                                        placeholder="Título de tu blog" 
+                                        required
+                                    >
+                                </div>
+                                <p class="mt-1 text-xs text-gray-500">Un buen título incrementa la visibilidad de tu post.</p>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <label for="content" class="block text-sm font-medium text-gray-700">
+                                    <i class="fas fa-paragraph mr-1"></i> Contenido
+                                </label>
+                                <div class="mt-1 content-editor rounded-md">
+                                    <div class="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
+                                        <div class="flex space-x-3">
+                                            <button type="button" class="text-gray-500 hover:text-gray-800" onclick="formatText('bold')">
+                                                <i class="fas fa-bold"></i>
+                                            </button>
+                                            <button type="button" class="text-gray-500 hover:text-gray-800" onclick="formatText('italic')">
+                                                <i class="fas fa-italic"></i>
+                                            </button>
+                                            <button type="button" class="text-gray-500 hover:text-gray-800" onclick="formatText('list')">
+                                                <i class="fas fa-list-ul"></i>
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <span id="charCounter" class="text-xs font-medium">0/250</span>
+                                        </div>
+                                    </div>
+                                    <textarea 
+                                        id="content" 
+                                        name="content" 
+                                        class="form-input border-0 focus:ring-0 rounded-t-none p-4" 
+                                        placeholder="Escribe aquí el contenido de tu blog..." 
+                                        rows="8"
+                                        maxlength="250" 
+                                        required
+                                        onkeyup="updateCharCounter(this)"
+                                    >{{ post.content }}</textarea>
+                                </div>
+                                <p class="mt-1 text-xs text-gray-500">Máximo 250 caracteres. Sé conciso y claro.</p>
+                            </div>
+                            
+                            <div class="flex items-center justify-between pt-4">
+                                <div class="flex space-x-2">
+                                    <a href="/blogs" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left mr-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <a href="/delete_blog/{{ post.id }}" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este blog?')">
+                                        <i class="fas fa-trash-alt mr-2"></i>
+                                        Eliminar
+                                    </a>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save mr-2"></i>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Vista previa -->
+                <div class="mt-6 bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 animate-fadeIn" style="animation-delay: 0.3s">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800">
+                            <i class="fas fa-eye mr-2 text-teal-500"></i>
+                            Vista Previa
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="border border-gray-200 rounded-md p-6 bg-gray-50">
+                            <h2 id="previewTitle" class="text-2xl font-bold text-gray-800 mb-4">{{ post.title }}</h2>
+                            <div class="h-px bg-gray-200 mb-4"></div>
+                            <p id="previewContent" class="text-gray-700">{{ post.content }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary">Actualizar</button>
-        </form>
-    </div>
-    {% include 'footer.html' %}
+        </div>
+    </main>
+    
+    <!-- Footer - Se cargará dinámicamente -->
+    <div id="footer-container"></div>
+    
+    <script>
+        // Actualizar fecha en el header
+        function updateDateTime() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('es-ES', options);
+        }
+        updateDateTime();
+        
+        // Actualizar contador de caracteres
+        function updateCharCounter(textarea) {
+            const maxLength = textarea.getAttribute('maxlength');
+            const currentLength = textarea.value.length;
+            document.getElementById('charCounter').textContent = `${currentLength}/${maxLength}`;
+            
+            // Actualizar la vista previa
+            updatePreview();
+            
+            // Cambiar color del contador según la longitud
+            const charCounter = document.getElementById('charCounter');
+            if (currentLength > maxLength * 0.8) {
+                charCounter.classList.add('text-red-500');
+                charCounter.classList.remove('text-yellow-500', 'text-gray-500');
+            } else if (currentLength > maxLength * 0.5) {
+                charCounter.classList.add('text-yellow-500');
+                charCounter.classList.remove('text-red-500', 'text-gray-500');
+            } else {
+                charCounter.classList.add('text-gray-500');
+                charCounter.classList.remove('text-red-500', 'text-yellow-500');
+            }
+        }
+        
+        // Actualizar la vista previa
+        function updatePreview() {
+            const title = document.getElementById('title').value || 'Vista previa del título';
+            const content = document.getElementById('content').value || 'El contenido de tu blog aparecerá aquí...';
+            
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewContent').textContent = content;
+        }
+        
+        // Simples funciones de formato (solo para UI, no funcionales realmente en esta versión)
+        function formatText(command) {
+            const textarea = document.getElementById('content');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            
+            let formattedText = '';
+            
+            switch (command) {
+                case 'bold':
+                    formattedText = `**${selectedText}**`;
+                    break;
+                case 'italic':
+                    formattedText = `*${selectedText}*`;
+                    break;
+                case 'list':
+                    formattedText = `\n- ${selectedText}`;
+                    break;
+                default:
+                    formattedText = selectedText;
+            }
+            
+            // Insertar el texto formateado
+            textarea.focus();
+            textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+            
+            // Actualizar el contador y la vista previa
+            updateCharCounter(textarea);
+            
+            // Colocar el cursor después del texto formateado
+            const newCursorPos = start + formattedText.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+        }
+        
+        // Inicializar listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Actualizar vista previa cuando cambia el título
+            document.getElementById('title').addEventListener('input', updatePreview);
+            
+            // Inicializar contador de caracteres
+            const textarea = document.getElementById('content');
+            updateCharCounter(textarea);
+        });
+    </script>
 </body>
 </html>
