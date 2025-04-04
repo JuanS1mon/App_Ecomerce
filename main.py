@@ -43,7 +43,6 @@ from Services.mail import mail
 from routers.config.Admin import create_admin_router
 from Services.tickets import route_ticket
 
-
 from db.schemas.config.Usuarios import UserDB
 from db.models.Blog import BlogPost as BlogPostModel
 from sqlalchemy.orm import Session

@@ -104,7 +104,7 @@ def generate_and_save_service(module_name, field_names, field_types):
     # Generar todos los componentes dentro de la carpeta de servicios
     try:
         # 1. Generar y guardar el servicio (CRUD con SQL)
-        from .Generar_Funciones.Generar_Cruds_service import generate_crud_functions
+        from .Generar_Funciones.Generar_Cruds_sql import generate_crud_functions
         service_code = generate_crud_functions(module_name, field_names, field_types)
         save_file_to_service(f"{service_dir}/service_{module_name}.py", service_code)
         
