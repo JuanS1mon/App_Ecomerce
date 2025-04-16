@@ -96,8 +96,8 @@ async def routes_update_{module_name}({primary_key}: {primary_key_type}, {module
 @router.get("/pagina", response_class=HTMLResponse)
 async def get_pagina():
     try:
-        # Considerar si quieres cambiar la ubicación HTML para servicios
-        with open("static/html/{module_name}.html", "r", encoding="utf-8") as file:
+        # Ruta actualizada: ahora buscamos en static/module_name/index.html
+        with open(f"static/{module_name}/index.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

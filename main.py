@@ -153,6 +153,12 @@ app.include_router(Scraping.router)
 app.include_router(roles_router)
 app.include_router(route_ticket.router)
 
+# Importar y registrar los routers de Stock
+from Services.app_stock.stock.route_stock import router as stock_router
+from Services.app_stock.stock.route_reports import router as stock_reports_router
+app.include_router(stock_router)
+app.include_router(stock_reports_router)
+
 # Crear el gestor de servicios ANTES de importar otros módulos
 services_manager = ServicesManager(app)
 
@@ -187,29 +193,275 @@ async def startup_event():
     except Exception as e:
         logger.error(f"Error al importar modelos: {str(e)}")
     
-    # Activar servicios manualmente uno por uno 
+    # Verificar servicios pendientes de activar
     try:
-        active_services = [s for s, active in services_manager.active_services.items() if active]
-        for service_id in active_services:
-            logger.info(f"Activando servicio: {service_id}")
-            try:
-                # Cargar el router directamente
-                router = services_manager.load_service(service_id)
-                if router:
-                    app.include_router(router)
-                    logger.info(f"Servicio {service_id} activado correctamente")
-                else:
-                    logger.error(f"No se pudo cargar el router para {service_id}")
-            except Exception as e:
-                logger.error(f"Error activando {service_id}: {str(e)}")
+        pending = services_manager.activate_saved_services(ask_confirmation=True)
+        pending_services = pending.get('services', [])
+        pending_maestros = pending.get('maestros', [])
+        
+        if pending_services or pending_maestros:
+            logger.info(f"Servicios pendientes de activar: {len(pending_services)} servicios y {len(pending_maestros)} maestros")
+            
+            # En lugar de activarlos automáticamente, guardamos el estado pendiente para que
+            # el usuario pueda confirmar cuando esté listo
+            app.state.pending_activation = pending
+            logger.info("La activación de servicios está pendiente de confirmación por el usuario")
+            logger.info("Visite /continuar-iteracion para activarlos")
+        else:
+            logger.info("No hay servicios pendientes de activar")
+        
     except Exception as e:
-        logger.error(f"Error al activar servicios: {str(e)}")
+        logger.error(f"Error al verificar servicios pendientes: {str(e)}")
         
     logger.info("Verificando estado final de servicios...")
     services_manager.check_services_state()
     services_manager.diagnose_routes()
 
     logger.info("Aplicación iniciada correctamente.")
+
+# Añadir una ruta para gestionar la confirmación de iteración
+@app.get("/continuar-iteracion", response_class=HTMLResponse, include_in_schema=False)
+async def continuar_iteracion(request: Request):
+    """Muestra una página para que el usuario confirme si desea continuar con la iteración de servicios."""
+    pending = getattr(request.app.state, "pending_activation", {"services": [], "maestros": []})
+    pending_services = pending.get('services', [])
+    pending_maestros = pending.get('maestros', [])
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Confirmación de iteración</title>
+        <style>
+            body {{ 
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                margin: 0; 
+                padding: 0;
+                background-color: #f5f5f5;
+                color: #333;
+            }}
+            h1 {{ 
+                color: #2c3e50; 
+                margin-bottom: 20px;
+            }}
+            h3 {{
+                color: #34495e;
+                margin-top: 15px;
+                margin-bottom: 10px;
+            }}
+            .container {{ 
+                max-width: 800px; 
+                margin: 40px auto; 
+                padding: 30px; 
+                background-color: #fff; 
+                border-radius: 8px; 
+                box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
+            }}
+            .info-box {{
+                background-color: #e1f5fe;
+                border-left: 4px solid #03a9f4;
+                padding: 15px;
+                margin: 20px 0;
+                border-radius: 4px;
+            }}
+            ul {{ 
+                padding-left: 20px; 
+                margin-bottom: 20px;
+            }}
+            li {{ 
+                margin-bottom: 8px;
+                line-height: 1.5;
+            }}
+            .button-container {{
+                display: flex;
+                margin-top: 30px;
+            }}
+            .button {{ 
+                display: inline-block; 
+                padding: 12px 20px; 
+                background-color: #4CAF50; 
+                color: white; 
+                text-decoration: none; 
+                border-radius: 4px; 
+                cursor: pointer; 
+                margin-right: 15px;
+                font-weight: 500;
+                transition: background-color 0.2s;
+            }}
+            .button:hover {{
+                background-color: #45a049;
+            }}
+            .button.cancel {{ 
+                background-color: #f44336; 
+            }}
+            .button.cancel:hover {{ 
+                background-color: #d32f2f; 
+            }}
+            .empty-list {{
+                color: #777;
+                font-style: italic;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>¿Desea continuar con la iteración?</h1>
+            
+            {f"<p><strong>{len(pending_services)}</strong> servicios y <strong>{len(pending_maestros)}</strong> maestros están pendientes de activación:</p>" if pending_services or pending_maestros else "<p>No hay servicios pendientes de activación.</p>"}
+            
+            <div class="info-box">
+                <p><strong>Nota:</strong> Al continuar con la iteración, se activarán todos los servicios y maestros pendientes. 
+                Esto puede afectar el funcionamiento de la aplicación si hay cambios importantes.</p>
+            </div>
+            
+            {f'<h3>Servicios pendientes:</h3>' if pending_services else ""}
+            {f'<ul>{"".join([f"<li>{service}</li>" for service in pending_services])}</ul>' if pending_services else "<p class='empty-list'>No hay servicios pendientes</p>"}
+            
+            {f'<h3>Maestros pendientes:</h3>' if pending_maestros else ""}
+            {f'<ul>{"".join([f"<li>{maestro}</li>" for maestro in pending_maestros])}</ul>' if pending_maestros else "<p class='empty-list'>No hay maestros pendientes</p>"}
+            
+            <div class="button-container">
+                {f'<a href="/activar-servicios" class="button">Sí, continuar con la iteración</a>' if pending_services or pending_maestros else ""}
+                <a href="/" class="button cancel">No, volver al inicio</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return HTMLResponse(content=html_content)
+
+@app.get("/activar-servicios", response_class=HTMLResponse, include_in_schema=False)
+async def activar_servicios(request: Request):
+    """Activa los servicios pendientes tras la confirmación del usuario."""
+    pending = getattr(request.app.state, "pending_activation", None)
+    result_message = ""
+    activated_services = []
+    activated_maestros = []
+    error_details = None
+    
+    if pending:
+        try:
+            # Guardar los servicios que vamos a activar para mostrarlos después
+            activated_services = pending.get('services', [])
+            activated_maestros = pending.get('maestros', [])
+            
+            # Activar servicios pendientes
+            services_manager.activate_saved_services()
+            
+            # Limpiar estado pendiente
+            request.app.state.pending_activation = None
+            
+            result_message = "Los servicios se han activado correctamente."
+        except Exception as e:
+            logger.error(f"Error al activar servicios: {str(e)}")
+            result_message = f"Error al activar servicios"
+            error_details = str(e)
+    else:
+        result_message = "No hay servicios pendientes de activación."
+    
+    # HTML para mostrar el resultado de la activación
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Activación de servicios</title>
+        <style>
+            body {{ 
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                margin: 0; 
+                padding: 0;
+                background-color: #f5f5f5;
+                color: #333;
+            }}
+            h1 {{ 
+                color: #2c3e50; 
+                margin-bottom: 20px;
+            }}
+            h3 {{
+                color: #34495e;
+                margin-top: 15px;
+                margin-bottom: 10px;
+            }}
+            .container {{ 
+                max-width: 800px; 
+                margin: 40px auto; 
+                padding: 30px; 
+                background-color: #fff; 
+                border-radius: 8px; 
+                box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
+            }}
+            .message {{
+                padding: 15px;
+                margin: 20px 0;
+                border-radius: 4px;
+            }}
+            .success {{
+                background-color: #e8f5e9;
+                color: #2e7d32;
+                border-left: 4px solid #4caf50;
+            }}
+            .error {{
+                background-color: #ffebee;
+                color: #c62828;
+                border-left: 4px solid #f44336;
+            }}
+            .button {{ 
+                display: inline-block; 
+                padding: 12px 20px; 
+                background-color: #4CAF50; 
+                color: white; 
+                text-decoration: none; 
+                border-radius: 4px;
+                font-weight: 500;
+                transition: background-color 0.2s;
+            }}
+            .button:hover {{
+                background-color: #45a049;
+            }}
+            ul {{ 
+                padding-left: 20px; 
+                margin-bottom: 20px;
+            }}
+            li {{ 
+                margin-bottom: 8px;
+                line-height: 1.5;
+            }}
+            .details {{
+                background-color: #f9f9f9;
+                padding: 15px;
+                border-radius: 4px;
+                margin-top: 15px;
+                border: 1px solid #ddd;
+                white-space: pre-wrap;
+                font-family: monospace;
+                font-size: 14px;
+                overflow-x: auto;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Activación de servicios</h1>
+            
+            <div class="message {'success' if 'Error' not in result_message else 'error'}">
+                <p><strong>{result_message}</strong></p>
+                {f'<p>El error fue: </p><div class="details">{error_details}</div>' if error_details else ''}
+            </div>
+            
+            {f'<h3>Servicios activados:</h3><ul>{"".join([f"<li>{service}</li>" for service in activated_services])}</ul>' if activated_services and "Error" not in result_message else ""}
+            
+            {f'<h3>Maestros activados:</h3><ul>{"".join([f"<li>{maestro}</li>" for maestro in activated_maestros])}</ul>' if activated_maestros and "Error" not in result_message else ""}
+            
+            <div style="margin-top: 30px;">
+                <a href="/" class="button">Volver al inicio</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return HTMLResponse(content=html_content)
 
 # Ruta de inicio
 @app.get("/index", response_class=HTMLResponse, include_in_schema=False)

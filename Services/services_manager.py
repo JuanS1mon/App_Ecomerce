@@ -131,89 +131,103 @@ class ServicesManager:
             logger.warning("Pruebe refreshing estos servicios o reinicie la aplicación")
 
     # Añadir este método a la clase ServicesManager (por ejemplo después del método register_all_maestros)
-    def activate_saved_services(self):
-        """Activa todos los servicios que estaban marcados como activos en el estado guardado."""
-        activated_services = 0
-        activated_maestros = 0
+    def activate_saved_services(self, ask_confirmation=False):
+        """Activa todos los servicios que estaban marcados como activos en el estado guardado.
         
+        Args:
+            ask_confirmation (bool): Si es True, retorna una lista de servicios pendientes en lugar
+                                     de activarlos directamente. El código que llama debe manejar la confirmación.
+        """
         # Primero escanear servicios disponibles para actualizar la lista
         available_services = self.scan_services()
         available_maestros = self.scan_maestros()
         
-        # Mostrar servicios que deberían activarse
+        # Obtener servicios que deberían activarse
         active_services = [s for s, active in self.active_services.items() if active]
-        logger.info(f"Intentando activar {len(active_services)} servicios guardados:")
-        for service_id in active_services:
-            if service_id in available_services:
-                logger.info(f"  → Activando servicio: {service_id}")
-            else:
-                logger.warning(f"  ✗ Servicio no disponible: {service_id}")
+        active_maestros = [m for m, active in self.active_maestros.items() if active]
+        
+        # Filtrar solo los disponibles
+        pending_services = [s for s in active_services if s in available_services]
+        pending_maestros = [m for m in active_maestros if m in available_maestros]
+        
+        logger.info(f"Intentando activar {len(pending_services)} servicios y {len(pending_maestros)} maestros guardados")
+        
+        # Si se solicita confirmación, devolver la lista de servicios y maestros pendientes
+        if ask_confirmation:
+            return {
+                'services': pending_services,
+                'maestros': pending_maestros
+            }
+        
+        activated_services = 0
+        activated_maestros = 0
+        
+        # Mostrar servicios que deberían activarse
+        for service_id in pending_services:
+            logger.info(f"  → Activando servicio: {service_id}")
         
         # Activar servicios guardados
-        for service_id, is_active in list(self.active_services.items()):
-            if is_active and service_id in available_services:
-                try:
-                    # Verificar si el servicio ya está realmente activado
-                    already_active = False
-                    if service_id in self.services and "router" in self.services[service_id]:
-                        router = self.services[service_id]["router"]
-                        already_active = any(getattr(route, "router", None) == router for route in self.app.routes)
+        for service_id in pending_services:
+            try:
+                # Verificar si el servicio ya está realmente activado
+                already_active = False
+                if service_id in self.services and "router" in self.services[service_id]:
+                    router = self.services[service_id]["router"]
+                    already_active = any(getattr(route, "router", None) == router for route in self.app.routes)
+                
+                if already_active:
+                    logger.info(f"Servicio {service_id} ya estaba registrado en rutas")
+                    activated_services += 1
+                    continue
+                
+                # Forzar el registro del servicio incluso si está marcado como activo
+                if self.register_service(service_id, force=True):
+                    activated_services += 1
+                    logger.info(f"✅ Servicio {service_id} activado correctamente")
                     
-                    if already_active:
-                        logger.info(f"Servicio {service_id} ya estaba registrado en rutas")
-                        activated_services += 1
-                        continue
-                    
-                    # Forzar el registro del servicio incluso si está marcado como activo
-                    if self.register_service(service_id, force=True):
-                        activated_services += 1
-                        logger.info(f"✅ Servicio {service_id} activado correctamente")
-                        
-                        # Verificar que realmente esté en las rutas
-                        service_registered = any(
-                            hasattr(route, "router") and 
-                            service_id in self.services and
-                            getattr(route, "router", None) == self.services[service_id].get("router")
-                            for route in self.app.routes
-                        )
-                        
-                        if not service_registered:
-                            logger.warning(f"⚠️ Servicio {service_id} marcado como activo pero no está en app.routes")
-                    else:
-                        logger.warning(f"❌ No se pudo activar el servicio {service_id}")
-                except Exception as e:
-                    logger.error(f"❌ Error al activar servicio {service_id}: {str(e)}")
-                    import traceback
-                    logger.error(traceback.format_exc())
-        
-        # AHORA FUERA DEL BUCLE DE SERVICIOS - Activar maestros guardados
-        active_maestros = [m for m, active in self.active_maestros.items() if active]
-        logger.info(f"Intentando activar {len(active_maestros)} maestros guardados:")
-        
-        for maestro_id, is_active in list(self.active_maestros.items()):
-            if is_active and maestro_id in available_maestros:
-                try:
-                    already_included = any(
+                    # Verificar que realmente esté en las rutas
+                    service_registered = any(
                         hasattr(route, "router") and 
-                        maestro_id in self.maestros and
-                        getattr(route, "router", None) == self.maestros[maestro_id].get("router")
+                        service_id in self.services and
+                        getattr(route, "router", None) == self.services[service_id].get("router")
                         for route in self.app.routes
                     )
                     
-                    if already_included:
-                        logger.info(f"Maestro {maestro_id} ya estaba registrado en rutas")
-                        activated_maestros += 1
-                        continue
-                        
-                    if self.register_maestro(maestro_id):
-                        activated_maestros += 1
-                        logger.info(f"✅ Maestro {maestro_id} activado correctamente")
-                    else:
-                        logger.warning(f"❌ No se pudo activar el maestro {maestro_id}")
-                except Exception as e:
-                    logger.error(f"Error al activar maestro {maestro_id}: {str(e)}")
-                    import traceback
-                    logger.error(traceback.format_exc())
+                    if not service_registered:
+                        logger.warning(f"⚠️ Servicio {service_id} marcado como activo pero no está en app.routes")
+                else:
+                    logger.warning(f"❌ No se pudo activar el servicio {service_id}")
+            except Exception as e:
+                logger.error(f"❌ Error al activar servicio {service_id}: {str(e)}")
+                import traceback
+                logger.error(traceback.format_exc())
+        
+        # AHORA FUERA DEL BUCLE DE SERVICIOS - Activar maestros guardados
+        logger.info(f"Intentando activar {len(active_maestros)} maestros guardados:")
+        
+        for maestro_id in pending_maestros:
+            try:
+                already_included = any(
+                    hasattr(route, "router") and 
+                    maestro_id in self.maestros and
+                    getattr(route, "router", None) == self.maestros[maestro_id].get("router")
+                    for route in self.app.routes
+                )
+                
+                if already_included:
+                    logger.info(f"Maestro {maestro_id} ya estaba registrado en rutas")
+                    activated_maestros += 1
+                    continue
+                    
+                if self.register_maestro(maestro_id):
+                    activated_maestros += 1
+                    logger.info(f"✅ Maestro {maestro_id} activado correctamente")
+                else:
+                    logger.warning(f"❌ No se pudo activar el maestro {maestro_id}")
+            except Exception as e:
+                logger.error(f"Error al activar maestro {maestro_id}: {str(e)}")
+                import traceback
+                logger.error(traceback.format_exc())
         
         # AHORA FUERA DE AMBOS BUCLES - Guardar estado final
         self.save_state()

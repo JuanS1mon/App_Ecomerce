@@ -24,10 +24,12 @@ router = APIRouter(
 )
 
 # Ruta base para archivos estáticos HTML
-
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # Obtiene la raíz del proyecto
-HTML_BASE_PATH = BASE_DIR / "static" / "html" / "ticket"
+HTML_BASE_PATH = BASE_DIR / "static" / "html" / "tickets"  # Nueva ruta
+
+# Asegurar que el directorio existe
+HTML_BASE_PATH.mkdir(parents=True, exist_ok=True)
 
 # ----- Rutas para las páginas HTML -----
 

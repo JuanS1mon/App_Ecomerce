@@ -116,6 +116,16 @@
         .tooltip {
             transition: all 0.2s ease;
         }
+
+        /* Estilos para asegurar que los botones de gestión sean visibles por defecto */
+        #gestion-btn, #gestion-link {
+            display: inline-flex !important; /* Forzar visibilidad con !important */
+        }
+        /* Solo ocultar los botones si explícitamente se le asigna la clase 'role-usuario' al body */
+        body.role-usuario #gestion-btn,
+        body.role-usuario #gestion-link {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -487,7 +497,7 @@
     </footer>
 
     <!-- Carga del archivo JavaScript -->
-    <script src="/static/html/ticket/ticket_admin.js"></script>
+    <script src="/static/html/tickets/ticket_admin.js"></script>
 
     <script>
         // Variables para controlar la actualización automática
@@ -579,49 +589,58 @@
     <script>
         // Comprobar permisos para acceso a gestión
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar si el usuario tiene permisos (admin o técnico)
-            fetch('/usuarios_admin/api/user/current-roles')
-                .then(response => response.json())
-                .then(data => {
-                    const userRoles = data.roles || [];
-                    const allowedRoles = ['admin', 'tecnico', 'administrador', 'soporte'];
-                    const hasPermission = allowedRoles.some(role => userRoles.includes(role));
-                    
-                    // Mostrar u ocultar los botones de gestión según los permisos
-                    const gestionLink = document.getElementById('gestion-link');
-                    const gestionBtn = document.getElementById('gestion-btn');
-                    
-                    if (!hasPermission) {
-                        // Si no tiene permisos, ocultar los botones
-                        if (gestionLink) gestionLink.style.display = 'none';
-                        if (gestionBtn) gestionBtn.style.display = 'none';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al verificar permisos:', error);
-                    // En caso de error, intentar con endpoint alternativo
-                    fetch('/usuarios_admin/usuario-rol')
-                        .then(response => response.json())
-                        .then(data => {
-                            const userRoles = data.roles || [];
-                            const allowedRoles = ['admin', 'tecnico', 'administrador', 'soporte'];
-                            const hasPermission = allowedRoles.some(role => userRoles.includes(role));
-                            
-                            if (!hasPermission) {
-                                const gestionLink = document.getElementById('gestion-link');
-                                const gestionBtn = document.getElementById('gestion-btn');
-                                if (gestionLink) gestionLink.style.display = 'none';
-                                if (gestionBtn) gestionBtn.style.display = 'none';
-                            }
-                        })
-                        .catch(error => {
-                            // En caso de error, ocultar los botones por seguridad
-                            const gestionLink = document.getElementById('gestion-link');
-                            const gestionBtn = document.getElementById('gestion-btn');
-                            if (gestionLink) gestionLink.style.display = 'none';
-                            if (gestionBtn) gestionBtn.style.display = 'none';
-                        });
-                });
+            console.log('Iniciando verificación de roles (versión simplificada)');
+            
+            // Función para mostrar los botones de gestión
+            function mostrarBotonesGestion() {
+                const gestionBtn = document.getElementById('gestion-btn');
+                const gestionLink = document.getElementById('gestion-link');
+                if (gestionBtn) gestionBtn.style.cssText = "display: inline-flex !important";
+                if (gestionLink) gestionLink.style.cssText = "display: flex !important";
+                console.log('Mostrando botones de gestión (forzado)');
+            }
+            
+            // Función para verificar si el usuario tiene rol 'usuario' exclusivamente
+            function verificarRolUsuario() {
+                // Solo ocultar botones si el usuario tiene únicamente el rol 'usuario'
+                fetch('/usuarios_admin/usuario-rol')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Datos de rol recibidos:', data);
+                        
+                        // Si hay un rol_principal y es 'usuario', ocultar los botones
+                        if (data && data.rol_principal && 
+                            data.rol_principal.toLowerCase() === 'usuario') {
+                            document.body.classList.add('role-usuario');
+                            console.log('Usuario con rol principal "usuario", ocultando botones de gestión');
+                        } else {
+                            // Asegurarnos de que los botones sean visibles
+                            mostrarBotonesGestion();
+                            console.log('Usuario con rol diferente a "usuario", mostrando botones de gestión');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al verificar roles:', error);
+                        // En caso de error, mostrar los botones para admin
+                        mostrarBotonesGestion();
+                    });
+            }
+            
+            // Asegurar que los botones estén visibles de inmediato
+            mostrarBotonesGestion();
+            
+            // Luego verificar si debemos ocultarlos (solo para rol 'usuario')
+            verificarRolUsuario();
+            
+            // Comprobar visibilidad después de 1 segundo
+            setTimeout(() => {
+                const gestionBtn = document.getElementById('gestion-btn');
+                const gestionLink = document.getElementById('gestion-link');
+                console.log('Visibilidad final de botones:',
+                    'gestion-btn:', gestionBtn ? getComputedStyle(gestionBtn).display : 'no encontrado',
+                    'gestion-link:', gestionLink ? getComputedStyle(gestionLink).display : 'no encontrado'
+                );
+            }, 1000);
         });
     </script>
 </body>

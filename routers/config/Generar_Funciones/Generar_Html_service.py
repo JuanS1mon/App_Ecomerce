@@ -94,8 +94,8 @@ def generate_html_for_service(module_name, field_names, field_types):
 </style>
             """)
             
-            # Referencia al archivo JS externo
-            doc.stag('script', src=f'/static/js/{module_name}_service.js', defer=True)
+            # Referencia al archivo JS externo - Actualizada para apuntar a la carpeta específica del módulo
+            doc.stag('script', src=f'/static/{module_name}/{module_name}_service.js', defer=True)
 
         with tag('body', klass='bg-gray-50 min-h-screen'):
             # Barra de navegación mejorada

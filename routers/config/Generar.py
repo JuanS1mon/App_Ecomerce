@@ -131,19 +131,19 @@ def generate_and_save_service(module_name, field_names, field_types):
         # 6. Generar el archivo HTML y JS para la ruta /pagina
         html_content, js_content = generate_html_for_service(module_name, field_names, field_types)
         
-        # Guardar el archivo HTML
-        html_dir = "static/html"
-        os.makedirs(html_dir, exist_ok=True)
-        html_path = f"{html_dir}/{module_name}.html"
+        # Crear directorio específico para el módulo dentro de static
+        module_dir = f"static/{module_name}"
+        os.makedirs(module_dir, exist_ok=True)
+        
+        # Guardar el archivo HTML en la carpeta específica del módulo
+        html_path = f"{module_dir}/index.html"
         
         with open(html_path, 'w', encoding='utf-8') as f:
             f.write(html_content)
         logger.info(f"Archivo HTML {html_path} generado para la ruta /pagina")
         
-        # Guardar el archivo JavaScript
-        js_dir = "static/js"
-        os.makedirs(js_dir, exist_ok=True)
-        js_path = f"{js_dir}/{module_name}_service.js"
+        # Guardar el archivo JavaScript en la carpeta específica del módulo
+        js_path = f"{module_dir}/{module_name}_service.js"
         
         with open(js_path, 'w', encoding='utf-8') as f:
             f.write(js_content)
