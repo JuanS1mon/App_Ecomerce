@@ -2,31 +2,37 @@
 from io import BytesIO
 import os
 import logging
+from xml.etree.ElementInclude import include
+from datetime import datetime
 from fastapi import APIRouter, Request, status, Depends, File, UploadFile, HTTPException, BackgroundTasks
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
+from sqlalchemy import MetaData, Table, inspect, text, cast, Date, func
+from sqlalchemy.orm import Session
 from Services.migracion.migracion import procesar_archivo
 from Services.security.security import get_current_user
 from db.database import get_db
 from db.schemas.config.Usuarios import UserDB
-from datetime import datetime
+from db.models.config.activityLog import ActivityLog
 import json
-from sqlalchemy.orm import Session
 from db.crud.tablas import get_tables
 import pandas as pd
 from tenacity import retry, stop_after_attempt, wait_exponential
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-
 from Services.Analisis.analisis import clean_data
-
-
-from sqlalchemy import inspect, Table, MetaData, func, cast, Date
-from sqlalchemy import text 
-
-from db.models.config.activityLog import ActivityLog
-
-
+# Primero, definimos los tipos de archivo permitidos
+ALLOWED_EXTENSIONS = {
+    'EXCEL': [
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ],
+    'CSV': [
+        "text/csv",
+        "application/csv",
+        "text/plain"  # Algunos navegadores envían CSV como text/plain
+    ]
+}
 
 
 progress_storage = {}
@@ -68,7 +74,7 @@ async def process_sheet_with_retry(sheet_data, sheet_name, timestamp, user_resul
     """Procesa una hoja con sistema de reintentos"""
     try:
         # Convertir columnas datetime
-        datetime_columns = sheet_data.select_dtypes(include=['datetime64[ns]', 'datetime']).columns
+        datetime_columns = sheet_data.select_dtypes(include(['datetime64[ns]', 'datetime'])).columns
         for column in datetime_columns:
             sheet_data[column] = sheet_data[column].dt.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -76,6 +82,113 @@ async def process_sheet_with_retry(sheet_data, sheet_name, timestamp, user_resul
     except Exception as e:
         logging.error(f"Error procesando hoja {sheet_name}: {str(e)}")
         raise
+
+# Funciones para procesar archivos en segundo plano
+async def process_excel_file_in_background(
+    temp_file_path: str,
+    nombre_migracion: str,
+    timestamp: str,
+    user_results_dir: str, 
+    db: Session,
+    current_user,
+    progress: MigracionProgress
+):
+    """
+    Procesa un archivo Excel en segundo plano.
+    """
+    try:
+        logging.info(f"Iniciando procesamiento de archivo Excel: {temp_file_path}")
+        progress.status = "procesando"
+        
+        # Usar xlrd para Excel antiguos (.xls) o openpyxl para nuevos (.xlsx)
+        if temp_file_path.endswith('.xls'):
+            try:
+                excel = pd.ExcelFile(temp_file_path, engine='xlrd')
+            except Exception as e:
+                logging.error(f"Error al leer archivo XLS: {str(e)}")
+                progress.status = "error"
+                progress.errors.append({"sheet": "todas", "error": f"Error al leer archivo XLS: {str(e)}"})
+                return
+        else:
+            try:
+                excel = pd.ExcelFile(temp_file_path, engine='openpyxl')
+            except Exception as e:
+                logging.error(f"Error al leer archivo XLSX: {str(e)}")
+                progress.status = "error"
+                progress.errors.append({"sheet": "todas", "error": f"Error al leer archivo XLSX: {str(e)}"})
+                return
+
+        # Contar las hojas para actualizar el progreso
+        sheet_names = excel.sheet_names
+        progress.total_sheets = len(sheet_names)
+        logging.info(f"Encontradas {progress.total_sheets} hojas en el archivo Excel")
+        
+        for sheet_name in sheet_names:
+            try:
+                progress.update(sheet_name, "procesando")
+                logging.info(f"Procesando hoja: {sheet_name}")
+                
+                # Leer la hoja
+                df = excel.parse(sheet_name, header=0)
+                
+                # Eliminar filas completamente vacías
+                df.dropna(how='all', inplace=True)
+                
+                # Si el dataframe está vacío después de eliminar filas vacías, saltamos
+                if df.empty:
+                    progress.update(sheet_name, "completado", "Hoja vacía")
+                    continue
+                
+                # Eliminar columnas completamente vacías  
+                df.dropna(axis=1, how='all', inplace=True)
+                
+                # Procesar la hoja con el sistema de reintentos
+                df = await process_sheet_with_retry(df, sheet_name, timestamp, user_results_dir)
+                
+                # Convertir a JSON (asegurando que los datos datetime se convierten correctamente)
+                json_path = os.path.join(user_results_dir, f"{sheet_name}_{timestamp}.json")
+                
+                # Convertir al formato JSON usando orient='records' para una lista de diccionarios
+                df.to_json(json_path, orient='records', date_format='iso')
+                
+                # Nombre de la tabla en la base de datos
+                table_name = f"migracion_{nombre_migracion}_{sheet_name}_{timestamp}"
+                table_name = table_name.replace(" ", "_").replace("-", "_").lower()
+                
+                # Guardar el resultado de la migración
+                result_filename = f"result_{sheet_name}_{timestamp}.json"
+                result_path = os.path.join(user_results_dir, result_filename)
+                
+                # Procesar el archivo JSON
+                procesar_archivo(json_path, result_path, db, current_user, table_name)
+                
+                progress.update(sheet_name, "completado")
+                
+            except Exception as e:
+                error_msg = f"Error procesando hoja {sheet_name}: {str(e)}"
+                logging.error(error_msg)
+                progress.update(sheet_name, "error", error_msg)
+                continue
+                
+        # Actualizar el estado final
+        if progress.errors:
+            progress.status = "completado con errores"
+        else:
+            progress.status = "completado"
+            
+        # Eliminar el archivo temporal
+        try:
+            os.remove(temp_file_path)
+        except Exception as e:
+            logging.warning(f"No se pudo eliminar el archivo temporal {temp_file_path}: {str(e)}")
+        
+    except Exception as e:
+        logging.error(f"Error en el proceso de migración: {str(e)}")
+        progress.status = "error"
+        progress.errors.append({"sheet": "general", "error": f"Error general: {str(e)}"})
+        
+    finally:
+        logging.info(f"Proceso de migración completado con estado: {progress.status}")
 
 # Configuración de logging
 logging.basicConfig(
@@ -443,19 +556,6 @@ async def migrate_data(
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al migrar datos: {str(e)}")
     
-# Primero, definimos los tipos de archivo permitidos
-ALLOWED_EXTENSIONS = {
-    'EXCEL': [
-        "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    ],
-    'CSV': [
-        "text/csv",
-        "application/csv",
-        "text/plain"  # Algunos navegadores envían CSV como text/plain
-    ]
-}
-
 # Función para procesar archivos CSV
 async def process_csv_file(
     contents: bytes,
@@ -799,8 +899,15 @@ async def process_excel_file_in_background(
     progress: MigracionProgress
 ):
     try:
+        # Determinar el motor Excel adecuado según la extensión del archivo
+        file_ext = os.path.splitext(file_path)[1].lower()
+        if file_ext == '.xls':
+            excel_engine = 'xlrd'  # Motor para archivos .xls
+        else:
+            excel_engine = 'openpyxl'  # Motor para archivos .xlsx
+            
         # Usar ExcelFile para leer las hojas bajo demanda
-        with pd.ExcelFile(file_path, engine='openpyxl') as xls:
+        with pd.ExcelFile(file_path, engine=excel_engine) as xls:
             sheet_names = xls.sheet_names
             progress.total_sheets = len(sheet_names)
             
@@ -814,7 +921,7 @@ async def process_excel_file_in_background(
                     df = pd.read_excel(
                         file_path, 
                         sheet_name=sheet_name, 
-                        engine='openpyxl', 
+                        engine=excel_engine, 
                         # Optimizaciones para archivos grandes
                         dtype='object',  # Usa tipos inferidos más tarde en smaller chunks
                         na_filter=False,  # Desactivar el filtro NA para aumentar velocidad

@@ -1,20 +1,116 @@
 import datetime
 import pandas as pd
 import numpy as np
+from typing import Optional, List, Dict, Any
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+from sqlalchemy import text, inspect
 from fastapi import APIRouter, Request, logger, status, Depends, HTTPException,Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
+
 from Services.security.security import get_current_user
 from db.database import get_db
 from db.schemas.config.Usuarios import UserDB
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from db.crud.tablas import get_tables, get_columns, get_table_data
-from sqlalchemy import inspect, text
-from typing import Optional, List, Dict, Any
-from collections import Counter
-from Services.Analisis.analisis import convert_types, limpiar_datos, guardar_resultados_sql
+from db.crud.tablas import get_tables
 
+# ==================== FUNCIONES UTILITARIAS ====================
+
+def limpiar_datos(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Limpia y procesa un DataFrame de pandas
+    - Maneja valores nulos
+    - Convierte tipos de datos apropiados
+    - Elimina duplicados si es necesario
+    """
+    try:
+        # Hacer una copia para no modificar el original
+        df_clean = df.copy()
+        
+        # Reemplazar valores nulos con valores apropiados según el tipo
+        for column in df_clean.columns:
+            if df_clean[column].dtype == 'object':
+                df_clean[column] = df_clean[column].fillna('Sin datos')
+            elif pd.api.types.is_numeric_dtype(df_clean[column]):
+                df_clean[column] = df_clean[column].fillna(0)
+            elif pd.api.types.is_datetime64_any_dtype(df_clean[column]):
+                df_clean[column] = df_clean[column].fillna(pd.NaT)
+        
+        # Convertir columnas de texto que parecen números
+        for column in df_clean.select_dtypes(include=['object']).columns:
+            try:
+                # Intentar convertir a numérico si es posible
+                numeric_series = pd.to_numeric(df_clean[column], errors='ignore')
+                if not numeric_series.equals(df_clean[column]):
+                    df_clean[column] = numeric_series
+            except:
+                pass
+        
+        return df_clean
+    except Exception as e:
+        print(f"Error en limpiar_datos: {str(e)}")
+        return df
+
+
+def convert_types(value):
+    """
+    Convierte valores a tipos serializables para JSON
+    """
+    try:
+        if pd.isna(value) or value is None:
+            return None
+        elif isinstance(value, (pd.Timestamp, datetime.datetime)):
+            return value.isoformat() if hasattr(value, 'isoformat') else str(value)
+        elif isinstance(value, (pd.Timedelta, datetime.timedelta)):
+            return str(value)
+        elif isinstance(value, (np.integer, np.int64, np.int32)):
+            return int(value)
+        elif isinstance(value, (np.floating, np.float64, np.float32)):
+            return float(value) if not np.isnan(value) else None
+        elif isinstance(value, np.ndarray):
+            return value.tolist()
+        elif hasattr(value, 'item'):  # Para tipos numpy escalares
+            return value.item()
+        else:
+            return value
+    except Exception as e:
+        print(f"Error en convert_types: {str(e)}")
+        return str(value)
+
+
+def guardar_resultados_sql(db: Session, user_name: str, resultados: Dict[str, Any]):
+    """
+    Guarda los resultados del análisis en una tabla de auditoría o log
+    """
+    try:
+        # Crear una entrada de log simple en lugar de usar una tabla específica
+        # Esto es una implementación básica que puede expandirse
+        from datetime import datetime
+        
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "user": user_name,
+            "action": "analisis_datos",
+            "results_summary": {
+                "total_registros": resultados.get("total_registros", 0),
+                "categorias_count": len(resultados.get("categorias", [])),
+                "date_range": f"{resultados.get('first_date')} - {resultados.get('last_date')}",
+                "has_clusters": bool(resultados.get("clusters"))
+            }
+        }
+        
+        # Por ahora solo hacer log en consola
+        # En una implementación completa, esto iría a una tabla de base de datos
+        print(f"[AUDIT LOG] {log_entry}")
+        
+        # Si existe una tabla de logs, se podría implementar aquí:
+        # insert_query = text("INSERT INTO audit_logs (user_name, action, details, created_at) VALUES (:user, :action, :details, :created)")
+        # db.execute(insert_query, {"user": user_name, "action": "analisis_datos", "details": str(log_entry), "created": datetime.now()})
+        # db.commit()
+        
+    except Exception as e:
+        print(f"Error al guardar resultados: {str(e)}")
+        # No lanzar excepción para no interrumpir el flujo principal
 
 # Ajustar el directorio de las plantillas
 templates = Jinja2Templates(directory="static/html")

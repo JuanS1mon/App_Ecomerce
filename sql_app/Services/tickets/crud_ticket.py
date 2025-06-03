@@ -2,9 +2,10 @@ from sqlalchemy import text, or_, desc
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException, status
+from typing import Optional, Dict, Any, List
+
 from db.models.config.activityLog import ActivityLog
-from .model_ticket import Ticket
-from typing import List, Optional, Dict, Any
+from db.models.config.tickets import Ticket
 import logging
 import json
 from datetime import datetime, timedelta

@@ -1,14 +1,14 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Query, Form, UploadFile, File, Request
+from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy import desc, text
 from sqlalchemy.orm import Session
+from typing import Optional, List, Dict, Any
+
 from db.database import get_db
-from db.models.config.activityLog import ActivityLog
-from .schema_ticket import TicketCreate, TicketUpdate, TicketRead
-from .model_ticket import Ticket 
-from .crud_ticket import add_response_to_history, create_ticket, get_ticket, get_ticket_statistics_by_period, gets_tickets, delete_ticket, register_activity, update_ticket
 from Services.security.security import get_current_user
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, RedirectResponse
-from typing import Any, Dict, List, Optional
+from db.models.config.tickets import Ticket
+from Services.tickets.schema_ticket import TicketCreate, TicketRead, TicketUpdate
+from Services.tickets.crud_ticket import create_ticket, get_ticket, gets_tickets, update_ticket, delete_ticket
 import logging
 import json
 import os
@@ -24,10 +24,12 @@ router = APIRouter(
 )
 
 # Ruta base para archivos estáticos HTML
-
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # Obtiene la raíz del proyecto
-HTML_BASE_PATH = BASE_DIR / "static" / "html" / "ticket"
+HTML_BASE_PATH = BASE_DIR / "static" / "html" / "tickets"  # Nueva ruta
+
+# Asegurar que el directorio existe
+HTML_BASE_PATH.mkdir(parents=True, exist_ok=True)
 
 # ----- Rutas para las páginas HTML -----
 

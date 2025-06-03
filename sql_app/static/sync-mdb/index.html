@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Artículos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Gestión de Artículos</h1>
+            <div>
+                <a href="/articulos/sync-mdb.html" class="btn btn-primary">Sincronización MDB</a>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <h4 class="alert-heading">Herramientas de Sincronización MDB</h4>
+            <p>Para probar la conexión con MDB y enviar artículos de prueba, visita la página de <a href="/articulos/sync-mdb.html" class="alert-link">Sincronización MDB</a>.</p>
+            <hr>
+            <p class="mb-0">Allí podrás:</p>
+            <ul>
+                <li>Comprobar la conexión a un archivo MDB</li>
+                <li>Enviar un artículo genérico de prueba</li>
+                <li>Sincronizar los artículos de la base de datos</li>
+            </ul>
+        </div>
+
+        <!-- Aquí irá el contenido de la gestión de artículos -->
+        <div class="card">
+            <div class="card-header">
+                Lista de Artículos
+            </div>
+            <div class="card-body">
+                <div id="articulos-container">
+                    Cargando artículos...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para cargar los artículos (implementación básica)
+        async function cargarArticulos() {
+            try {
+                const response = await fetch('/articulos/');
+                if (response.ok) {
+                    const data = await response.json();
+                    mostrarArticulos(data);
+                } else {
+                    document.getElementById('articulos-container').innerHTML = 
+                        '<div class="alert alert-danger">Error al cargar los artículos</div>';
+                }
+            } catch (error) {
+                document.getElementById('articulos-container').innerHTML = 
+                    `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Función para mostrar los artículos
+        function mostrarArticulos(articulos) {
+            if (!articulos || articulos.length === 0) {
+                document.getElementById('articulos-container').innerHTML = 
+                    '<div class="alert alert-warning">No se encontraron artículos</div>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'table table-striped table-hover';
+            
+            // Cabecera
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>ID</th>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Precio Costo</th>
+                    <th>Precio Venta</th>
+                </tr>
+            `;
+            table.appendChild(thead);
+            
+            // Cuerpo
+            const tbody = document.createElement('tbody');
+            articulos.forEach(articulo => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${articulo.id}</td>
+                    <td>${articulo.codigo}</td>
+                    <td>${articulo.descripcion}</td>
+                    <td>${articulo.preciocosto?.toFixed(2) || 0}</td>
+                    <td>${articulo.precioventa?.toFixed(2) || 0}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            
+            document.getElementById('articulos-container').innerHTML = '';
+            document.getElementById('articulos-container').appendChild(table);
+        }
+
+        // Cargar artículos al iniciar
+        window.addEventListener('load', cargarArticulos);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

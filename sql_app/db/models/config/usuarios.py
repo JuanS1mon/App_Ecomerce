@@ -1,5 +1,9 @@
 from sqlalchemy import Column, Integer, NVARCHAR, Boolean
-from db.database import Base
+
+try:
+    from ...database import Base
+except ImportError:
+    from sql_app.db.database import Base
 
 class usuarios(Base):
     __tablename__ = 'Usuarios'  # Asegúrate de que coincida con el nombre real en la base de datos

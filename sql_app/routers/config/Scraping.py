@@ -16,8 +16,6 @@ from pydantic import BaseModel
 from db.schemas.Scraping import ScraperTestConfig
 from Services.scraping.scraping import extract_with_beautifulsoup
 from Services.scraping.scraping import extract_with_selenium
-#from ...Services.scraping.scraping import extract_with_scrapy
-# Importaciones específicas para scraping web   
 
 import requests
 from bs4 import BeautifulSoup

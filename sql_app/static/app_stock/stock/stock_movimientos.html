@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Confirmación de Movimientos de Stock
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <link href="/static/app_stock/stock/badge-amber.css" rel="stylesheet"/>
+  <link href="/static/app_stock/stock/ciclo-movimiento.css" rel="stylesheet"/>
+  <style>
+   .fade-in {
+        animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .slide-in {
+        animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        border-radius: 8px;
+        z-index: 9999;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    .toast-success {
+        background-color: #10B981;
+        color: white;
+    }
+    .toast-error {
+        background-color: #EF4444;
+        color: white;
+    }
+    .input-field:focus {
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+        outline: none;
+    }
+    .hover-raise {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-raise:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .table-container {
+        overflow-x: auto;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    /* Estilizando scrollbar */
+    .table-container::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    .table-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    .table-container::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 10px;
+    }
+    .table-container::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
+    }
+    /* Estilos adicionales para el modal de detalle */
+    .modal-overlay {
+        backdrop-filter: blur(2px);
+    }
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-green {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    .badge-yellow {
+        background-color: #FEF3C7;
+        color: #92400E;
+    }    .badge-blue {
+        background-color: #DBEAFE;
+        color: #1E40AF;
+    }
+    
+    /* Estilos para visualización de flujo de depósitos */
+    .deposito-flow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 1rem 0;
+        padding: 0.5rem;
+        background-color: #F3F4F6;
+        border-radius: 0.5rem;
+    }
+      .deposito-box {
+        background-color: white;
+        border: 1px solid #D1D5DB;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        width: 45%;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+    }
+    
+    .deposito-arrow {
+        font-size: 1.5rem;
+        color: #6B7280;
+        display: flex;
+        align-items: center;
+    }
+    
+    .deposito-box.origen {
+        border-left: 4px solid #92400E;
+    }
+    
+    .deposito-box.destino {
+        border-left: 4px solid #1E40AF;
+    }
+    
+    /* Estilos para depósitos con disponible negativo */
+    .deposito-box.border-red-300 {
+        border-color: #FCA5A5;
+        border-left-width: 4px;
+        border-left-color: #DC2626;
+    }
+    
+    .deposito-box.bg-red-50 {
+        background-color: #FEF2F2;
+    }
+    
+    .flow-details {
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        color: #4B5563;
+    }
+      .flow-quantity {
+        font-weight: 600;
+        font-size: 1.25rem;
+        color: #1F2937;
+        text-align: center;
+        margin-top: 0.5rem;
+    }
+    
+    /* Estilos para las filas confirmadas */
+    .confirmed-row {
+        background-color: #F0FDF4 !important;
+        border-left: 3px solid #10B981;
+    }
+    .confirmed-row:hover {
+        background-color: #ECFDF5 !important;
+    }
+    .confirmed-row td:first-child {
+        position: relative;
+    }
+    .badge-gray {
+        background-color: #F3F4F6;
+        color: #4B5563;
+    }
+  </style>
+  <script defer="True" src="/static/app_stock/stock/stock_movimientos.js">
+  </script>
+  <!-- Incluir el script para cargar componentes -->
+  <script src="/static/components/load-components.js"></script>
+ </head>
+ <body class="bg-gray-50 min-h-screen">
+  <!-- Placeholder para el navbar -->
+  <div id="navbar-placeholder"></div>
+  
+  <!-- Notificaciones Toast -->
+  <div id="toast-container">
+  </div>
+  <header class="bg-white shadow-sm mb-6">
+   <div class="container mx-auto px-4 py-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+     <div>
+      <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+       <i class="fas fa-exchange-alt text-blue-600 mr-3">
+       </i>
+       Confirmación de Movimientos de Stock
+      </h1>
+      <p class="text-gray-600 mt-1">
+       Revisa y confirma los movimientos pendientes entre depósitos
+      </p>
+     </div>
+     <div class="mt-4 md:mt-0">
+      <button class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors flex items-center" id="help-btn" onclick="toggleDescription()">
+       <i class="fas fa-info-circle mr-2">
+       </i>
+       Ayuda
+      </button>
+     </div>
+    </div>
+   </div>
+  </header>   <div class="hidden container mx-auto px-4 mb-6" id="description">
+   <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-lg shadow-sm slide-in">
+    <div class="flex justify-between items-start">
+     <h2 class="text-lg font-semibold text-blue-700 mb-3">
+      Cómo utilizar este módulo
+     </h2>
+     <button class="text-gray-400 hover:text-gray-600" onclick="toggleDescription()">
+      <i class="fas fa-times">
+      </i>
+     </button>
+    </div>
+    <div class="space-y-3 text-gray-700">
+     <div class="flex items-start">
+      <i class="fas fa-check-circle text-green-600 mt-1 mr-3">
+      </i>
+      <p>
+       Este módulo permite confirmar movimientos de stock entre depósitos.
+      </p>
+     </div>
+     <div class="flex items-start">
+      <i class="fas fa-table text-blue-600 mt-1 mr-3">
+      </i>
+      <p>
+       La tabla muestra todos los movimientos pendientes que tienen cantidades reservadas o preparadas.
+      </p>
+     </div>
+     <div class="flex items-start">
+      <i class="fas fa-edit text-yellow-600 mt-1 mr-3">
+      </i>
+      <p>
+       Puedes ver el detalle de cada movimiento haciendo clic en "Ver detalle" y confirmar las transferencias.
+      </p>
+     </div>
+     <div class="flex items-start">
+      <i class="fas fa-exchange-alt text-purple-600 mt-1 mr-3">
+      </i>
+      <p>
+       Al confirmar, el stock disponible se actualiza automáticamente en ambos depósitos.
+      </p>
+     </div>
+     
+     <div class="mt-4 border-t border-blue-200 pt-4">
+        <h3 class="font-semibold text-blue-800 mb-2">Flujo de movimiento según normas ISO</h3>
+        <div class="bg-white p-3 rounded border border-blue-100 text-sm">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-2 border-r border-blue-100">
+                    <span class="block font-medium text-amber-700 mb-1">1. Preparación (Origen)</span>
+                    <p class="text-gray-600">El depósito origen prepara la mercadería, reduciendo su disponible y aumentando su preparado.</p>
+                </div>
+                <div class="p-2 border-r border-blue-100">
+                    <span class="block font-medium text-blue-700 mb-1">2. Reserva (Destino)</span>
+                    <p class="text-gray-600">El depósito destino reserva la mercadería, generando un registro de reserva que bloquea el stock entrante.</p>
+                </div>
+                <div class="p-2">
+                    <span class="block font-medium text-green-700 mb-1">3. Confirmación</span>
+                    <p class="text-gray-600">Se confirma el movimiento, transfiriendo definitivamente el stock del origen al destino.</p>
+                </div>
+            </div>
+            <div class="mt-3 text-xs text-gray-500">
+                Este proceso cumple con los lineamientos de ISO 9001 para la trazabilidad del inventario y la cadena de custodia de materiales.
+            </div>
+        </div>
+     </div>
+    </div>
+   </div>
+  </div>   <div class="container mx-auto px-4">
+   <!-- Ciclo del movimiento de stock (basado en normas ISO) -->
+   <div class="ciclo-movimiento">
+     <div class="ciclo-step preparacion">
+       <div class="ciclo-step-number">1</div>
+       <div class="ciclo-step-title">PREPARACIÓN</div>
+       <div class="ciclo-step-description">
+         El depósito origen prepara la mercadería y genera un registro con cantidad preparada.
+       </div>
+       <div class="mt-2">
+         <span class="badge badge-amber">
+           <i class="fas fa-box mr-1"></i> Origen
+         </span>
+       </div>
+     </div>
+     <div class="arrow-container">
+       <i class="fas fa-arrow-right arrow-right"></i>
+     </div>
+     <div class="ciclo-step reserva">
+       <div class="ciclo-step-number">2</div>
+       <div class="ciclo-step-title">RESERVA</div>
+       <div class="ciclo-step-description">
+         El depósito destino reserva la mercadería, aguardando su recepción.
+       </div>
+       <div class="mt-2">
+         <span class="badge badge-blue">
+           <i class="fas fa-inbox mr-1"></i> Destino
+         </span>
+       </div>
+     </div>
+     <div class="arrow-container">
+       <i class="fas fa-arrow-right arrow-right"></i>
+     </div>
+     <div class="ciclo-step confirmacion">
+       <div class="ciclo-step-number">3</div>
+       <div class="ciclo-step-title">CONFIRMACIÓN</div>
+       <div class="ciclo-step-description">
+         Se confirma el movimiento, actualizando stock disponible en ambos depósitos.
+       </div>
+       <div class="mt-2">
+         <span class="badge badge-green">
+           <i class="fas fa-check-circle mr-1"></i> Completado
+         </span>
+       </div>
+     </div>
+   </div>
+   <div class="ciclo-iso text-right">
+     Proceso conforme a ISO 9001 para trazabilidad de inventario y transferencias de material
+   </div>
+   
+   <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+    <div class="flex flex-wrap items-center">
+     <div class="relative flex-grow">
+      <input class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700" id="search-input" placeholder="Buscar movimientos..." type="text"/>
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+       <i class="fas fa-search text-gray-400">
+       </i>
+      </div>
+     </div>
+     <div class="mt-2 sm:mt-0 sm:ml-4">
+      <button class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center" id="reset-search">
+       <i class="fas fa-redo-alt mr-2">
+       </i>
+       Restablecer
+      </button>
+     </div>
+    </div>
+   </div>
+   <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+     <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+      <i class="fas fa-exchange-alt text-blue-600 mr-2">
+      </i>
+      Movimientos Pendientes
+     </h2>
+     <div class="text-sm text-gray-500" id="record-count">
+      Cargando registros...
+     </div>
+    </div>
+    <div class="table-container">
+     <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">
+         Nro. Movimiento
+        </th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">
+         Código Artículo
+        </th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">
+         Fecha
+        </th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">
+         Depósito Origen <i class="fas fa-arrow-right text-gray-400 text-xs ml-1"></i> Destino
+        </th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">
+         Cant. Preparada
+         <span class="text-xs normal-case text-gray-400 block">(origen)</span>
+        </th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">
+         Cant. Reservada
+         <span class="text-xs normal-case text-gray-400 block">(destino)</span>
+        </th>
+        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">
+         Acciones
+        </th>
+       </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200" id="data-table-body">
+       <tr id="loading-row">
+        <td class="px-6 py-10 text-center text-sm text-gray-500" colspan="7">
+         <i class="fas fa-spinner fa-spin mr-2">
+         </i>
+         Cargando datos...
+        </td>
+       </tr>
+      </tbody>
+     </table>
+    </div>
+   </div>
+  </div>
+  
+  <!-- Modal de Detalle del Movimiento -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay hidden" id="detail-modal">
+   <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 fade-in">
+    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+     <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+      <i class="fas fa-exchange-alt text-blue-600 mr-2">
+      </i>
+      Detalle del Movimiento <span id="detail-title" class="ml-2 font-bold"></span>
+     </h3>
+     <button class="text-gray-400 hover:text-gray-500 focus:outline-none" onclick="closeDetailModal()" type="button">
+      <i class="fas fa-times">
+      </i>
+     </button>
+    </div>    <div class="p-6">
+      <div id="stock-warning" class="hidden mb-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-yellow-700">
+              <span class="font-medium">Aviso:</span> Se detectó uno o más depósitos con disponibilidad negativa.
+              Confirme que los depósitos origen y destino estén correctamente identificados.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="mb-4" id="detalle-info">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-sm font-semibold text-gray-700 mb-2">Información del artículo</h4>
+            <div class="text-sm text-gray-600" id="articulo-info">Cargando información...</div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-sm font-semibold text-gray-700 mb-2">Información del movimiento</h4>
+            <div class="text-sm text-gray-600" id="movimiento-info">Cargando información...</div>
+          </div>        </div>
+      </div>
+
+      <!-- Visualización del flujo de movimiento -->
+      <div class="mb-6">
+        <h4 class="text-sm font-semibold text-gray-700 mb-2">Visualización del Movimiento</h4>
+        <div id="flujo-movimiento" class="deposito-flow">
+          <!-- El contenido se llenará dinámicamente desde JavaScript -->
+          <div class="text-center text-sm text-gray-500">
+            <i class="fas fa-spinner fa-spin mr-2"></i> Cargando visualización...
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h4 class="text-sm font-semibold text-gray-700 mb-2">Depósitos involucrados</h4>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 border">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Depósito</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Función</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Disponible</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Reservado</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Preparado</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="depositos-table">
+              <tr>
+                <td colspan="5" class="px-4 py-3 text-center text-sm text-gray-500">
+                  <i class="fas fa-spinner fa-spin mr-2"></i> Cargando depósitos...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>      <div class="bg-gray-50 p-4 rounded-lg mb-4">
+        <h4 class="text-sm font-semibold text-gray-700 mb-2">Ajuste de cantidades (opcional)</h4>
+        <div class="text-sm text-gray-600 mb-2">
+          Si deseas confirmar una cantidad diferente a la sugerida, puedes ajustarla aquí:
+        </div>
+        <div class="flex flex-wrap items-end gap-4">
+          <div>            <label class="block text-sm font-medium text-gray-700 mb-1" for="cantidad-confirmar">
+              Cantidad a confirmar:
+            </label>
+            <input type="number" id="cantidad-confirmar" class="input-field px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" min="0.01" step="0.01" required>
+          </div>
+          <div class="text-sm text-gray-500">
+            <span>Máximo disponible: </span>
+            <span id="max-cantidad" class="font-semibold">0</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-amber-50 p-4 rounded-lg mb-4 border-l-4 border-amber-400">
+        <h4 class="text-sm font-semibold text-amber-700 mb-2">Cierre manual</h4>
+        <div class="text-sm text-amber-700">
+          Si no es posible confirmar todo el stock (ej. por faltantes o diferencias), puedes usar la opción
+          <strong>Cerrar Manualmente</strong> para marcar el movimiento como completo ignorando las cantidades pendientes.
+        </div>
+      </div>
+    </div>    <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+      <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors" onclick="closeDetailModal()" type="button">
+        Cancelar
+      </button>
+      <button class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors flex items-center" id="btn-cerrar-manual" onclick="cerrarMovimientoManual()" type="button">
+        <i class="fas fa-check-double mr-2"></i>
+        Cerrar Manualmente
+      </button>
+      <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center" id="btn-confirmar" onclick="confirmarMovimiento()" type="button">
+        <i class="fas fa-check-circle mr-2"></i>
+        Confirmar Movimiento
+      </button>
+    </div>
+   </div>
+  </div>
+
+  <!-- Modal de confirmación exitosa -->  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay hidden" id="success-modal">
+   <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 fade-in">
+      <div class="p-6">
+        <div id="success-message" class="text-gray-700">
+          <!-- El contenido detallado se insertará aquí -->
+        </div>
+        <div class="mt-6 flex justify-center">
+          <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" onclick="closeSuccessModal()" type="button">
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Placeholder para el footer -->
+  <div id="footer-placeholder"></div>
+ </body>
+</html>

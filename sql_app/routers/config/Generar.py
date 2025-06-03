@@ -6,7 +6,9 @@ import fileinput
 import logging
 import traceback
 from fastapi.security import OAuth2PasswordBearer
+
 from Services.security.security import get_current_user
+
 from .Generar_Funciones.Generar_Routes import generate_route
 from .Generar_Funciones.Generar_Cruds import generate_crud_functions
 from .Generar_Funciones.Generar_Schema import generate_schema
@@ -128,15 +130,26 @@ def generate_and_save_service(module_name, field_names, field_types):
         init_code = generate_init_file(module_name, module_name_cap)
         save_file_to_service(f"{service_dir}/__init__.py", init_code)
         
-        # 6. Generar el archivo HTML para la ruta /pagina
-        html_content = generate_html_for_service(module_name, field_names, field_types)
-        html_dir = "static/html"
-        os.makedirs(html_dir, exist_ok=True)
-        html_path = f"{html_dir}/{module_name}.html"
+        # 6. Generar el archivo HTML y JS para la ruta /pagina
+        html_content, js_content = generate_html_for_service(module_name, field_names, field_types)
+        
+        # Crear directorio específico para el módulo dentro de static
+        module_dir = f"static/{module_name}"
+        os.makedirs(module_dir, exist_ok=True)
+        
+        # Guardar el archivo HTML en la carpeta específica del módulo
+        html_path = f"{module_dir}/index.html"
         
         with open(html_path, 'w', encoding='utf-8') as f:
             f.write(html_content)
         logger.info(f"Archivo HTML {html_path} generado para la ruta /pagina")
+        
+        # Guardar el archivo JavaScript en la carpeta específica del módulo
+        js_path = f"{module_dir}/{module_name}_service.js"
+        
+        with open(js_path, 'w', encoding='utf-8') as f:
+            f.write(js_content)
+        logger.info(f"Archivo JavaScript {js_path} generado para complementar la interfaz")
         
         # 7. Registrar el servicio en el gestor de servicios
         register_service_in_manager(module_name)

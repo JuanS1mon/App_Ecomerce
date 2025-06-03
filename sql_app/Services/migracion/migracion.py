@@ -5,12 +5,10 @@ import pandas as pd
 from io import BytesIO
 import json
 from datetime import date, datetime
+from typing import List, Dict, Any, Union
 from sqlalchemy.orm import Session
 from sqlalchemy import MetaData, Table, Column, Integer, String, Float, DateTime, Boolean, BigInteger
 from db.models.config.activityLog import ActivityLog
-from db.models.config.usuarios import usuarios
-from typing import List, Dict, Any, Union
-
 # Funciones de utilidad
 def eanCheck(ean):
     """Validación mejorada de códigos EAN"""

@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from db.database import get_db
-from db.crud.config.roles import get_all_roles, create_role, get_role_by_name, delete_role
-from db.crud.config.Usuarios import assign_role_to_user, remove_role_from_user, get_user_roles
-from db.schemas.config.roles import Role, RoleCreate, RoleAssignment
-from Services.security.security import require_admin
-from typing import List
+
+try:
+    from ...db.database import get_db
+    from .security import require_admin
+except ImportError:
+    from sql_app.db.database import get_db
+    from sql_app.Services.security.security import require_admin
 
 router = APIRouter(
     prefix="/admin/roles",

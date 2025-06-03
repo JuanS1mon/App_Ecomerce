@@ -26,32 +26,40 @@ if is_heroku:
     master_engine = None
 else:
     # Configuración local usando variables de entorno
-    DB_TYPE = os.getenv("DB_TYPE", "postgresql")
-    DB_USER = os.getenv("DB_USER", "postgres")
-    DB_PASSWORD = os.getenv("DB_PASSWORD", "")
-    DB_HOST = os.getenv("DB_HOST", "localhost")
-    DB_NAME = os.getenv("DB_NAME", "sqlapp")
-    DB_DRIVER = os.getenv("DB_DRIVER", "ODBC Driver 17 for SQL Server")
-
-    # Valores seguros para el pool con predeterminados
-    POOL_SIZE = int(os.getenv("POOL_SIZE", "5"))
-    MAX_OVERFLOW = int(os.getenv("MAX_OVERFLOW", "10"))
-    POOL_TIMEOUT = int(os.getenv("POOL_TIMEOUT", "30"))
-    POOL_PRE_PING = os.getenv("POOL_PRE_PING", "True").lower() in ('true', '1', 't')
-    POOL_RECYCLE = int(os.getenv("POOL_RECYCLE", "3600"))
+    DB_TYPE = os.getenv("DB_TYPE", "postgresql").split('#')[0].strip()  # Limpiar comentarios
     
-    # Construir URLs según el tipo de base de datos
-    if DB_TYPE == "sqlserver":
-        SQLALCHEMY_DATABASE_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?driver={DB_DRIVER}"
-        SQLALCHEMY_MASTER_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master?driver={DB_DRIVER}"
-    elif DB_TYPE == "postgresql":
-        SQLALCHEMY_DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
-        SQLALCHEMY_MASTER_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/postgres"
+    if DB_TYPE == "sqlite":
+        # Configuración para SQLite
+        SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
+        master_engine = None
     else:
-        raise ValueError("DB_TYPE debe ser 'sqlserver' o 'postgresql'")
-    
-    # Crear el motor de conexión a la base de datos master (solo en desarrollo)
-    master_engine = create_engine(SQLALCHEMY_MASTER_URL, isolation_level="AUTOCOMMIT")
+        # Configuración para PostgreSQL/SQL Server
+        DB_USER = os.getenv("DB_USER", "postgres")
+        DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+        DB_HOST = os.getenv("DB_HOST", "localhost")
+        DB_NAME = os.getenv("DB_NAME", "sqlapp")
+        DB_DRIVER = os.getenv("DB_DRIVER", "ODBC Driver 17 for SQL Server")
+
+        # Valores seguros para el pool con predeterminados
+        POOL_SIZE = int(os.getenv("POOL_SIZE", "5"))
+        MAX_OVERFLOW = int(os.getenv("MAX_OVERFLOW", "10"))
+        POOL_TIMEOUT = int(os.getenv("POOL_TIMEOUT", "30"))
+        POOL_PRE_PING = os.getenv("POOL_PRE_PING", "True").lower() in ('true', '1', 't')
+        POOL_RECYCLE = int(os.getenv("POOL_RECYCLE", "3600"))
+        
+        # Construir URLs según el tipo de base de datos
+        if DB_TYPE == "sqlserver":
+            SQLALCHEMY_DATABASE_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?driver={DB_DRIVER}"
+            SQLALCHEMY_MASTER_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master?driver={DB_DRIVER}"
+        elif DB_TYPE == "postgresql":
+            SQLALCHEMY_DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+            SQLALCHEMY_MASTER_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/postgres"
+        else:
+            raise ValueError("DB_TYPE debe ser 'sqlserver', 'postgresql' o 'sqlite'")
+        
+        # Crear el motor de conexión a la base de datos master (solo en desarrollo)
+        if DB_TYPE != "sqlite":
+            master_engine = create_engine(SQLALCHEMY_MASTER_URL, isolation_level="AUTOCOMMIT")
 
 # Configuración de pool para Heroku
 if is_heroku:
@@ -66,14 +74,28 @@ if is_heroku:
     )
 else:
     # Usar configuración local
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URL,
-        pool_size=POOL_SIZE,
-        max_overflow=MAX_OVERFLOW,
-        pool_timeout=POOL_TIMEOUT,
-        pool_pre_ping=POOL_PRE_PING,
-        pool_recycle=POOL_RECYCLE
-    )
+    if os.getenv("DB_TYPE", "postgresql") == "sqlite":
+        # Configuración específica para SQLite
+        engine = create_engine(
+            SQLALCHEMY_DATABASE_URL,
+            connect_args={"check_same_thread": False}
+        )
+    else:
+        # Configuración para PostgreSQL/SQL Server
+        POOL_SIZE = int(os.getenv("POOL_SIZE", "5"))
+        MAX_OVERFLOW = int(os.getenv("MAX_OVERFLOW", "10"))
+        POOL_TIMEOUT = int(os.getenv("POOL_TIMEOUT", "30"))
+        POOL_PRE_PING = os.getenv("POOL_PRE_PING", "True").lower() in ('true', '1', 't')
+        POOL_RECYCLE = int(os.getenv("POOL_RECYCLE", "3600"))
+        
+        engine = create_engine(
+            SQLALCHEMY_DATABASE_URL,
+            pool_size=POOL_SIZE,
+            max_overflow=MAX_OVERFLOW,
+            pool_timeout=POOL_TIMEOUT,
+            pool_pre_ping=POOL_PRE_PING,
+            pool_recycle=POOL_RECYCLE
+        )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=True, bind=engine)
 Base = declarative_base()
@@ -132,8 +154,10 @@ def ensure_roles_model():
             if not os.path.exists(roles_file_path):
                 with open(roles_file_path, 'w') as f:
                     f.write("""from sqlalchemy import Column, Integer, String
-from db.database import Base
-
+try:
+    from ...db.database import Base
+except ImportError:
+    from sql_app.db.database import Base
 class Roles(Base):
     __tablename__ = "Roles"
     __table_args__ = {'extend_existing': True}
@@ -161,16 +185,78 @@ class Roles(Base):
         import traceback
         traceback.print_exc()
 
+# Función para crear específicamente las tablas relacionadas con OT
+def create_ot_tables():
+    try:
+        # Importar los modelos OT
+        from ..Services.app_stock.ot.model_ot import OT, Operacion, ReporteTiempo
+        
+        # Crear una conexión directa para ejecutar SQL puro
+        connection = engine.connect()
+        
+        # Eliminar las tablas existentes si existen para forzar su recreación
+        print("Eliminando tablas de OT existentes para recrearlas...")
+        try:
+            connection.execute(text("DROP TABLE IF EXISTS reportes_tiempo"))
+            print("Tabla reportes_tiempo eliminada")
+        except Exception as e:
+            print(f"Error al eliminar tabla reportes_tiempo: {e}")
+        
+        try:
+            connection.execute(text("DROP TABLE IF EXISTS operaciones"))
+            print("Tabla operaciones eliminada")
+        except Exception as e:
+            print(f"Error al eliminar tabla operaciones: {e}")
+        
+        try:
+            connection.execute(text("DROP TABLE IF EXISTS ot"))
+            print("Tabla ot eliminada")
+        except Exception as e:
+            print(f"Error al eliminar tabla ot: {e}")
+            
+        connection.commit()
+        
+        # Crear metadatos específicos para las tablas de OT
+        metadata = MetaData()
+        
+        # Obtener las definiciones de tablas y transferirlas a los metadatos
+        ot_table = Base.metadata.tables["ot"]
+        ot_table.tometadata(metadata)
+        
+        operaciones_table = Base.metadata.tables["operaciones"]
+        operaciones_table.tometadata(metadata)
+        
+        reportes_tiempo_table = Base.metadata.tables["reportes_tiempo"]
+        reportes_tiempo_table.tometadata(metadata)
+        
+        # Crear las tablas en el orden correcto
+        metadata.create_all(bind=engine)
+        print("Tablas de OT creadas exitosamente")
+        
+        # Verificar que las columnas se hayan creado correctamente
+        inspector = inspect(engine)
+        columns = inspector.get_columns("ot")
+        column_names = [col['name'] for col in columns]
+        print(f"Columnas creadas en tabla OT: {column_names}")
+        
+    except Exception as e:
+        print(f"Error al crear tablas de OT: {e}")
+        import traceback
+        traceback.print_exc()
+
 # Crear las tablas en la base de datos
 def create_tables():
     try:
         # Primero asegurar que exista la tabla Roles
         ensure_roles_model()
         
+        # Asegurar que existan las tablas de OT
+        create_ot_tables()
+        
         # Ahora crear el resto de las tablas
         tables_to_create = []
         for table_name, table in Base.metadata.tables.items():
-            if table_name != "Roles":  # Ya creamos Roles antes
+            if table_name != "Roles" and table_name not in ["ot", "operaciones", "reportes_tiempo"]:
                 tables_to_create.append(table)
         
         if tables_to_create:

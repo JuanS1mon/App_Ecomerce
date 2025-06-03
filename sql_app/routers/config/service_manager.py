@@ -2,7 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request, Backgrou
 from typing import Dict, List, Any, Optional
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from Services.services_manager import ServicesManager
+try:
+    from ...Services.services_manager import ServicesManager
+except ImportError:
+    from sql_app.Services.services_manager import ServicesManager
 import os
 import logging
 import traceback

@@ -1,9 +1,12 @@
 # sql_app/routers/blog.py
 from fastapi import APIRouter, Depends, Form, HTTPException, Request,status
 from sqlalchemy.orm import Session
+
+
 from db.database import get_db
 from db.models.Blog import BlogPost as BlogPostModel
 from db.schemas.Blog import BlogPost, BlogPostCreate, BlogPostUpdate
+
 from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse, RedirectResponse
 

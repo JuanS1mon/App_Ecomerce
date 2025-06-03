@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, ForeignKey
-from db.database import Base
-
+try:
+    from ...db.database import Base
+except ImportError:
+    from sql_app.db.database import Base
 class usuarios_rol(Base):
     __tablename__ = "UsuariosRol"  # Ajustar al nombre real de la tabla en SQL Server
     
