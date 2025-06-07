@@ -2,11 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Iniciar sesión</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="/static/js/components.js"></script>
+    <!-- DESHABILITADO components.js que interfiere con login -->
+    <!-- <script src="/static/js/components.js"></script> -->
     <style>
         /* Estética actualizada similar al panel de administración */
         .gradient-bg {
@@ -177,9 +177,8 @@
                         <label for="remember_me" class="ml-2 block text-sm text-gray-700">
                             Recordarme
                         </label>
-                    </div>
-                    <div class="text-sm">
-                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                    </div>                    <div class="text-sm">
+                        <a href="/reset-password" class="font-medium text-indigo-600 hover:text-indigo-500">
                             ¿Olvidaste tu contraseña?
                         </a>
                     </div>
@@ -214,10 +213,11 @@
                 <p>Si tienes problemas para iniciar sesión, contacta con el equipo de soporte.</p>
             </div>
         </div>
-    </div>
-
-    <script>
+    </div>    <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si el usuario ya está autenticado
+            checkIfAlreadyAuthenticated();
+            
             // Toggle password visibility
             const togglePassword = document.getElementById('toggle-password');
             const passwordInput = document.getElementById('password');
@@ -231,11 +231,57 @@
                     const iconClass = type === 'password' ? 'fa-eye' : 'fa-eye-slash';
                     this.querySelector('i').className = `fas ${iconClass}`;
                 });
-            }
-            
-            // Form submission
+            }            // Función para verificar autenticación existente
+            async function checkIfAlreadyAuthenticated() {
+                // EVITAR BUCLE: Solo verificar autenticación si estamos en una página de login
+                const currentPath = window.location.pathname;
+                if (!currentPath.includes('login') && !currentPath.includes('register')) {
+                    console.log('No estamos en página de login, saltando verificación de autenticación');
+                    return;
+                }
+                
+                // EVITAR BUCLE: No verificar si acabamos de hacer login
+                if (sessionStorage.getItem('just_logged_in') === 'true') {
+                    console.log('Acabamos de hacer login, saltando verificación para evitar bucle');
+                    sessionStorage.removeItem('just_logged_in');
+                    return;
+                }
+                
+                try {
+                    console.log('Verificando autenticación existente para página de login...');
+                    const response = await fetch('/usuarios/current', {
+                        method: 'GET',
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        const userData = await response.json();
+                        console.log('Estado de autenticación:', userData);
+                        
+                        if (userData.autenticado) {
+                            console.log('Usuario ya autenticado, redirigiendo desde página de login...');
+                            showNotification('Ya tienes una sesión activa. Redirigiendo...', 'success');
+                            
+                            // Redirigir después de un breve retraso
+                            setTimeout(() => {
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const redirectUrl = urlParams.get('redirect') || '/admin';
+                                console.log('Redirigiendo a:', redirectUrl);
+                                window.location.href = redirectUrl;
+                            }, 1000);
+                        }
+                    }
+                } catch (error) {
+                    console.log('No hay sesión activa, mostrando formulario de login');
+                }
+            }// Form submission
             document.getElementById('form_common').addEventListener('submit', function(event) {
                 event.preventDefault();
+                
+                console.log('🚀 INICIO DE DEBUGGING DETALLADO');
+                console.log('📍 URL actual:', window.location.href);
+                console.log('🌐 Origin:', window.location.origin);
+                console.log('📋 Form element:', document.getElementById('form_common'));
 
                 const submitButton = document.getElementById('submit_button');
                 const originalText = submitButton.innerHTML;
@@ -245,8 +291,17 @@
                 submitButton.disabled = true;
 
                 let formData = new FormData(document.getElementById('form_common'));
+                console.log('📊 Datos del formulario:', {
+                    username: formData.get('username'),
+                    password: formData.get('password') ? '***' : 'vacío'
+                });
 
-                fetch('/login', {
+                const requestUrl = '/login';
+                const fullUrl = window.location.origin + requestUrl;
+                console.log('🎯 URL de petición:', requestUrl);
+                console.log('🔗 URL completa:', fullUrl);
+                console.log('📤 Método:', 'POST');
+                console.log('📋 Content-Type:', 'application/x-www-form-urlencoded');                fetch(requestUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -258,33 +313,61 @@
                     credentials: 'include'  // Asegúrate de enviar las cookies con la solicitud
                 })
                 .then(response => {
+                    console.log('📬 RESPUESTA RECIBIDA:');
+                    console.log('✅ Status:', response.status);
+                    console.log('🔗 URL:', response.url);
+                    console.log('📋 Headers:', Array.from(response.headers.entries()));
+                    console.log('✅ OK?:', response.ok);
+                    
                     if (!response.ok) {
-                        throw new Error('Nombre de usuario o contraseña incorrectos');
+                        if (response.status === 405) {
+                            console.error('Error 405: Método no permitido. Verificar endpoint.');
+                            throw new Error('Error de configuración del servidor (405)');
+                        } else if (response.status === 401) {
+                            throw new Error('Nombre de usuario o contraseña incorrectos');
+                        } else {
+                            throw new Error(`Error del servidor: ${response.status}`);
+                        }
                     }
                     return response.json();
-                })
-                .then(data => {
+                }).then(data => {
+                    console.log('Datos recibidos del servidor:', data);
+                    
                     // Restore button state
                     submitButton.innerHTML = originalText;
                     submitButton.disabled = false;
                     
                     if (data.access_token) {
-                        console.log('Token de acceso recibido:', data.access_token);  // Imprimir el token en la consola
+                        console.log('Token de acceso recibido:', data.access_token);
+                        console.log('Datos del usuario:', data.user_info);
+                        
                         // Mostrar notificación de éxito
                         showNotification('Inicio de sesión exitoso. Redirigiendo...', 'success');
-                        // Almacenar el token en localStorage
+                          // Almacenar el token en localStorage
                         localStorage.setItem('access_token', data.access_token);
-                        // Redirigir al usuario a '/admin/' después de un breve retraso
+                          // Verificar si hay una URL de redirección en los parámetros
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirectUrl = urlParams.get('redirect') || '/admin';
+                        
+                        console.log('URL de redirección determinada:', redirectUrl);
+                        console.log('Iniciando redirección inmediata...');
+                        
+                        // Evitar verificación de autenticación en la página destino
+                        sessionStorage.setItem('just_logged_in', 'true');
+                          // Redirigir inmediatamente para mejor UX
                         setTimeout(() => {
-                            window.location.href = '/admin';
-                        }, 1000);
+                            console.log('Ejecutando redirección a:', redirectUrl);
+                            window.location.href = redirectUrl;
+                        }, 300); // Tiempo reducido para redirección más rápida
                     } else {
+                        console.log('No se recibió access_token en la respuesta');
+                        console.log('Estructura completa de la respuesta:', data);
                         showNotification('Nombre de usuario o contraseña incorrectos', 'error');
                         document.getElementById('message').textContent = 'Nombre de usuario o contraseña incorrectos';
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+                })                .catch(error => {
+                    console.error('Error completo:', error);
+                    console.error('Stack trace:', error.stack);
                     // Restore button state
                     submitButton.innerHTML = originalText;
                     submitButton.disabled = false;
@@ -346,9 +429,9 @@
                     }, 500);
                 }, 5000);
             }
-        });
-    </script>
+        });    </script>
     
-    {% include 'footer.html' %}
+    <!-- DESHABILITADO footer include que puede cargar scripts adicionales -->
+    <!-- {% include 'footer.html' %} -->
 </body>
 </html>

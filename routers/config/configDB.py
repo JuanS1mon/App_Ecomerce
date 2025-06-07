@@ -1,14 +1,15 @@
 from fastapi import FastAPI, Request, APIRouter, status, Depends, Body
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
-from Services.security.security import get_current_user
+from ...Services.security.security import get_current_user
+
 import json
 from dotenv import dotenv_values
 import logging
 
 logger = logging.getLogger(__name__)
 
-templates = Jinja2Templates(directory="static")
+templates = Jinja2Templates(directory="sql_app/static")
 
 router = APIRouter(
     include_in_schema=False,  # Oculta todas las rutas de este router en la documentación

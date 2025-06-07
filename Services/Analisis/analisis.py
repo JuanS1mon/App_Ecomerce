@@ -5,7 +5,7 @@ import numpy as np
 import json
 import os
 from sqlalchemy.orm import Session
-from db.models.resultados import ResultadoKPI
+from ...db.models.resultados import ResultadoKPI
 
 def clean_data(data: List[Dict]) -> List[Dict]:
     """

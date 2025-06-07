@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, Float, Date, DateTime, Text, ForeignKey
 from sqlalchemy.sql import func
-from db.database import Base
+from ....db.database import Base
 
 class Depositos_tipos(Base):
     __tablename__ = 'depositos_tipos'

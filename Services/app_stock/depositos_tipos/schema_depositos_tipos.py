@@ -6,7 +6,8 @@ class Depositos_tiposBase(BaseModel):
     descripcion: str
 
 class Depositos_tiposCreate(Depositos_tiposBase):
-    id: int
+    # Eliminamos el ID ya que es auto incremental
+    pass
 
 class Depositos_tiposUpdate(Depositos_tiposBase):
     pass

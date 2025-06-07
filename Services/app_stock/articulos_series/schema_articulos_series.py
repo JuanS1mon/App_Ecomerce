@@ -6,7 +6,7 @@ class Articulos_seriesBase(BaseModel):
     serie: str
 
 class Articulos_seriesCreate(Articulos_seriesBase):
-    id: int
+    id: Optional[int] = None
 
 class Articulos_seriesUpdate(Articulos_seriesBase):
     pass

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-from db.database import Base
+from ...database import Base
 import datetime
 
 class ActivityLog(Base):

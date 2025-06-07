@@ -3,7 +3,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
-from db.schemas.config.Usuarios import UserDB
+from ...schemas.config.Usuarios import UserDB
 import logging
 
 # Configura el logger

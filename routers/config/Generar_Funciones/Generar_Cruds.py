@@ -31,8 +31,10 @@ def generate_crud_functions(module_name, field_names, field_types):
     code = f'''from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException, status
-from db.models.{module_file_name} import {module_class_name}
-from typing import List, Optional
+try:
+    from ...db.models.{module_file_name} import {module_class_name}
+except ImportError:
+    from sql_app.db.models.{module_file_name} import {module_class_name}
 import logging
 
 logger = logging.getLogger(__name__)

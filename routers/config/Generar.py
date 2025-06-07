@@ -6,7 +6,9 @@ import fileinput
 import logging
 import traceback
 from fastapi.security import OAuth2PasswordBearer
-from Services.security.security import get_current_user
+
+from ...Services.security.security import get_current_user
+
 from .Generar_Funciones.Generar_Routes import generate_route
 from .Generar_Funciones.Generar_Cruds import generate_crud_functions
 from .Generar_Funciones.Generar_Schema import generate_schema
@@ -18,7 +20,7 @@ from fastapi.templating import Jinja2Templates
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-templates = Jinja2Templates(directory="static/html")
+templates = Jinja2Templates(directory="sql_app/static")
 
 # Configurar logger para este módulo
 logger = logging.getLogger(__name__)
@@ -132,7 +134,7 @@ def generate_and_save_service(module_name, field_names, field_types):
         html_content, js_content = generate_html_for_service(module_name, field_names, field_types)
         
         # Crear directorio específico para el módulo dentro de static
-        module_dir = f"static/{module_name}"
+        module_dir = f"sql_app/static/{module_name}"
         os.makedirs(module_dir, exist_ok=True)
         
         # Guardar el archivo HTML en la carpeta específica del módulo
@@ -184,7 +186,7 @@ def register_service_in_manager(module_name):
     """
     try:
         # Importamos el gestor de servicios
-        from routers.config import service_manager
+        from ...routers.config import service_manager
         
         # El ID del servicio según la convención del gestor
         service_id = f"{module_name}.route_{module_name}"
@@ -338,7 +340,7 @@ def generate_and_save_model(module_name, field_names, field_types):
 
 def save_html_form(module_name, html_content):
     import os
-    output_dir = "static/html"
+    output_dir = "sql_app/static/html"
     os.makedirs(output_dir, exist_ok=True)  # Crear el directorio si no existe
 
     file_path = f"{output_dir}/{module_name}.html"
@@ -378,7 +380,7 @@ def add_new_route_to_main(new_route):
             lines = list(file)
         last_maestros_index = None
         for i, line in enumerate(lines):
-            if line.strip().startswith('from routers.Maestros import'):
+            if line.strip().startswith('from ...routers.Maestros import'):
                 if f'Route_{new_route}' not in line:
                     lines[i] = line.strip() + f', Route_{new_route}\n'
             if '#Maestros' in line:

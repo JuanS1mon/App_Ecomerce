@@ -1,7 +1,6 @@
-
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from sqlalchemy.orm import Session
-from db.database import get_db
+from ....db.database import get_db
 from .schema_articulos_series import Articulos_seriesCreate, Articulos_seriesUpdate, Articulos_seriesRead
 from .model_articulos_series import Articulos_series as Articulos_seriesModel
 from .service_articulos_series import create_articulos_series, get_articulos_series, gets_articulos_series, delete_articulos_series, update_articulos_series
@@ -19,8 +18,9 @@ router = APIRouter(
 
 @router.post("/", response_model=Articulos_seriesRead, status_code=status.HTTP_201_CREATED)
 async def routes_post_articulos_series(articulos_series: Articulos_seriesCreate, db: Session = Depends(get_db)):
-    if articulos_series.id is None or articulos_series.serie is None:
-        raise HTTPException(status_code=status.HTTP_417_EXPECTATION_FAILED, detail="Todos los campos requeridos deben tener un valor")
+    # Verificar solo el campo obligatorio serie
+    if articulos_series.serie is None:
+        raise HTTPException(status_code=status.HTTP_417_EXPECTATION_FAILED, detail="El campo serie es requerido")
     try:
         articulos_series_model = Articulos_seriesModel(**articulos_series.model_dump())
         db_articulos_series = create_articulos_series(db=db, articulos_series=articulos_series_model)
@@ -46,8 +46,8 @@ async def routes_get_articulos_series_id(id: int, db: Session = Depends(get_db))
 async def routes_gets_articulos_series_all(db: Session = Depends(get_db)):
     try:
         db_articulos_series = gets_articulos_series(db)
-        if not db_articulos_series:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Route: articulos_seriess no encontrados")
+        # Eliminamos la validación que provocaba el error 400
+        # Si no hay registros, simplemente devolvemos una lista vacía
         return [Articulos_seriesRead.model_validate(articulos_series) for articulos_series in db_articulos_series]
     except Exception as e:
         logger.error(f"Error al obtener registros de Articulos_series: {e}")
@@ -83,7 +83,7 @@ async def routes_update_articulos_series(id: int, articulos_series: Articulos_se
 async def get_pagina():
     try:
         # Ruta actualizada: ahora buscamos en static/module_name/index.html
-        with open(f"static/articulos_series/index.html", "r", encoding="utf-8") as file:
+        with open(f"sql_app/static/app_stock/articulos_series/articulos_serie.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

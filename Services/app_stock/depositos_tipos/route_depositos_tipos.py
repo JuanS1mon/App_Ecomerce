@@ -1,7 +1,6 @@
-
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from sqlalchemy.orm import Session
-from db.database import get_db
+from ....db.database import get_db
 from .schema_depositos_tipos import Depositos_tiposCreate, Depositos_tiposUpdate, Depositos_tiposRead
 from .model_depositos_tipos import Depositos_tipos as Depositos_tiposModel
 from .service_depositos_tipos import create_depositos_tipos, get_depositos_tipos, gets_depositos_tipos, delete_depositos_tipos, update_depositos_tipos
@@ -19,8 +18,9 @@ router = APIRouter(
 
 @router.post("/", response_model=Depositos_tiposRead, status_code=status.HTTP_201_CREATED)
 async def routes_post_depositos_tipos(depositos_tipos: Depositos_tiposCreate, db: Session = Depends(get_db)):
-    if depositos_tipos.id is None or depositos_tipos.descripcion is None:
-        raise HTTPException(status_code=status.HTTP_417_EXPECTATION_FAILED, detail="Todos los campos requeridos deben tener un valor")
+    # Solo validamos la descripción ya que el ID es auto incremental
+    if depositos_tipos.descripcion is None:
+        raise HTTPException(status_code=status.HTTP_417_EXPECTATION_FAILED, detail="La descripción es obligatoria")
     try:
         depositos_tipos_model = Depositos_tiposModel(**depositos_tipos.model_dump())
         db_depositos_tipos = create_depositos_tipos(db=db, depositos_tipos=depositos_tipos_model)
@@ -46,8 +46,8 @@ async def routes_get_depositos_tipos_id(id: int, db: Session = Depends(get_db)):
 async def routes_gets_depositos_tipos_all(db: Session = Depends(get_db)):
     try:
         db_depositos_tipos = gets_depositos_tipos(db)
-        if not db_depositos_tipos:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Route: depositos_tiposs no encontrados")
+        # Eliminamos la validación que provoca el error 400
+        # Si no hay registros, simplemente devolvemos una lista vacía
         return [Depositos_tiposRead.model_validate(depositos_tipos) for depositos_tipos in db_depositos_tipos]
     except Exception as e:
         logger.error(f"Error al obtener registros de Depositos_tipos: {e}")
@@ -82,8 +82,9 @@ async def routes_update_depositos_tipos(id: int, depositos_tipos: Depositos_tipo
 @router.get("/pagina", response_class=HTMLResponse)
 async def get_pagina():
     try:
-        # Ruta actualizada: ahora buscamos en static/module_name/index.html
-        with open(f"static/depositos_tipos/index.html", "r", encoding="utf-8") as file:
+        # Corrigiendo la ruta del archivo HTML
+        # La ruta correcta debe ser dentro de la carpeta depositos_tipos, no depositos
+        with open(f"sql_app/static/app_stock/depositos_tipos/depositos_tipos.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

@@ -1,24 +1,4 @@
 {
-    "services": {
-        "test.route_test": true,
-        "tickets.route_ticket": true,
-        "facturacion.route_facturacion": true,
-        "articulos.route_articulos": true,
-        "articulos_tipos.route_articulos_tipos": true,
-        "articulos_series.route_articulos_series": true,
-        "stock.route_stock": true,
-        "stock_historico.route_stock_historico": true,
-        "depositos.route_depositos": true,
-        "depositos_tipos.route_depositos_tipos": true,
-        "ot.route_ot": true,
-        "app_stock.articulos.route_articulos": true,
-        "app_stock.articulos_series.route_articulos_series": true,
-        "app_stock.articulos_tipos.route_articulos_tipos": false,
-        "app_stock.depositos.route_depositos": true,
-        "app_stock.ot.route_ot": true,
-        "app_stock.stock.route_stock": true,
-        "app_stock.stock_historico.route_stock_historico": true,
-        "app_stock.depositos_tipos.route_depositos_tipos": true
-    },
+    "services": {},
     "maestros": {}
 }

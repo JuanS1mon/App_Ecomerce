@@ -11,21 +11,20 @@ logger = logging.getLogger(__name__)
 def create_articulos_tipos(db: Session, articulos_tipos: Articulos_tipos) -> Articulos_tipos:
     """
     Crea un nuevo registro de Articulos_tipos en la base de datos usando SQL directo.
-    Adaptado para SQL Server usando cláusula OUTPUT.
+    El ID será generado automáticamente por la base de datos.
     """
     try:
         # Preparar los datos para la consulta
         articulos_tipos_data = {}
         
-        for field in ['id', 'descripcion']:
-            if hasattr(articulos_tipos, field):
-                articulos_tipos_data[field] = getattr(articulos_tipos, field)
+        if hasattr(articulos_tipos, 'descripcion'):
+            articulos_tipos_data['descripcion'] = getattr(articulos_tipos, 'descripcion')
         
         # Construir la consulta SQL INSERT con OUTPUT para SQL Server
         query = text("""
-            INSERT INTO articulos_tipos (id, descripcion)
+            INSERT INTO articulos_tipos (descripcion)
             OUTPUT INSERTED.id, INSERTED.descripcion
-            VALUES (:id, :descripcion)
+            VALUES (:descripcion)
         """)
         
         # Ejecutar la consulta y obtener el registro insertado directamente
@@ -62,6 +61,7 @@ def create_articulos_tipos(db: Session, articulos_tipos: Articulos_tipos) -> Art
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error inesperado: {str(e)}"
         )
+
 def get_articulos_tipos(db: Session, id: int) -> Optional[Articulos_tipos]:
     """
     Obtiene un registro de Articulos_tipos por su clave primaria usando SQL directo.
@@ -84,6 +84,7 @@ def get_articulos_tipos(db: Session, id: int) -> Optional[Articulos_tipos]:
     except SQLAlchemyError as e:
         logger.error(f"Error al obtener Articulos_tipos: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al obtener el registro: {str(e)}")
+
 def gets_articulos_tipos(db: Session) -> List[Articulos_tipos]:
     """
     Obtiene una lista de todos los registros de Articulos_tipos usando SQL directo.
@@ -104,6 +105,7 @@ def gets_articulos_tipos(db: Session) -> List[Articulos_tipos]:
     except SQLAlchemyError as e:
         logger.error(f"Error al obtener registros de Articulos_tipos: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al obtener los registros: {str(e)}")
+
 def delete_articulos_tipos(db: Session, id: int) -> Articulos_tipos:
     """
     Elimina un registro de Articulos_tipos por su clave primaria usando SQL directo.
@@ -133,6 +135,7 @@ def delete_articulos_tipos(db: Session, id: int) -> Articulos_tipos:
         db.rollback()
         logger.error(f"Error al eliminar Articulos_tipos: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al eliminar el registro: {str(e)}")
+
 def update_articulos_tipos(db: Session, id: int, articulos_tipos_data: Dict[str, Any]) -> Articulos_tipos:
     """
     Actualiza un registro de Articulos_tipos por su clave primaria usando SQL directo.

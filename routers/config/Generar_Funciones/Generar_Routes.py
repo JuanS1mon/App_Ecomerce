@@ -14,12 +14,10 @@ def generate_route(module_name, field_names, field_types):
     route_code = f"""
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from sqlalchemy.orm import Session
-from db.database import get_db
-from db.schemas.Maestro.Schema_{module_name} import {module_class_name}Create, {module_class_name}Update, {module_class_name}Read
-from db.models.{module_name} import {module_class_name} as {module_class_name}Model
-from db.crud.Maestro.Crud_{module_name} import create_{module_name}, get_{module_name}, gets_{module_name}, delete_{module_name}, update_{module_name}
-from fastapi.responses import HTMLResponse, FileResponse
-from typing import List, Optional
+try:
+    from ...db.database import get_db
+except ImportError:
+    from sql_app.db.database import get_db
 import logging
 
 logger = logging.getLogger(__name__)
@@ -95,7 +93,7 @@ async def routes_update_{module_name}({primary_key}: {primary_key_type}, {module
 @router.get("/pagina", response_class=HTMLResponse)
 async def get_pagina():
     try:
-        with open("static/html/{module_name}.html", "r", encoding="utf-8") as file:
+        with open("sql_app/static/html/{module_name}.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

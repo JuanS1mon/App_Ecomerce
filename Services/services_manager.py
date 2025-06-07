@@ -275,7 +275,10 @@ class ServicesManager:
         
         # Crear tablas en la base de datos
         try:
-            from db.database import Base, engine
+try:
+    from ...db.database import Base, engine
+except ImportError:
+    from sql_app.db.database import Base, engine
             Base.metadata.create_all(bind=engine)
             logger.info(f"Tablas creadas para {models_imported} modelos importados")
         except Exception as e:
@@ -525,7 +528,10 @@ class ServicesManager:
                         importlib.import_module(module_path)
                     
                     # Crear tablas después de importar el modelo
-                    from db.database import Base, engine
+try:
+    from ...db.database import Base, engine
+except ImportError:
+    from sql_app.db.database import Base, engine
                     Base.metadata.create_all(bind=engine)
                     logger.info(f"Tablas para {service_id} creadas correctamente")
                 except ImportError:

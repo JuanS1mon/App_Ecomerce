@@ -11,21 +11,23 @@ logger = logging.getLogger(__name__)
 def create_depositos(db: Session, depositos: Depositos) -> Depositos:
     """
     Crea un nuevo registro de Depositos en la base de datos usando SQL directo.
-    Adaptado para SQL Server usando cláusula OUTPUT.
+    Adaptado para SQL Server usando cláusula OUTPUT para un ID auto incremental.
     """
     try:
         # Preparar los datos para la consulta
         depositos_data = {}
         
-        for field in ['id', 'descripcion', 'codigo', 'observacion']:
+        # Excluimos el ID ya que es auto incremental
+        for field in ['descripcion', 'codigo', 'observacion']:
             if hasattr(depositos, field):
                 depositos_data[field] = getattr(depositos, field)
         
         # Construir la consulta SQL INSERT con OUTPUT para SQL Server
+        # Sin incluir el ID en los valores
         query = text("""
-            INSERT INTO depositos (id, descripcion, codigo, observacion)
+            INSERT INTO depositos (descripcion, codigo, observacion)
             OUTPUT INSERTED.id, INSERTED.descripcion, INSERTED.codigo, INSERTED.observacion
-            VALUES (:id, :descripcion, :codigo, :observacion)
+            VALUES (:descripcion, :codigo, :observacion)
         """)
         
         # Ejecutar la consulta y obtener el registro insertado directamente
@@ -41,7 +43,7 @@ def create_depositos(db: Session, depositos: Depositos) -> Depositos:
         
         # Crear un nuevo objeto Depositos con los valores devueltos
         new_depositos = Depositos()
-        new_depositos.id = row[0]
+        new_depositos.id = row[0]  # El ID generado automáticamente
         new_depositos.descripcion = row[1]
         new_depositos.codigo = row[2]
         new_depositos.observacion = row[3]
@@ -106,6 +108,7 @@ def gets_depositos(db: Session) -> List[Depositos]:
             depositos.observacion = row[3]
             depositoss.append(depositos)
         
+        # No lanzamos excepción si la lista está vacía, simplemente devolvemos la lista vacía
         return depositoss
     except SQLAlchemyError as e:
         logger.error(f"Error al obtener registros de Depositos: {e}")

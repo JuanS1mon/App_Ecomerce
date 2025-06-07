@@ -1,7 +1,5 @@
 from sqlalchemy.orm import Session
-from db.database import engine
-from db.models.config.roles import Role
-from db.models.config.usuarios import usuarios
+from ...db.database import engine
 
 def init_roles():
     """Inicializa roles básicos en la base de datos"""

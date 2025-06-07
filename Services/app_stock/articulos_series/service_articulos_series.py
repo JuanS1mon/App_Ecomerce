@@ -11,21 +11,21 @@ logger = logging.getLogger(__name__)
 def create_articulos_series(db: Session, articulos_series: Articulos_series) -> Articulos_series:
     """
     Crea un nuevo registro de Articulos_series en la base de datos usando SQL directo.
-    Adaptado para SQL Server usando cláusula OUTPUT.
+    Adaptado para SQL Server usando cláusula OUTPUT e ID autoincremental.
     """
     try:
         # Preparar los datos para la consulta
         articulos_series_data = {}
         
-        for field in ['id', 'serie']:
-            if hasattr(articulos_series, field):
-                articulos_series_data[field] = getattr(articulos_series, field)
+        # Solo incluimos el campo serie, permitiendo que el ID sea autogenerado
+        if hasattr(articulos_series, 'serie'):
+            articulos_series_data['serie'] = getattr(articulos_series, 'serie')
         
-        # Construir la consulta SQL INSERT con OUTPUT para SQL Server
+        # Construir la consulta SQL INSERT con OUTPUT para SQL Server, sin incluir el campo ID
         query = text("""
-            INSERT INTO articulos_series (id, serie)
+            INSERT INTO articulos_series (serie)
             OUTPUT INSERTED.id, INSERTED.serie
-            VALUES (:id, :serie)
+            VALUES (:serie)
         """)
         
         # Ejecutar la consulta y obtener el registro insertado directamente
@@ -62,6 +62,7 @@ def create_articulos_series(db: Session, articulos_series: Articulos_series) -> 
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error inesperado: {str(e)}"
         )
+
 def get_articulos_series(db: Session, id: int) -> Optional[Articulos_series]:
     """
     Obtiene un registro de Articulos_series por su clave primaria usando SQL directo.
@@ -84,6 +85,7 @@ def get_articulos_series(db: Session, id: int) -> Optional[Articulos_series]:
     except SQLAlchemyError as e:
         logger.error(f"Error al obtener Articulos_series: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al obtener el registro: {str(e)}")
+
 def gets_articulos_series(db: Session) -> List[Articulos_series]:
     """
     Obtiene una lista de todos los registros de Articulos_series usando SQL directo.
@@ -104,6 +106,7 @@ def gets_articulos_series(db: Session) -> List[Articulos_series]:
     except SQLAlchemyError as e:
         logger.error(f"Error al obtener registros de Articulos_series: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al obtener los registros: {str(e)}")
+
 def delete_articulos_series(db: Session, id: int) -> Articulos_series:
     """
     Elimina un registro de Articulos_series por su clave primaria usando SQL directo.
@@ -133,6 +136,7 @@ def delete_articulos_series(db: Session, id: int) -> Articulos_series:
         db.rollback()
         logger.error(f"Error al eliminar Articulos_series: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al eliminar el registro: {str(e)}")
+
 def update_articulos_series(db: Session, id: int, articulos_series_data: Dict[str, Any]) -> Articulos_series:
     """
     Actualiza un registro de Articulos_series por su clave primaria usando SQL directo.

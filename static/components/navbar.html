@@ -1,34 +1,80 @@
-<nav class="bg-gray-800 p-4">
+<nav class="bg-gradient-to-r from-indigo-900 to-blue-900 p-3 sticky top-0 z-30 shadow-lg border-b border-blue-800">
     <div class="container mx-auto flex justify-between items-center">
         <div class="flex items-center space-x-4">
-            <a href="/index">
-            </a>
-            <a href="/index" class="text-white text-lg font-semibold hover:text-gray-300">Inicio</a>
-            <span class="text-gray-400">/</span>
-            <a href="/admin" class="text-white text-lg font-semibold hover:text-gray-300" id="admin-link">Admin</a>
-            <span class="text-gray-400 path-separator">/</span>
-            <span class="text-gray-300" id="page-title">Configuración</span>
-        </div>
-        <div class="relative">
-            <button id="perfil" class="flex items-center focus:outline-none">
-                <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white" id="user-initial">
-                    U
+            <a class="flex items-center space-x-2 hover:opacity-90 transition-opacity" href="/index">
+                <div class="bg-white p-1 rounded-full shadow-sm">
+                    <img alt="Logo" class="h-7 w-auto" src="/static/img/logo_mapache.gif"/>
                 </div>
-                <svg class="ml-2 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
-                </svg>
-            </button>
-            <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
-                <a href="/admin/perfil" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Perfil de usuario</a>
-                <form action="/logout" method="post">
-                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">Logout</button>
-                </form>
+                <span class="text-white font-bold text-lg hidden md:block">
+                    SQL App Studio
+                </span>
+            </a>
+            <div class="flex items-center space-x-2 bg-blue-800 bg-opacity-30 px-3 py-1 rounded-md" id="breadcrumb-container">
+                <!-- Los elementos del breadcrumb se generarán dinámicamente -->
+            </div>
+        </div>
+        <div class="flex items-center space-x-3 relative">
+            <div class="relative group">
+                <a class="flex items-center text-white hover:bg-blue-800 px-3 py-1.5 rounded-md text-sm transition-colors" href="/admin">
+                    <i class="fas fa-cog mr-2"></i>
+                    <span class="hidden sm:inline">Admin</span>
+                </a>
+            </div>
+            
+            <div class="relative group">
+                <a class="flex items-center text-white hover:bg-blue-800 px-3 py-1.5 rounded-md text-sm transition-colors" href="/docs">
+                    <i class="fas fa-book mr-2"></i>
+                    <span class="hidden sm:inline">API</span>
+                </a>
+            </div>
+            
+            <div class="h-6 border-r border-blue-700 mx-1"></div>
+            
+            <span class="text-xs text-blue-200">
+                <i class="far fa-calendar-alt mr-1"></i>
+                <span id="current-date">28 Abr, 2025</span>
+            </span>
+            
+            <div class="relative">
+                <button id="perfil" class="flex items-center focus:outline-none hover:bg-blue-800 px-2.5 py-1.5 rounded-md transition-colors">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white shadow-md" id="user-initial">
+                        U
+                    </div>
+                    <svg class="ml-1 w-4 h-4 text-blue-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-xl z-50 border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                        <div class="text-sm font-medium text-gray-800" id="user-name">Usuario Actual</div>
+                        <div class="text-xs text-gray-500 mt-0.5" id="user-email">usuario@ejemplo.com</div>
+                    </div>
+                    <a href="/admin/perfil" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                        <i class="fas fa-user-circle text-blue-500 mr-3 w-4 text-center"></i>
+                        Perfil de usuario
+                    </a>
+                    <a href="/admin/configuracion" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                        <i class="fas fa-cogs text-blue-500 mr-3 w-4 text-center"></i>
+                        Configuración
+                    </a>
+                    <form id="logout-form" action="/logout" method="post" class="border-t border-gray-200">
+                        <button type="submit" class="w-full flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
+                            <i class="fas fa-sign-out-alt mr-3 w-4 text-center"></i>
+                            Cerrar sesión
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </nav>
 
 <script>
+    // Mostrar fecha actual en formato español
+    const fechaActual = new Date();
+    const opciones = { day: 'numeric', month: 'short', year: 'numeric' };
+    document.getElementById('current-date').textContent = fechaActual.toLocaleDateString('es-ES', opciones);
+
     // Configuración del menú desplegable de perfil
     document.getElementById('perfil').addEventListener('click', function(event) {
         event.preventDefault();
@@ -47,43 +93,415 @@
         }
     });
 
-    // Actualizar la navegación según la página actual
-    function updateNavigation() {
+    /**
+     * Configuración central de rutas
+     * Cada entrada contiene:
+     * - title: título a mostrar en el navegador y breadcrumb
+     * - parent: ruta padre para la jerarquía del breadcrumb (opcional para rutas principales)
+     * - icon: nombre del icono de Font Awesome para mostrar (opcional)
+     * - isRoot: indica si es una página principal (opcional, por defecto false)
+     */
+    const routeConfig = {
+        // Rutas principales
+        'index': { 
+            title: 'Inicio', 
+            isRoot: true,
+            icon: 'fa-home' 
+        },
+        'admin': { 
+            title: 'Admin', 
+            parent: 'index',
+            icon: 'fa-cog' 
+        },
+        
+        // Configuración
+        'configdb': { 
+            title: 'Configuración DB', 
+            parent: 'admin',
+            icon: 'fa-database' 
+        },
+        'migraciones': { 
+            title: 'Migraciones', 
+            parent: 'admin',
+            icon: 'fa-exchange-alt'
+        },
+        'generar': { 
+            title: 'Generar API', 
+            parent: 'admin',
+            icon: 'fa-code' 
+        },
+        'services': { 
+            title: 'Servicios', 
+            parent: 'admin',
+            icon: 'fa-cogs' 
+        },
+        
+        // App Stock
+        'app_stock': { 
+            title: 'Inventario', 
+            parent: 'index',
+            icon: 'fa-boxes' 
+        },
+        'dashboard': { 
+            title: 'Dashboard', 
+            parent: 'app_stock',
+            icon: 'fa-tachometer-alt' 
+        },
+        'articulos': { 
+            title: 'Artículos', 
+            parent: 'app_stock',
+            icon: 'fa-box' 
+        },
+        'articulos_series': { 
+            title: 'Series', 
+            parent: 'articulos',
+            icon: 'fa-list-ol' 
+        },
+        'categorias': { 
+            title: 'Categorías', 
+            parent: 'app_stock',
+            icon: 'fa-tags' 
+        },
+        'proveedores': { 
+            title: 'Proveedores', 
+            parent: 'app_stock',
+            icon: 'fa-truck' 
+        },
+        
+        // Facturas
+        'facturacion': {
+            title: 'Facturación', 
+            parent: 'index',
+            icon: 'fa-file-invoice'
+        },
+        'facturas': {
+            title: 'Facturas', 
+            parent: 'facturacion',
+            icon: 'fa-file-invoice-dollar'
+        },
+        'presupuestos': {
+            title: 'Presupuestos', 
+            parent: 'facturacion',
+            icon: 'fa-file-alt'
+        }
+    };
+
+    // Función para forzar la recarga de los estilos en caso de cambios
+    function forceStylesRefresh() {
+        const links = document.querySelectorAll('link[rel="stylesheet"]');
+        links.forEach(link => {
+            const href = link.href;
+            link.href = href + (href.indexOf('?') >= 0 ? '&' : '?') + 'forceRefresh=' + Date.now();
+        });
+    }
+
+    // Tabla de mapeo para rutas especiales exactas
+    const specialRoutesExact = {
+        '/articulos/dashboard': [
+            { key: 'index', active: false },
+            { key: 'app_stock', active: false },
+            { key: 'dashboard', active: true }
+        ]
+    };
+
+    // Tabla de mapeo para rutas especiales parciales (cuando la ruta contiene cierta cadena)
+    const specialRoutesPartial = {
+        '/articulos/dashboard': [
+            { key: 'index', active: false },
+            { key: 'app_stock', active: false },
+            { key: 'dashboard', active: true }
+        ],
+        '/articulos': [
+            { key: 'index', active: false },
+            { key: 'app_stock', active: false },
+            { key: 'articulos', active: true }
+        ]
+    };
+
+    /**
+     * Genera el breadcrumb basado en la ruta actual
+     * Utiliza el objeto routeConfig para determinar la jerarquía
+     */
+    function generateBreadcrumb() {
         const currentPath = window.location.pathname;
-        const pageTitleElement = document.getElementById('page-title');
-        const adminLink = document.getElementById('admin-link');
-        const pathSeparator = document.querySelector('.path-separator');
         
-        // Determinar el título de la página actual
-        let pageTitle = "Dashboard";
+        // Verificar si es una ruta especial exacta
+        if (specialRoutesExact[currentPath]) {
+            return buildBreadcrumbFromConfig(specialRoutesExact[currentPath]);
+        }
         
-        if (currentPath.includes('configdb')) {
-            pageTitle = "Configuración DB";
-        } else if (currentPath.includes('migraciones')) {
-            pageTitle = "Migraciones";
-        } else if (currentPath.includes('generar')) {
-            pageTitle = "Generar API";}
-
-        
-        // Si estamos en la página de inicio, ocultar el separador y título de página
-        if (currentPath === '/' || currentPath === '/index') {
-            pageTitleElement.style.display = 'none';
-            pathSeparator.style.display = 'none';
-            adminLink.style.display = 'none';
-        } else {
-            pageTitleElement.style.display = 'inline';
-            pathSeparator.style.display = 'inline';
-            adminLink.style.display = 'inline';
-            
-
-            
-            if (pageTitleElement) {
-                pageTitleElement.textContent = pageTitle;
+        // Si no es una ruta especial exacta, comprobar rutas parciales
+        for (const route in specialRoutesPartial) {
+            if (currentPath.includes(route) && route !== '/') {
+                return buildBreadcrumbFromConfig(specialRoutesPartial[route]);
             }
+        }
+        
+        // Si no es una ruta especial, procesamos normalmente
+        return processRegularPath(currentPath);
+    }
+    
+    /**
+     * Construye un breadcrumb a partir de una configuración específica
+     */
+    function buildBreadcrumbFromConfig(config) {
+        const elements = [];
+        
+        config.forEach(item => {
+            const routeData = routeConfig[item.key];
+            if (routeData) {
+                elements.push({
+                    title: routeData.title,
+                    path: item.path || `/${item.key}`,
+                    icon: routeData.icon || '',
+                    active: item.active
+                });
+            }
+        });
+        
+        return elements;
+    }
+    
+    /**
+     * Procesa una ruta regular para generar el breadcrumb
+     */
+    function processRegularPath(currentPath) {
+        const pathSegments = currentPath.split('/').filter(segment => segment);
+        const breadcrumbElements = [];
+        
+        // Agregar inicio como primer elemento (raíz)
+        if (routeConfig['index']) {
+            breadcrumbElements.push({
+                title: routeConfig['index'].title,
+                path: '/index',
+                icon: routeConfig['index'].icon || 'fa-home',
+                active: currentPath === '/' || currentPath === '/index'
+            });
+        }
+        
+        // Si estamos en la página principal, no hay más que mostrar
+        if (currentPath === '/' || currentPath === '/index') {
+            return breadcrumbElements;
+        }
+        
+        // Caso especial para /articulos/dashboard - Fuerza navegación correcta
+        if (currentPath === '/articulos/dashboard' || currentPath.includes('/articulos/dashboard')) {
+            breadcrumbElements.push({
+                title: 'Inventario',
+                path: '/app_stock',
+                icon: 'fa-boxes',
+                active: false
+            });
+            
+            breadcrumbElements.push({
+                title: 'Dashboard',
+                path: '/articulos/dashboard',
+                icon: 'fa-tachometer-alt',
+                active: true
+            });
+            
+            return breadcrumbElements;
+        }
+        
+        // Construir la ruta completa basada en la configuración y jerarquía
+        let currentSegment = '';
+        let processedSegments = [];
+        
+        for (let i = 0; i < pathSegments.length; i++) {
+            const segment = pathSegments[i];
+            
+            // Saltear segmentos irrelevantes (como números de ID)
+            if (segment.match(/^\d+$/) || segment === 'pagina') {
+                continue;
+            }
+            
+            currentSegment = segment;
+            processedSegments.push(currentSegment);
+            
+            // Determinar jerarquía y títulos
+            if (routeConfig[currentSegment]) {
+                const config = routeConfig[currentSegment];
+                const isActive = i === pathSegments.length - 1;
+                
+                breadcrumbElements.push({
+                    title: config.title,
+                    path: '/' + processedSegments.join('/'),
+                    icon: config.icon || '',
+                    active: isActive
+                });
+            } else {
+                // Si no hay configuración para este segmento, usamos el nombre del segmento capitalizado
+                const title = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/_/g, ' ');
+                const isActive = i === pathSegments.length - 1;
+                
+                breadcrumbElements.push({
+                    title: title,
+                    path: '/' + processedSegments.join('/'),
+                    icon: '',
+                    active: isActive
+                });
+            }
+        }
+        
+        return breadcrumbElements;
+    }
+
+    /**
+     * Actualiza la navegación (breadcrumb) según la página actual
+     */
+    function updateNavigation() {
+        console.log("Actualizando navegación para ruta:", window.location.pathname);
+        
+        const breadcrumbContainer = document.getElementById('breadcrumb-container');
+        const breadcrumbElements = generateBreadcrumb();
+        
+        // Limpiar el contenedor actual
+        breadcrumbContainer.innerHTML = '';
+        
+        // Reconstruir el breadcrumb con íconos
+        breadcrumbElements.forEach((item, index) => {
+            // Crear el contenedor del elemento (para dar espacio entre elementos)
+            const itemContainer = document.createElement('div');
+            itemContainer.className = 'flex items-center';
+            
+            // Añadir el elemento a la navegación
+            const element = document.createElement(item.active ? 'span' : 'a');
+            
+            // Añadir icono si está disponible
+            if (item.icon) {
+                const icon = document.createElement('i');
+                icon.className = `fas ${item.icon} ${index > 0 ? 'mx-1' : ''}`;
+                element.appendChild(icon);
+                
+                // Espacio entre icono y texto
+                const space = document.createTextNode(' ');
+                element.appendChild(space);
+            }
+            
+            // Añadir el texto
+            const textNode = document.createTextNode(item.title);
+            element.appendChild(textNode);
+            
+            if (item.active) {
+                // Si es el elemento activo, se muestra como texto
+                element.className = 'text-blue-100 font-medium flex items-center';
+            } else {
+                // Si no es el elemento activo, se muestra como enlace
+                element.href = item.path;
+                element.className = 'text-white hover:text-blue-200 transition-colors flex items-center';
+            }
+            
+            // Añadir el elemento al contenedor
+            itemContainer.appendChild(element);
+            breadcrumbContainer.appendChild(itemContainer);
+            
+            // Añadir el separador si no es el último elemento
+            if (index < breadcrumbElements.length - 1) {
+                const separator = document.createElement('span');
+                separator.className = 'text-blue-400 mx-1';
+                separator.innerHTML = '<i class="fas fa-chevron-right text-xs"></i>';
+                breadcrumbContainer.appendChild(separator);
+            }
+        });
+        
+        // Actualizar el título de la página
+        const activeElement = breadcrumbElements[breadcrumbElements.length - 1];
+        if (activeElement) {
+            document.title = `${activeElement.title} - SQL App Studio`;
+        }
+
+        // Intentar obtener datos del usuario actual
+        fetchCurrentUser();
+    }
+    
+    /**
+     * Obtiene información del usuario actual si está disponible
+     */
+    function fetchCurrentUser() {
+        // Actualizar inicial del usuario si está disponible en window.currentUser
+        const userInitial = document.getElementById('user-initial');
+        const userName = document.getElementById('user-name');
+        const userEmail = document.getElementById('user-email');
+        
+        if (window.currentUser && window.currentUser.nombre) {
+            // Si hay datos del usuario en window.currentUser
+            if (userInitial) userInitial.textContent = window.currentUser.nombre.charAt(0).toUpperCase();
+            if (userName) userName.textContent = window.currentUser.nombre;
+            if (userEmail && window.currentUser.email) userEmail.textContent = window.currentUser.email;
+        } else {
+            // Intentar obtener datos del usuario desde la API
+            fetch('/usuarios/current', { 
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(response => {
+                if (response.ok) return response.json();
+                throw new Error('No se pudo obtener la información del usuario');
+            })
+            .then(data => {
+                console.log('Datos de usuario obtenidos:', data);
+                // Guardar para uso futuro
+                window.currentUser = data;
+                
+                // Actualizar interfaz
+                if (userInitial && data.nombre) {
+                    userInitial.textContent = data.nombre.charAt(0).toUpperCase();
+                }
+                if (userName && data.nombre) {
+                    userName.textContent = data.nombre;
+                }
+                if (userEmail && data.email) {
+                    userEmail.textContent = data.email;
+                }
+
+                // Configurar manejo de cierre de sesión
+                const logoutForm = document.getElementById('logout-form');
+                if (logoutForm) {
+                    logoutForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        console.log('Cerrando sesión...');
+                        
+                        // Realizar petición POST a /logout
+                        fetch('/logout', {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => {
+                            if (response.ok || response.redirected) {
+                                console.log('Sesión cerrada correctamente');
+                                // Redirigir a la página de login
+                                window.location.href = '/loginpage';
+                            } else {
+                                throw new Error('Error al cerrar sesión');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error en logout:', error);
+                            alert('Error al cerrar sesión. Por favor, inténtelo de nuevo.');
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                console.log('Usuario no autenticado o error:', error);
+            });
         }
     }
     
+    // Aplicar un forzado de actualización para evitar problemas de caché
+    forceStylesRefresh();
     
-    // Llamar a las funciones al cargar
+    // Detectar cambios en la URL (para aplicaciones SPA)
+    window.addEventListener('popstate', updateNavigation);
+    
+    // Exponer la función updateNavigation globalmente para que otros scripts puedan actualizarla
+    window.updateNavigation = updateNavigation;
+    
+    // Llamar a la función al cargar la página
+    document.addEventListener('DOMContentLoaded', updateNavigation);
     updateNavigation();
 </script>

@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, NVARCHAR, Table
-from db.database import Base
-
+try:
+    from ...database import Base
+except ImportError:
+    from sql_app.db.database import Base
 class roles(Base):
     __tablename__ = "Roles"
     

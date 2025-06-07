@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Integer, String, Boolean, Float, Date, DateTime, Text, ForeignKey, Numeric
 from sqlalchemy.sql import func
-from db.database import Base
-from datetime import datetime
-
+try:
+    from ...db.database import Base
+except ImportError:
+    from sql_app.db.database import Base
 class Facturacion(Base):
     __tablename__ = 'facturacion'
 

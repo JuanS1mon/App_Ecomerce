@@ -1,22 +1,33 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, List
 from pydantic import BaseModel, ConfigDict
-from datetime import date, datetime
+from datetime import date
+
 
 class StockBase(BaseModel):
     nro_movimiento: int
     codigo_art: int
-    # Estos campos son opcionales porque no existen en la tabla actual
     id_articulos_serie: Optional[int] = 0
     id_deposito: Optional[int] = 0
     cant_disponible: Optional[float] = 0.0
     cant_reservado: Optional[float] = 0.0
     cant_preparado: Optional[float] = 0.0
     tipo: Optional[bool] = False
-    fecha: Optional[str] = ""
+    fecha: Optional[date] = None
     observacion: Optional[str] = ""
+    
 
-class StockCreate(StockBase):
-    id: int
+class StockCreate(BaseModel):
+    nro_movimiento: Optional[int] = None  # ✅ hacerlo opcional
+    codigo_art: int
+    id_articulos_serie: int
+    id_deposito: int
+    id_deposito_destino: int  # Solo se usa en la lógica, no existe en BD
+    cant_disponible: float
+    cant_reservado: float
+    cant_preparado: float
+    tipo: bool
+    fecha: date
+    observacion: Optional[str] = None
 
 class StockUpdate(BaseModel):
     nro_movimiento: Optional[int] = None
@@ -27,14 +38,14 @@ class StockUpdate(BaseModel):
     cant_reservado: Optional[float] = None
     cant_preparado: Optional[float] = None
     tipo: Optional[bool] = None
-    fecha: Optional[str] = None
+    fecha: Optional[date] = None
     observacion: Optional[str] = None
+    anulado: Optional[bool] = None  # Para anular el movimiento
 
 class StockRead(StockBase):
     id: int
     model_config = ConfigDict(from_attributes=True)
 
-# Esquemas adicionales para reportes y dashboard
 class StockFilter(BaseModel):
     codigo_art: Optional[int] = None
     id_deposito: Optional[int] = None

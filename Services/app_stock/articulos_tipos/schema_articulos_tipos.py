@@ -6,7 +6,7 @@ class Articulos_tiposBase(BaseModel):
     descripcion: str
 
 class Articulos_tiposCreate(Articulos_tiposBase):
-    id: int
+    id: Optional[int] = None
 
 class Articulos_tiposUpdate(Articulos_tiposBase):
     pass

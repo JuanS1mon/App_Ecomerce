@@ -4,11 +4,12 @@ from datetime import date, datetime
 
 class DepositosBase(BaseModel):
     descripcion: str
-    codigo: str
-    observacion: str
+    codigo: Optional[str] = None
+    observacion: Optional[str] = None
 
 class DepositosCreate(DepositosBase):
-    id: int
+    # Eliminamos el ID ya que es auto incremental
+    pass
 
 class DepositosUpdate(DepositosBase):
     pass

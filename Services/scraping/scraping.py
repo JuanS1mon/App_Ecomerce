@@ -4,7 +4,7 @@ import time
 from urllib.parse import urljoin
 from pydantic import BaseModel
 from typing import List, Optional
-from db.schemas.Scraping import ScraperTestConfig , SelectorConfig  
+from ...db.schemas.Scraping import ScraperTestConfig , SelectorConfig
 
 def extract_with_beautifulsoup(config: ScraperTestConfig, max_items: int = 10):
     """

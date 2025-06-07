@@ -3,15 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>401 No Autorizado</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>401 - No Autorizado | SQL App Studio</title>
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Incluir el script de carga de componentes -->
+    <script src="/static/components/load-components.js"></script>
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .animate-pulse-slow {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="text-center">
-        <h1 class="text-5xl font-bold text-gray-800 mb-4">401 No Autorizado</h1>
-        <p class="text-lg text-gray-600 mb-6">No tienes permiso para acceder a esta página.</p>
-        <a href="/loginpage" class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300">Iniciar Sesión</a>
-    </div>
-
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Placeholder para el navbar -->
+    <div id="navbar-placeholder"></div>
+    
+    <!-- Contenido principal -->
+    <main class="flex-grow flex items-center justify-center px-4">
+        <div class="max-w-3xl w-full py-16 text-center">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-amber-600 to-amber-800 py-6">
+                    <h1 class="text-white text-5xl font-bold">401</h1>
+                    <p class="text-amber-100 mt-2 text-lg">No Autorizado</p>
+                </div>
+                
+                <div class="p-8">
+                    <div class="flex justify-center mb-8">
+                        <div class="w-24 h-24 rounded-full bg-amber-50 flex items-center justify-center animate-pulse-slow">
+                            <i class="fas fa-lock text-4xl text-amber-600"></i>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Acceso denegado</h2>
+                    
+                    <p class="text-gray-600 mb-6">
+                        No tienes autorización para acceder a esta página. Es necesario iniciar sesión o contar con credenciales válidas para continuar.
+                    </p>
+                    
+                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-6">
+                        <div class="flex items-start">
+                            <div class="mr-3">
+                                <i class="fas fa-info-circle text-amber-600"></i>
+                            </div>
+                            <div class="text-sm text-left text-amber-800">
+                                <p class="font-semibold">Posibles causas:</p>
+                                <ul class="list-disc pl-5 mt-2 space-y-1">
+                                    <li>No has iniciado sesión en el sistema</li>
+                                    <li>Tu sesión ha expirado</li>
+                                    <li>No tienes los permisos necesarios para acceder a este recurso</li>
+                                    <li>Las credenciales proporcionadas no son válidas</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <a href="/loginpage" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Iniciar sesión
+                        </a>
+                        <button onclick="goBack()" class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i> Volver atrás
+                        </button>
+                    </div>
+                    
+                    <div class="mt-8 text-sm text-gray-500">
+                        <p>Si crees que deberías tener acceso a esta página, por favor contacta al administrador del sistema.</p>
+                        <p class="mt-1">Referencia: 401 Unauthorized</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Placeholder para el footer -->
+    <div id="footer-placeholder"></div>
+    
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 </body>
 </html>

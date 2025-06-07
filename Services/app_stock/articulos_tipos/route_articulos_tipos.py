@@ -1,7 +1,6 @@
-
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from sqlalchemy.orm import Session
-from db.database import get_db
+from ....db.database import get_db
 from .schema_articulos_tipos import Articulos_tiposCreate, Articulos_tiposUpdate, Articulos_tiposRead
 from .model_articulos_tipos import Articulos_tipos as Articulos_tiposModel
 from .service_articulos_tipos import create_articulos_tipos, get_articulos_tipos, gets_articulos_tipos, delete_articulos_tipos, update_articulos_tipos
@@ -19,8 +18,8 @@ router = APIRouter(
 
 @router.post("/", response_model=Articulos_tiposRead, status_code=status.HTTP_201_CREATED)
 async def routes_post_articulos_tipos(articulos_tipos: Articulos_tiposCreate, db: Session = Depends(get_db)):
-    if articulos_tipos.id is None or articulos_tipos.descripcion is None:
-        raise HTTPException(status_code=status.HTTP_417_EXPECTATION_FAILED, detail="Todos los campos requeridos deben tener un valor")
+    if articulos_tipos.descripcion is None:
+        raise HTTPException(status_code=status.HTTP_417_EXPECTATION_FAILED, detail="El campo descripción es obligatorio")
     try:
         articulos_tipos_model = Articulos_tiposModel(**articulos_tipos.model_dump())
         db_articulos_tipos = create_articulos_tipos(db=db, articulos_tipos=articulos_tipos_model)
@@ -83,7 +82,7 @@ async def routes_update_articulos_tipos(id: int, articulos_tipos: Articulos_tipo
 async def get_pagina():
     try:
         # Ruta actualizada: ahora buscamos en static/module_name/index.html
-        with open(f"static/articulos_tipos/index.html", "r", encoding="utf-8") as file:
+        with open(f"sql_app/static/app_stock/articulos_tipos/articulos_tipos.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

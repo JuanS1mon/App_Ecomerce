@@ -4,14 +4,14 @@ from fastapi import FastAPI, Form, Request, APIRouter, status, Depends, HTTPExce
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from Services.security.security import encriptar_clave, get_current_user  # Importar la función de seguridad
-from db.database import get_db
-from db.models.config.usuarios import usuarios 
-from db.models.config.activityLog import ActivityLog
+from ...Services.security.security import encriptar_clave, get_current_user  # Importar la función de seguridad
+from ...db.database import get_db
+from ...db.models.config.usuarios import usuarios 
+from ...db.models.config.activityLog import ActivityLog
 from datetime import date, timedelta
-from db.schemas.config.Usuarios import UserDB  # Asegúrate de importar UserDB
+from ...db.schemas.config.Usuarios import UserDB  # Asegúrate de importar UserDB
 
-templates = Jinja2Templates(directory="static/html")  # Ajusta el directorio según sea necesario
+templates = Jinja2Templates(directory="sql_app/static")  # Cambiado para coincidir con main.py
 
 def create_admin_router(app: FastAPI):
     router = APIRouter(

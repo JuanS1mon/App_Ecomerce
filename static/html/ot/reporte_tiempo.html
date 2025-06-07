@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Reporte de Tiempo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Registrar Reporte de Tiempo</h2>
+        
+        <form id="reporteTiempoForm" class="needs-validation" novalidate>
+            <input type="hidden" id="operacionId" name="operacion_id" value="">
+            
+            <div class="mb-3">
+                <label for="fecha" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="fecha" name="fecha" required>
+                <div class="invalid-feedback">
+                    Por favor seleccione una fecha.
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="horas" class="form-label">Horas</label>
+                <input type="number" class="form-control" id="horas" name="horas" step="0.25" min="0.25" required>
+                <div class="invalid-feedback">
+                    Por favor ingrese las horas trabajadas (mínimo 0.25).
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción</label>
+                <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+                <div class="invalid-feedback">
+                    Por favor ingrese una descripción.
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="usuario" class="form-label">Usuario</label>
+                <input type="text" class="form-control" id="usuario" name="usuario" required>
+                <div class="invalid-feedback">
+                    Por favor ingrese el usuario.
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a href="#" class="btn btn-secondary" onclick="window.history.back()">Cancelar</a>
+        </form>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="continuarIteracionModal" tabindex="-1" aria-labelledby="continuarIteracionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="continuarIteracionModalLabel">Confirmar acción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Desea continuar con la iteración?</p>
+                    <p class="text-muted">Si selecciona "No", la operación se marcará como finalizada.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnContinuar">Sí, continuar</button>
+                    <button type="button" class="btn btn-secondary" id="btnFinalizar">No, finalizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener el ID de operación de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const operacionId = urlParams.get('operacion_id');
+            document.getElementById('operacionId').value = operacionId;
+            
+            // Establecer la fecha actual por defecto
+            const fechaInput = document.getElementById('fecha');
+            const today = new Date().toISOString().split('T')[0];
+            fechaInput.value = today;
+            
+            // Manejar el envío del formulario
+            const form = document.getElementById('reporteTiempoForm');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                if (form.checkValidity()) {
+                    // Mostrar modal de confirmación
+                    const modal = new bootstrap.Modal(document.getElementById('continuarIteracionModal'));
+                    modal.show();
+                }
+                
+                form.classList.add('was-validated');
+            });
+            
+            // Manejar la acción de continuar
+            document.getElementById('btnContinuar').addEventListener('click', function() {
+                enviarReporteTiempo(true);
+            });
+            
+            // Manejar la acción de finalizar
+            document.getElementById('btnFinalizar').addEventListener('click', function() {
+                enviarReporteTiempo(false);
+            });
+            
+            function enviarReporteTiempo(continuarIteracion) {
+                // Recopilar datos del formulario
+                const formData = {
+                    operacion_id: parseInt(document.getElementById('operacionId').value),
+                    fecha: document.getElementById('fecha').value,
+                    horas: parseFloat(document.getElementById('horas').value),
+                    descripcion: document.getElementById('descripcion').value,
+                    usuario: document.getElementById('usuario').value,
+                    continuar_iteracion: continuarIteracion
+                };
+                
+                // Enviar datos a la API
+                fetch('/tiempos/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.detail || 'Error al guardar el reporte de tiempo');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('Reporte de tiempo guardado correctamente.');
+                    // Redirigir a la página de detalle de la operación
+                    window.location.href = '/operaciones/detalle?id=' + formData.operacion_id;
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                    console.error('Error:', error);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

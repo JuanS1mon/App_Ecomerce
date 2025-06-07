@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, Float, Date, DateTime, Text, ForeignKey
 from sqlalchemy.sql import func
-from db.database import Base
+from ....db.database import Base
 
 class Stock(Base):
     __tablename__ = 'stock'
@@ -16,3 +16,4 @@ class Stock(Base):
     tipo = Column(Boolean, default=False)
     fecha = Column(String(255))
     observacion = Column(String(255))
+    anulado = Column(Boolean, default=False)

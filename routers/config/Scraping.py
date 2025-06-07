@@ -5,25 +5,23 @@ import logging
 from fastapi import APIRouter, Request, status, Depends, HTTPException, BackgroundTasks
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, JSONResponse, HTMLResponse
-from Services.security.security import get_current_user
-from db.database import get_db
-from db.schemas.config.Usuarios import UserDB
+from ...Services.security.security import get_current_user
+from ...db.database import get_db
+from ...db.schemas.config.Usuarios import UserDB
 from datetime import datetime
 import json
 from sqlalchemy.orm import Session
 import pandas as pd
 from pydantic import BaseModel
-from db.schemas.Scraping import ScraperTestConfig
-from Services.scraping.scraping import extract_with_beautifulsoup
-from Services.scraping.scraping import extract_with_selenium
-#from ...Services.scraping.scraping import extract_with_scrapy
-# Importaciones específicas para scraping web   
+from ...db.schemas.Scraping import ScraperTestConfig
+from ...Services.scraping.scraping import extract_with_beautifulsoup
+from ...Services.scraping.scraping import extract_with_selenium
 
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 
-from db.models.config.activityLog import ActivityLog
+from ...db.models.config.activityLog import ActivityLog
  
 # Configuración de logging
 logging.basicConfig(
@@ -33,7 +31,7 @@ logging.basicConfig(
 )
 
 # Ajustar el directorio de las plantillas
-templates = Jinja2Templates(directory="static/html")
+templates = Jinja2Templates(directory="sql_app/static")
 
 
 router = APIRouter(

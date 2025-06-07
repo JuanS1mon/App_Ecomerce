@@ -11,21 +11,21 @@ logger = logging.getLogger(__name__)
 def create_depositos_tipos(db: Session, depositos_tipos: Depositos_tipos) -> Depositos_tipos:
     """
     Crea un nuevo registro de Depositos_tipos en la base de datos usando SQL directo.
-    Adaptado para SQL Server usando cláusula OUTPUT.
+    Adaptado para SQL Server usando cláusula OUTPUT para un ID auto incremental.
     """
     try:
         # Preparar los datos para la consulta
         depositos_tipos_data = {}
         
-        for field in ['id', 'descripcion']:
-            if hasattr(depositos_tipos, field):
-                depositos_tipos_data[field] = getattr(depositos_tipos, field)
+        # Solo incluimos la descripción, el ID será auto incremental
+        if hasattr(depositos_tipos, 'descripcion'):
+            depositos_tipos_data['descripcion'] = getattr(depositos_tipos, 'descripcion')
         
         # Construir la consulta SQL INSERT con OUTPUT para SQL Server
         query = text("""
-            INSERT INTO depositos_tipos (id, descripcion)
+            INSERT INTO depositos_tipos (descripcion)
             OUTPUT INSERTED.id, INSERTED.descripcion
-            VALUES (:id, :descripcion)
+            VALUES (:descripcion)
         """)
         
         # Ejecutar la consulta y obtener el registro insertado directamente
@@ -41,7 +41,7 @@ def create_depositos_tipos(db: Session, depositos_tipos: Depositos_tipos) -> Dep
         
         # Crear un nuevo objeto Depositos_tipos con los valores devueltos
         new_depositos_tipos = Depositos_tipos()
-        new_depositos_tipos.id = row[0]
+        new_depositos_tipos.id = row[0]  # El ID generado automáticamente
         new_depositos_tipos.descripcion = row[1]
         
         return new_depositos_tipos
