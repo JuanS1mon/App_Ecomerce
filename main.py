@@ -172,7 +172,7 @@ app.add_middleware(
 # Middlewares de aplicación (orden importante: LIFO - último en entrar, primero en salir)
 app.add_middleware(UserTemplateMiddleware)     # Procesar contexto de usuario
 app.add_middleware(DBErrorMiddleware)          # Manejar errores de base de datos
-app.add_middleware(CustomErrorMiddleware)      # Páginas de error personalizadas
+# app.add_middleware(CustomErrorMiddleware)      # Páginas de error personalizadas - DESACTIVADO TEMPORALMENTE
 app.add_middleware(FrontendRedirectMiddleware) # Redirección al frontend
 
 # ============================================================================

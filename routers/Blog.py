@@ -2,16 +2,11 @@
 from fastapi import APIRouter, Depends, Form, HTTPException, Request,status
 from sqlalchemy.orm import Session
 
-try:
-    # Importaciones relativas (cuando se ejecuta como módulo)
-    from ..db.database import get_db
-    from ..db.models.Blog import BlogPost as BlogPostModel
-    from ..db.schemas.Blog import BlogPost, BlogPostCreate, BlogPostUpdate
-except ImportError:
-    # Importaciones absolutas (cuando se ejecuta directamente)
-    from .db.database import get_db
-    from .db.models.Blog import BlogPost as BlogPostModel
-    from .db.schemas.Blog import BlogPost, BlogPostCreate, BlogPostUpdate
+# Importaciones relativas (cuando se ejecuta como módulo)
+from ..db.database import get_db
+from ..db.models.Blog import BlogPost as BlogPostModel
+from ..db.schemas.Blog import BlogPost, BlogPostCreate, BlogPostUpdate
+
 
 from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse, RedirectResponse
@@ -62,8 +57,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
-# Configurar Jinja2Templates para buscar en el directorio "static"
-templates = Jinja2Templates(directory="sql_app/static")
+# Configurar Jinja2Templates para buscar en el directorio "static/html"
+templates = Jinja2Templates(directory="sql_app/static/html")
 
 
 # Ejemplo de ruta para renderizar la plantilla

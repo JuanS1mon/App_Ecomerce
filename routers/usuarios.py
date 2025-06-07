@@ -47,13 +47,13 @@ except ImportError:
         get_usuario, 
         create_usuario,    update_usuario_activate
     )
-    from .db.database import get_db
-    from .db.schemas.config.Usuarios import (
+    from ..db.database import get_db
+    from ..db.schemas.config.Usuarios import (
         UserDB, 
         PasswordReset, 
         PasswordResetRequest
     )
-    from .db.models.config.usuarios import usuarios as UsuariosModel
+    from ..db.models.config.usuarios import usuarios as UsuariosModel
 
 # Configuración del router
 router = APIRouter(
@@ -1107,9 +1107,8 @@ async def reset_password_request(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Formato de email inválido"
             )
-        
-        # Buscar usuario por email
-        from .db.models.config.usuarios import usuarios as UsuariosModel
+          # Buscar usuario por email
+        from ..db.models.config.usuarios import usuarios as UsuariosModel
         user = db.query(UsuariosModel).filter(UsuariosModel.mail == email).first()
         
         if not user:
@@ -1242,9 +1241,8 @@ async def confirm_password_reset(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Token inválido o expirado"
             )
-        
-        # Buscar usuario
-        from .db.models.config.usuarios import usuarios as UsuariosModel
+          # Buscar usuario
+        from ..db.models.config.usuarios import usuarios as UsuariosModel
         user = db.query(UsuariosModel).filter(UsuariosModel.usuario == username).first()
         
         if not user:

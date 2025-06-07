@@ -185,63 +185,7 @@ class Roles(Base):
         import traceback
         traceback.print_exc()
 
-# Función para crear específicamente las tablas relacionadas con OT
-def create_ot_tables():
-    try:        # Importar los modelos OT
-        from ..Services.app_stock.ot.model_ot import OT, Operacion, ReporteTiempo
-        
-        # Crear una conexión directa para ejecutar SQL puro
-        connection = engine.connect()
-        
-        # Eliminar las tablas existentes si existen para forzar su recreación
-        print("Eliminando tablas de OT existentes para recrearlas...")
-        try:
-            connection.execute(text("DROP TABLE IF EXISTS reportes_tiempo"))
-            print("Tabla reportes_tiempo eliminada")
-        except Exception as e:
-            print(f"Error al eliminar tabla reportes_tiempo: {e}")
-        
-        try:
-            connection.execute(text("DROP TABLE IF EXISTS operaciones"))
-            print("Tabla operaciones eliminada")
-        except Exception as e:
-            print(f"Error al eliminar tabla operaciones: {e}")
-        
-        try:
-            connection.execute(text("DROP TABLE IF EXISTS ot"))
-            print("Tabla ot eliminada")
-        except Exception as e:
-            print(f"Error al eliminar tabla ot: {e}")
-            
-        connection.commit()
-        
-        # Crear metadatos específicos para las tablas de OT
-        metadata = MetaData()
-        
-        # Obtener las definiciones de tablas y transferirlas a los metadatos
-        ot_table = Base.metadata.tables["ot"]
-        ot_table.tometadata(metadata)
-        
-        operaciones_table = Base.metadata.tables["operaciones"]
-        operaciones_table.tometadata(metadata)
-        
-        reportes_tiempo_table = Base.metadata.tables["reportes_tiempo"]
-        reportes_tiempo_table.tometadata(metadata)
-        
-        # Crear las tablas en el orden correcto
-        metadata.create_all(bind=engine)
-        print("Tablas de OT creadas exitosamente")
-        
-        # Verificar que las columnas se hayan creado correctamente
-        inspector = inspect(engine)
-        columns = inspector.get_columns("ot")
-        column_names = [col['name'] for col in columns]
-        print(f"Columnas creadas en tabla OT: {column_names}")
-        
-    except Exception as e:
-        print(f"Error al crear tablas de OT: {e}")
-        import traceback
-        traceback.print_exc()
+
 
 # Crear las tablas en la base de datos
 def create_tables():
@@ -249,23 +193,10 @@ def create_tables():
         # Primero asegurar que exista la tabla Roles
         ensure_roles_model()
         
-        # Asegurar que existan las tablas de OT
-        create_ot_tables()
-        
-        # Ahora crear el resto de las tablas
-        tables_to_create = []
-        for table_name, table in Base.metadata.tables.items():
-            if table_name != "Roles" and table_name not in ["ot", "operaciones", "reportes_tiempo"]:
-                tables_to_create.append(table)
-        
-        if tables_to_create:
-            # Crear todas las demás tablas
-            metadata = MetaData()
-            for table in tables_to_create:
-                table.tometadata(metadata)
-            metadata.create_all(bind=engine)
-            
+        # Crear todas las demás tablas usando el método estándar de SQLAlchemy
+        Base.metadata.create_all(bind=engine)
         print("Tablas creadas exitosamente.")
+        
     except NoReferencedTableError as e:
         print(f"Error de tabla referenciada: {e}")
         # Si falla porque falta una tabla referenciada, intenta manejar caso por caso

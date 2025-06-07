@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Iniciar sesión</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- DESHABILITADO components.js que interfiere con login -->
     <!-- <script src="/static/js/components.js"></script> -->
     <style>
@@ -213,26 +212,202 @@
                 <p>Si tienes problemas para iniciar sesión, contacta con el equipo de soporte.</p>
             </div>
         </div>
-    </div>    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Verificar si el usuario ya está autenticado
-            checkIfAlreadyAuthenticated();
+    </div>    
+    
+    <!-- INTERCEPTOR DE AUTENTICACIÓN EMBEBIDO - SOLUCIÓN DEFINITIVA -->
+    <script>
+        console.log('🔐 Cargando interceptor de autenticación embebido...');
+        console.log('🌐 URL actual:', window.location.href);
+        console.log('📅 Timestamp:', new Date().toISOString());
+        
+        // Marcar que el interceptor se cargó
+        window.AUTH_INTERCEPTOR_LOADED = true;
+        window.AUTH_INTERCEPTOR_VERSION = '3.0.0-embedded';
+        console.log('✅ Interceptor de autenticación embebido cargado - Versión:', window.AUTH_INTERCEPTOR_VERSION);
+        
+        // =================================================================
+        // CONFIGURACIÓN Y CONSTANTES
+        // =================================================================        const AUTH_CONFIG = {
+            TOKEN_KEY: 'access_token',
+            LOGIN_ENDPOINT: '/login',
+            LOGOUT_ENDPOINT: '/logout',
+            LOGIN_PAGE: '/loginpage',
+            DEBUG_ENDPOINT: '/admin-debug',
+            EXCLUDED_PATHS: ['/login', '/logout', '/loginpage', '/registerpage', '/static', '/usuarios/current']
+        };
+        
+        // =================================================================
+        // INTERCEPTOR DE FETCH EMBEBIDO
+        // =================================================================
+        (function setupEmbeddedFetchInterceptor() {
+            // Guardar referencia al fetch original
+            const originalFetch = window.fetch;
             
-            // Toggle password visibility
-            const togglePassword = document.getElementById('toggle-password');
-            const passwordInput = document.getElementById('password');
-            
-            if (togglePassword && passwordInput) {
-                togglePassword.addEventListener('click', function() {
-                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    passwordInput.setAttribute('type', type);
+            // Sobrescribir fetch global
+            window.fetch = function(url, options = {}) {
+                // Obtener token de localStorage
+                const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+                
+                // Verificar si debe incluir token
+                const shouldIncludeToken = token && 
+                    !AUTH_CONFIG.EXCLUDED_PATHS.some(path => url.includes(path)) &&
+                    url !== AUTH_CONFIG.DEBUG_ENDPOINT;
+                
+                if (shouldIncludeToken) {
+                    // Asegurar que existe el objeto headers
+                    options.headers = options.headers || {};
                     
-                    // Toggle icon
-                    const iconClass = type === 'password' ? 'fa-eye' : 'fa-eye-slash';
-                    this.querySelector('i').className = `fas ${iconClass}`;
+                    // Solo agregar si no hay Authorization header ya presente
+                    const hasAuthHeader = Object.keys(options.headers).some(
+                        key => key.toLowerCase() === 'authorization'
+                    );
+                    
+                    if (!hasAuthHeader) {
+                        options.headers['Authorization'] = `Bearer ${token}`;
+                        console.log('🔐✅ Token agregado automáticamente (embebido) a:', url);
+                        console.log('🎫 Token (primeros 20 chars):', token.substring(0, 20) + '...');
+                    } else {
+                        console.log('🔐⚠️ Header Authorization ya presente en:', url);
+                    }
+                } else if (token) {
+                    console.log('🔐⏭️ Token disponible pero excluido para:', url);
+                } else {
+                    console.log('🔐❌ No hay token disponible para:', url);
+                }
+                
+                // Llamar al fetch original
+                return originalFetch.call(this, url, options)
+                    .then(response => {
+                        // Manejar respuestas 401 (no autorizado)
+                        if (response.status === 401 && shouldIncludeToken) {
+                            console.log('🚨 Token rechazado por el servidor, limpiando localStorage');
+                            localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+                            
+                            // Solo redirigir si no estamos ya en login
+                            if (!window.location.pathname.includes('login')) {
+                                window.location.href = AUTH_CONFIG.LOGIN_PAGE;
+                            }
+                        }
+                        
+                        return response;
+                    })
+                    .catch(error => {
+                        console.error('❌ Error en petición interceptada (embebido):', error);
+                        throw error;
+                    });
+            };
+            
+            console.log('✅ Interceptor de fetch embebido configurado');
+        })();
+        
+        // =================================================================
+        // NAVEGACIÓN CON AUTENTICACIÓN EMBEBIDA
+        // =================================================================
+        window.navigateWithAuth = function(url) {
+            console.log('🚀 navigateWithAuth embebido llamado para:', url);
+            const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+            console.log('🎫 Token disponible:', !!token);
+            
+            if (!token) {
+                console.log('🚪 Navegando sin token a:', url);
+                window.location.href = url;
+                return;
+            }
+            
+            console.log('🔐 Navegando con verificación de token a:', url);
+            console.log('🎫 Token (primeros 20 chars):', token.substring(0, 20) + '...');
+            
+            // Hacer petición de verificación antes de navegar
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ Token válido, navegando a:', url);
+                    window.location.href = url;
+                } else if (response.status === 401) {
+                    console.log('🚨 Token inválido, redirigiendo a login');
+                    localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+                    window.location.href = AUTH_CONFIG.LOGIN_PAGE;
+                } else {
+                    console.log(`⚠️ Error ${response.status}, navegando normalmente`);
+                    window.location.href = url;
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error en verificación de navegación:', error);
+                window.location.href = url;
+            });
+        };
+        
+        console.log('✅ Interceptor de autenticación embebido completamente cargado');
+        console.log('🔧 Para debug, verifica window.AUTH_INTERCEPTOR_LOADED');
+    </script>
+    
+    <script>
+        // Evitar ejecución múltiple del script
+        if (window.loginScriptLoaded) {
+            console.log('Script de login ya cargado, evitando duplicación');
+        } else {
+            window.loginScriptLoaded = true;            document.addEventListener('DOMContentLoaded', function() {
+                // Limpiar flags de redirección al cargar la página de login
+                if (window.location.pathname.includes('login')) {
+                    // Limpiar solo si no venimos de una redirección reciente
+                    const loginRedirectAttempted = sessionStorage.getItem('login_redirect_attempted');
+                    if (!loginRedirectAttempted) {
+                        sessionStorage.removeItem('just_logged_in');
+                        console.log('Limpiando flags de sesión al cargar página de login');
+                    }
+                }
+                
+                // Verificar si el usuario ya está autenticado
+                checkIfAlreadyAuthenticated();
+                
+                // Limpiar flags si el usuario navega manualmente a login
+                window.addEventListener('pageshow', function(event) {
+                    if (event.persisted) {
+                        // Página cargada desde caché
+                        console.log('Página cargada desde caché, limpiando flags');
+                        sessionStorage.removeItem('login_redirect_attempted');
+                        window.isCheckingAuth = false;
+                        window.lastAuthCheck = 0;
+                    }
                 });
-            }            // Función para verificar autenticación existente
+                
+                // Toggle password visibility
+                const togglePassword = document.getElementById('toggle-password');
+                const passwordInput = document.getElementById('password');
+                
+                if (togglePassword && passwordInput) {
+                    togglePassword.addEventListener('click', function() {
+                        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                        passwordInput.setAttribute('type', type);
+                        
+                        // Toggle icon
+                        const iconClass = type === 'password' ? 'fa-eye' : 'fa-eye-slash';
+                        this.querySelector('i').className = `fas ${iconClass}`;
+                    });
+                }            // Función para verificar autenticación existente
             async function checkIfAlreadyAuthenticated() {
+                // EVITAR BUCLE: Verificar si ya estamos procesando una verificación
+                if (window.isCheckingAuth) {
+                    console.log('Ya hay una verificación de autenticación en curso, saltando...');
+                    return;
+                }
+                
+                // EVITAR BUCLE: Throttling - no verificar más de una vez cada 5 segundos
+                const lastCheck = window.lastAuthCheck || 0;
+                const now = Date.now();
+                if (now - lastCheck < 5000) {
+                    console.log('Verificación de autenticación muy reciente, saltando...');
+                    return;
+                }
+                window.lastAuthCheck = now;
+                
                 // EVITAR BUCLE: Solo verificar autenticación si estamos en una página de login
                 const currentPath = window.location.pathname;
                 if (!currentPath.includes('login') && !currentPath.includes('register')) {
@@ -247,32 +422,104 @@
                     return;
                 }
                 
-                try {
-                    console.log('Verificando autenticación existente para página de login...');
+                // EVITAR BUCLE: Verificar si ya hemos redirigido en esta sesión
+                if (sessionStorage.getItem('login_redirect_attempted') === 'true') {
+                    console.log('Ya se intentó redirigir en esta sesión, evitando bucle');
+                    return;
+                }
+                
+                // Marcar que estamos verificando autenticación
+                window.isCheckingAuth = true;
+                  try {
+                    console.log('🔍 Verificando autenticación existente para página de login...');
+                    
+                    // Obtener token directamente para evitar bucle con interceptor
+                    const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+                    
+                    if (!token) {
+                        console.log('❌ No hay token guardado, mostrando formulario de login');
+                        window.isCheckingAuth = false;
+                        return;
+                    }
+                    
+                    // Hacer petición manual con token para verificar validez
                     const response = await fetch('/usuarios/current', {
                         method: 'GET',
-                        credentials: 'include'
+                        credentials: 'include',
+                        headers: {
+                            'Cache-Control': 'no-cache',
+                            'Authorization': `Bearer ${token}`
+                        }
                     });
                     
                     if (response.ok) {
                         const userData = await response.json();
-                        console.log('Estado de autenticación:', userData);
+                        console.log('✅ Estado de autenticación:', userData);
                         
                         if (userData.autenticado) {
-                            console.log('Usuario ya autenticado, redirigiendo desde página de login...');
-                            showNotification('Ya tienes una sesión activa. Redirigiendo...', 'success');
+                            console.log('✅ Usuario ya autenticado, redirigiendo desde página de login...');
                             
-                            // Redirigir después de un breve retraso
+                            // Marcar que ya intentamos redirigir
+                            sessionStorage.setItem('login_redirect_attempted', 'true');
+                            
+                            showNotification('Ya tienes una sesión activa. Redirigiendo...', 'success');
+                              // Redirigir después de un breve retraso
                             setTimeout(() => {
                                 const urlParams = new URLSearchParams(window.location.search);
                                 const redirectUrl = urlParams.get('redirect') || '/admin';
-                                console.log('Redirigiendo a:', redirectUrl);
-                                window.location.href = redirectUrl;
-                            }, 1000);
+                                console.log('Redirigiendo usuario autenticado a:', redirectUrl);
+                                
+                                // Verificar si el interceptor está disponible
+                                if (typeof window.navigateWithAuth === 'function') {
+                                    console.log('Usando navegateWithAuth del interceptor para usuario autenticado');
+                                    // Limpiar la marca de redirección antes de redirigir
+                                    sessionStorage.removeItem('login_redirect_attempted');
+                                    window.navigateWithAuth(redirectUrl);
+                                } else {
+                                    console.log('Interceptor no disponible, navegando con token manual para usuario autenticado');
+                                    // Fallback: verificar token antes de navegar
+                                    const token = localStorage.getItem('access_token');
+                                    if (token) {
+                                        fetch(redirectUrl, {
+                                            method: 'GET',
+                                            headers: {
+                                                'Authorization': `Bearer ${token}`,
+                                                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                                            }
+                                        })
+                                        .then(response => {
+                                            console.log('Respuesta de verificación para usuario autenticado:', response.status);
+                                            sessionStorage.removeItem('login_redirect_attempted');
+                                            window.location.href = redirectUrl;
+                                        })
+                                        .catch(error => {
+                                            console.log('Error en verificación, navegando directamente:', error);
+                                            sessionStorage.removeItem('login_redirect_attempted');
+                                            window.location.href = redirectUrl;
+                                        });
+                                    } else {
+                                        // Sin token, navegar directamente
+                                        sessionStorage.removeItem('login_redirect_attempted');
+                                        window.location.href = redirectUrl;
+                                    }
+                                }                            }, 1000);
                         }
+                    } else {
+                        console.log('❌ Token inválido o sesión expirada');
+                        localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+                        showNotification('Sesión expirada. Por favor, inicia sesión nuevamente.', 'warning');
                     }
                 } catch (error) {
-                    console.log('No hay sesión activa, mostrando formulario de login');
+                    console.log('❌ Error verificando autenticación o token inválido:', error);
+                    // Si hay error, limpiar token por si acaso está corrupto
+                    if (localStorage.getItem(AUTH_CONFIG.TOKEN_KEY)) {
+                        console.log('Limpiando token potencialmente corrupto');
+                        localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+                    }
+                    console.log('Mostrando formulario de login');
+                } finally {
+                    // Limpiar la marca de verificación en curso
+                    window.isCheckingAuth = false;
                 }
             }// Form submission
             document.getElementById('form_common').addEventListener('submit', function(event) {
@@ -351,13 +598,40 @@
                         
                         console.log('URL de redirección determinada:', redirectUrl);
                         console.log('Iniciando redirección inmediata...');
-                        
-                        // Evitar verificación de autenticación en la página destino
+                          // Evitar verificación de autenticación en la página destino
                         sessionStorage.setItem('just_logged_in', 'true');
-                          // Redirigir inmediatamente para mejor UX
+                          // Redirigir usando navegación con token
                         setTimeout(() => {
-                            console.log('Ejecutando redirección a:', redirectUrl);
-                            window.location.href = redirectUrl;
+                            console.log('Ejecutando redirección con token a:', redirectUrl);
+                            
+                            // Verificar que el interceptor esté disponible
+                            if (typeof window.navigateWithAuth === 'function') {
+                                console.log('Usando navegateWithAuth del interceptor');
+                                navigateWithAuth(redirectUrl);
+                            } else {
+                                console.log('Interceptor no disponible, navegando directamente con token verificado');
+                                // Fallback: verificar token antes de navegar
+                                const token = localStorage.getItem('access_token');
+                                if (token) {
+                                    fetch(redirectUrl, {
+                                        method: 'GET',
+                                        headers: {
+                                            'Authorization': `Bearer ${token}`,
+                                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                                        }
+                                    })
+                                    .then(response => {
+                                        console.log('Respuesta de verificación:', response.status);
+                                        window.location.href = redirectUrl;
+                                    })
+                                    .catch(error => {
+                                        console.log('Error en verificación, navegando directamente:', error);
+                                        window.location.href = redirectUrl;
+                                    });
+                                } else {
+                                    window.location.href = redirectUrl;
+                                }
+                            }
                         }, 300); // Tiempo reducido para redirección más rápida
                     } else {
                         console.log('No se recibió access_token en la respuesta');
@@ -426,10 +700,12 @@
                     
                     setTimeout(() => {
                         notification.remove();
-                    }, 500);
-                }, 5000);
+                    }, 500);                }, 5000);
             }
-        });    </script>
+            
+            });  // End of DOMContentLoaded
+        }  // End of loginScriptLoaded check
+    </script>
     
     <!-- DESHABILITADO footer include que puede cargar scripts adicionales -->
     <!-- {% include 'footer.html' %} -->
