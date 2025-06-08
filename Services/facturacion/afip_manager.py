@@ -2,6 +2,24 @@
 Módulo para gestionar la comunicación con AFIP para facturación electrónica.
 Permite autenticación, obtención de CAE y consulta de datos fiscales.
 """
+
+"""
+
+Módulo para gestionar la comunicación con AFIP para facturación electrónica.
+Permite autenticación, obtención de CAE y consulta de datos fiscales.
+"""
+
+"""
+
+Módulo para gestionar la comunicación con AFIP para facturación electrónica.
+Permite autenticación, obtención de CAE y consulta de datos fiscales.
+"""
+
+"""
+
+Módulo para gestionar la comunicación con AFIP para facturación electrónica.
+Permite autenticación, obtención de CAE y consulta de datos fiscales.
+"""
 import os
 import logging
 import json

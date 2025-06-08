@@ -1,10 +1,12 @@
+# Imports de bibliotecas estándar
 from typing import List
+
+# Imports de terceros
 from pydantic import BaseModel
-try:
-    from ...schemas.config.roles import Role
-except ImportError:
-    from sql_app.db.schemas.config.roles import Role
-# Actualiza tu clase UserDB:
+
+# Imports del proyecto
+from ...schemas.config.roles import Role# Actualiza tu clase UserDB:
+
 class UserDB(BaseModel):
     codigo: int
     usuario: str

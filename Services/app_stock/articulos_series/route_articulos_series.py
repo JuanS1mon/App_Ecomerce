@@ -1,12 +1,24 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query
-from sqlalchemy.orm import Session
-from ....db.database import get_db
-from .schema_articulos_series import Articulos_seriesCreate, Articulos_seriesUpdate, Articulos_seriesRead
-from .model_articulos_series import Articulos_series as Articulos_seriesModel
-from .service_articulos_series import create_articulos_series, get_articulos_series, gets_articulos_series, delete_articulos_series, update_articulos_series
-from fastapi.responses import HTMLResponse, FileResponse
-from typing import List, Optional
+
+# Imports de bibliotecas estándar
 import logging
+from typing import List, Optional
+
+# Imports de terceros
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, HTMLResponse
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.db.database import get_db
+from sql_app.Services.app_stock.articulos_series.model_articulos_series import Articulos_series as Articulos_seriesModel
+from sql_app.Services.app_stock.articulos_series.schema_articulos_series import Articulos_seriesCreate, Articulos_seriesRead, Articulos_seriesUpdate
+from sql_app.Services.app_stock.articulos_series.service_articulos_series import (
+    create_articulos_series,
+    delete_articulos_series,
+    get_articulos_series,
+    gets_articulos_series,
+    update_articulos_series
+)
 
 logger = logging.getLogger(__name__)
 

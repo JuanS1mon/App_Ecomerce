@@ -1,18 +1,24 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query
-from sqlalchemy.orm import Session
-from ....db.database import get_db
-from .schema_stock import StockCreate, StockUpdate, StockRead
-from .model_stock import Stock as StockModel
-from .service_stock import create_stock, get_stock, gets_stock, delete_stock, update_stock, anular_movimiento
-
-from fastapi.responses import HTMLResponse, FileResponse
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, HTMLResponse
 from sqlalchemy import text
-from ...app_stock.articulos.model_articulos import Articulos as ArticulosModel
-from ...app_stock.articulos.schema_articulos import ArticulosRead
+from sqlalchemy.orm import Session
 
-
+from sql_app.db.database import get_db
+from sql_app.Services.app_stock.articulos.model_articulos import Articulos as ArticulosModel
+from sql_app.Services.app_stock.articulos.schema_articulos import ArticulosRead
+from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+from sql_app.Services.app_stock.stock.schema_stock import StockCreate, StockRead, StockUpdate
+from sql_app.Services.app_stock.stock.service_stock import (
+    anular_movimiento,
+    create_stock,
+    delete_stock,
+    get_stock,
+    gets_stock,
+    update_stock
+)
 
 logger = logging.getLogger(__name__)
 

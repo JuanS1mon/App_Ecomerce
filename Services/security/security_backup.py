@@ -3,18 +3,29 @@ Módulo de seguridad mejorado para autenticación y autorización
 Incluye mejoras de seguridad, logging seguro y validación robusta
 """
 
+"""
+
+Módulo de seguridad mejorado para autenticación y autorización
+Incluye mejoras de seguridad, logging seguro y validación robusta
+"""
+
+"""
+
+Módulo de seguridad mejorado para autenticación y autorización
+Incluye mejoras de seguridad, logging seguro y validación robusta
+"""
+
+"""
+
+Módulo de seguridad mejorado para autenticación y autorización
+Incluye mejoras de seguridad, logging seguro y validación robusta
+"""
+
 from fastapi import HTTPException, Depends, status, Request
 from sqlalchemy.orm import Session
 
-try:
-    from ...db.database import get_db
-    from ...db.crud.config.Usuarios import get_usuario, user_pass, get_user_from_db
-except ImportError:
-    from sql_app.db.database import get_db
-    from sql_app.db.crud.config.Usuarios import get_usuario, user_pass, get_user_from_db
-
-from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordBearer
+from db.database import get_db
+from db.crud.config.Usuarios import get_usuario, user_pass, get_user_from_dbfrom fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from dotenv import load_dotenv
@@ -23,13 +34,8 @@ import secrets
 import hashlib
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Union
-try:
-    from ...db.schemas.config.Usuarios import UserDB
-    from ...db.crud.config.Usuarios import has_role
-except ImportError:
-    from sql_app.db.schemas.config.Usuarios import UserDB
-    from sql_app.db.crud.config.Usuarios import has_role
-
+from db.schemas.config.Usuarios import UserDB
+from db.crud.config.Usuarios import has_role
 import logging
 from .rate_limit_improved import check_rate_limit, record_successful_login, clear_attempts
 import re
@@ -202,8 +208,7 @@ def decodifica_token(token: str) -> Optional[dict]:
         if jti and is_token_revoked(jti):
             logger.warning(f"Token revocado usado: {jti}")
             return None
-        
-        return payload
+          return payload
         
     except jwt.ExpiredSignatureError:
         logger.warning("Token expirado")
@@ -214,7 +219,7 @@ def decodifica_token(token: str) -> Optional[dict]:
     except jwt.InvalidIssuerError:
         logger.warning("Token con emisor inválido")
         return None
-    except jwt.InvalidTokenError as e:
+    except JWTError as e:
         logger.warning(f"Token inválido: {str(e)}")
         return None
 
@@ -334,9 +339,9 @@ def authenticate_user(db: Session, username: str, password: str, request: Reques
             return None
           # Obtener información completa del usuario
         try:
-            from ...db.models.config.usuarios import usuarios as UsuariosModel
+            from db.models.config.usuarios import usuarios as UsuariosModel
         except ImportError:
-            from sql_app.db.models.config.usuarios import usuarios as UsuariosModel
+            from db.models.config.usuarios import usuarios as UsuariosModel
         
         user = db.query(UsuariosModel).filter(UsuariosModel.usuario == username).first()
         if not user:

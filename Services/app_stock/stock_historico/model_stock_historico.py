@@ -1,6 +1,9 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, Date, DateTime, Text, ForeignKey
+# Imports de terceros
+from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.sql import func
-from ....db.database import Base
+
+# Imports del proyecto
+from sql_app.db.database import Base
 
 class Stock_historico(Base):
     __tablename__ = 'stock_historico'

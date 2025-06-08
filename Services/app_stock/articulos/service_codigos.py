@@ -1,18 +1,22 @@
-from sqlalchemy.orm import Session
-import os
-import json
-import uuid
-import barcode
+# Imports de bibliotecas estándar
 from barcode.writer import ImageWriter
-import qrcode
+from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, Any
-from fastapi import HTTPException, status
+import barcode
+import json
 import logging
-from datetime import datetime
+import os
+import qrcode
+import uuid
 
-from .model_articulos import Articulos
-from .service_articulos import get_articulos, update_articulos
+# Imports de terceros
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.Services.app_stock.articulos.model_articulos import Articulos
+from sql_app.Services.app_stock.articulos.service_articulos import get_articulos, update_articulos
 
 logger = logging.getLogger(__name__)
 

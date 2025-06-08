@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Iniciar sesión</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- DESHABILITADO components.js que interfiere con login -->
-    <!-- <script src="/static/js/components.js"></script> -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">    <!-- HABILITANDO components.js que incluye navbar -->
+    <script src="/static/js/components.js"></script>
     <style>
         /* Estética actualizada similar al panel de administración */
         .gradient-bg {
@@ -228,13 +227,13 @@
         // =================================================================
         // CONFIGURACIÓN Y CONSTANTES
         // =================================================================        const AUTH_CONFIG = {
-            TOKEN_KEY: 'access_token',
-            LOGIN_ENDPOINT: '/login',
-            LOGOUT_ENDPOINT: '/logout',
-            LOGIN_PAGE: '/loginpage',
-            DEBUG_ENDPOINT: '/admin-debug',
+            TOKEN_KEY: 'access_token';
+            LOGIN_ENDPOINT: '/login';
+            LOGOUT_ENDPOINT: '/logout';
+            LOGIN_PAGE: '/loginpage';
+            DEBUG_ENDPOINT: '/admin-debug';
             EXCLUDED_PATHS: ['/login', '/logout', '/loginpage', '/registerpage', '/static', '/usuarios/current']
-        };
+        ;
         
         // =================================================================
         // INTERCEPTOR DE FETCH EMBEBIDO
@@ -354,6 +353,9 @@
             console.log('Script de login ya cargado, evitando duplicación');
         } else {
             window.loginScriptLoaded = true;            document.addEventListener('DOMContentLoaded', function() {
+                // Cargar navbar
+                loadNavbar();
+                
                 // Limpiar flags de redirección al cargar la página de login
                 if (window.location.pathname.includes('login')) {
                     // Limpiar solo si no venimos de una redirección reciente
@@ -599,40 +601,50 @@
                         console.log('URL de redirección determinada:', redirectUrl);
                         console.log('Iniciando redirección inmediata...');
                           // Evitar verificación de autenticación en la página destino
-                        sessionStorage.setItem('just_logged_in', 'true');
-                          // Redirigir usando navegación con token
+                        sessionStorage.setItem('just_logged_in', 'true');                        // Redirigir usando navegación con token
                         setTimeout(() => {
                             console.log('Ejecutando redirección con token a:', redirectUrl);
+                            console.log('Token almacenado antes de redirección:', !!localStorage.getItem('access_token'));
                             
-                            // Verificar que el interceptor esté disponible
-                            if (typeof window.navigateWithAuth === 'function') {
-                                console.log('Usando navegateWithAuth del interceptor');
-                                navigateWithAuth(redirectUrl);
-                            } else {
-                                console.log('Interceptor no disponible, navegando directamente con token verificado');
-                                // Fallback: verificar token antes de navegar
-                                const token = localStorage.getItem('access_token');
-                                if (token) {
-                                    fetch(redirectUrl, {
-                                        method: 'GET',
-                                        headers: {
-                                            'Authorization': `Bearer ${token}`,
-                                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-                                        }
-                                    })
-                                    .then(response => {
-                                        console.log('Respuesta de verificación:', response.status);
-                                        window.location.href = redirectUrl;
-                                    })
-                                    .catch(error => {
-                                        console.log('Error en verificación, navegando directamente:', error);
-                                        window.location.href = redirectUrl;
-                                    });
-                                } else {
-                                    window.location.href = redirectUrl;
-                                }
+                            // Asegurar que el token esté realmente guardado
+                            const storedToken = localStorage.getItem('access_token');
+                            if (!storedToken) {
+                                console.error('¡ERROR! Token no guardado correctamente, reintentando...');
+                                localStorage.setItem('access_token', data.access_token);
                             }
-                        }, 300); // Tiempo reducido para redirección más rápida
+                                      // NAVEGACIÓN CON VERIFICACIÓN DE TOKEN USANDO INTERCEPTOR
+                            if (typeof window.navigateWithAuth === 'function') {
+                                console.log('Usando navigateWithAuth del interceptor embebido...');
+                                window.navigateWithAuth(redirectUrl);
+                            } else {
+                                console.log('Interceptor no disponible, verificando token manualmente...');
+                                // Verificar token antes de navegar
+                                fetch(redirectUrl, {
+                                    method: 'GET',
+                                    headers: {
+                                        'Authorization': `Bearer ${data.access_token}`,
+                                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                                    }
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        console.log('✅ Token válido, navegando...');
+                                        window.location.href = redirectUrl;
+                                    } else if (response.status === 401) {
+                                        console.log('❌ Token rechazado, limpiando y volviendo a login');
+                                        localStorage.removeItem('access_token');
+                                        showNotification('Error de autenticación, intenta nuevamente', 'error');
+                                    } else {
+                                        console.log('⚠️ Otro error, navegando normalmente');
+                                        window.location.href = redirectUrl;
+                                    }
+                                })
+                                .catch(error => {
+                                    console.log('❌ Error en verificación, navegando normalmente');
+                                    window.location.href = redirectUrl;
+                                });
+                            }
+                        }, 100); // Tiempo muy reducido
                     } else {
                         console.log('No se recibió access_token en la respuesta');
                         console.log('Estructura completa de la respuesta:', data);

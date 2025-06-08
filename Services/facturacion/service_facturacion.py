@@ -1,24 +1,26 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException, status
-from sqlalchemy import text
-from .model_facturacion import Facturacion, FacturaItem  # Importamos el modelo de items
-from typing import List, Optional, Dict, Any, Tuple
-import logging
-import os
-from datetime import datetime
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle
-from reportlab.lib.units import cm
-import barcode
+# Imports de bibliotecas estándar
+from sql_app.Services.app_stock.articulos.model_facturacion import FacturaItem  # Importamos el modelo de items, Facturacion
 from barcode.writer import ImageWriter
+from datetime import datetime
 from io import BytesIO
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Table, TableStyle
+from typing import Any, Dict, List, Optional, Tuple
+import barcode
 import base64
 import json
+import logging
+import os
 import re
 
+# Imports de terceros
+from fastapi import HTTPException, status
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 

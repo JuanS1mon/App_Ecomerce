@@ -1,9 +1,9 @@
+# Imports de terceros
 from sqlalchemy import Column, Integer, ForeignKey
-try:
-    from ...database import Base
-except ImportError:
-    from sql_app.db.database import Base
-class usuarios_rol(Base):
+
+# Imports del proyecto
+from ...database import Baseclass usuarios_rol(Base):
+
     __tablename__ = "UsuariosRol"  # Ajustar al nombre real de la tabla en SQL Server
     
     usuario_id = Column(Integer, ForeignKey("Usuarios.codigo", ondelete="CASCADE"), primary_key=True)

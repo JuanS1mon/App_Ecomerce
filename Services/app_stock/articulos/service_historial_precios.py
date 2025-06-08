@@ -1,17 +1,19 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import and_, or_, desc, func
-from fastapi import HTTPException, status
-from typing import List, Optional, Dict, Any
+
+# Imports de bibliotecas estándar
 import logging
 from datetime import datetime, date
+from typing import List, Optional, Dict, Any
 
-try:
-    from .model_precios_historial import PreciosHistorial
-    from .model_articulos import Articulos
-except ImportError:
-    from sql_app.Services.app_stock.articulos.model_precios_historial import PreciosHistorial
-    from sql_app.Services.app_stock.articulos.model_articulos import Articulos
+# Imports de terceros
+from fastapi import HTTPException, status
+from sqlalchemy import and_, or_, desc, func
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.Services.app_stock.articulos.model_articulos import Articulos
+from sql_app.Services.app_stock.articulos.model_precios_historial import PreciosHistorial
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 

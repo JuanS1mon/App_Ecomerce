@@ -1,20 +1,25 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
+# Imports de bibliotecas estándar
+from barcode.writer import ImageWriter
+from datetime import datetime, timedelta
+from io import BytesIO
+from typing import List, Optional, Dict, Any
+import barcode
+import base64
+import logging
+import os
+import qrcode
+import uuid
+
+# Imports de terceros
 from fastapi import HTTPException, status
 from sqlalchemy import text, or_
-from .model_articulos import Articulos
-from .model_precios_historial import PreciosHistorial  # Importando el modelo de precios historial
-from .service_precios_historial import registrar_cambio_precio
-from typing import List, Optional, Dict, Any
-import logging
-from datetime import datetime, timedelta
-import barcode
-from barcode.writer import ImageWriter
-import qrcode
-from io import BytesIO
-import base64
-import os
-import uuid
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.Services.app_stock.articulos.model_articulos import Articulos
+from sql_app.Services.app_stock.articulos.model_precios_historial import PreciosHistorial  # Importando el modelo de precios historial
+from sql_app.Services.app_stock.articulos.service_precios_historial import registrar_cambio_precio
 
 logger = logging.getLogger(__name__)
 

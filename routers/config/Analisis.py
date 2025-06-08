@@ -1,20 +1,27 @@
-import datetime
-import pandas as pd
-import numpy as np
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel
-from sqlalchemy.orm import Session
-from sqlalchemy import text, inspect
-from fastapi import APIRouter, Request, logger, status, Depends, HTTPException,Form
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse
-
-from ...Services.security.security import get_current_user
-from ...db.database import get_db
-from ...db.schemas.config.Usuarios import UserDB
-from ...db.crud.tablas import get_tables
-
 # ==================== FUNCIONES UTILITARIAS ====================
+
+
+
+
+
+
+
+from fastapi.responses import HTMLResponse, JSONResponse
+from typing import Any, Dict, List, Optional
+import datetime
+
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, logger, status
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
+from sqlalchemy import inspect, text
+from sqlalchemy.orm import Session
+import numpy as np
+import pandas as pd
+
+from sql_app.Services.security.security import get_current_user
+from sql_app.db.crud.tablas import get_tables
+from sql_app.db.database import get_db
+from sql_app.db.schemas.config.Usuarios import UserDB
 
 def limpiar_datos(df: pd.DataFrame) -> pd.DataFrame:
     """

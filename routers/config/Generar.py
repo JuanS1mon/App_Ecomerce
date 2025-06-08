@@ -1,23 +1,32 @@
 #generar.py
-from fastapi import APIRouter, status, Depends, Request
-from starlette.responses import FileResponse
-import os
-import fileinput
-import logging
-import traceback
+
+
+
+
+
+
+
+
+
+
 from fastapi.security import OAuth2PasswordBearer
+from starlette.responses import FileResponse
+import logging
+import os
 
-from ...Services.security.security import get_current_user
-
-from .Generar_Funciones.Generar_Routes import generate_route
 from .Generar_Funciones.Generar_Cruds import generate_crud_functions
-from .Generar_Funciones.Generar_Schema import generate_schema
-from .Generar_Funciones.Generar_Models import generate_model
 from .Generar_Funciones.Generar_Html import generate_html_form
-from .Generar_Funciones.Generar_Test import generate_tests
 from .Generar_Funciones.Generar_Html_service import generate_html_for_service
+from .Generar_Funciones.Generar_Models import generate_model
+from .Generar_Funciones.Generar_Routes import generate_route
+from .Generar_Funciones.Generar_Schema import generate_schema
+from .Generar_Funciones.Generar_Test import generate_tests
+from fastapi import APIRouter, Depends, Request, status
 from fastapi.templating import Jinja2Templates
+import fileinput
+import traceback
 
+from sql_app.Services.security.security import get_current_user
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 templates = Jinja2Templates(directory="sql_app/static")
@@ -186,7 +195,7 @@ def register_service_in_manager(module_name):
     """
     try:
         # Importamos el gestor de servicios
-        from ...routers.config import service_manager
+        from routers.config import service_manager
         
         # El ID del servicio según la convención del gestor
         service_id = f"{module_name}.route_{module_name}"
@@ -380,7 +389,7 @@ def add_new_route_to_main(new_route):
             lines = list(file)
         last_maestros_index = None
         for i, line in enumerate(lines):
-            if line.strip().startswith('from ...routers.Maestros import'):
+            if line.strip().startswith('from routers.Maestros import'):
                 if f'Route_{new_route}' not in line:
                     lines[i] = line.strip() + f', Route_{new_route}\n'
             if '#Maestros' in line:

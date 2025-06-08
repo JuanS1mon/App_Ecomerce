@@ -1,3 +1,4 @@
+# Imports de bibliotecas estándar
 import fitz  # PyMuPDF
 
 def reemplazar_texto_pdf(ruta_pdf, ruta_pdf_salida, texto_a_reemplazar, nuevo_texto):

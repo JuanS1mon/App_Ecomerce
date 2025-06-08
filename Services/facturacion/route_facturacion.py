@@ -1,11 +1,9 @@
-
-from fastapi import APIRouter, HTTPException, status, Depends, Query
+# Imports de terceros
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-try:
-    from ...db.database import get_db
-except ImportError:
-    from sql_app.db.database import get_db
-import logging
+
+# Imports del proyecto
+from sql_app.db.database import get_dbimport logging
 
 logger = logging.getLogger(__name__)
 

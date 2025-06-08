@@ -1,27 +1,40 @@
 # migraciones.py
-from io import BytesIO
-import os
-import logging
-from xml.etree.ElementInclude import include
-from datetime import datetime
-from fastapi import APIRouter, Request, status, Depends, File, UploadFile, HTTPException, BackgroundTasks
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
-from sqlalchemy import MetaData, Table, inspect, text, cast, Date, func
-from sqlalchemy.orm import Session
-from ...Services.migracion.migracion import procesar_archivo
-from ...Services.security.security import get_current_user
-from ...db.database import get_db
-from ...db.schemas.config.Usuarios import UserDB
-from ...db.models.config.activityLog import ActivityLog
+
+# Imports de bibliotecas estándar
 import json
-from ...db.crud.tablas import get_tables
+import logging
+import os
+from datetime import datetime
+from io import BytesIO
+
+# Imports de terceros
 import pandas as pd
-from tenacity import retry, stop_after_attempt, wait_exponential
-from fastapi.responses import JSONResponse
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    HTTPException,
+    Request,
+    UploadFile,
+    status
+)
+from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from ...Services.Analisis.analisis import clean_data
-# Primero, definimos los tipos de archivo permitidos
+from sqlalchemy import Date, MetaData, Table, cast, func, inspect, text
+from sqlalchemy.orm import Session
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+# Imports del proyecto
+from sql_app.Services.Analisis.analisis import clean_data
+from sql_app.Services.migracion.migracion import procesar_archivo
+from sql_app.Services.security.security import get_current_user
+from sql_app.db.crud.tablas import get_tables
+from sql_app.db.database import get_db
+from sql_app.db.models.config.activityLog import ActivityLog
+from sql_app.db.schemas.config.Usuarios import UserDB
+
 ALLOWED_EXTENSIONS = {
     'EXCEL': [
         "application/vnd.ms-excel",
@@ -72,9 +85,10 @@ class MigracionProgress:
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
 async def process_sheet_with_retry(sheet_data, sheet_name, timestamp, user_results_dir):
     """Procesa una hoja con sistema de reintentos"""
+    
     try:
         # Convertir columnas datetime
-        datetime_columns = sheet_data.select_dtypes(include(['datetime64[ns]', 'datetime'])).columns
+        datetime_columns = sheet_data.select_dtypes(include=['datetime64[ns]', 'datetime']).columns
         for column in datetime_columns:
             sheet_data[column] = sheet_data[column].dt.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -755,13 +769,15 @@ async def change_field_type(
                               "Formatos aceptados: 'YYYY-MM-DD', 'YYYY/MM/DD', 'DD-MM-YYYY', etc. "
                               "Se recomienda limpiar los datos antes de cambiar el tipo."
                 },
-                status_code=400
+                            status_code=400
             )
         
         return JSONResponse(
             content={"success": False, "message": error_msg},
             status_code=500
         )
+
+
 async def _handle_date_conversion(request: ChangeFieldTypeRequest, db: Session, current_user):
     """Función auxiliar para manejar específicamente la conversión a tipo DATE con limpieza de datos."""
     try:

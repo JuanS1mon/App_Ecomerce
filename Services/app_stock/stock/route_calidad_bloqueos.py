@@ -1,12 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
-from sqlalchemy.orm import Session
-from typing import List, Dict, Any, Optional
+# Imports de bibliotecas estándar
+from typing import Any, Dict, List, Optional
 import logging
-try:
-    from ....db.database import get_db
-except ImportError:
-    from sql_app.db.database import get_db
-# Configurar logger
+
+# Imports de terceros
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.db.database import get_db# Configurar logger
+
 logger = logging.getLogger(__name__)
 
 # Configurar templates

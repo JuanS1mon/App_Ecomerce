@@ -1,10 +1,13 @@
-import re
+# Imports de bibliotecas estándar
+from starlette.middleware.base import BaseHTTPMiddleware
 import logging
-import traceback
 import pyodbc
+import re
+import traceback
+
+# Imports de terceros
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse, HTMLResponse
-from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy.exc import SQLAlchemyError, ProgrammingError
 
 logger = logging.getLogger(__name__)

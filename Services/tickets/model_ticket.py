@@ -1,11 +1,11 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, JSON, ForeignKey
+"""
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, JSON, String, Text
+
 from sqlalchemy.sql import func
-try:
-    from ...db.database import Base
-except ImportError:
-    from sql_app.db.database import Base
-class Ticket(Base):
-    """
+
+from sql_app.db.database import Baseclass Ticket(Base):
+
     Modelo para la tabla de tickets en la base de datos.
     IMPORTANTE: Solo incluir columnas que existen en la tabla real.
     """

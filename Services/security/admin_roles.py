@@ -1,12 +1,15 @@
+# Imports de bibliotecas estándar
 from typing import List
+
+# Imports de terceros
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from ...db.database import get_db
-from .security import require_admin
-from ...db.schemas.config.roles import Role, RoleCreate, RoleAssignment
-from ...db.crud.config.roles import (
-    get_all_roles, get_role_by_name, create_role, delete_role
-)
+
+# Imports del proyecto
+from sql_app.Services.security.security import require_admin
+from sql_app.db.crud.config.roles import get_role_by_name, create_role, delete_role, get_all_roles
+from sql_app.db.database import get_db
+from sql_app.db.schemas.config.roles import Role, RoleAssignment, RoleCreate
 
 router = APIRouter(
     prefix="/admin/roles",

@@ -1,4 +1,7 @@
+# Imports de terceros
 from sqlalchemy import Column, Integer, String, Float, DateTime
+
+# Imports del proyecto
 from ..database import Base  # Asegúrate de importar Base desde el archivo correcto
 
 class ResultadoKPI(Base):

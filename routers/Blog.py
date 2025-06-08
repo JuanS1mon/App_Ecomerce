@@ -1,16 +1,25 @@
 # sql_app/routers/blog.py
-from fastapi import APIRouter, Depends, Form, HTTPException, Request,status
-from sqlalchemy.orm import Session
 
 # Importaciones relativas (cuando se ejecuta como módulo)
-from ..db.database import get_db
+
+
+
+
+
+
+
+
+
+
 from ..db.models.Blog import BlogPost as BlogPostModel
 from ..db.schemas.Blog import BlogPost, BlogPostCreate, BlogPostUpdate
-
-
-from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse, RedirectResponse
 
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session
+
+from sql_app.db.database import get_db
 
 router = APIRouter(
     include_in_schema=False,  # Oculta todas las rutas de este router en la documentación,

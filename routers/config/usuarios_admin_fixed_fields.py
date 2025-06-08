@@ -2,6 +2,21 @@
 Módulo de gestión de usuarios para administradores - Versión con campos corregidos
 """
 
+"""
+
+Módulo de gestión de usuarios para administradores - Versión con campos corregidos
+"""
+
+"""
+
+Módulo de gestión de usuarios para administradores - Versión con campos corregidos
+"""
+
+"""
+
+Módulo de gestión de usuarios para administradores - Versión con campos corregidos
+"""
+
 import json
 import logging
 from typing import List, Dict, Any, Optional
@@ -12,10 +27,10 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from pydantic import BaseModel
-from ...Services.security.security import get_current_user, require_admin, encriptar_clave
-from ...db.database import get_db
-from ...db.schemas.config.Usuarios import UserDB
-from ...db.models.config.usuarios import usuarios as UsuariosModel
+from Services.security.security import get_current_user, require_admin, encriptar_clave
+from db.database import get_db
+from db.schemas.config.Usuarios import UserDB
+from db.models.config.usuarios import usuarios as UsuariosModel
 
 # Configuración
 templates = Jinja2Templates(directory="sql_app/static")

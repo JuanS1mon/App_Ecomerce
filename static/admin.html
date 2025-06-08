@@ -45,6 +45,39 @@
                     });
             };
             
+            // VERIFICACIÓN INICIAL DE AUTENTICACIÓN AL CARGAR ADMIN
+            window.checkInitialAuth = async function() {
+                const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+                
+                if (!token) {
+                    console.log('❌ No hay token en admin, redirigiendo a login');
+                    window.location.href = '/loginpage?redirect=/admin';
+                    return;
+                }
+                
+                try {
+                    console.log('🔍 Verificando token al cargar página admin...');
+                    const response = await fetch('/usuarios/current', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        console.log('❌ Token inválido en admin, redirigiendo a login');
+                        localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+                        window.location.href = '/loginpage?redirect=/admin';
+                    } else {
+                        console.log('✅ Token válido en admin, continuando...');
+                    }
+                } catch (error) {
+                    console.error('❌ Error verificando token en admin:', error);
+                    window.location.href = '/loginpage?redirect=/admin';
+                }
+            };
+            
             window.AUTH_INTERCEPTOR_LOADED = true;
             console.log('✅ Interceptor admin embebido cargado');
         }
@@ -374,10 +407,13 @@
 
         // Ejecutar al cargar y actualizar cada minuto
         updateDateTime();
-        setInterval(updateDateTime, 60000);
-
-        // Código para el gráfico (se mantiene igual, solo añadimos algunas mejoras visuales)
+        setInterval(updateDateTime, 60000);        // Código para el gráfico (se mantiene igual, solo añadimos algunas mejoras visuales)
         document.addEventListener('DOMContentLoaded', function() {
+            // VERIFICAR AUTENTICACIÓN AL CARGAR LA PÁGINA
+            if (typeof window.checkInitialAuth === 'function') {
+                window.checkInitialAuth();
+            }
+            
             const ctx = document.getElementById('activityChart').getContext('2d');
             
             // Datos de ejemplo para el gráfico

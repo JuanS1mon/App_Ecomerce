@@ -1,21 +1,44 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query, Form, UploadFile, File, Request
+# Imports de bibliotecas estándar
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+import json
+import logging
+import os
+
+# Imports de terceros
+from fastapi import (
+
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    Request,
+    UploadFile,
+    status
+)
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy import desc, text
 from sqlalchemy.orm import Session
-from typing import Optional, List, Dict, Any
 
-from ...db.database import get_db
-from ..security.security import get_current_user
-from ...db.models.config.tickets import Ticket
-from .schema_ticket import TicketCreate, TicketRead, TicketUpdate
-from .crud_ticket import add_response_to_history, create_ticket, get_ticket, get_ticket_statistics_by_period, gets_tickets, register_activity, update_ticket, delete_ticket
-import logging
-import json
-import os
-from datetime import datetime, timedelta
-from pathlib import Path
-
-from ...db.models.config.activityLog import ActivityLog
+# Imports del proyecto
+from sql_app.Services.security.security import get_current_user
+from sql_app.Services.tickets.crud_ticket import (
+    add_response_to_history,
+    create_ticket,
+    delete_ticket,
+    get_ticket,
+    get_ticket_statistics_by_period,
+    gets_tickets,
+    register_activity,
+    update_ticket
+)
+from sql_app.Services.tickets.schema_ticket import TicketCreate, TicketRead, TicketUpdate
+from sql_app.db.models.config.tickets import Ticket
+from sql_app.db.database import get_db
+from sql_app.db.models.config.activityLog import ActivityLog
 
 logger = logging.getLogger(__name__)
 

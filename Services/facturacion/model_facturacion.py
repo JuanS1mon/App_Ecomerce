@@ -1,10 +1,22 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, Date, DateTime, Text, ForeignKey, Numeric
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    Text
+)
 from sqlalchemy.sql import func
-try:
-    from ...db.database import Base
-except ImportError:
-    from sql_app.db.database import Base
+
+from sql_app.db.database import Base
+
+
 class Facturacion(Base):
+
     __tablename__ = 'facturacion'
 
     # Campos de identificación

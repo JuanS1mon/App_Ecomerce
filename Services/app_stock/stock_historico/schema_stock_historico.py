@@ -1,6 +1,9 @@
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, ConfigDict
+# Imports de bibliotecas estándar
 from datetime import date, datetime
+from typing import Optional, List, Dict, Any
+
+# Imports de terceros
+from pydantic import BaseModel, ConfigDict
 
 class Stock_historicoBase(BaseModel):
     nro_movimiento: int

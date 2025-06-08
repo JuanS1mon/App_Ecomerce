@@ -1,10 +1,16 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
+
+# Imports de bibliotecas estándar
+import logging
+from typing import List, Optional, Dict, Any
+
+# Imports de terceros
 from fastapi import HTTPException, status
 from sqlalchemy import text
-from .model_articulos_series import Articulos_series  # Corregida la importación
-from typing import List, Optional, Dict, Any
-import logging
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.Services.app_stock.articulos_series.model_articulos_series import Articulos_series
 
 logger = logging.getLogger(__name__)
 

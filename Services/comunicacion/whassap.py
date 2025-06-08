@@ -1,10 +1,13 @@
-import pywhatkit as kit
-import pyautogui
-import time
-import re
-import logging
-from fastapi import HTTPException
+# Imports de bibliotecas estándar
 from pywhatkit.core.exceptions import CountryCodeException
+import logging
+import pyautogui
+import pywhatkit as kit
+import re
+import time
+
+# Imports de terceros
+from fastapi import HTTPException
 
 def enviar_mensaje_whatsapp(numero, mensaje):
     try:

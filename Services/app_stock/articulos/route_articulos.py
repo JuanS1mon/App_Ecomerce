@@ -1,16 +1,20 @@
+# Imports de terceros
 from fastapi import APIRouter, HTTPException, status, Depends, Query, Body, Request
 from sqlalchemy.orm import Session
+
+# Imports del proyecto
 from ....db.database import get_db
-from .schema_articulos import ArticulosCreate, ArticulosUpdate, ArticulosRead
 from .model_articulos import Articulos as ArticulosModel
+from .schema_articulos import ArticulosCreate, ArticulosUpdate, ArticulosRead
 from .service_articulos import (
+
     create_articulos, get_articulos, get_articulos_by_codigo, gets_articulos, delete_articulos, update_articulos,
     actualizar_precio_articulo, actualizar_precios_masivos, get_articulos_stats,
     get_historial_precios, generar_codigo_barra, generar_codigo_qr, get_recent_price_changes
 )
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from ...security.security import get_current_user  # Importamos la función de seguridad
+from sql_app.Services.security.security import get_current_user  # Importamos la función de seguridad
 from typing import List, Optional, Dict, Any
 import logging
 from datetime import datetime, timedelta

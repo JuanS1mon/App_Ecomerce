@@ -1,12 +1,21 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query
-from sqlalchemy.orm import Session
-from ....db.database import get_db
-from .schema_depositos import DepositosCreate, DepositosUpdate, DepositosRead
-from .model_depositos import Depositos as DepositosModel
-from .service_depositos import create_depositos, get_depositos, gets_depositos, delete_depositos, update_depositos
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
-from typing import List, Optional, Dict, Any
 import logging
+from typing import Any, Dict, List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from sqlalchemy.orm import Session
+
+from sql_app.Services.app_stock.depositos.model_depositos import Depositos as DepositosModel
+from sql_app.Services.app_stock.depositos.schema_depositos import DepositosCreate, DepositosRead, DepositosUpdate
+from sql_app.Services.app_stock.depositos.service_depositos import (
+    create_depositos,
+    delete_depositos,
+    get_depositos,
+    gets_depositos,
+    update_depositos
+)
+
+from sql_app.db.database import get_db
 
 logger = logging.getLogger(__name__)
 

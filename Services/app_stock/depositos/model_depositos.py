@@ -1,7 +1,10 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, Date, DateTime, Text, ForeignKey
-from sqlalchemy.sql import func
+# Imports de terceros
+from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
-from ....db.database import Base
+from sqlalchemy.sql import func
+
+# Imports del proyecto
+from sql_app.db.database import Base
 
 class Depositos(Base):
     __tablename__ = 'depositos'

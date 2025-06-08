@@ -1,5 +1,8 @@
-from pydantic import BaseModel, Field
+# Imports de bibliotecas estándar
 from typing import Optional, List
+
+# Imports de terceros
+from pydantic import BaseModel, Field
 
 # Modelo para representar un rol
 class Role(BaseModel):

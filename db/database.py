@@ -1,14 +1,20 @@
-from sqlalchemy import create_engine, text, MetaData, Table, inspect
-from sqlalchemy.orm import declarative_base, sessionmaker
-from sqlalchemy.ext.declarative import DeferredReflection
-from dotenv import load_dotenv
-import os
-import importlib
-import sys
-from sqlalchemy.exc import OperationalError, InterfaceError, ProgrammingError, NoReferencedTableError
-from fastapi import HTTPException
-
 # Cargar variables de entorno
+
+
+
+
+
+from sqlalchemy import MetaData, Table, create_engine, inspect, text
+from sqlalchemy.exc import InterfaceError, NoReferencedTableError, OperationalError, ProgrammingError
+from sqlalchemy.ext.declarative import DeferredReflection
+import os
+import sys
+
+from dotenv import load_dotenv
+from fastapi import HTTPException
+from sqlalchemy.orm import declarative_base, sessionmaker
+import importlib
+
 load_dotenv()
 
 # Detectar si estamos en Heroku
@@ -154,11 +160,7 @@ def ensure_roles_model():
             if not os.path.exists(roles_file_path):
                 with open(roles_file_path, 'w') as f:
                     f.write("""from sqlalchemy import Column, Integer, String
-try:
-    from ...db.database import Base
-except ImportError:
-    from sql_app.db.database import Base
-class Roles(Base):
+from db.database import Baseclass Roles(Base):
     __tablename__ = "Roles"
     __table_args__ = {'extend_existing': True}
     

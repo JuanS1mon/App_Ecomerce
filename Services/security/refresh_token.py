@@ -1,12 +1,15 @@
+# Imports de bibliotecas estándar
 from datetime import datetime, timedelta, timezone
-from jose import jwt, JWTError
-import os
+from db.crud.config.Usuarios import get_user_from_db
 from dotenv import load_dotenv
-import logging
-from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
-from sql_app.db.crud.config.Usuarios import get_user_from_db
 from typing import Dict, Optional
+import logging
+import os
+
+# Imports de terceros
+from fastapi import HTTPException, status
+from jose import jwt, JWTError
+from sqlalchemy.orm import Session
 
 # Cargar variables de entorno
 load_dotenv()

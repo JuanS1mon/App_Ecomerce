@@ -1,13 +1,16 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException, status
-from sqlalchemy import text, func, and_, or_
+# Imports de bibliotecas estándar
+from sql_app.Services.app_stock.articulos.model_confirmacion_movimiento import ConfirmacionMovimiento
+from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+from datetime import datetime, timedelta
+from enum import Enum
 from typing import List, Optional, Dict, Any
 import logging
-from datetime import datetime, timedelta
-from .model_stock import Stock as StockModel
-from .model_confirmacion_movimiento import ConfirmacionMovimiento
-from enum import Enum
+
+# Imports de terceros
+from fastapi import HTTPException, status
+from sqlalchemy import text, func, and_, or_
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -800,7 +803,7 @@ def calcular_stock_disponible(db: Session, id_deposito: int, codigo_art: int, in
         # Obtenemos bloqueos por calidad activos para este artículo en este depósito
         # Primero importamos el modelo si es necesario
         try:
-            from .model_calidad import CalidadBloqueo
+            from sql_app.Services.app_stock.articulos.model_calidad import CalidadBloqueo
             
             # Sumamos todas las cantidades bloqueadas activas
             bloqueados_calidad = db.query(func.sum(CalidadBloqueo.cantidad)).filter(

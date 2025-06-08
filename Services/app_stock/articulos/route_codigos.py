@@ -1,15 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query, Body
-from sqlalchemy.orm import Session
-from typing import Dict, Any, Optional, List
-from fastapi.responses import FileResponse, JSONResponse
+# Imports de bibliotecas estándar
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+import json
 import logging
 import os
-from pathlib import Path
-import json
 
-from ....db.database import get_db
-from .schema_articulos import CodigoBarrasRequest, QRCodeRequest
-from .service_codigos import (
+# Imports de terceros
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, JSONResponse
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.db.database import get_db
+from sql_app.Services.app_stock.articulos.schema_articulos import CodigoBarrasRequest, QRCodeRequest
+from sql_app.Services.app_stock.articulos.service_codigos import (
     generar_codigo_barras, 
     generar_codigo_qr, 
     generar_etiqueta_completa

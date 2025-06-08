@@ -1,6 +1,9 @@
+# Imports de bibliotecas estándar
 import logging
-from sqlalchemy.orm import Session
+
+# Imports de terceros
 from sqlalchemy import inspect, text
+from sqlalchemy.orm import Session
 
 def get_tables(db: Session):
     inspector = inspect(db.get_bind())

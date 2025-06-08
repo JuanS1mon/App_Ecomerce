@@ -1,14 +1,13 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import func, or_
+# Imports de bibliotecas estándar
+from Services.app_stock.ot.model_ot import OT, Operacion, ReporteTiempo# Configuración del logger
 from datetime import datetime
 from typing import List, Optional
 import logging
 
-try:
-    from ...Services.app_stock.ot.model_ot import OT, Operacion, ReporteTiempo
-except ImportError:
-    from sql_app.Services.app_stock.ot.model_ot import OT, Operacion, ReporteTiempo
-# Configuración del logger
+# Imports de terceros
+from sqlalchemy import func, or_
+from sqlalchemy.orm import Session
+
 logger = logging.getLogger(__name__)
 
 # Servicios para Órdenes de Trabajo (OT)

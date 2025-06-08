@@ -1,13 +1,20 @@
-
-from fastapi import APIRouter, HTTPException, status, Depends, Query
-from sqlalchemy.orm import Session
-from ....db.database import get_db
-from .schema_stock_historico import Stock_historicoCreate, Stock_historicoUpdate, Stock_historicoRead
-from .model_stock_historico import Stock_historico as Stock_historicoModel
-from .service_stock_historico import create_stock_historico, get_stock_historico, gets_stock_historico, delete_stock_historico, update_stock_historico
-from fastapi.responses import HTMLResponse, FileResponse
-from typing import List, Optional
 import logging
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, HTMLResponse
+from sqlalchemy.orm import Session
+
+from sql_app.db.database import get_db
+from sql_app.Services.app_stock.stock_historico.model_stock_historico import Stock_historico as Stock_historicoModel
+from sql_app.Services.app_stock.stock_historico.schema_stock_historico import Stock_historicoCreate, Stock_historicoRead, Stock_historicoUpdate
+from sql_app.Services.app_stock.stock_historico.service_stock_historico import (
+    create_stock_historico,
+    delete_stock_historico,
+    get_stock_historico,
+    gets_stock_historico,
+    update_stock_historico
+)
 
 logger = logging.getLogger(__name__)
 

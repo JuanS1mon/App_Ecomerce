@@ -1,15 +1,20 @@
+# Imports de bibliotecas estándar
+from datetime import date, timedelta
 import os
 import re
-from fastapi import FastAPI, Form, Request, APIRouter, status, Depends, HTTPException
+
+# Imports de terceros
+from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request, status
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from ...Services.security.security import encriptar_clave, get_current_user  # Importar la función de seguridad
-from ...db.database import get_db
-from ...db.models.config.usuarios import usuarios 
-from ...db.models.config.activityLog import ActivityLog
-from datetime import date, timedelta
-from ...db.schemas.config.Usuarios import UserDB  # Asegúrate de importar UserDB
+
+# Imports del proyecto
+from sql_app.Services.security.security import encriptar_clave, get_current_user  # Importar la función de seguridad
+from sql_app.db.database import get_db
+from sql_app.db.models.config.activityLog import ActivityLog
+from sql_app.db.models.config.usuarios import usuarios
+from sql_app.db.schemas.config.Usuarios import UserDB  # Asegúrate de importar UserDB
 
 templates = Jinja2Templates(directory="sql_app/static")  # Cambiado para coincidir con main.py
 

@@ -2,19 +2,29 @@
 Funciones de autenticación opcional para casos donde el usuario puede o no estar autenticado
 """
 
+"""
+
+Funciones de autenticación opcional para casos donde el usuario puede o no estar autenticado
+"""
+
+"""
+
+Funciones de autenticación opcional para casos donde el usuario puede o no estar autenticado
+"""
+
+"""
+
+Funciones de autenticación opcional para casos donde el usuario puede o no estar autenticado
+"""
+
 from fastapi import Request, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-try:
-    # Importaciones relativas (cuando se ejecuta como módulo)
-    from ...db.database import get_db
-    from ...db.schemas.config.Usuarios import UserDB
-    from ...db.crud.config.Usuarios import get_user_from_db
-except ImportError:
-    # Importaciones absolutas (cuando se ejecuta directamente)
-    from sql_app.db.database import get_db
-    from sql_app.db.schemas.config.Usuarios import UserDB
-    from sql_app.db.crud.config.Usuarios import get_user_from_db
+
+# Importaciones absolutas (cuando se ejecuta directamente)
+from ...db.database import get_db
+from ...db.schemas.config.Usuarios import UserDB
+from ...db.crud.config.Usuarios import get_user_from_db
 from jose import jwt, JWTError
 import os
 import logging
@@ -75,7 +85,7 @@ async def get_optional_user(request: Request, db: Session = Depends(get_db)):
                   # Convertir roles a objetos Role si son diccionarios
                 for role_data in roles_data:
                     if isinstance(role_data, dict):
-                        from sql_app.db.schemas.config.Usuarios import Role
+                        from db.schemas.config.Usuarios import Role
                         roles.append(Role(**role_data))
                     else:
                         roles.append(role_data)

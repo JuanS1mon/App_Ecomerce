@@ -1,11 +1,14 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException, status
-from sqlalchemy import text, func, and_, or_
+# Imports de bibliotecas estándar
+from sql_app.Services.app_stock.articulos.model_calidad import CalidadBloqueo
+from datetime import datetime
 from typing import List, Dict, Any, Optional
 import logging
-from datetime import datetime
-from .model_calidad import CalidadBloqueo
+
+# Imports de terceros
+from fastapi import HTTPException, status
+from sqlalchemy import text, func, and_, or_
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 

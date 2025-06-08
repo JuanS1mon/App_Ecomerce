@@ -3,6 +3,24 @@ Router de usuarios mejorado con seguridad avanzada
 Incluye validaciones robustas, logging seguro y protección contra ataques
 """
 
+"""
+
+Router de usuarios mejorado con seguridad avanzada
+Incluye validaciones robustas, logging seguro y protección contra ataques
+"""
+
+"""
+
+Router de usuarios mejorado con seguridad avanzada
+Incluye validaciones robustas, logging seguro y protección contra ataques
+"""
+
+"""
+
+Router de usuarios mejorado con seguridad avanzada
+Incluye validaciones robustas, logging seguro y protección contra ataques
+"""
+
 from fastapi import APIRouter, Depends, HTTPException, Response, status, BackgroundTasks, Request
 from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse, FileResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -17,43 +35,25 @@ import logging
 import secrets
 import re
 import jwt
+from jose import JWTError
 from typing import Optional
 
 # Importar versiones mejoradas de seguridad
-try:
-    # Importaciones relativas (cuando se ejecuta como módulo)
-    from ..Services.security.security import (ACCESS_TOKEN_DURATION, authenticate_user, current_user, encriptar_clave, verificar_clave, crear_access_token,decodifica_token,validate_username,validate_password_strength,log_security_event,revoke_token,generar_token_activacion, SECRET, ALGORITHM)
-    from ..Services.security.get_optional_user import get_optional_user
-    from ..Services.mail.mail import enviar_email_simple, validar_email
-    from ..Services.comunicacion.whassap import enviar_mensaje_whatsapp, validar_telefono
-    from ..db.crud.config.Usuarios import (
-        get_usuario, 
-        create_usuario,    update_usuario_activate
-    )
-    from ..db.database import get_db
-    from ..db.schemas.config.Usuarios import (
-        UserDB, 
-        PasswordReset, 
-        PasswordResetRequest
-    )
-    from ..db.models.config.usuarios import usuarios as UsuariosModel
-except ImportError:
-    # Importaciones absolutas (cuando se ejecuta directamente)
-    from ..Services.security.security import (ACCESS_TOKEN_DURATION, authenticate_user, current_user, encriptar_clave, verificar_clave, crear_access_token,decodifica_token,validate_username,validate_password_strength,log_security_event,revoke_token,generar_token_activacion, SECRET, ALGORITHM)
-    from ..Services.security.get_optional_user import get_optional_user
-    from ..Services.mail.mail import enviar_email_simple, validar_email
-    from ..Services.comunicacion.whassap import enviar_mensaje_whatsapp, validar_telefono
-    from ..db.crud.config.Usuarios import (
-        get_usuario, 
-        create_usuario,    update_usuario_activate
-    )
-    from ..db.database import get_db
-    from ..db.schemas.config.Usuarios import (
-        UserDB, 
-        PasswordReset, 
-        PasswordResetRequest
-    )
-    from ..db.models.config.usuarios import usuarios as UsuariosModel
+from ..Services.security.security import (ACCESS_TOKEN_DURATION, authenticate_user, current_user, encriptar_clave, verificar_clave, crear_access_token,decodifica_token,validate_username,validate_password_strength,log_security_event,revoke_token,generar_token_activacion, SECRET, ALGORITHM, get_current_user)
+from ..Services.security.get_optional_user import get_optional_user
+from ..Services.mail.mail import enviar_email_simple, validar_email
+from ..Services.comunicacion.whassap import enviar_mensaje_whatsapp, validar_telefono
+from ..db.crud.config.Usuarios import (
+    get_usuario, 
+    create_usuario, update_usuario_activate
+)
+from ..db.database import get_db
+from ..db.schemas.config.Usuarios import (
+    UserDB, 
+    PasswordReset, 
+    PasswordResetRequest
+)
+from ..db.models.config.usuarios import usuarios as UsuariosModel
 
 # Configuración del router
 router = APIRouter(
@@ -300,41 +300,19 @@ async def get_my_profile(user: UserDB = Depends(current_user)):
         )
 
 @router.get("/usuarios/current")
-async def get_current_user_info(request: Request, user: Optional[UserDB] = Depends(get_optional_user)):
+async def get_current_user_info(request: Request, user: UserDB = Depends(get_current_user)):
     """Obtiene información del usuario para el navbar"""
-    # Si el usuario no está autenticado, devolver información de invitado
-    if user is None:
-        logger.info("Acceso a /usuarios/current sin autenticación, devolviendo usuario anónimo")
-        return {
-            "nombre": "Invitado",
-            "email": "",
-            "autenticado": False,
-            "usuario": None
-        }
+    logger.info(f"🔍 DEBUG: Iniciando get_current_user_info")
+    logger.info(f"🔍 DEBUG: Usuario recibido: {user}")
+    logger.info(f"🔍 DEBUG: Tipo de usuario: {type(user)}")
     
-    try:
-        user_data = {
-            "id": user.codigo,
-            "nombre": user.nombre,
-            "email": user.mail,
-            "usuario": user.usuario,
-            "autenticado": True
-        }
-        
-        if hasattr(user, "roles") and user.roles:
-            user_data["roles"] = [
-                {"id": getattr(role, "id", None), "nombre": getattr(role, "nombre", None)}
-                for role in user.roles
-            ]
-        
-        return user_data
-        
-    except Exception as e:
-        logger.error(f"Error obteniendo usuario actual: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error obteniendo información del usuario"
-        )
+    # Esto NO debería ejecutarse nunca si get_current_user funciona correctamente
+    return {
+        "mensaje": "ENDPOINT CORREGIDO EJECUTANDOSE",
+        "debug": True,
+        "user_type": str(type(user)),
+        "user_data": str(user) if user else "None"
+    }
 
 @router.get("/activar", response_class=HTMLResponse)
 async def activar_cuenta_page(
@@ -1108,7 +1086,7 @@ async def reset_password_request(
                 detail="Formato de email inválido"
             )
           # Buscar usuario por email
-        from ..db.models.config.usuarios import usuarios as UsuariosModel
+        from db.models.config.usuarios import usuarios as UsuariosModel
         user = db.query(UsuariosModel).filter(UsuariosModel.mail == email).first()
         
         if not user:
@@ -1221,7 +1199,7 @@ async def confirm_password_reset(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Token expirado"
             )
-        except jwt.InvalidTokenError:
+        except JWTError:
             log_security_event(
                 "PASSWORD_RESET_INVALID_TOKEN",
                 {"token": sanitize_for_log(reset_data.token[:20]), **client_info},
@@ -1242,7 +1220,7 @@ async def confirm_password_reset(
                 detail="Token inválido o expirado"
             )
           # Buscar usuario
-        from ..db.models.config.usuarios import usuarios as UsuariosModel
+        from db.models.config.usuarios import usuarios as UsuariosModel
         user = db.query(UsuariosModel).filter(UsuariosModel.usuario == username).first()
         
         if not user:

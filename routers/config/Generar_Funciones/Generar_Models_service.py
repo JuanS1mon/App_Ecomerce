@@ -8,7 +8,7 @@ def generate_model(module_name, field_names, field_types):
     # Importaciones necesarias con soporte para más tipos de datos
     model_code = "from sqlalchemy import Column, Integer, String, Boolean, Float, Date, DateTime, Text, ForeignKey\n"
     model_code += "from sqlalchemy.sql import func\n"
-    model_code += "from ...db.database import Base\n\n"
+    model_code += "from db.database import Base\n\n"
 
     # Definir la clase del modelo
     model_code += f"class {module_name_cap}(Base):\n"

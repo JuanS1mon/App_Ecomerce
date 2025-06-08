@@ -1,6 +1,9 @@
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, ConfigDict
+# Imports de bibliotecas estándar
 from datetime import datetime
+from typing import Optional, List, Dict, Any
+
+# Imports de terceros
+from pydantic import BaseModel, Field, ConfigDict
 
 # Esquemas para ReporteTiempo
 class ReporteTiempoBase(BaseModel):

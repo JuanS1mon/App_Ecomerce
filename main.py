@@ -7,29 +7,36 @@
 # ============================================================================
 # IMPORTACIONES ESTÁNDAR Y DEPENDENCIAS
 # ============================================================================
-from dotenv import load_dotenv
-import os
-import httpx
-import traceback
-import importlib
-import logging
 
 # ============================================================================
 # IMPORTACIONES DE FASTAPI Y STARLETTE
 # ============================================================================
-from fastapi import Depends, FastAPI, Request, status, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.exceptions import RequestValidationError
-from fastapi.encoders import jsonable_encoder
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # ============================================================================
 # CONFIGURACIÓN DE LOGGING
 # ============================================================================
+
+
+
+
+
+from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+import logging
+import os
+
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from starlette.exceptions import HTTPException as StarletteHTTPException
+import httpx
+import importlib
+import traceback
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -42,24 +49,24 @@ logger = logging.getLogger("main")
 # ============================================================================
 # IMPORTACIONES DE BASE DE DATOS Y MODELOS
 # ============================================================================
-from .db.database import Base, engine, get_db, create_database, create_tables
-from .db.schemas.config.Usuarios import UserDB
-from .db.models.Blog import BlogPost as BlogPostModel
-from .db.middleware.db_error_handler import DBErrorMiddleware
+from sql_app.db.database import Base, engine, get_db, create_database, create_tables
+from sql_app.db.schemas.config.Usuarios import UserDB
+from sql_app.db.models.Blog import BlogPost as BlogPostModel
+from sql_app.db.middleware.db_error_handler import DBErrorMiddleware
 from sqlalchemy.orm import Session
 
 # ============================================================================
 # IMPORTACIONES DE ROUTERS Y SERVICIOS
 # ============================================================================
-from .routers import usuarios as aut_usuario
-from .routers import Blog
-from .routers.config import Generar, configDB, Migraciones, Analisis, Scraping, usuarios_admin
-from .routers.config.Admin import create_admin_router
-from .Services.security.security import current_user
-from .Services.security.admin_roles import router as roles_router
-from .Services.mail import mail
-from .Services.tickets import route_ticket
-from .Services.app_stock.route_config_stock import configure_stock_routes
+from sql_app.routers import usuarios as aut_usuario
+from sql_app.routers import Blog
+from sql_app.routers.config import Generar, configDB, Migraciones, Analisis, Scraping, usuarios_admin
+from sql_app.routers.config.Admin import create_admin_router
+from sql_app.Services.security.security import current_user
+from sql_app.Services.security.admin_roles import router as roles_router
+from sql_app.Services.mail import mail
+from sql_app.Services.tickets import route_ticket
+from sql_app.Services.app_stock.route_config_stock import configure_stock_routes
 # ============================================================================
 # CONFIGURACIÓN DE ENTORNO Y VARIABLES GLOBALES
 # ============================================================================
@@ -172,14 +179,14 @@ app.add_middleware(
 # Middlewares de aplicación (orden importante: LIFO - último en entrar, primero en salir)
 app.add_middleware(UserTemplateMiddleware)     # Procesar contexto de usuario
 app.add_middleware(DBErrorMiddleware)          # Manejar errores de base de datos
-# app.add_middleware(CustomErrorMiddleware)      # Páginas de error personalizadas - DESACTIVADO TEMPORALMENTE
+app.add_middleware(CustomErrorMiddleware)      # Páginas de error personalizadas - REACTIVADO
 app.add_middleware(FrontendRedirectMiddleware) # Redirección al frontend
 
 # ============================================================================
 # MANEJADORES DE EXCEPCIONES GLOBALES
 # ============================================================================
 
-# Manejador de excepciones HTTP de Starlette
+# Manejador de excepciones HTTP de Starlette - REACTIVADO
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     """Manejador personalizado para excepciones HTTP con páginas de error personalizadas"""
@@ -376,8 +383,8 @@ async def read_root(request: Request):
 #     """API para activar cuenta - workaround directo en main.py"""
 #     try:
 #         # Importar funciones necesarias
-#         from .Services.security.security import decodifica_token, log_security_event
-#         from .db.crud.config.Usuarios import update_usuario_activate
+#         from Services.security.security import decodifica_token, log_security_event
+#         from db.crud.config.Usuarios import update_usuario_activate
 #         
 #         # Función helper para obtener info del cliente
 #         def get_client_info(request):
@@ -501,7 +508,7 @@ async def get_login_page():
 @app.get("/login-simple", response_class=HTMLResponse, include_in_schema=False)
 async def get_login_simple():
     """Página de login simplificada para pruebas"""
-    with open("sql_app/static/login_simple.html", "r", encoding="utf-8") as file:
+    with open("sql_app/static/login.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read(), status_code=200)
 
 # ============================================================================
@@ -513,7 +520,7 @@ async def admin_debug(request: Request, db: Session = Depends(get_db)):
     """Endpoint de debug para probar autenticación en el panel de administración"""
     try:
         # Intentar obtener usuario usando get_optional_user
-        from .Services.security.get_optional_user import get_optional_user
+        from Services.security.get_optional_user import get_optional_user
         user = await get_optional_user(request, db)
         
         if user is None:
@@ -547,7 +554,7 @@ async def admin_debug(request: Request, db: Session = Depends(get_db)):
 async def admin_simple(request: Request, db: Session = Depends(get_db)):
     """Panel de administración simplificado sin dependencias complejas"""
     try:
-        from .Services.security.get_optional_user import get_optional_user
+        from Services.security.get_optional_user import get_optional_user
         user = await get_optional_user(request, db)
         
         if user is None:
@@ -621,7 +628,7 @@ async def read_admin(request: Request, db: Session = Depends(get_db)):
     """Panel de administración principal de la aplicación"""
     try:
         # Obtener usuario actual usando get_optional_user que funciona correctamente
-        from .Services.security.get_optional_user import get_optional_user
+        from Services.security.get_optional_user import get_optional_user
         user = await get_optional_user(request, db)
         
         # Si no hay usuario autenticado, redirigir al login
@@ -634,3 +641,35 @@ async def read_admin(request: Request, db: Session = Depends(get_db)):
         logger.error(f"Error cargando panel de admin: {str(e)}")
         # Si hay algún error, redirigir a la página de login
         return RedirectResponse(url="/loginpage", status_code=302)
+
+# Página de test del interceptor de autenticación
+@app.get("/test-interceptor", response_class=HTMLResponse, include_in_schema=False)
+async def get_test_interceptor():
+    """Página de test para verificar el interceptor de autenticación"""
+    with open("sql_app/static/test-interceptor.html", "r", encoding="utf-8") as file:
+        return HTMLResponse(content=file.read(), status_code=200)
+
+# ============================================================================
+# EJECUCIÓN DEL SERVIDOR
+# ============================================================================
+if __name__ == "__main__":
+    import uvicorn
+    
+    logger.info("🚀 Iniciando servidor FastAPI")
+    logger.info("🔗 Servidor disponible en: http://localhost:8000")
+    logger.info("📚 Documentación API en: http://localhost:8000/docs")
+    logger.info("🛡️ Admin panel en: http://localhost:8000/admin")
+    logger.info("⚠️  Usa Ctrl+C para detener el servidor")
+    
+    try:        uvicorn.run(
+            app=app,
+            host="0.0.0.0",
+            port=8001,
+            reload=False,
+            log_level="info",
+            access_log=True
+        )
+    except KeyboardInterrupt:
+        logger.info("🛑 Servidor detenido por el usuario")
+    except Exception as e:
+        logger.error(f"❌ Error al iniciar servidor: {str(e)}")

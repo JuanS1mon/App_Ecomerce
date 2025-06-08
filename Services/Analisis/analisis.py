@@ -1,10 +1,15 @@
-import datetime
+# Imports de bibliotecas estándar
 from typing import Any, List, Dict
-import pandas as pd
-import numpy as np
+import datetime
 import json
+import numpy as np
 import os
+import pandas as pd
+
+# Imports de terceros
 from sqlalchemy.orm import Session
+
+# Imports del proyecto
 from ...db.models.resultados import ResultadoKPI
 
 def clean_data(data: List[Dict]) -> List[Dict]:

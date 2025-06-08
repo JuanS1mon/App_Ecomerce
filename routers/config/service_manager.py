@@ -1,21 +1,22 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request, BackgroundTasks
-from typing import Dict, List, Any, Optional
+# Configuración de logging
+
+
+
+
+
+from Services.services_manager import ServicesManagerimport os
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
-try:
-    from ...Services.services_manager import ServicesManager
-except ImportError:
-    from sql_app.Services.services_manager import ServicesManager
-import os
+from typing import Any, Dict, List, Optional
 import logging
-import traceback
+import sys
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import importlib
 import importlib.util
-import sys
+import traceback
 
-
-# Configuración de logging
 logger = logging.getLogger("service_manager")
 
 # Modelo para respuestas estándar

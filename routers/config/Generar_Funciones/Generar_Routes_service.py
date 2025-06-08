@@ -15,11 +15,7 @@ def generate_route(module_name, field_names, field_types):
     route_code = f"""
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from sqlalchemy.orm import Session
-try:
-    from ...db.database import get_db
-except ImportError:
-    from sql_app.db.database import get_db
-import logging
+from db.database import get_dbimport logging
 
 logger = logging.getLogger(__name__)
 

@@ -1,12 +1,17 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
+
+# Imports de bibliotecas estándar
+import datetime
+import logging
+from typing import List, Optional, Dict, Any
+
+# Imports de terceros
 from fastapi import HTTPException, status
 from sqlalchemy import text
-from .model_ot import OT as Ot, Operacion, ReporteTiempo
-from typing import List, Optional, Dict, Any
-from .model_ot import OT as Ot  # Ensure Ot is correctly imported
-import logging
-import datetime
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.Services.app_stock.ot.model_ot import OT as Ot, Operacion, ReporteTiempo
 
 logger = logging.getLogger(__name__)
 

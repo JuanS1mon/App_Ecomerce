@@ -1,6 +1,9 @@
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, ConfigDict, Field
+# Imports de bibliotecas estándar
 from datetime import datetime
+from typing import Optional, List, Dict, Any
+
+# Imports de terceros
+from pydantic import BaseModel, ConfigDict, Field
 
 class PreciosHistorialBase(BaseModel):
     articulo_id: int

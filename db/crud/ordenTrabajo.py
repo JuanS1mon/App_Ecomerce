@@ -1,9 +1,14 @@
-from sqlalchemy.orm import Session
-from sql_app.Services.app_stock.ot.OrdenTrabajo import OrdenTrabajo, Operacion, ReporteTiempo
-from .ordenTrabajo import OrdenTrabajoCreate, OrdenTrabajoUpdate, OperacionCreate, OperacionUpdate, ReporteTiempoCreate, ReporteTiempoUpdate
+# Imports de bibliotecas estándar
+from Services.app_stock.ot.OrdenTrabajo import OrdenTrabajo, Operacion, ReporteTiempo
 from datetime import datetime
 from typing import List, Optional
+
+# Imports de terceros
 from sqlalchemy import desc
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from .ordenTrabajo import OrdenTrabajoCreate, OrdenTrabajoUpdate, OperacionCreate, OperacionUpdate, ReporteTiempoCreate, ReporteTiempoUpdate
 
 # Funciones CRUD para Órdenes de Trabajo
 def get_orden_trabajo(db: Session, ot_id: int):

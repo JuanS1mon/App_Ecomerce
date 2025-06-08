@@ -1,12 +1,26 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query
-from sqlalchemy.orm import Session
-from ....db.database import get_db
-from .schema_articulos_tipos import Articulos_tiposCreate, Articulos_tiposUpdate, Articulos_tiposRead
-from .model_articulos_tipos import Articulos_tipos as Articulos_tiposModel
-from .service_articulos_tipos import create_articulos_tipos, get_articulos_tipos, gets_articulos_tipos, delete_articulos_tipos, update_articulos_tipos
-from fastapi.responses import HTMLResponse, FileResponse
-from typing import List, Optional
+
+# Imports de bibliotecas estándar
 import logging
+from typing import List, Optional
+
+# Imports de terceros
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, HTMLResponse
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.db.database import get_db
+from sql_app.Services.app_stock.articulos_tipos.model_articulos_tipos import Articulos_tipos as Articulos_tiposModel
+from sql_app.Services.app_stock.articulos_tipos.schema_articulos_tipos import Articulos_tiposCreate, Articulos_tiposRead, Articulos_tiposUpdate
+from sql_app.Services.app_stock.articulos_tipos.service_articulos_tipos import (
+    create_articulos_tipos,
+    delete_articulos_tipos,
+    get_articulos_tipos,
+    gets_articulos_tipos,
+    update_articulos_tipos
+)
+
+from sql_app.db.database import get_db
 
 logger = logging.getLogger(__name__)
 

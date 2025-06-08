@@ -1,8 +1,11 @@
-from sqlalchemy.orm import Session
+# Imports de bibliotecas estándar
+import logging
+
+# Imports de terceros
+from fastapi import HTTPException
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException
-import logging
+from sqlalchemy.orm import Session
 
 # Configura el logger
 logger = logging.getLogger(__name__)

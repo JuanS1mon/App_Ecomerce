@@ -1,11 +1,15 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException, status
+# Imports de bibliotecas estándar
+from datetime import datetime
 from typing import List, Optional, Dict, Any
 import logging
-from datetime import datetime
 
-from .model_precios_historial import PreciosHistorial
+# Imports de terceros
+from fastapi import HTTPException, status
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.Services.app_stock.articulos.model_precios_historial import PreciosHistorial
 
 logger = logging.getLogger(__name__)
 

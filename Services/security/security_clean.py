@@ -3,10 +3,29 @@ Módulo de seguridad para autenticación y autorización
 Basado en security.py con correcciones de imports y sintaxis
 """
 
+"""
+
+Módulo de seguridad para autenticación y autorización
+Basado en security.py con correcciones de imports y sintaxis
+"""
+
+"""
+
+Módulo de seguridad para autenticación y autorización
+Basado en security.py con correcciones de imports y sintaxis
+"""
+
+"""
+
+Módulo de seguridad para autenticación y autorización
+Basado en security.py con correcciones de imports y sintaxis
+"""
+
 from fastapi import HTTPException, Depends, status, Request
 from sqlalchemy.orm import Session
 
-from ...db.crud.config.Usuarios import get_usuario, user_pass, get_user_from_db
+from db.database import get_db
+from db.crud.config.Usuarios import get_usuario, user_pass, get_user_from_db
 
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
@@ -19,8 +38,8 @@ import hashlib
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Union
 
-from ...db.schemas.config.Usuarios import UserDB
-from ...db.crud.config.Usuarios import has_role
+from db.schemas.config.Usuarios import UserDB
+from db.crud.config.Usuarios import has_role
 
 import logging
 import re
@@ -86,7 +105,7 @@ def decodifica_token(token: str):
     except jwt.ExpiredSignatureError:
         logger.warning("Token expirado")
         return None
-    except jwt.InvalidTokenError:
+    except JWTError:
         logger.warning("Token inválido")
         return None
 
@@ -123,9 +142,9 @@ def authenticate_user(db: Session, username: str, password: str, request: Reques
         
         # Obtener información completa del usuario
         try:
-            from ...db.models.config.usuarios import usuarios as UsuariosModel
+            from db.models.config.usuarios import usuarios as UsuariosModel
         except ImportError:
-            from sql_app.db.models.config.usuarios import usuarios as UsuariosModel
+            from db.models.config.usuarios import usuarios as UsuariosModel
         
         # Obtener el usuario completo de la base de datos
         user = db.query(UsuariosModel).filter(UsuariosModel.usuario == username).first()
@@ -244,9 +263,9 @@ async def get_current_user(request: Request = None, token: str = Depends(oauth2)
             for role_data in roles_data:
                 if isinstance(role_data, dict):
                     try:
-                        from ...db.schemas.config.Usuarios import Role
+                        from db.schemas.config.Usuarios import Role
                     except ImportError:
-                        from sql_app.db.schemas.config.Usuarios import Role
+                        from db.schemas.config.Usuarios import Role
                     roles.append(Role(**role_data))
                 else:
                     roles.append(role_data)

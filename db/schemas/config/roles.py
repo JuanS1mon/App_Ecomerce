@@ -1,5 +1,8 @@
-from pydantic import BaseModel
+# Imports de bibliotecas estándar
 from typing import Optional
+
+# Imports de terceros
+from pydantic import BaseModel
 
 class RoleBase(BaseModel):
     nombre: str

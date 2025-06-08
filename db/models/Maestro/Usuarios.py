@@ -1,5 +1,8 @@
-from sqlalchemy import Column, Integer, Float, String, DateTime
+# Imports de bibliotecas estándar
 from datetime import datetime
+
+# Imports de terceros
+from sqlalchemy import Column, Integer, Float, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()

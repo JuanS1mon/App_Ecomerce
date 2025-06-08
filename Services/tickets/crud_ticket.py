@@ -1,14 +1,18 @@
-from sqlalchemy import text, or_, desc
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException, status
+# Imports de bibliotecas estándar
+from datetime import datetime, timedelta
 from typing import Optional, Dict, Any, List
+import json
+import logging
 
+# Imports de terceros
+from fastapi import HTTPException, status
+from sqlalchemy import text, or_, desc
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
 from ...db.models.config.activityLog import ActivityLog
 from ...db.models.config.tickets import Ticket
-import logging
-import json
-from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
