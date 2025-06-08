@@ -5,7 +5,8 @@ Este servidor incluye solo las rutas esenciales para las pruebas de seguridad
 
 from fastapi import FastAPI, HTTPException, Form, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
+from fastapi.responses import HTMLResponse
+from pydantic import BaseModel, Field
 from typing import Optional
 import uvicorn
 from datetime import datetime, timedelta
@@ -33,10 +34,12 @@ RATE_LIMIT_MAX_ATTEMPTS = int(os.getenv("RATE_LIMIT_MAX_ATTEMPTS", "5").split('#
 RATE_LIMIT_TIME_WINDOW = int(os.getenv("RATE_LIMIT_TIME_WINDOW", "60").split('#')[0].strip())
 
 class UserCreate(BaseModel):
-    nombre: str
-    usuario: str
-    clave: str
-    mail: str
+    nombre: str = Field(..., min_length=2, max_length=50, description="Nombre del usuario")
+    usuario: str = Field(..., min_length=3, max_length=30, description="Nombre de usuario único")
+    clave: str = Field(..., min_length=3, description="Contraseña del usuario")
+    mail: str = Field(..., pattern=r'^[^@]+@[^@]+\.[^@]+$', description="Email válido del usuario")
+    telefono: Optional[str] = None
+    acepta_terminos: bool = Field(..., description="Aceptación de términos y condiciones")
 
 class Token(BaseModel):
     access_token: str
@@ -141,15 +144,45 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 async def register_user(user_data: UserCreate):
     """Endpoint de registro con validación de contraseñas"""
     
-    # Validar contraseña
+    # Validar contraseña según las reglas de seguridad
     if not validate_password(user_data.clave):
+        # Proporcionar información específica sobre los requisitos de contraseña
+        min_length = int(os.getenv("PASSWORD_MIN_LENGTH", "8").split('#')[0].strip())
+        require_uppercase = os.getenv("PASSWORD_REQUIRE_UPPERCASE", "true").split('#')[0].strip().lower() == "true"
+        require_lowercase = os.getenv("PASSWORD_REQUIRE_LOWERCASE", "true").split('#')[0].strip().lower() == "true"
+        require_numbers = os.getenv("PASSWORD_REQUIRE_NUMBERS", "true").split('#')[0].strip().lower() == "true"
+        require_special = os.getenv("PASSWORD_REQUIRE_SPECIAL", "true").split('#')[0].strip().lower() == "true"
+        
+        requirements = []
+        if len(user_data.clave) < min_length:
+            requirements.append(f"mínimo {min_length} caracteres")
+        if require_uppercase and not any(c.isupper() for c in user_data.clave):
+            requirements.append("al menos una letra mayúscula")
+        if require_lowercase and not any(c.islower() for c in user_data.clave):
+            requirements.append("al menos una letra minúscula")
+        if require_numbers and not any(c.isdigit() for c in user_data.clave):
+            requirements.append("al menos un número")
+        if require_special and not any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in user_data.clave):
+            requirements.append("al menos un carácter especial (!@#$%^&*()_+-=[]{}|;:,.<>?)")
+        
+        detail_message = f"La contraseña debe tener: {', '.join(requirements)}"
+        
         raise HTTPException(
-            status_code=400,
-            detail="Password does not meet security requirements"
+            status_code=422,
+            detail={
+                "message": "La contraseña no cumple con los requisitos de seguridad",
+                "requirements": detail_message,
+                "field": "clave"
+            }
         )
+      # Simular registro exitoso con código de estado 201 Created
+    from fastapi.responses import JSONResponse
+    from fastapi import status
     
-    # Simular registro exitoso
-    return {"message": "User registered successfully", "user_id": 123}
+    return JSONResponse(
+        content={"message": "Usuario registrado exitosamente", "user_id": 123},
+        status_code=status.HTTP_201_CREATED
+    )
 
 @app.get("/protected")
 async def protected_route(token: str = Depends(oauth2_scheme)):
@@ -184,6 +217,49 @@ async def root():
 async def health_check():
     """Health check"""
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+
+# Rutas para servir HTML estático
+@app.get("/registerpage", response_class=HTMLResponse, include_in_schema=False)
+async def get_register_page():
+    # Servir directamente el archivo register.html
+    return HTMLResponse(content="""
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redireccionando</title>
+    <script>
+        // Redireccionar al endpoint API
+        window.location.href = "/api/docs";
+    </script>
+</head>
+<body>
+    <p>Redireccionando...</p>
+</body>
+</html>
+    """, status_code=200)
+        
+@app.get("/loginpage", response_class=HTMLResponse, include_in_schema=False)
+async def get_login_page():
+    # Servir una página HTML simple
+    return HTMLResponse(content="""
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redireccionando</title>
+    <script>
+        // Redireccionar al endpoint API
+        window.location.href = "/api/docs";
+    </script>
+</head>
+<body>
+    <p>Redireccionando...</p>
+</body>
+</html>
+    """, status_code=200)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)

@@ -1,0 +1,136 @@
+2025-06-08 01:44:45,262 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 01:44:45,267 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\service_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 01:44:45,315 - INFO - Procesando 154 archivos Python...
+2025-06-08 01:44:45,318 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\fix_remaining_imports.py
+2025-06-08 01:44:45,335 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\imports_config.py
+2025-06-08 01:44:45,339 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\main.py
+2025-06-08 01:44:45,346 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\db\database.py
+2025-06-08 01:44:45,352 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\db\models\roles.py
+2025-06-08 01:44:45,357 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\Blog.py
+2025-06-08 01:44:45,362 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\usuarios.py
+2025-06-08 01:44:45,367 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Admin.py
+2025-06-08 01:44:45,371 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Analisis.py
+2025-06-08 01:44:45,375 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\configDB.py
+2025-06-08 01:44:45,379 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar.py
+2025-06-08 01:44:45,383 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Migraciones.py
+2025-06-08 01:44:45,388 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Scraping.py
+2025-06-08 01:44:45,392 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\service_manager.py
+2025-06-08 01:44:45,398 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\usuarios_admin.py
+2025-06-08 01:44:45,402 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\usuarios_admin_fixed.py
+2025-06-08 01:44:45,405 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\usuarios_admin_fixed_fields.py
+2025-06-08 01:44:45,411 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar_Funciones\Generar_Models_service.py
+2025-06-08 01:44:45,416 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar_Funciones\Generar_Routes.py
+2025-06-08 01:44:45,420 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar_Funciones\Generar_Routes_service.py
+2025-06-08 01:44:45,425 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\services_manager.py
+2025-06-08 01:44:45,432 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\articulos\route_codigos.py
+2025-06-08 01:44:45,437 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\articulos\route_historial_precios.py
+2025-06-08 01:44:45,441 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\articulos\route_precios_historial.py
+2025-06-08 01:44:45,447 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\articulos_series\model_articulos_series.py
+2025-06-08 01:44:45,451 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\articulos_series\route_articulos_series.py
+2025-06-08 01:44:45,455 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\articulos_tipos\model_articulos_tipos.py
+2025-06-08 01:44:45,458 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\articulos_tipos\route_articulos_tipos.py
+2025-06-08 01:44:45,463 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\depositos\model_depositos.py
+2025-06-08 01:44:45,467 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\depositos\route_depositos.py
+2025-06-08 01:44:45,472 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\depositos_tipos\model_depositos_tipos.py
+2025-06-08 01:44:45,475 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\depositos_tipos\route_depositos_tipos.py
+2025-06-08 01:44:45,480 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\ot\model_ot.py
+2025-06-08 01:44:45,484 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\ot\ot.py
+2025-06-08 01:44:45,488 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\ot\route_ot.py
+2025-06-08 01:44:45,492 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\ot\service_operaciones.py
+2025-06-08 01:44:45,499 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\model_calidad.py
+2025-06-08 01:44:45,502 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\model_confirmacion_movimiento.py
+2025-06-08 01:44:45,505 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\model_stock.py
+2025-06-08 01:44:45,509 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_calidad_bloqueos.py
+2025-06-08 01:44:45,514 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 01:44:45,514 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_stock.py
+2025-06-08 01:44:45,519 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_stock_admin.py
+2025-06-08 01:44:45,523 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_stock_calculado.py
+2025-06-08 01:44:45,528 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_stock_movimientos.py
+2025-06-08 01:44:45,532 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\service_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 01:44:45,533 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\service_stock_calculado.py
+2025-06-08 01:44:45,539 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock_historico\model_stock_historico.py
+2025-06-08 01:44:45,541 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock_historico\route_stock_historico.py
+2025-06-08 01:44:45,547 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\afip_integration.py
+2025-06-08 01:44:45,552 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\afip_manager.py
+2025-06-08 01:44:45,556 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\models_facturacion.py
+2025-06-08 01:44:45,558 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\model_facturacion.py
+2025-06-08 01:44:45,562 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\route_facturacion.py
+2025-06-08 01:44:45,568 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\service_facturacion.py
+2025-06-08 01:44:45,573 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\scraping\scraping.py
+2025-06-08 01:44:45,577 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\admin_roles.py
+2025-06-08 01:44:45,580 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\get_optional_user.py
+2025-06-08 01:44:45,584 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\roles_basicos.py
+2025-06-08 01:44:45,588 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\security.py
+2025-06-08 01:44:45,591 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\security_backup.py
+2025-06-08 01:44:45,595 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\security_clean.py
+2025-06-08 01:44:45,600 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\tickets\model_ticket.py
+2025-06-08 01:44:45,604 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\tickets\route_ticket.py
+2025-06-08 01:44:45,609 - INFO - Proceso completado
+2025-06-08 01:53:23,754 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 01:53:23,768 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\service_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 01:53:23,799 - INFO - Procesando 154 archivos Python...
+2025-06-08 01:53:23,800 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\fix_remaining_imports.py
+2025-06-08 01:53:23,811 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\imports_config.py
+2025-06-08 01:53:23,815 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\main.py
+2025-06-08 01:53:23,821 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\db\database.py
+2025-06-08 01:53:23,829 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\Blog.py
+2025-06-08 01:53:23,834 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\usuarios.py
+2025-06-08 01:53:23,840 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Analisis.py
+2025-06-08 01:53:23,844 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar.py
+2025-06-08 01:53:23,849 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\service_manager.py
+2025-06-08 01:53:23,854 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\usuarios_admin.py
+2025-06-08 01:53:23,858 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\usuarios_admin_fixed.py
+2025-06-08 01:53:23,861 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\usuarios_admin_fixed_fields.py
+2025-06-08 01:53:23,869 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar_Funciones\Generar_Models_service.py
+2025-06-08 01:53:23,872 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar_Funciones\Generar_Routes.py
+2025-06-08 01:53:23,875 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar_Funciones\Generar_Routes_service.py
+2025-06-08 01:53:23,880 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\services_manager.py
+2025-06-08 01:53:23,894 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\ot\service_operaciones.py
+2025-06-08 01:53:23,901 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 01:53:23,902 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_stock_calculado.py
+2025-06-08 01:53:23,906 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\service_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 01:53:23,907 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\service_stock_calculado.py
+2025-06-08 01:53:23,915 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\afip_integration.py
+2025-06-08 01:53:23,920 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\afip_manager.py
+2025-06-08 01:53:23,925 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\service_facturacion.py
+2025-06-08 01:53:23,931 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\scraping\scraping.py
+2025-06-08 01:53:23,936 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\get_optional_user.py
+2025-06-08 01:53:23,941 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\security.py
+2025-06-08 01:53:23,944 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\security_backup.py
+2025-06-08 01:53:23,948 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\security_clean.py
+2025-06-08 01:53:23,953 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\tickets\route_ticket.py
+2025-06-08 01:53:23,959 - INFO - Proceso completado
+2025-06-08 02:25:52,324 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 02:25:52,327 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\service_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 02:25:52,353 - INFO - Procesando 154 archivos Python...
+2025-06-08 02:25:52,354 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\fix_remaining_imports.py
+2025-06-08 02:25:52,361 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\imports_config.py
+2025-06-08 02:25:52,364 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\main.py
+2025-06-08 02:25:52,368 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\db\database.py
+2025-06-08 02:25:52,375 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\Blog.py
+2025-06-08 02:25:52,379 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\usuarios.py
+2025-06-08 02:25:52,383 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Analisis.py
+2025-06-08 02:25:52,388 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar.py
+2025-06-08 02:25:52,392 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\service_manager.py
+2025-06-08 02:25:52,394 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\usuarios_admin.py
+2025-06-08 02:25:52,397 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\usuarios_admin_fixed.py
+2025-06-08 02:25:52,399 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\usuarios_admin_fixed_fields.py
+2025-06-08 02:25:52,402 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar_Funciones\Generar_Models_service.py
+2025-06-08 02:25:52,405 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar_Funciones\Generar_Routes.py
+2025-06-08 02:25:52,407 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\routers\config\Generar_Funciones\Generar_Routes_service.py
+2025-06-08 02:25:52,409 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\services_manager.py
+2025-06-08 02:25:52,420 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\ot\service_operaciones.py
+2025-06-08 02:25:52,425 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 02:25:52,426 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\route_stock_calculado.py
+2025-06-08 02:25:52,429 - ERROR - Error leyendo c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\service_reports.py: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2025-06-08 02:25:52,430 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\app_stock\stock\service_stock_calculado.py
+2025-06-08 02:25:52,434 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\afip_integration.py
+2025-06-08 02:25:52,437 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\afip_manager.py
+2025-06-08 02:25:52,440 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\facturacion\service_facturacion.py
+2025-06-08 02:25:52,443 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\scraping\scraping.py
+2025-06-08 02:25:52,446 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\get_optional_user.py
+2025-06-08 02:25:52,449 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\security.py
+2025-06-08 02:25:52,452 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\security_backup.py
+2025-06-08 02:25:52,466 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\security\security_clean.py
+2025-06-08 02:25:52,470 - INFO - Arreglando importaciones en: c:\Users\PCJuan\Desktop\sql_app\sql_app\Services\tickets\route_ticket.py
+2025-06-08 02:25:52,475 - INFO - Proceso completado

@@ -1,15 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
-from sqlalchemy.orm import Session
-from sqlalchemy import text
-from typing import List, Dict, Any, Optional
+# Imports de bibliotecas estándar
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 import logging
 import os
-from datetime import datetime, timedelta
-try:
-    from ...db.database import get_db
-except ImportError:
-    from sql_app.db.database import get_db
-    get_top_articulos_por_stock
+
+# Imports de terceros
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.db.database import get_db    get_top_articulos_por_stock
+
 )
 
 
@@ -17,7 +19,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 # Configurar templates
-templates = Jinja2Templates(directory="static")
+templates = Jinja2Templates(directory="sql_app/static")
 
 # Crear router para stock calculado
 router = APIRouter(

@@ -1,15 +1,19 @@
-from fastapi import FastAPI, Request, APIRouter, status, Depends, Body
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import JSONResponse
-from Services.security.security import get_current_user
-
-import json
+# Imports de bibliotecas estándar
 from dotenv import dotenv_values
+import json
 import logging
+
+# Imports de terceros
+from fastapi import APIRouter, Body, Depends, FastAPI, Request, status
+from fastapi.responses import JSONResponse
+from fastapi.templating import Jinja2Templates
+
+# Imports del proyecto
+from sql_app.Services.security.security import get_current_user
 
 logger = logging.getLogger(__name__)
 
-templates = Jinja2Templates(directory="static")
+templates = Jinja2Templates(directory="sql_app/static")
 
 router = APIRouter(
     include_in_schema=False,  # Oculta todas las rutas de este router en la documentación

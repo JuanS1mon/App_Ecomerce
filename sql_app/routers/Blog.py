@@ -1,15 +1,25 @@
 # sql_app/routers/blog.py
-from fastapi import APIRouter, Depends, Form, HTTPException, Request,status
-from sqlalchemy.orm import Session
+
+# Importaciones relativas (cuando se ejecuta como módulo)
 
 
-from db.database import get_db
-from db.models.Blog import BlogPost as BlogPostModel
-from db.schemas.Blog import BlogPost, BlogPostCreate, BlogPostUpdate
 
-from fastapi.templating import Jinja2Templates
+
+
+
+
+
+
+
+from ..db.models.Blog import BlogPost as BlogPostModel
+from ..db.schemas.Blog import BlogPost, BlogPostCreate, BlogPostUpdate
 from starlette.responses import HTMLResponse, RedirectResponse
 
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session
+
+from sql_app.db.database import get_db
 
 router = APIRouter(
     include_in_schema=False,  # Oculta todas las rutas de este router en la documentación,
@@ -56,8 +66,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
-# Configurar Jinja2Templates para buscar en el directorio "static"
-templates = Jinja2Templates(directory="static/html")
+# Configurar Jinja2Templates para buscar en el directorio "static/html"
+templates = Jinja2Templates(directory="sql_app/static/html")
 
 
 # Ejemplo de ruta para renderizar la plantilla

@@ -1,20 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+# Imports de bibliotecas estándar
+from sql_app.Services.app_stock.ot.schema_ot import (
 from typing import List, Optional
-from sqlalchemy.orm import Session
 import logging
 
-from db.database import get_db
-from .schema_ot import (
+# Imports de terceros
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.db.database import get_db
+
     OT, OTCreate, OTUpdate,
     Operacion, OperacionCreate, OperacionUpdate,
     ReporteTiempo, ReporteTiempoCreate, ReporteTiempoUpdate
 )
 # Importar funciones directamente en lugar de clases
-from .service_ot import (
+from sql_app.Services.app_stock.ot.service_ot import (
     create_ot, get_ot, gets_ot as get_ots, update_ot, 
     delete_ot, finalizar_ot, verificar_estado_ot
 )
-from .service_operaciones import (
+from sql_app.Services.app_stock.articulos.service_operaciones import (
     create_operacion, get_operacion as get_operacion_by_id, gets_operaciones_by_ot as get_operaciones_by_ot,
     update_operacion, delete_operacion, finalizar_operacion,
     create_reporte_tiempo as create_reporte, get_reporte_tiempo as get_reporte_by_id, 

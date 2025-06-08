@@ -14,11 +14,7 @@ def generate_route(module_name, field_names, field_types):
     route_code = f"""
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from sqlalchemy.orm import Session
-try:
-    from ...db.database import get_db
-except ImportError:
-    from sql_app.db.database import get_db
-import logging
+from db.database import get_dbimport logging
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +89,7 @@ async def routes_update_{module_name}({primary_key}: {primary_key_type}, {module
 @router.get("/pagina", response_class=HTMLResponse)
 async def get_pagina():
     try:
-        with open("static/html/{module_name}.html", "r", encoding="utf-8") as file:
+        with open("sql_app/static/html/{module_name}.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

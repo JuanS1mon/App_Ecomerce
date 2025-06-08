@@ -1,7 +1,10 @@
-from typing import Optional, List, Dict, Any, Union
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, validator
+# Imports de bibliotecas estándar
 from datetime import date, datetime
 from enum import Enum
+from typing import Optional, List, Dict, Any, Union
+
+# Imports de terceros
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, validator
 
 # Enums para los schemas (réplicas de los enums del modelo)
 class TipoComprobanteEnum(str, Enum):

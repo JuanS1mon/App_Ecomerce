@@ -1,4 +1,7 @@
+# Imports de bibliotecas estándar
 from typing import List, Optional, Dict, Any, Union
+
+# Imports de terceros
 from pydantic import BaseModel, HttpUrl
 
 # Modelos para la configuración del scraper

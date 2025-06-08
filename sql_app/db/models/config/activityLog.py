@@ -1,6 +1,11 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-from db.database import Base
+# Imports de bibliotecas estándar
 import datetime
+
+# Imports de terceros
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+
+# Imports del proyecto
+from ...database import Base
 
 class ActivityLog(Base):
     __tablename__ = "activity_log"

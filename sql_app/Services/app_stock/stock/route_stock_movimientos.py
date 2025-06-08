@@ -1,15 +1,20 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query
-from sqlalchemy.orm import Session
-try:
-    from ...db.database import get_db
-except ImportError:
-    from sql_app.db.database import get_db
-# Importamos las funciones de servicio para movimientos de stock
-from .stock_movimientos import get_movimientos_pendientes, get_detalle_movimiento, confirmar_movimiento, revertir_confirmacion, cerrar_movimiento, get_historial_confirmaciones
-from fastapi.responses import HTMLResponse, FileResponse
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
+from sql_app.db.database import get_db
+from .stock_movimientos import (
+    cerrar_movimiento,
+    confirmar_movimiento,
+    get_detalle_movimiento,
+    get_historial_confirmaciones,
+    get_movimientos_pendientes,
+    revertir_confirmacion
+)
 
 logger = logging.getLogger(__name__)
 
@@ -148,7 +153,7 @@ async def get_pagina_movimientos():
     Devuelve la página HTML para la gestión de movimientos de stock.
     """
     try:
-        with open(f"static/app_stock/stock/stock_movimientos.html", "r", encoding="utf-8") as file:
+        with open(f"sql_app/static/app_stock/stock/stock_movimientos.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

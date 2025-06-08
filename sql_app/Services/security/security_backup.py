@@ -3,18 +3,29 @@ Módulo de seguridad mejorado para autenticación y autorización
 Incluye mejoras de seguridad, logging seguro y validación robusta
 """
 
+"""
+
+Módulo de seguridad mejorado para autenticación y autorización
+Incluye mejoras de seguridad, logging seguro y validación robusta
+"""
+
+"""
+
+Módulo de seguridad mejorado para autenticación y autorización
+Incluye mejoras de seguridad, logging seguro y validación robusta
+"""
+
+"""
+
+Módulo de seguridad mejorado para autenticación y autorización
+Incluye mejoras de seguridad, logging seguro y validación robusta
+"""
+
 from fastapi import HTTPException, Depends, status, Request
 from sqlalchemy.orm import Session
 
-try:
-    from ...db.database import get_db
-    from ...db.crud.config.Usuarios import get_usuario, user_pass, get_user_from_db
-except ImportError:
-    from sql_app.db.database import get_db
-    from sql_app.db.crud.config.Usuarios import get_usuario, user_pass, get_user_from_db
-
-from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordBearer
+from db.database import get_db
+from db.crud.config.Usuarios import get_usuario, user_pass, get_user_from_dbfrom fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from dotenv import load_dotenv
@@ -23,13 +34,8 @@ import secrets
 import hashlib
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Union
-try:
-    from ...db.schemas.config.Usuarios import UserDB
-    from ...db.crud.config.Usuarios import has_role
-except ImportError:
-    from sql_app.db.schemas.config.Usuarios import UserDB
-    from sql_app.db.crud.config.Usuarios import has_role
-
+from db.schemas.config.Usuarios import UserDB
+from db.crud.config.Usuarios import has_role
 import logging
 from .rate_limit_improved import check_rate_limit, record_successful_login, clear_attempts
 import re
@@ -202,8 +208,7 @@ def decodifica_token(token: str) -> Optional[dict]:
         if jti and is_token_revoked(jti):
             logger.warning(f"Token revocado usado: {jti}")
             return None
-        
-        return payload
+          return payload
         
     except jwt.ExpiredSignatureError:
         logger.warning("Token expirado")
@@ -214,7 +219,7 @@ def decodifica_token(token: str) -> Optional[dict]:
     except jwt.InvalidIssuerError:
         logger.warning("Token con emisor inválido")
         return None
-    except jwt.InvalidTokenError as e:
+    except JWTError as e:
         logger.warning(f"Token inválido: {str(e)}")
         return None
 
@@ -334,9 +339,9 @@ def authenticate_user(db: Session, username: str, password: str, request: Reques
             return None
           # Obtener información completa del usuario
         try:
-            from ...db.models.config.usuarios import usuarios as UsuariosModel
+            from db.models.config.usuarios import usuarios as UsuariosModel
         except ImportError:
-            from sql_app.db.models.config.usuarios import usuarios as UsuariosModel
+            from db.models.config.usuarios import usuarios as UsuariosModel
         
         user = db.query(UsuariosModel).filter(UsuariosModel.usuario == username).first()
         if not user:
@@ -507,102 +512,8 @@ async def get_current_user_secure(request: Request, db: Session = Depends(get_db
         
         for role_data in roles_data:
             if isinstance(role_data, dict):
-try:
-    from ...db.schemas.config.Usuarios import Role
-except ImportError:
-    from sql_app.db.schemas.config.Usuarios import Role
-                roles.append(Role(**role_data))
-            else:
-                roles.append(role_data)
-        
-        user_db = UserDB(
-            codigo=user.get("codigo"),
-            usuario=user.get("usuario"),
-            nombre=user.get("nombre"),
-            mail=user.get("mail"),
-            telefono=user.get("telefono"),
-            direccion=user.get("direccion"),
-            fecha_nacimiento=user.get("fecha_nacimiento"),
-            activo=user.get("activo", True),
-            roles=roles
-        )
-        user = user_db
-    else:
-        if hasattr(user, "activo") and not user.activo:
-            log_security_event(
-                "UNAUTHORIZED_ACCESS",
-                {"reason": "user_inactive", "username": username, "ip": client_ip},
-                "WARNING"
-            )
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Usuario deshabilitado",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-    
-    # Log acceso exitoso (solo en rutas sensibles)
-    sensitive_paths = ["/admin", "/users", "/config", "/delete", "/update"]
-    if any(path in str(request.url.path) for path in sensitive_paths):
-        log_security_event(
-            "SECURE_ACCESS",
-            {"username": username, "ip": client_ip, "path": str(request.url.path)},
-            "INFO"
-        )
-    
-    return user
-
-# Funciones de autorización mejoradas
-def user_has_role_secure(user, role_name: str) -> bool:
-    """Verifica roles con validación mejorada"""
-    if not user or not role_name:
-        return False
-    
-    # Sanitizar nombre del rol
-    role_name = role_name.strip().lower()
-    
-    if isinstance(user, dict):
-        roles = user.get("roles", [])
-        return any(
-            role.get("nombre", "").strip().lower() == role_name 
-            for role in roles
-        )
-    
-    if hasattr(user, "roles") and user.roles:
-        if isinstance(user.roles[0], dict):
-            return any(
-                role.get("nombre", "").strip().lower() == role_name 
-                for role in user.roles
-            )
-        else:
-            return any(
-                getattr(role, "nombre", "").strip().lower() == role_name 
-                for role in user.roles
-            )
-    
-    return False
-
-async def require_role_secure(role_name: str, user: UserDB = Depends(get_current_user_secure)):
-    """Dependencia que requiere rol específico con logging"""
-    if not user_has_role_secure(user, role_name):
-        username = getattr(user, "usuario", "unknown")
-        log_security_event(
-            "AUTHORIZATION_FAILED",
-            {"username": username, "required_role": role_name, "reason": "insufficient_privileges"},
-            "WARNING"
-        )
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Se requiere el rol '{role_name}' para acceder a esta funcionalidad"
-        )
-    return user
-
-async def require_admin_secure(user: UserDB = Depends(get_current_user_secure)):
-    """Dependencia que requiere privilegios de administrador"""
-    return await require_role_secure("admin", user)
-
-# Mantener compatibilidad con código existente
-current_user = get_current_user_secure
-get_current_user = get_current_user_secure
-get_authenticated_user = get_current_user_secure
-require_admin = require_admin_secure
-user_has_role = user_has_role_secure
+                roles.append({
+                    "id": role_data.get("id", 0),
+                    "nombre": role_data.get("nombre", "usuario"),
+                    "descripcion": role_data.get("descripcion", "Usuario estándar")
+                })

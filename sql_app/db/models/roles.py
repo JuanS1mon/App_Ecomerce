@@ -1,8 +1,9 @@
+# Imports de terceros
 from sqlalchemy import Column, Integer, String
-try:
-    from ...db.database import Base
-except ImportError:
-    from sql_app.db.database import Base
+
+# Imports del proyecto
+from sql_app.db.database import Base
+
 class Roles(Base):
     __tablename__ = "Roles"
     __table_args__ = {'extend_existing': True}

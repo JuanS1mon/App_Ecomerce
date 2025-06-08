@@ -1,12 +1,21 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query
-from sqlalchemy.orm import Session
-from db.database import get_db
-from .schema_depositos import DepositosCreate, DepositosUpdate, DepositosRead
-from .model_depositos import Depositos as DepositosModel
-from .service_depositos import create_depositos, get_depositos, gets_depositos, delete_depositos, update_depositos
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
-from typing import List, Optional, Dict, Any
 import logging
+from typing import Any, Dict, List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from sqlalchemy.orm import Session
+
+from sql_app.Services.app_stock.depositos.model_depositos import Depositos as DepositosModel
+from sql_app.Services.app_stock.depositos.schema_depositos import DepositosCreate, DepositosRead, DepositosUpdate
+from sql_app.Services.app_stock.depositos.service_depositos import (
+    create_depositos,
+    delete_depositos,
+    get_depositos,
+    gets_depositos,
+    update_depositos
+)
+
+from sql_app.db.database import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +92,7 @@ async def routes_update_depositos(id: int, depositos: DepositosUpdate, db: Sessi
 async def get_pagina():
     try:
         # Ruta actualizada: ahora buscamos en static/module_name/index.html
-        with open(f"static/app_stock/depositos/depositos.html", "r", encoding="utf-8") as file:
+        with open(f"sql_app/static/app_stock/depositos/depositos.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:
@@ -98,7 +107,7 @@ async def get_dashboard():
     """
     try:
         # Ruta para el archivo HTML del dashboard
-        with open(f"static/app_stock/depositos/depositos_dashboard.html", "r", encoding="utf-8") as file:
+        with open(f"sql_app/static/app_stock/depositos/depositos_dashboard.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

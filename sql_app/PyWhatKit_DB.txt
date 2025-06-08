@@ -1,0 +1,25 @@
+Date: 6/6/2025
+Time: 10:39
+Phone Number: +541159002769
+Message: Hola juan13, Tu registro ha sido exitoso. Tienes 15 minutos para activar tu cuenta. Haz clic en el siguiente enlace para activar: http://localhost:8000/activar?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqdWFuMTMiLCJ0eXBlIjoiYWN0aXZhdGlvbiIsImV4cCI6MTc0OTIxODAzN30.uGL6HhnpXtFC6kzC09uZibPOf7OQpEGUe5DAk4HVljQ Si no solicitaste este registro, ignora este mensaje. Saludos, Equipo de Seguridad
+--------------------
+Date: 6/6/2025
+Time: 13:53
+Phone Number: +541159002769
+Message: Hola juan, Tu registro ha sido exitoso. Tienes 15 minutos para activar tu cuenta. Haz clic en el siguiente enlace para activar: http://localhost:8000/activar?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqdWFuIiwidHlwZSI6ImFjdGl2YXRpb24iLCJleHAiOjE3NDkyMjk2OTV9.A9M0Z1xeED6uHg8FWx4Wg0rqkJ3Xao_4jzJDPPv4HoA Si no solicitaste este registro, ignora este mensaje. Saludos, Equipo de Seguridad
+--------------------
+Date: 6/6/2025
+Time: 14:17
+Phone Number: +541159002769
+Message: Hola juan, Tu registro ha sido exitoso. Tienes 15 minutos para activar tu cuenta. Haz clic en el siguiente enlace para activar: http://localhost:8000/activar?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqdWFuIiwidHlwZSI6ImFjdGl2YXRpb24iLCJleHAiOjE3NDkyMzExMzN9.iiqUhJ6kjnAQRt-GBbiAy-xV-73qukamUmKWr1Qkago Si no solicitaste este registro, ignora este mensaje. Saludos, Equipo de Seguridad
+--------------------
+Date: 6/6/2025
+Time: 14:22
+Phone Number: +541159002769
+Message: Hola juan, Tu registro ha sido exitoso. Tienes 15 minutos para activar tu cuenta. Haz clic en el siguiente enlace para activar: http://localhost:8000/activar?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqdWFuIiwidHlwZSI6ImFjdGl2YXRpb24iLCJleHAiOjE3NDkyMzE0NDR9.1qfKCS87yCbMVq9BNxEnl9yBJeVYC7udIa-noxNLvjU Si no solicitaste este registro, ignora este mensaje. Saludos, Equipo de Seguridad
+--------------------
+Date: 6/6/2025
+Time: 14:25
+Phone Number: +541159002769
+Message: Hola juan, Tu registro ha sido exitoso. Tienes 15 minutos para activar tu cuenta. Haz clic en el siguiente enlace para activar: http://localhost:8000/activar?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqdWFuIiwidHlwZSI6ImFjdGl2YXRpb24iLCJleHAiOjE3NDkyMzE2Mzl9.nki8-GhbwrGlxwV-Tovb1GYcXkXkr4ggWAW2lXl9Occ Si no solicitaste este registro, ignora este mensaje. Saludos, Equipo de Seguridad
+--------------------

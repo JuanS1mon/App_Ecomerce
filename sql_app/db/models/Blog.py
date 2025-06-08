@@ -1,5 +1,10 @@
+# Imports de bibliotecas estándar
 from datetime import datetime
+
+# Imports de terceros
 from sqlalchemy import Column, DateTime, Integer, NVARCHAR, Boolean,func
+
+# Imports del proyecto
 from ..database import Base
 
 class BlogPost(Base):

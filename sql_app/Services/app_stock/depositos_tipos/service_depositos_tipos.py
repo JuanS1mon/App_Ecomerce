@@ -1,10 +1,13 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException, status
-from sqlalchemy import text
-from .model_depositos_tipos import Depositos_tipos  # Corregida la importación
+# Imports de bibliotecas estándar
+from sql_app.Services.app_stock.depositos_tipos.model_depositos_tipos import Depositos_tipos  # Corregida la importación
 from typing import List, Optional, Dict, Any
 import logging
+
+# Imports de terceros
+from fastapi import HTTPException, status
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 

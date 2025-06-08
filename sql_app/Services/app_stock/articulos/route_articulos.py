@@ -1,16 +1,20 @@
+# Imports de terceros
 from fastapi import APIRouter, HTTPException, status, Depends, Query, Body, Request
 from sqlalchemy.orm import Session
-from db.database import get_db
-from .schema_articulos import ArticulosCreate, ArticulosUpdate, ArticulosRead
+
+# Imports del proyecto
+from ....db.database import get_db
 from .model_articulos import Articulos as ArticulosModel
+from .schema_articulos import ArticulosCreate, ArticulosUpdate, ArticulosRead
 from .service_articulos import (
+
     create_articulos, get_articulos, get_articulos_by_codigo, gets_articulos, delete_articulos, update_articulos,
     actualizar_precio_articulo, actualizar_precios_masivos, get_articulos_stats,
     get_historial_precios, generar_codigo_barra, generar_codigo_qr, get_recent_price_changes
 )
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from Services.security.security import get_current_user  # Importamos la función de seguridad
+from sql_app.Services.security.security import get_current_user  # Importamos la función de seguridad
 from typing import List, Optional, Dict, Any
 import logging
 from datetime import datetime, timedelta
@@ -19,7 +23,7 @@ import os
 logger = logging.getLogger(__name__)
 
 # Configuramos el directorio de plantillas
-templates = Jinja2Templates(directory="static")
+templates = Jinja2Templates(directory="sql_app/static")
 
 router = APIRouter(
     prefix="/articulos",
@@ -105,7 +109,7 @@ async def routes_update_articulos(
 async def get_pagina():
     try:
         # Ruta actualizada: ahora buscamos en static/module_name/index.html
-        with open(f"static/app_stock/articulos/articulos.html", "r", encoding="utf-8") as file:
+        with open(f"sql_app/static/app_stock/articulos/articulos.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:
@@ -348,7 +352,7 @@ async def get_codigos_barras_pagina():
     """
     try:
         # Esta página aún no existe, redireccionamos temporalmente al dashboard
-        with open("static/app_stock/articulos/articulos_dashboard.html", "r", encoding="utf-8") as file:
+        with open("sql_app/static/app_stock/articulos/articulos_dashboard.html", "r", encoding="utf-8") as file:
             html_content = file.read()
             
         # En el futuro, aquí iría la página específica de códigos de barras
@@ -367,7 +371,7 @@ async def get_codigos_qr_pagina():
     """
     try:
         # Esta página aún no existe, redireccionamos temporalmente al dashboard
-        with open("static/app_stock/articulos/articulos_dashboard.html", "r", encoding="utf-8") as file:
+        with open("sql_app/static/app_stock/articulos/articulos_dashboard.html", "r", encoding="utf-8") as file:
             html_content = file.read()
             
         # En el futuro, aquí iría la página específica de códigos QR
@@ -386,7 +390,7 @@ async def get_etiquetas_pagina():
     """
     try:
         # Esta página aún no existe, redireccionamos temporalmente al dashboard
-        with open("static/app_stock/articulos/articulos_dashboard.html", "r", encoding="utf-8") as file:
+        with open("sql_app/static/app_stock/articulos/articulos_dashboard.html", "r", encoding="utf-8") as file:
             html_content = file.read()
             
         # En el futuro, aquí iría la página específica de etiquetas

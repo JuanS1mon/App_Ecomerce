@@ -1,18 +1,24 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query
-from sqlalchemy.orm import Session
-from db.database import get_db
-from .schema_stock import StockCreate, StockUpdate, StockRead
-from .model_stock import Stock as StockModel
-from .service_stock import create_stock, get_stock, gets_stock, delete_stock, update_stock, anular_movimiento
-
-from fastapi.responses import HTMLResponse, FileResponse
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, HTMLResponse
 from sqlalchemy import text
-from Services.app_stock.articulos.model_articulos import Articulos as ArticulosModel
-from Services.app_stock.articulos.schema_articulos import ArticulosRead
+from sqlalchemy.orm import Session
 
-
+from sql_app.db.database import get_db
+from sql_app.Services.app_stock.articulos.model_articulos import Articulos as ArticulosModel
+from sql_app.Services.app_stock.articulos.schema_articulos import ArticulosRead
+from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+from sql_app.Services.app_stock.stock.schema_stock import StockCreate, StockRead, StockUpdate
+from sql_app.Services.app_stock.stock.service_stock import (
+    anular_movimiento,
+    create_stock,
+    delete_stock,
+    get_stock,
+    gets_stock,
+    update_stock
+)
 
 logger = logging.getLogger(__name__)
 
@@ -156,7 +162,7 @@ async def routes_update_stock(id: int, stock: StockUpdate, db: Session = Depends
 async def get_pagina():
     try:
         # Ruta actualizada: ahora buscamos en static/module_name/index.html
-        with open(f"static/stock/stock.html", "r", encoding="utf-8") as file:
+        with open(f"sql_app/static/stock/stock.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

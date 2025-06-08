@@ -1,8 +1,10 @@
-from sqlalchemy.orm import Session
+# Imports de terceros
+from fastapi import HTTPException
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException
+from sqlalchemy.orm import Session
 
+# Imports del proyecto
 from ..schemas.Modelo import ModeloCreate
 
 # MI IDEA es tener un crud por cada tabla de la base de datos y que cada uno tenga sus funciones

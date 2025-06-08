@@ -1,0 +1,8 @@
+2025-06-03 15:04:58,631 - INFO - Iniciando prueba de registro con log (se guardará en c:\Users\PCJuan\Desktop\sql_app\registro_test_fix_20250603_150458.log)
+2025-06-03 15:04:58,632 - INFO - Enviando solicitud de registro con datos: {"nombre": "Juan Simon", "usuario": "juansimon", "clave": "Contrase\u00f1a123!", "mail": "fjuansimon@gmail.com", "telefono": "+541159002769", "acepta_terminos": true}
+2025-06-03 15:04:58,636 - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-06-03 15:05:00,698 - DEBUG - http://localhost:8000 "POST /user/registro HTTP/1.1" 201 59
+2025-06-03 15:05:00,703 - INFO - Código de estado: 201
+2025-06-03 15:05:00,705 - INFO - Encabezados: {"date": "Tue, 03 Jun 2025 18:05:00 GMT", "server": "uvicorn", "content-length": "59", "content-type": "application/json"}
+2025-06-03 15:05:00,706 - INFO - Contenido: {"message":"Usuario registrado exitosamente","user_id":123}
+2025-06-03 15:05:00,708 - INFO - Resultado final: Éxito

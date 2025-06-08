@@ -1,8 +1,9 @@
+# Imports de terceros
 from sqlalchemy.orm import Session
-try:
-    from ...db.database import engine
-except ImportError:
-    from sql_app.db.database import engine
+
+# Imports del proyecto
+from sql_app.db.database import engine
+
 def init_roles():
     """Inicializa roles básicos en la base de datos"""
     db = Session(engine)

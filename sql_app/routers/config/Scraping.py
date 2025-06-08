@@ -1,29 +1,32 @@
 # scraping.py
-from io import BytesIO
-import os
-import logging
-from fastapi import APIRouter, Request, status, Depends, HTTPException, BackgroundTasks
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse, JSONResponse, HTMLResponse
-from Services.security.security import get_current_user
-from db.database import get_db
-from db.schemas.config.Usuarios import UserDB
-from datetime import datetime
-import json
-from sqlalchemy.orm import Session
-import pandas as pd
-from pydantic import BaseModel
-from db.schemas.Scraping import ScraperTestConfig
-from Services.scraping.scraping import extract_with_beautifulsoup
-from Services.scraping.scraping import extract_with_selenium
 
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urlparse
 
-from db.models.config.activityLog import ActivityLog
- 
+
 # Configuración de logging
+
+from datetime import datetime
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+import json
+import logging
+import os
+import requests
+
+from ...Services.scraping.scraping import extract_with_beautifulsoup, extract_with_selenium
+from ...db.schemas.Scraping import ScraperTestConfig
+from bs4 import BeautifulSoup
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+from fastapi.templating import Jinja2Templates
+from io import BytesIO
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+from urllib.parse import urlparse
+import pandas as pd
+
+from sql_app.Services.security.security import get_current_user
+from sql_app.db.database import get_db
+from sql_app.db.models.config.activityLog import ActivityLog
+from sql_app.db.schemas.config.Usuarios import UserDB
+
 logging.basicConfig(
     filename='logs/scraping.log',
     level=logging.INFO,
@@ -31,7 +34,7 @@ logging.basicConfig(
 )
 
 # Ajustar el directorio de las plantillas
-templates = Jinja2Templates(directory="static/html")
+templates = Jinja2Templates(directory="sql_app/static")
 
 
 router = APIRouter(

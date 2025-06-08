@@ -1,11 +1,9 @@
-
-from fastapi import APIRouter, HTTPException, status, Depends, Query
+# Imports de terceros
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-try:
-    from ...db.database import get_db
-except ImportError:
-    from sql_app.db.database import get_db
-import logging
+
+# Imports del proyecto
+from sql_app.db.database import get_dbimport logging
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +79,7 @@ async def routes_update_facturacion(id: int, facturacion: FacturacionUpdate, db:
 async def get_pagina():
     try:
         # Ruta actualizada: ahora buscamos en static/module_name/index.html
-        with open(f"static/facturacion/crear_factura.html", "r", encoding="utf-8") as file:
+        with open(f"sql_app/static/facturacion/crear_factura.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

@@ -1,11 +1,10 @@
-from sqlalchemy import Column, Integer, Float, String, DateTime, Boolean, ForeignKey, Text
+"""
+
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
-try:
-    from ...db.database import Base
-except ImportError:
-    from sql_app.db.database import Base
-class CalidadBloqueo(Base):
-    """
+
+from sql_app.db.database import Baseclass CalidadBloqueo(Base):
+
     Modelo para almacenar bloqueos de calidad sobre artículos en depósitos específicos.
     """
     __tablename__ = "stock_calidad_bloqueos"

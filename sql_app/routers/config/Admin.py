@@ -1,14 +1,22 @@
+# Imports de bibliotecas estándar
+from datetime import date, timedelta
 import os
 import re
-from fastapi import FastAPI, Form, Request, APIRouter, status, Depends, HTTPException
+
+# Imports de terceros
+from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request, status
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from db.database import get_db
-from Services.security.security import encriptar_clave, get_current_user  # Importar la función de seguridad
-from db.models.config.usuarios import usuarios
 
-templates = Jinja2Templates(directory="static/html")  # Ajusta el directorio según sea necesario
+# Imports del proyecto
+from sql_app.Services.security.security import encriptar_clave, get_current_user  # Importar la función de seguridad
+from sql_app.db.database import get_db
+from sql_app.db.models.config.activityLog import ActivityLog
+from sql_app.db.models.config.usuarios import usuarios
+from sql_app.db.schemas.config.Usuarios import UserDB  # Asegúrate de importar UserDB
+
+templates = Jinja2Templates(directory="sql_app/static")  # Cambiado para coincidir con main.py
 
 def create_admin_router(app: FastAPI):
     router = APIRouter(
@@ -27,7 +35,7 @@ def create_admin_router(app: FastAPI):
             if "roles" in current_user:
                 is_admin = any(role["nombre"] == "admin" for role in current_user["roles"])
         else:
-            # Si es un objeto usuario
+            # Si es un objeto UserDB
             if hasattr(current_user, "roles"):
                 is_admin = any(role.nombre == "admin" for role in current_user.roles)
         
@@ -77,12 +85,12 @@ def create_admin_router(app: FastAPI):
             "user": current_user,
             "user_count": user_count,
             "activities": activities[:10],  # Mostrar las últimas 10 en la lista
-                    "chart_data": chart_data,
+            "chart_data": chart_data,
             "activity_count": activity_count
         })
     
     @router.get("/perfil")
-    async def user_perfil(request: Request, user = Depends(get_current_user)):
+    async def user_perfil(request: Request, user: UserDB = Depends(get_current_user)):
         return templates.TemplateResponse("/usuarios/usuario_admin.html", {
             "request": request,
             "user": user
@@ -98,7 +106,7 @@ def create_admin_router(app: FastAPI):
         fecha_nacimiento: str = Form(None),  # Cambiado de ... a None para hacerlo opcional
         password: str = Form(None),
         db: Session = Depends(get_db),
-        user = Depends(get_current_user)
+        user: UserDB = Depends(get_current_user)
     ):
 
         # Actualizar los datos del usuario en la base de datos

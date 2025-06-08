@@ -1,11 +1,13 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Boolean, Enum, Text
-from sqlalchemy.orm import relationship
+# Enums para los tipos de datos específicos
+
 from datetime import datetime
+from sqlalchemy import Boolean, Column, DateTime, Enum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import relationship
+
 import enum
 
 from sql_app.db.database import Base
 
-# Enums para los tipos de datos específicos
 class TipoComprobante(enum.Enum):
     FACTURA_A = "A"
     FACTURA_B = "B"

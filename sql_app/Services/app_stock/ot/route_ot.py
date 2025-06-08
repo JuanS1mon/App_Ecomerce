@@ -1,14 +1,50 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query
-from sqlalchemy.orm import Session
-from db.database import get_db
-from .schema_ot import OTCreate as OtCreate, OTUpdate as OtUpdate, OT as OtRead, OperacionCreate, OperacionUpdate, Operacion as OperacionRead, ReporteTiempoCreate, ReporteTiempoUpdate, ReporteTiempo as ReporteTiempoRead
-from .model_ot import OT as OtModel, Operacion as OperacionModel, ReporteTiempo as ReporteTiempoModel
-from .service_ot import create_ot, get_ot, gets_ot, delete_ot, update_ot, finalizar_ot, verificar_estado_ot
-from .service_operaciones import create_operacion, get_operacion, gets_operaciones_by_ot, update_operacion, delete_operacion, finalizar_operacion
-from .service_operaciones import create_reporte_tiempo, get_reporte_tiempo, gets_reportes_tiempo_by_operacion, update_reporte_tiempo, delete_reporte_tiempo, calcular_horas_totales_operacion
-from fastapi.responses import HTMLResponse, FileResponse
-from typing import List, Optional
+
+# Imports estándar
 import logging
+from typing import List, Optional
+
+# Imports de terceros
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, HTMLResponse
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.db.database import get_db
+from sql_app.Services.app_stock.ot.model_ot import OT as OtModel, Operacion as OperacionModel, ReporteTiempo as ReporteTiempoModel
+from sql_app.Services.app_stock.ot.schema_ot import (
+    OT as OtRead,
+    OTCreate as OtCreate,
+    OTUpdate as OtUpdate,
+    Operacion as OperacionRead,
+    OperacionCreate,
+    OperacionUpdate,
+    ReporteTiempo as ReporteTiempoRead,
+    ReporteTiempoCreate,
+    ReporteTiempoUpdate
+)
+from sql_app.Services.app_stock.ot.service_ot import (
+    create_ot,
+    delete_ot,
+    finalizar_ot,
+    get_ot,
+    gets_ot,
+    update_ot,
+    verificar_estado_ot
+)
+from sql_app.Services.app_stock.ot.service_operaciones import (
+    calcular_horas_totales_operacion,
+    create_operacion,
+    create_reporte_tiempo,
+    delete_operacion,
+    delete_reporte_tiempo,
+    finalizar_operacion,
+    get_operacion,
+    get_reporte_tiempo,
+    gets_operaciones_by_ot,
+    gets_reportes_tiempo_by_operacion,
+    update_operacion,
+    update_reporte_tiempo
+)
 
 logger = logging.getLogger(__name__)
 
@@ -258,7 +294,7 @@ async def routes_get_horas_totales_operacion(operacion_id: int, db: Session = De
 @router.get("/pagina", response_class=HTMLResponse)
 async def get_pagina():
     try:
-        with open(f"static/app_stock/ot/ot.html", "r", encoding="utf-8") as file:
+        with open(f"sql_app/static/app_stock/ot/ot.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

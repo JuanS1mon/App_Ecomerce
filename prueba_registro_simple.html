@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Registro de Usuario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, button {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prueba Simple de Registro</h1>
+    <p>Este formulario prueba directamente el endpoint /user/registro sin dependencias externas</p>
+
+    <form id="registroForm">
+        <div class="form-group">
+            <label for="nombre">Nombre completo:</label>
+            <input type="text" id="nombre" value="Usuario Prueba" required>
+        </div>
+
+        <div class="form-group">
+            <label for="usuario">Nombre de usuario:</label>
+            <input type="text" id="usuario" value="usuario_prueba" required>
+        </div>
+
+        <div class="form-group">
+            <label for="clave">Contraseña:</label>
+            <input type="password" id="clave" value="Clave123!" required>
+        </div>
+
+        <div class="form-group">
+            <label for="mail">Correo electrónico:</label>
+            <input type="email" id="mail" value="usuario@ejemplo.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="telefono">Teléfono:</label>
+            <input type="text" id="telefono" value="+5491122334455">
+        </div>
+
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="acepta_terminos" checked>
+                Acepto los términos y condiciones
+            </label>
+        </div>
+
+        <button type="submit">Registrar Usuario</button>
+    </form>
+
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('registroForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const responseDiv = document.getElementById('response');
+            responseDiv.style.display = 'none';
+            responseDiv.className = '';
+            responseDiv.innerHTML = '';
+
+            const data = {
+                nombre: document.getElementById('nombre').value,
+                usuario: document.getElementById('usuario').value,
+                clave: document.getElementById('clave').value,
+                mail: document.getElementById('mail').value,
+                telefono: document.getElementById('telefono').value,
+                acepta_terminos: document.getElementById('acepta_terminos').checked
+            };
+
+            console.log('Datos a enviar:', data);
+
+            fetch('/user/registro', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                // Mostrar información sobre el status de la respuesta
+                console.log('Código de estado:', response.status);
+                
+                // Convertir la respuesta a JSON
+                return response.json().then(data => {
+                    return { 
+                        status: response.status,
+                        ok: response.ok,
+                        data: data
+                    };
+                });
+            })
+            .then(result => {
+                responseDiv.style.display = 'block';
+                
+                if (result.ok) {
+                    responseDiv.className = 'success';
+                    responseDiv.innerHTML = `
+                        <h3>¡Registro exitoso!</h3>
+                        <p>${JSON.stringify(result.data, null, 2)}</p>
+                    `;
+                } else {
+                    responseDiv.className = 'error';
+                    responseDiv.innerHTML = `
+                        <h3>Error ${result.status}</h3>
+                        <p>${JSON.stringify(result.data, null, 2)}</p>
+                    `;
+                    
+                    // Mostrar detalles adicionales para errores de validación
+                    if (result.status === 422 && result.data.detail) {
+                        let errorList = '<ul>';
+                        if (Array.isArray(result.data.detail)) {
+                            result.data.detail.forEach(error => {
+                                const campo = error.loc ? error.loc[error.loc.length - 1] : 'unknown';
+                                errorList += `<li><strong>${campo}:</strong> ${error.msg}</li>`;
+                            });
+                        } else {
+                            errorList += `<li>${result.data.detail}</li>`;
+                        }
+                        errorList += '</ul>';
+                        responseDiv.innerHTML += `<div>Detalles de validación: ${errorList}</div>`;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'error';
+                responseDiv.innerHTML = `
+                    <h3>Error</h3>
+                    <p>${error.message}</p>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>

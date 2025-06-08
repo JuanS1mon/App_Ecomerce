@@ -1,7 +1,12 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, Text, func, Boolean
-from sqlalchemy.orm import relationship
-from db.database import Base
+# Imports de bibliotecas estándar
 import datetime
+
+# Imports de terceros
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text, func
+from sqlalchemy.orm import relationship
+
+# Imports del proyecto
+from sql_app.db.database import Base
 
 class OT(Base):
     """

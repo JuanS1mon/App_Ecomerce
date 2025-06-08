@@ -1,11 +1,10 @@
-from sqlalchemy import Column, Integer, Float, String, DateTime, Boolean, ForeignKey
+"""
+
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-try:
-    from ...db.database import Base
-except ImportError:
-    from sql_app.db.database import Base
-class ConfirmacionMovimiento(Base):
-    """
+
+from sql_app.db.database import Baseclass ConfirmacionMovimiento(Base):
+
     Modelo para almacenar confirmaciones de movimientos de stock.
     """
     __tablename__ = "confirmaciones_movimientos"

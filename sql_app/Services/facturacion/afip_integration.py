@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
+
+
+
 Módulo de integración con AFIP para facturación electrónica Argentina
 Proporciona funciones para autenticación, generación de CAE, consulta de comprobantes, etc.
 Basado en las especificaciones de WebServices de AFIP:

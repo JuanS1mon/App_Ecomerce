@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Gestión de Usuarios - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <h1 class="text-xl font-bold">
+                    <i class="fas fa-users mr-2"></i>
+                    Gestión de Usuarios
+                </h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm">
+                    <i class="fas fa-user mr-1"></i>
+                    {{ user.nombre if user.nombre else user.usuario }}
+                </span>
+                <a href="/admin" class="bg-blue-500 hover:bg-blue-700 px-3 py-2 rounded text-sm">
+                    <i class="fas fa-arrow-left mr-1"></i>
+                    Volver al Panel
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto mt-8 px-4">
+        <!-- Header Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-user-cog mr-2 text-blue-600"></i>
+                Panel de Administración de Usuarios
+            </h2>
+            <p class="text-gray-600">
+                Gestiona usuarios, roles y permisos del sistema desde este panel de control.
+            </p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Total Usuarios</h3>
+                        <p class="text-2xl font-bold text-blue-600" id="total-users">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-user-check text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Usuarios Activos</h3>
+                        <p class="text-2xl font-bold text-green-600" id="active-users">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                        <i class="fas fa-user-shield text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Administradores</h3>
+                        <p class="text-2xl font-bold text-yellow-600" id="admin-users">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <i class="fas fa-key text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Roles</h3>
+                        <p class="text-2xl font-bold text-purple-600" id="total-roles">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>        <!-- Action Buttons -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Acciones Rápidas</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button onclick="openCreateUserModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Crear Usuario
+                </button>
+                <button onclick="openRoleAssignModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center">
+                    <i class="fas fa-user-tag mr-2"></i>
+                    Asignar Roles
+                </button>
+                <button onclick="refreshStatistics()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center">
+                    <i class="fas fa-chart-bar mr-2"></i>
+                    Actualizar Stats
+                </button>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-800">Lista de Usuarios</h3>
+            </div>
+            <div class="p-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Usuario
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Nombre
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Email
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Estado
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Roles
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Los usuarios se cargarán aquí via JavaScript -->
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>
+                                    Cargando usuarios...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>        </div>
+    </div>
+
+    <!-- Modal para crear usuario -->
+    <div id="createUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Crear Nuevo Usuario</h3>
+            </div>
+            <form id="createUserForm" class="px-6 py-4">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Usuario</label>
+                        <input type="text" name="usuario" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nombre</label>
+                        <input type="text" name="nombre" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" name="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+                        <input type="password" name="password" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeCreateUserModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                        Crear Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para cambiar contraseña -->
+    <div id="changePasswordModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Cambiar Contraseña</h3>
+            </div>
+            <form id="changePasswordForm" class="px-6 py-4">
+                <input type="hidden" id="changePasswordUserId" name="userId">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nueva Contraseña</label>
+                        <input type="password" name="newPassword" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
+                        <input type="password" name="confirmPassword" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">
+                        Cambiar Contraseña
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para ver perfil de usuario -->
+    <div id="userProfileModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Perfil de Usuario</h3>
+            </div>
+            <div id="userProfileContent" class="px-6 py-4">
+                <!-- El contenido se llenará dinámicamente -->
+            </div>
+            <div class="flex justify-end px-6 py-4">
+                <button type="button" onclick="closeUserProfileModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Función para cargar estadísticas
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/usuarios_admin/estadisticas/', {
+                    headers: {
+                        'Authorization': `Bearer ${getCookie('access_token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('total-users').textContent = stats.total_usuarios || 0;
+                    document.getElementById('active-users').textContent = stats.usuarios_activos || 0;
+                    document.getElementById('admin-users').textContent = stats.administradores || 0;
+                    document.getElementById('total-roles').textContent = stats.total_roles || 0;
+                }
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        // Función para cargar la lista de usuarios
+        async function loadUsers() {
+            try {
+                const response = await fetch('/usuarios_admin/usuarios/', {
+                    headers: {
+                        'Authorization': `Bearer ${getCookie('access_token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const users = await response.json();
+                    renderUsersTable(users);
+                } else {
+                    throw new Error('Error al cargar usuarios');
+                }
+            } catch (error) {
+                console.error('Error cargando usuarios:', error);
+                document.getElementById('users-table-body').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-red-500">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Error al cargar usuarios
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Función para renderizar la tabla de usuarios
+        function renderUsersTable(users) {
+            const tbody = document.getElementById('users-table-body');
+            
+            if (users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            <i class="fas fa-users mr-2"></i>
+                            No hay usuarios registrados
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <div class="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
+                                    ${user.nombre ? user.nombre.charAt(0).toUpperCase() : user.usuario.charAt(0).toUpperCase()}
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${user.usuario}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${user.nombre || '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${user.email || '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${user.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">
+                            <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                                Usuario
+                            </span>
+                        </div>
+                    </td>                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button class="text-indigo-600 hover:text-indigo-900 mr-3" onclick="viewUser(${user.id})" title="Ver perfil">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="text-blue-600 hover:text-blue-900 mr-3" onclick="editUser(${user.id})" title="Editar usuario">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-green-600 hover:text-green-900 mr-3" onclick="changePassword(${user.id})" title="Cambiar contraseña">
+                            <i class="fas fa-key"></i>
+                        </button>
+                        <button class="text-yellow-600 hover:text-yellow-900 mr-3" onclick="toggleUserStatus(${user.id}, ${user.activo})" title="${user.activo ? 'Desactivar' : 'Activar'} usuario">
+                            <i class="fas fa-${user.activo ? 'user-slash' : 'user-check'}"></i>
+                        </button>
+                        <button class="text-red-600 hover:text-red-900" onclick="deleteUser(${user.id})" title="Eliminar usuario">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Función para obtener cookies
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }        // Funciones de acción
+        async function viewUser(userId) {
+            try {
+                const response = await fetch(`/usuarios_admin/usuarios/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${getCookie('access_token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    showUserProfile(user);
+                } else {
+                    alert('Error al cargar el perfil del usuario');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar el perfil del usuario');
+            }
+        }
+
+        async function editUser(userId) {
+            try {
+                const response = await fetch(`/usuarios_admin/usuarios/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${getCookie('access_token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    openEditUserModal(user);
+                } else {
+                    alert('Error al cargar los datos del usuario');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar los datos del usuario');
+            }
+        }
+
+        async function changePassword(userId) {
+            openChangePasswordModal(userId);
+        }
+
+        async function toggleUserStatus(userId, isActive) {
+            if (confirm(`¿Estás seguro de que quieres ${isActive ? 'desactivar' : 'activar'} este usuario?`)) {
+                try {
+                    const response = await fetch(`/usuarios_admin/usuarios/${userId}/toggle-status`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${getCookie('access_token')}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        alert(`Usuario ${isActive ? 'desactivado' : 'activado'} exitosamente`);
+                        loadUsers(); // Recargar la tabla
+                        loadStatistics(); // Actualizar estadísticas
+                    } else {
+                        alert('Error al cambiar el estado del usuario');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al cambiar el estado del usuario');
+                }
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (confirm('¿Estás seguro de que quieres eliminar este usuario? Esta acción no se puede deshacer.')) {
+                try {
+                    const response = await fetch(`/usuarios_admin/usuarios/${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${getCookie('access_token')}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        alert('Usuario eliminado exitosamente');
+                        loadUsers(); // Recargar la tabla
+                        loadStatistics(); // Actualizar estadísticas
+                    } else {
+                        alert('Error al eliminar el usuario');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al eliminar el usuario');
+                }
+            }
+        }        // Funciones para modales
+        function openCreateUserModal() {
+            document.getElementById('createUserModal').classList.remove('hidden');
+        }
+
+        function closeCreateUserModal() {
+            document.getElementById('createUserModal').classList.add('hidden');
+            document.getElementById('createUserForm').reset();
+        }
+
+        function openEditUserModal(user) {
+            // Por ahora solo mostrar una alerta, se puede expandir después
+            alert(`Editar usuario: ${user.usuario}\nNombre: ${user.nombre}\nEmail: ${user.email}`);
+        }
+
+        function openChangePasswordModal(userId) {
+            document.getElementById('changePasswordUserId').value = userId;
+            document.getElementById('changePasswordModal').classList.remove('hidden');
+        }
+
+        function closeChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.add('hidden');
+            document.getElementById('changePasswordForm').reset();
+        }
+
+        function openRoleAssignModal() {
+            // Implementar modal de asignación de roles
+            alert('Modal de asignación de roles - En desarrollo');
+        }
+
+        function showUserProfile(user) {
+            const content = document.getElementById('userProfileContent');
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Usuario</label>
+                        <p class="text-sm text-gray-900">${user.usuario}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nombre</label>
+                        <p class="text-sm text-gray-900">${user.nombre || 'No especificado'}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                        <p class="text-sm text-gray-900">${user.email || 'No especificado'}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Estado</label>
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${user.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Fecha de creación</label>
+                        <p class="text-sm text-gray-900">${user.fecha_creacion || 'No disponible'}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('userProfileModal').classList.remove('hidden');
+        }
+
+        function closeUserProfileModal() {
+            document.getElementById('userProfileModal').classList.add('hidden');
+        }
+
+        // Manejadores de formularios
+        document.getElementById('createUserForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const userData = {
+                usuario: formData.get('usuario'),
+                nombre: formData.get('nombre'),
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+
+            try {
+                const response = await fetch('/usuarios_admin/usuarios/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${getCookie('access_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    alert('Usuario creado exitosamente');
+                    closeCreateUserModal();
+                    loadUsers();
+                    loadStatistics();
+                } else {
+                    const error = await response.json();
+                    alert('Error al crear usuario: ' + (error.detail || 'Error desconocido'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al crear usuario');
+            }
+        });
+
+        document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const newPassword = formData.get('newPassword');
+            const confirmPassword = formData.get('confirmPassword');
+            const userId = formData.get('userId');
+
+            if (newPassword !== confirmPassword) {
+                alert('Las contraseñas no coinciden');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/usuarios_admin/usuarios/${userId}/cambiar-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${getCookie('access_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nueva_password: newPassword })
+                });
+
+                if (response.ok) {
+                    alert('Contraseña cambiada exitosamente');
+                    closeChangePasswordModal();
+                } else {
+                    const error = await response.json();
+                    alert('Error al cambiar contraseña: ' + (error.detail || 'Error desconocido'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cambiar contraseña');
+            }
+        });
+
+        function refreshStatistics() {
+            loadStatistics();
+            loadUsers();
+        }
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatistics();
+            loadUsers();
+        });
+    </script>
+</body>
+</html>

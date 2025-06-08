@@ -1,6 +1,9 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional
+# Imports de bibliotecas estándar
 from datetime import datetime
+from typing import List, Optional
+
+# Imports de terceros
+from pydantic import BaseModel, Field
 
 # Esquemas para Operación
 class OperacionBase(BaseModel):

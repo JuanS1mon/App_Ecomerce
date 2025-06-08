@@ -1,0 +1,110 @@
+REPORTE DE IMPORTACIONES PROBLEMÁTICAS
+==================================================
+
+sql_app\fix_remaining_imports.py:
+  - 3 importaciones inconsistentes: from\s+db\.database\s+import
+
+sql_app\imports_config.py:
+  - 14 importaciones duplicadas
+
+sql_app\main.py:
+  - 3 importaciones duplicadas
+  - 1 importaciones inconsistentes: from\s+Services\.security\.security\s+import
+
+sql_app\db\database.py:
+  - 2 importaciones duplicadas
+  - 1 importaciones inconsistentes: from\s+db\.database\s+import
+
+sql_app\routers\Blog.py:
+  - 1 importaciones duplicadas
+
+sql_app\routers\usuarios.py:
+  - 1 importaciones duplicadas
+  - 1 importaciones inconsistentes: from\s+\.\.\.?Services\.security\.security\s+import
+  - 1 importaciones inconsistentes: from\s+\.\.\.?db\.database\s+import
+  - 1 importaciones inconsistentes: from\s+\.\.\.?db\.schemas\.config\.Usuarios\s+import
+  - 1 importaciones inconsistentes: from\s+\.\.\.?db\.models\.config\.usuarios\s+import
+
+sql_app\routers\config\Analisis.py:
+  - 1 importaciones duplicadas
+
+sql_app\routers\config\Generar.py:
+  - 1 importaciones duplicadas
+
+sql_app\routers\config\service_manager.py:
+  - 2 importaciones duplicadas
+
+sql_app\routers\config\usuarios_admin.py:
+  - 1 importaciones inconsistentes: from\s+\.\.\.?Services\.security\.security\s+import
+  - 1 importaciones inconsistentes: from\s+\.\.\.?db\.database\s+import
+  - 1 importaciones inconsistentes: from\s+\.\.\.?db\.schemas\.config\.Usuarios\s+import
+  - 1 importaciones inconsistentes: from\s+\.\.\.?db\.models\.config\.usuarios\s+import
+
+sql_app\routers\config\usuarios_admin_fixed.py:
+  - 1 importaciones inconsistentes: from\s+Services\.security\.security\s+import
+  - 1 importaciones inconsistentes: from\s+db\.database\s+import
+
+sql_app\routers\config\usuarios_admin_fixed_fields.py:
+  - 1 importaciones inconsistentes: from\s+Services\.security\.security\s+import
+  - 1 importaciones inconsistentes: from\s+db\.database\s+import
+
+sql_app\routers\config\Generar_Funciones\Generar_Models_service.py:
+  - 1 importaciones inconsistentes: from\s+db\.database\s+import
+
+sql_app\routers\config\Generar_Funciones\Generar_Routes.py:
+  - 1 importaciones inconsistentes: from\s+db\.database\s+import
+
+sql_app\routers\config\Generar_Funciones\Generar_Routes_service.py:
+  - 1 importaciones inconsistentes: from\s+db\.database\s+import
+
+sql_app\Services\services_manager.py:
+  - 11 importaciones duplicadas
+  - 2 importaciones inconsistentes: from\s+db\.database\s+import
+
+sql_app\Services\app_stock\ot\service_operaciones.py:
+  - 1 importaciones duplicadas
+
+sql_app\Services\app_stock\stock\route_stock_calculado.py:
+  - 1 importaciones duplicadas
+
+sql_app\Services\app_stock\stock\service_stock_calculado.py:
+  - 6 importaciones duplicadas
+
+sql_app\Services\facturacion\afip_integration.py:
+  - 1 importaciones duplicadas
+
+sql_app\Services\facturacion\afip_manager.py:
+  - 7 importaciones duplicadas
+
+sql_app\Services\facturacion\service_facturacion.py:
+  - 2 importaciones duplicadas
+
+sql_app\Services\scraping\scraping.py:
+  - 2 importaciones duplicadas
+
+sql_app\Services\security\get_optional_user.py:
+  - 1 importaciones inconsistentes: from\s+\.\.\.?db\.database\s+import
+  - 1 importaciones inconsistentes: from\s+\.\.\.?db\.schemas\.config\.Usuarios\s+import
+
+sql_app\Services\security\security.py:
+  - 2 importaciones duplicadas
+  - 1 importaciones inconsistentes: from\s+\.\.\.?db\.database\s+import
+  - 1 importaciones inconsistentes: from\s+\.\.\.?db\.schemas\.config\.Usuarios\s+import
+
+sql_app\Services\security\security_backup.py:
+  - 1 importaciones duplicadas
+  - 1 importaciones inconsistentes: from\s+db\.database\s+import
+
+sql_app\Services\security\security_clean.py:
+  - 2 importaciones duplicadas
+  - 1 importaciones inconsistentes: from\s+db\.database\s+import
+
+sql_app\Services\tickets\route_ticket.py:
+  - 1 importaciones duplicadas
+
+TOTAL DE PROBLEMAS ENCONTRADOS: 90
+
+RESULTADOS DE CORRECCIÓN:
+- Archivos procesados: 154
+- Archivos corregidos: 28
+- Archivos con errores: 0

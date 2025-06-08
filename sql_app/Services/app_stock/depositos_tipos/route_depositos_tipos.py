@@ -1,12 +1,22 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query
-from sqlalchemy.orm import Session
-from db.database import get_db
-from .schema_depositos_tipos import Depositos_tiposCreate, Depositos_tiposUpdate, Depositos_tiposRead
-from .model_depositos_tipos import Depositos_tipos as Depositos_tiposModel
-from .service_depositos_tipos import create_depositos_tipos, get_depositos_tipos, gets_depositos_tipos, delete_depositos_tipos, update_depositos_tipos
-from fastapi.responses import HTMLResponse, FileResponse
-from typing import List, Optional
 import logging
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, HTMLResponse
+from sqlalchemy.orm import Session
+
+from sql_app.db.database import get_db
+from sql_app.Services.app_stock.depositos_tipos.model_depositos_tipos import Depositos_tipos as Depositos_tiposModel
+from sql_app.Services.app_stock.depositos_tipos.schema_depositos_tipos import Depositos_tiposCreate, Depositos_tiposRead, Depositos_tiposUpdate
+from sql_app.Services.app_stock.depositos_tipos.service_depositos_tipos import (
+    create_depositos_tipos,
+    delete_depositos_tipos,
+    get_depositos_tipos,
+    gets_depositos_tipos,
+    update_depositos_tipos
+)
+
+from sql_app.db.database import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +94,7 @@ async def get_pagina():
     try:
         # Corrigiendo la ruta del archivo HTML
         # La ruta correcta debe ser dentro de la carpeta depositos_tipos, no depositos
-        with open(f"static/app_stock/depositos_tipos/depositos_tipos.html", "r", encoding="utf-8") as file:
+        with open(f"sql_app/static/app_stock/depositos_tipos/depositos_tipos.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

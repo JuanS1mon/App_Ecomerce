@@ -1,13 +1,15 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException, status
-from sqlalchemy import text,func
-from .model_stock import Stock  # Corregida la importación
+# Imports de bibliotecas estándar
+from sql_app.Services.app_stock.stock.model_stock import Stock  # Corregida la importación
+from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+from datetime import date
 from typing import List, Optional, Dict, Any
 import logging
-from .model_stock import Stock as StockModel
-from datetime import date
 
+# Imports de terceros
+from fastapi import HTTPException, status
+from sqlalchemy import text,func
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 def anular_movimiento(db: Session, nro_movimiento: int) -> int:

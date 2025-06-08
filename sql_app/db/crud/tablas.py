@@ -1,6 +1,9 @@
+# Imports de bibliotecas estándar
 import logging
-from sqlalchemy.orm import Session
+
+# Imports de terceros
 from sqlalchemy import inspect, text
+from sqlalchemy.orm import Session
 
 def get_tables(db: Session):
     inspector = inspect(db.get_bind())
@@ -10,7 +13,7 @@ def get_tables(db: Session):
     #logging.info(f"Todas las tablas: {tables}")
     
     # Filtrar tablas específicas a excluir
-    excluded_tables = {"usuarios", "activity_logs","blog_posts","alembic_version"}
+    excluded_tables = {"usuarios", "activity_log","blog_posts","alembic_version"}
     
     # Tablas que comienzan con "migracion_"
     tabla1 = [table for table in tables if table.startswith("migracion_") and table not in excluded_tables]

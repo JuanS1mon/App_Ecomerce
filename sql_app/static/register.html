@@ -230,6 +230,15 @@
                     </div>
                 </div>
                 
+                <div class="form-field relative">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="acepta_terminos" name="acepta_terminos" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" required>
+                        <label for="acepta_terminos" class="ml-2 block text-sm text-gray-700">
+                            Acepto los <a href="/terminos" class="text-indigo-600 hover:text-indigo-800">términos y condiciones</a>
+                        </label>
+                    </div>
+                </div>
+                
                 <div class="mt-8">
                     <button type="submit" class="btn-submit w-full flex justify-center items-center gradient-bg text-white py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 font-medium text-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         <i class="fas fa-user-plus mr-2"></i>
@@ -281,40 +290,76 @@
             
             // Form submission
             document.getElementById('register_form').addEventListener('submit', function(event) {
-                event.preventDefault();
+                event.preventDefault();                // Validar la aceptación de términos
+                const aceptaTerminos = document.getElementById('acepta_terminos');
+                if (!aceptaTerminos.checked) {
+                    showNotification('Debes aceptar los términos y condiciones para continuar.', 'error');
+                    return;
+                }
+                
+                // Log para depuración
+                console.log("Valor de acepta_terminos:", aceptaTerminos.checked);
 
                 const submitButton = this.querySelector('button[type="submit"]');
                 const originalText = submitButton.innerHTML;
                 
                 // Show loading state
                 submitButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Procesando...';
-                submitButton.disabled = true;
-
+                submitButton.disabled = true;                // Obtener datos del formulario
                 let formData = new FormData(document.getElementById('register_form'));
                 let codigoPais = formData.get('codigo_pais');
                 let telefono = formData.get('telefono');
                 let telefonoCompleto = codigoPais + telefono;
-
-                fetch('/user/registro', {
+                  // Crear objeto con datos para enviar
+                const datosEnvio = {
+                    nombre: formData.get('nombre'),
+                    usuario: formData.get('usuario'),
+                    clave: formData.get('clave'),
+                    mail: formData.get('mail'),
+                    telefono: telefonoCompleto,
+                    acepta_terminos: true  // Valor explícito true como un booleano (sin comillas)
+                };
+                
+                console.log("Datos a enviar:", JSON.stringify(datosEnvio));                fetch('/user/registro', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        'nombre': formData.get('nombre'),
-                        'usuario': formData.get('usuario'),
-                        'clave': formData.get('clave'),
-                        'mail': formData.get('mail'),
-                        'telefono': telefonoCompleto,
-                        'activo': true  // Añadir el campo activo
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
+                    body: JSON.stringify(datosEnvio)
+                })                .then(response => {
                     // Restore button state
                     submitButton.innerHTML = originalText;
                     submitButton.disabled = false;
                     
+                    if (response.status === 422) {
+                        return response.json().then(errorData => {
+                            let errorMessage = 'Datos de registro inválidos. ';
+                            
+                            // Mostrar error completo en la consola para depuración
+                            console.error("Error 422 completo:", JSON.stringify(errorData));
+                            
+                            if (errorData.detail && Array.isArray(errorData.detail)) {
+                                errorData.detail.forEach(error => {
+                                    if (error.loc && error.msg) {
+                                        // Formatear mensaje de error
+                                        const campo = error.loc[error.loc.length - 1];
+                                        errorMessage += `${campo}: ${error.msg}. `;
+                                        console.log(`Error en campo ${campo}: ${error.msg}`);
+                                    }
+                                });
+                            } else if (errorData.detail) {
+                                errorMessage = errorData.detail;
+                                console.log(`Error detallado: ${errorData.detail}`);
+                            }
+                            
+                            showNotification(errorMessage, 'error');
+                            return Promise.reject('Error de validación: ' + errorMessage);
+                        });
+                    }
+                    
+                    return response.json();
+                })
+                .then(data => {
                     if (data.detail) {
                         showNotification(data.detail, 'error');
                     } else {

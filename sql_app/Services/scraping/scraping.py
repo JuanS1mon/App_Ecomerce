@@ -1,10 +1,15 @@
-import requests
+# Imports de bibliotecas estándar
 from bs4 import BeautifulSoup
-import time
-from urllib.parse import urljoin
-from pydantic import BaseModel
 from typing import List, Optional
-from db.schemas.Scraping import ScraperTestConfig , SelectorConfig
+from urllib.parse import urljoin
+import requests
+import time
+
+# Imports de terceros
+from pydantic import BaseModel
+
+# Imports del proyecto
+from ...db.schemas.Scraping import ScraperTestConfig, SelectorConfig
 
 def extract_with_beautifulsoup(config: ScraperTestConfig, max_items: int = 10):
     """

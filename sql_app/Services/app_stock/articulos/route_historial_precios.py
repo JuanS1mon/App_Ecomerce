@@ -1,14 +1,17 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query, Request
-from sqlalchemy.orm import Session
-from typing import Dict, Any, Optional, List
+# Imports de bibliotecas estándar
 from datetime import datetime, timedelta
-from fastapi.responses import HTMLResponse
-import logging
+from typing import Any, Dict, List, Optional
 import json
+import logging
 
-from db.database import get_db
-from .service_articulos import (
-    get_historial_precios,
+# Imports de terceros
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi.responses import HTMLResponse
+from sqlalchemy.orm import Session
+
+# Imports del proyecto
+from sql_app.db.database import get_db
+from sql_app.Services.app_stock.articulos.service_historial_precios import (
     get_historial_precios_por_articulo,
     get_estadisticas_historial_precios,
     get_historial_precios_con_filtros
@@ -36,7 +39,7 @@ async def get_historial_precios_pagina():
     Muestra la página de historial de precios de artículos.
     """
     try:
-        with open("static/app_stock/articulos/historial_precios/historial_precios.html", "r", encoding="utf-8") as file:
+        with open("sql_app/static/app_stock/articulos/historial_precios/historial_precios.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

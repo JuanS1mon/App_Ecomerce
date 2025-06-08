@@ -1,23 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request, Form
+# Configurar logger
+
+from ...security.security import get_current_user
+from ..articulos.model_articulos import Articulos
+from ..depositos.model_depositos import Depositos
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import Session
-from db.database import get_db
-from Services.security.security import get_current_user
 import logging
 import os
 
-# Importar los modelos ORM que necesitamos
-from ..articulos.model_articulos import Articulos
-from ..depositos.model_depositos import Depositos
 from ..stock.model_stock import Stock
-from sqlalchemy import func, desc, text
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi.templating import Jinja2Templates
+from sqlalchemy import desc, func, text
+from sqlalchemy.orm import Session
 
-# Configurar logger
+from sql_app.db.database import get_db
+
 logger = logging.getLogger(__name__)
 
 # Configurar templates - Revisamos la ruta correcta
-templates = Jinja2Templates(directory="static/html")
+templates = Jinja2Templates(directory="sql_app/static")
 
 # Crear router
 router = APIRouter(
@@ -187,7 +188,7 @@ async def get_stock_dashboard(request: Request, db: Session = Depends(get_db),
     """
     try:
         # Corregir la ruta para que apunte al archivo correcto
-        with open("static/app_stock/stock_dashboard.html", "r", encoding="utf-8") as file:
+        with open("sql_app/static/app_stock/stock_dashboard.html", "r", encoding="utf-8") as file:
             html_content = file.read()
         return HTMLResponse(content=html_content)
     except Exception as e:

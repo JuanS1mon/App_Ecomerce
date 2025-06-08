@@ -6,7 +6,10 @@
     <title>Iniciar sesión</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- HABILITANDO components.js que incluye navbar -->
     <script src="/static/js/components.js"></script>
+    
     <style>
         /* Estética actualizada similar al panel de administración */
         .gradient-bg {
@@ -135,7 +138,6 @@
     <!-- Navbar - Se cargará dinámicamente -->
     <div id="navbar-container"></div>
 
-
     <!-- Contenido principal -->
     <div class="container mx-auto p-8 flex-grow">
         <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md card-hover border border-gray-100 card-shine">
@@ -179,7 +181,7 @@
                         </label>
                     </div>
                     <div class="text-sm">
-                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                        <a href="/reset-password" class="font-medium text-indigo-600 hover:text-indigo-500">
                             ¿Olvidaste tu contraseña?
                         </a>
                     </div>
@@ -214,141 +216,538 @@
                 <p>Si tienes problemas para iniciar sesión, contacta con el equipo de soporte.</p>
             </div>
         </div>
-    </div>
-
+    </div>    
+    
+    <!-- INTERCEPTOR DE AUTENTICACIÓN EMBEBIDO - SOLUCIÓN DEFINITIVA -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle password visibility
-            const togglePassword = document.getElementById('toggle-password');
-            const passwordInput = document.getElementById('password');
+        console.log('🔐 Cargando interceptor de autenticación embebido...');
+        console.log('🌐 URL actual:', window.location.href);
+        console.log('📅 Timestamp:', new Date().toISOString());
+        
+        // Marcar que el interceptor se cargó
+        window.AUTH_INTERCEPTOR_LOADED = true;
+        window.AUTH_INTERCEPTOR_VERSION = '3.0.0-embedded';
+        console.log('✅ Interceptor de autenticación embebido cargado - Versión:', window.AUTH_INTERCEPTOR_VERSION);
+        
+        // =================================================================
+        // CONFIGURACIÓN Y CONSTANTES - CORREGIDO
+        // =================================================================
+        const AUTH_CONFIG = {
+            TOKEN_KEY: 'access_token',
+            LOGIN_ENDPOINT: '/login',
+            LOGOUT_ENDPOINT: '/logout',
+            LOGIN_PAGE: '/loginpage',
+            DEBUG_ENDPOINT: '/admin-debug',
+            EXCLUDED_PATHS: ['/login', '/logout', '/loginpage', '/registerpage', '/static', '/usuarios/current']
+        };
+        
+        console.log('✅ AUTH_CONFIG configurado correctamente:', AUTH_CONFIG);
+        
+        // =================================================================
+        // INTERCEPTOR DE FETCH EMBEBIDO
+        // =================================================================
+        (function setupEmbeddedFetchInterceptor() {
+            // Guardar referencia al fetch original
+            const originalFetch = window.fetch;
             
-            if (togglePassword && passwordInput) {
-                togglePassword.addEventListener('click', function() {
-                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    passwordInput.setAttribute('type', type);
-                    
-                    // Toggle icon
-                    const iconClass = type === 'password' ? 'fa-eye' : 'fa-eye-slash';
-                    this.querySelector('i').className = `fas ${iconClass}`;
-                });
-            }
-            
-            // Form submission
-            document.getElementById('form_common').addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                const submitButton = document.getElementById('submit_button');
-                const originalText = submitButton.innerHTML;
+            // Sobrescribir fetch global
+            window.fetch = function(url, options = {}) {
+                // Obtener token de localStorage
+                const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
                 
-                // Show loading state
-                submitButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Verificando...';
-                submitButton.disabled = true;
-
-                let formData = new FormData(document.getElementById('form_common'));
-
-                fetch('/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        'username': formData.get('username'),
-                        'password': formData.get('password')
-                    }),
-                    credentials: 'include'  // Asegúrate de enviar las cookies con la solicitud
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Nombre de usuario o contraseña incorrectos');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Restore button state
-                    submitButton.innerHTML = originalText;
-                    submitButton.disabled = false;
+                // Verificar si debe incluir token
+                const shouldIncludeToken = token && 
+                    !AUTH_CONFIG.EXCLUDED_PATHS.some(path => url.includes(path)) &&
+                    url !== AUTH_CONFIG.DEBUG_ENDPOINT;
+                
+                if (shouldIncludeToken) {
+                    // Asegurar que existe el objeto headers
+                    options.headers = options.headers || {};
                     
-                    if (data.access_token) {
-                        console.log('Token de acceso recibido:', data.access_token);  // Imprimir el token en la consola
-                        // Mostrar notificación de éxito
-                        showNotification('Inicio de sesión exitoso. Redirigiendo...', 'success');
-                        // Almacenar el token en localStorage
-                        localStorage.setItem('access_token', data.access_token);
-                        // Redirigir al usuario a '/admin/' después de un breve retraso
-                        setTimeout(() => {
-                            window.location.href = '/admin';
-                        }, 1000);
+                    // Solo agregar si no hay Authorization header ya presente
+                    const hasAuthHeader = Object.keys(options.headers).some(
+                        key => key.toLowerCase() === 'authorization'
+                    );
+                    
+                    if (!hasAuthHeader) {
+                        options.headers['Authorization'] = `Bearer ${token}`;
+                        console.log('🔐✅ Token agregado automáticamente (embebido) a:', url);
+                        console.log('🎫 Token (primeros 20 chars):', token.substring(0, 20) + '...');
                     } else {
-                        showNotification('Nombre de usuario o contraseña incorrectos', 'error');
-                        document.getElementById('message').textContent = 'Nombre de usuario o contraseña incorrectos';
+                        console.log('🔐⚠️ Header Authorization ya presente en:', url);
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Restore button state
-                    submitButton.innerHTML = originalText;
-                    submitButton.disabled = false;
-                    showNotification('Error de autenticación', 'error');
-                    document.getElementById('message').textContent = 'Nombre de usuario o contraseña incorrectos';
-                });
-            });
-            
-            // Notification function con estilo mejorado como el panel de admin
-            function showNotification(message, type) {
-                // Remove existing notifications
-                const existingNotifications = document.querySelectorAll('.notification');
-                existingNotifications.forEach(notification => notification.remove());
-                
-                // Create notification element
-                const notification = document.createElement('div');
-                notification.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transition-all duration-500 transform translate-x-full flex items-center`;
-                
-                if (type === 'success') {
-                    notification.classList.add('bg-green-100', 'text-green-800', 'border-l-4', 'border-green-500');
-                    notification.innerHTML = `
-                        <div class="flex-shrink-0 bg-green-500 rounded-full p-2 mr-3">
-                            <i class="fas fa-check text-white"></i>
-                        </div>
-                        <div>
-                            <p class="font-medium">¡Éxito!</p>
-                            <p class="text-sm">${message}</p>
-                        </div>
-                    `;
+                } else if (token) {
+                    console.log('🔐⏭️ Token disponible pero excluido para:', url);
                 } else {
-                    notification.classList.add('bg-red-100', 'text-red-800', 'border-l-4', 'border-red-500');
-                    notification.innerHTML = `
-                        <div class="flex-shrink-0 bg-red-500 rounded-full p-2 mr-3">
-                            <i class="fas fa-exclamation-triangle text-white"></i>
-                        </div>
-                        <div>
-                            <p class="font-medium">Error</p>
-                            <p class="text-sm">${message}</p>
-                        </div>
-                    `;
+                    console.log('🔐❌ No hay token disponible para:', url);
                 }
                 
-                // Add to DOM
-                document.body.appendChild(notification);
-                
-                // Animate in
-                setTimeout(() => {
-                    notification.classList.remove('translate-x-full');
-                    notification.classList.add('translate-x-0');
-                }, 10);
-                
-                // Auto remove after delay
-                setTimeout(() => {
-                    notification.classList.remove('translate-x-0');
-                    notification.classList.add('translate-x-full');
-                    
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 500);
-                }, 5000);
+                // Llamar al fetch original
+                return originalFetch.call(this, url, options)
+                    .then(response => {
+                        // Manejar respuestas 401 (no autorizado)
+                        if (response.status === 401 && shouldIncludeToken) {
+                            console.log('🚨 Token rechazado por el servidor, limpiando localStorage');
+                            localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+                            
+                            // Solo redirigir si no estamos ya en login
+                            if (!window.location.pathname.includes('login')) {
+                                window.location.href = AUTH_CONFIG.LOGIN_PAGE;
+                            }
+                        }
+                        
+                        return response;
+                    })
+                    .catch(error => {
+                        console.error('❌ Error en petición interceptada (embebido):', error);
+                        throw error;
+                    });
+            };
+            
+            console.log('✅ Interceptor de fetch embebido configurado');
+        })();
+        
+        // =================================================================
+        // NAVEGACIÓN CON AUTENTICACIÓN EMBEBIDA
+        // =================================================================
+        window.navigateWithAuth = function(url) {
+            console.log('🚀 navigateWithAuth embebido llamado para:', url);
+            const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+            console.log('🎫 Token disponible:', !!token);
+            
+            if (!token) {
+                console.log('🚪 Navegando sin token a:', url);
+                window.location.href = url;
+                return;
             }
-        });
+            
+            console.log('🔐 Navegando con verificación de token a:', url);
+            console.log('🎫 Token (primeros 20 chars):', token.substring(0, 20) + '...');
+            
+            // Hacer petición de verificación antes de navegar
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ Token válido, navegando a:', url);
+                    window.location.href = url;
+                } else if (response.status === 401) {
+                    console.log('🚨 Token inválido, redirigiendo a login');
+                    localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+                    window.location.href = AUTH_CONFIG.LOGIN_PAGE;
+                } else {
+                    console.log(`⚠️ Error ${response.status}, navegando normalmente`);
+                    window.location.href = url;
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error en verificación de navegación:', error);
+                window.location.href = url;
+            });
+        };
+        
+        console.log('✅ Interceptor de autenticación embebido completamente cargado');
+        console.log('🔧 Para debug, verifica window.AUTH_INTERCEPTOR_LOADED');
     </script>
     
-    {% include 'footer.html' %}
+    <script>
+        // Evitar ejecución múltiple del script
+        if (window.loginScriptLoaded) {
+            console.log('Script de login ya cargado, evitando duplicación');
+        } else {
+            window.loginScriptLoaded = true;
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                // Cargar navbar
+                loadNavbar();
+                
+                // Limpiar flags de redirección al cargar la página de login
+                if (window.location.pathname.includes('login')) {
+                    // Limpiar solo si no venimos de una redirección reciente
+                    const loginRedirectAttempted = sessionStorage.getItem('login_redirect_attempted');
+                    if (!loginRedirectAttempted) {
+                        sessionStorage.removeItem('just_logged_in');
+                        console.log('Limpiando flags de sesión al cargar página de login');
+                    }
+                }
+                
+                // Verificar si el usuario ya está autenticado
+                checkIfAlreadyAuthenticated();
+                
+                // Limpiar flags si el usuario navega manualmente a login
+                window.addEventListener('pageshow', function(event) {
+                    if (event.persisted) {
+                        // Página cargada desde caché
+                        console.log('Página cargada desde caché, limpiando flags');
+                        sessionStorage.removeItem('login_redirect_attempted');
+                        window.isCheckingAuth = false;
+                        window.lastAuthCheck = 0;
+                    }
+                });
+                
+                // Toggle password visibility
+                const togglePassword = document.getElementById('toggle-password');
+                const passwordInput = document.getElementById('password');
+                
+                if (togglePassword && passwordInput) {
+                    togglePassword.addEventListener('click', function() {
+                        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                        passwordInput.setAttribute('type', type);
+                        
+                        // Toggle icon
+                        const iconClass = type === 'password' ? 'fa-eye' : 'fa-eye-slash';
+                        this.querySelector('i').className = `fas ${iconClass}`;
+                    });
+                }
+                
+                // Función para verificar autenticación existente
+                async function checkIfAlreadyAuthenticated() {
+                    // EVITAR BUCLE: Verificar si ya estamos procesando una verificación
+                    if (window.isCheckingAuth) {
+                        console.log('Ya hay una verificación de autenticación en curso, saltando...');
+                        return;
+                    }
+                    
+                    // EVITAR BUCLE: Throttling - no verificar más de una vez cada 5 segundos
+                    const lastCheck = window.lastAuthCheck || 0;
+                    const now = Date.now();
+                    if (now - lastCheck < 5000) {
+                        console.log('Verificación de autenticación muy reciente, saltando...');
+                        return;
+                    }
+                    window.lastAuthCheck = now;
+                    
+                    // EVITAR BUCLE: Solo verificar autenticación si estamos en una página de login
+                    const currentPath = window.location.pathname;
+                    if (!currentPath.includes('login') && !currentPath.includes('register')) {
+                        console.log('No estamos en página de login, saltando verificación de autenticación');
+                        return;
+                    }
+                    
+                    // EVITAR BUCLE: No verificar si acabamos de hacer login
+                    if (sessionStorage.getItem('just_logged_in') === 'true') {
+                        console.log('Acabamos de hacer login, saltando verificación para evitar bucle');
+                        sessionStorage.removeItem('just_logged_in');
+                        return;
+                    }
+                    
+                    // EVITAR BUCLE: Verificar si ya hemos redirigido en esta sesión
+                    if (sessionStorage.getItem('login_redirect_attempted') === 'true') {
+                        console.log('Ya se intentó redirigir en esta sesión, evitando bucle');
+                        return;
+                    }
+                    
+                    // Marcar que estamos verificando autenticación
+                    window.isCheckingAuth = true;
+                    
+                    try {
+                        console.log('🔍 Verificando autenticación existente para página de login...');
+                        
+                        // Obtener token directamente para evitar bucle con interceptor
+                        const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+                        
+                        if (!token) {
+                            console.log('❌ No hay token guardado, mostrando formulario de login');
+                            window.isCheckingAuth = false;
+                            return;
+                        }
+                        
+                        // Hacer petición manual con token para verificar validez
+                        const response = await fetch('/usuarios/current', {
+                            method: 'GET',
+                            credentials: 'include',
+                            headers: {
+                                'Cache-Control': 'no-cache',
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const userData = await response.json();
+                            console.log('✅ Estado de autenticación:', userData);
+                            
+                            if (userData.autenticado) {
+                                console.log('✅ Usuario ya autenticado, redirigiendo desde página de login...');
+                                
+                                // Marcar que ya intentamos redirigir
+                                sessionStorage.setItem('login_redirect_attempted', 'true');
+                                
+                                showNotification('Ya tienes una sesión activa. Redirigiendo...', 'success');
+                                
+                                // Redirigir después de un breve retraso
+                                setTimeout(() => {
+                                    const urlParams = new URLSearchParams(window.location.search);
+                                    const redirectUrl = urlParams.get('redirect') || '/admin';
+                                    console.log('Redirigiendo usuario autenticado a:', redirectUrl);
+                                    
+                                    // Verificar si el interceptor está disponible
+                                    if (typeof window.navigateWithAuth === 'function') {
+                                        console.log('Usando navigateWithAuth del interceptor para usuario autenticado');
+                                        // Limpiar la marca de redirección antes de redirigir
+                                        sessionStorage.removeItem('login_redirect_attempted');
+                                        window.navigateWithAuth(redirectUrl);
+                                    } else {
+                                        console.log('Interceptor no disponible, navegando con token manual para usuario autenticado');
+                                        // Fallback: verificar token antes de navegar
+                                        const token = localStorage.getItem('access_token');
+                                        if (token) {
+                                            fetch(redirectUrl, {
+                                                method: 'GET',
+                                                headers: {
+                                                    'Authorization': `Bearer ${token}`,
+                                                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                                                }
+                                            })
+                                            .then(response => {
+                                                console.log('Respuesta de verificación para usuario autenticado:', response.status);
+                                                sessionStorage.removeItem('login_redirect_attempted');
+                                                window.location.href = redirectUrl;
+                                            })
+                                            .catch(error => {
+                                                console.log('Error en verificación, navegando directamente:', error);
+                                                sessionStorage.removeItem('login_redirect_attempted');
+                                                window.location.href = redirectUrl;
+                                            });
+                                        } else {
+                                            // Sin token, navegar directamente
+                                            sessionStorage.removeItem('login_redirect_attempted');
+                                            window.location.href = redirectUrl;
+                                        }
+                                    }
+                                }, 1000);
+                            }
+                        } else {
+                            console.log('❌ Token inválido o sesión expirada');
+                            localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+                            showNotification('Sesión expirada. Por favor, inicia sesión nuevamente.', 'warning');
+                        }
+                    } catch (error) {
+                        console.log('❌ Error verificando autenticación o token inválido:', error);
+                        // Si hay error, limpiar token por si acaso está corrupto
+                        if (localStorage.getItem(AUTH_CONFIG.TOKEN_KEY)) {
+                            console.log('Limpiando token potencialmente corrupto');
+                            localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+                        }
+                        console.log('Mostrando formulario de login');
+                    } finally {
+                        // Limpiar la marca de verificación en curso
+                        window.isCheckingAuth = false;
+                    }
+                }
+
+                // Form submission
+                document.getElementById('form_common').addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    
+                    console.log('🚀 INICIO DE DEBUGGING DETALLADO');
+                    console.log('📍 URL actual:', window.location.href);
+                    console.log('🌐 Origin:', window.location.origin);
+                    console.log('📋 Form element:', document.getElementById('form_common'));
+
+                    const submitButton = document.getElementById('submit_button');
+                    const originalText = submitButton.innerHTML;
+                    
+                    // Show loading state
+                    submitButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Verificando...';
+                    submitButton.disabled = true;
+
+                    let formData = new FormData(document.getElementById('form_common'));
+                    console.log('📊 Datos del formulario:', {
+                        username: formData.get('username'),
+                        password: formData.get('password') ? '***' : 'vacío'
+                    });
+
+                    const requestUrl = '/login';
+                    const fullUrl = window.location.origin + requestUrl;
+                    console.log('🎯 URL de petición:', requestUrl);
+                    console.log('🔗 URL completa:', fullUrl);
+                    console.log('📤 Método:', 'POST');
+                    console.log('📋 Content-Type:', 'application/x-www-form-urlencoded');
+                    
+                    fetch(requestUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            'username': formData.get('username'),
+                            'password': formData.get('password')
+                        }),
+                        credentials: 'include'  // Asegúrate de enviar las cookies con la solicitud
+                    })
+                    .then(response => {
+                        console.log('📬 RESPUESTA RECIBIDA:');
+                        console.log('✅ Status:', response.status);
+                        console.log('🔗 URL:', response.url);
+                        console.log('📋 Headers:', Array.from(response.headers.entries()));
+                        console.log('✅ OK?:', response.ok);
+                        
+                        if (!response.ok) {
+                            if (response.status === 405) {
+                                console.error('Error 405: Método no permitido. Verificar endpoint.');
+                                throw new Error('Error de configuración del servidor (405)');
+                            } else if (response.status === 401) {
+                                throw new Error('Nombre de usuario o contraseña incorrectos');
+                            } else {
+                                throw new Error(`Error del servidor: ${response.status}`);
+                            }
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Datos recibidos del servidor:', data);
+                        
+                        // Restore button state
+                        submitButton.innerHTML = originalText;
+                        submitButton.disabled = false;
+                        
+                        if (data.access_token) {
+                            console.log('Token de acceso recibido:', data.access_token);
+                            console.log('Datos del usuario:', data.user_info);
+                            
+                            // Mostrar notificación de éxito
+                            showNotification('Inicio de sesión exitoso. Redirigiendo...', 'success');
+                            
+                            // Almacenar el token en localStorage
+                            localStorage.setItem('access_token', data.access_token);
+                            
+                            // Verificar si hay una URL de redirección en los parámetros
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const redirectUrl = urlParams.get('redirect') || '/admin';
+                            
+                            console.log('URL de redirección determinada:', redirectUrl);
+                            console.log('Iniciando redirección inmediata...');
+                            
+                            // Evitar verificación de autenticación en la página destino
+                            sessionStorage.setItem('just_logged_in', 'true');
+                            
+                            // Redirigir usando navegación con token
+                            setTimeout(() => {
+                                console.log('Ejecutando redirección con token a:', redirectUrl);
+                                console.log('Token almacenado antes de redirección:', !!localStorage.getItem('access_token'));
+                                
+                                // Asegurar que el token esté realmente guardado
+                                const storedToken = localStorage.getItem('access_token');
+                                if (!storedToken) {
+                                    console.error('¡ERROR! Token no guardado correctamente, reintentando...');
+                                    localStorage.setItem('access_token', data.access_token);
+                                }
+                                
+                                // NAVEGACIÓN CON VERIFICACIÓN DE TOKEN USANDO INTERCEPTOR
+                                if (typeof window.navigateWithAuth === 'function') {
+                                    console.log('Usando navigateWithAuth del interceptor embebido...');
+                                    window.navigateWithAuth(redirectUrl);
+                                } else {
+                                    console.log('Interceptor no disponible, verificando token manualmente...');
+                                    // Verificar token antes de navegar
+                                    fetch(redirectUrl, {
+                                        method: 'GET',
+                                        headers: {
+                                            'Authorization': `Bearer ${data.access_token}`,
+                                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                                        }
+                                    })
+                                    .then(response => {
+                                        if (response.ok) {
+                                            console.log('✅ Token válido, navegando...');
+                                            window.location.href = redirectUrl;
+                                        } else if (response.status === 401) {
+                                            console.log('❌ Token rechazado, limpiando y volviendo a login');
+                                            localStorage.removeItem('access_token');
+                                            showNotification('Error de autenticación, intenta nuevamente', 'error');
+                                        } else {
+                                            console.log('⚠️ Otro error, navegando normalmente');
+                                            window.location.href = redirectUrl;
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.log('❌ Error en verificación, navegando normalmente');
+                                        window.location.href = redirectUrl;
+                                    });
+                                }
+                            }, 100); // Tiempo muy reducido
+                        } else {
+                            console.log('No se recibió access_token en la respuesta');
+                            console.log('Estructura completa de la respuesta:', data);
+                            showNotification('Nombre de usuario o contraseña incorrectos', 'error');
+                            document.getElementById('message').textContent = 'Nombre de usuario o contraseña incorrectos';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error completo:', error);
+                        console.error('Stack trace:', error.stack);
+                        // Restore button state
+                        submitButton.innerHTML = originalText;
+                        submitButton.disabled = false;
+                        showNotification('Error de autenticación', 'error');
+                        document.getElementById('message').textContent = 'Nombre de usuario o contraseña incorrectos';
+                    });
+                });
+                
+                // Notification function con estilo mejorado como el panel de admin
+                function showNotification(message, type) {
+                    // Remove existing notifications
+                    const existingNotifications = document.querySelectorAll('.notification');
+                    existingNotifications.forEach(notification => notification.remove());
+                    
+                    // Create notification element
+                    const notification = document.createElement('div');
+                    notification.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transition-all duration-500 transform translate-x-full flex items-center`;
+                    
+                    if (type === 'success') {
+                        notification.classList.add('bg-green-100', 'text-green-800', 'border-l-4', 'border-green-500');
+                        notification.innerHTML = `
+                            <div class="flex-shrink-0 bg-green-500 rounded-full p-2 mr-3">
+                                <i class="fas fa-check text-white"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">¡Éxito!</p>
+                                <p class="text-sm">${message}</p>
+                            </div>
+                        `;
+                    } else {
+                        notification.classList.add('bg-red-100', 'text-red-800', 'border-l-4', 'border-red-500');
+                        notification.innerHTML = `
+                            <div class="flex-shrink-0 bg-red-500 rounded-full p-2 mr-3">
+                                <i class="fas fa-exclamation-triangle text-white"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Error</p>
+                                <p class="text-sm">${message}</p>
+                            </div>
+                        `;
+                    }
+                    
+                    // Add to DOM
+                    document.body.appendChild(notification);
+                    
+                    // Animate in
+                    setTimeout(() => {
+                        notification.classList.remove('translate-x-full');
+                        notification.classList.add('translate-x-0');
+                    }, 10);
+                    
+                    // Auto remove after delay
+                    setTimeout(() => {
+                        notification.classList.remove('translate-x-0');
+                        notification.classList.add('translate-x-full');
+                        
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 500);
+                    }, 5000);
+                }
+                
+            });  // End of DOMContentLoaded
+        }  // End of loginScriptLoaded check
+    </script>
+    
+    <!-- DESHABILITADO footer include que puede cargar scripts adicionales -->
+    <!-- {% include 'footer.html' %} -->
 </body>
 </html>

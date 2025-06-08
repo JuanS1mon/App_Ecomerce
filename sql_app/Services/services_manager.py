@@ -1,13 +1,19 @@
+# Configuración de logging
+
+
+
+
+
+from typing import Any, Dict, List, Optional
+import logging
 import os
 import sys
+
+from fastapi import APIRouter, FastAPI
 import importlib
 import importlib.util
 import inspect
-from typing import Dict, List, Optional, Any
-import logging
-from fastapi import FastAPI, APIRouter
 
-# Configuración de logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("services_manager")
 
@@ -275,11 +281,7 @@ class ServicesManager:
         
         # Crear tablas en la base de datos
         try:
-try:
-    from ...db.database import Base, engine
-except ImportError:
-    from sql_app.db.database import Base, engine
-            Base.metadata.create_all(bind=engine)
+from db.database import Base, engine            Base.metadata.create_all(bind=engine)
             logger.info(f"Tablas creadas para {models_imported} modelos importados")
         except Exception as e:
             logger.error(f"Error al crear tablas: {str(e)}")
@@ -528,11 +530,7 @@ except ImportError:
                         importlib.import_module(module_path)
                     
                     # Crear tablas después de importar el modelo
-try:
-    from ...db.database import Base, engine
-except ImportError:
-    from sql_app.db.database import Base, engine
-                    Base.metadata.create_all(bind=engine)
+from db.database import Base, engine                    Base.metadata.create_all(bind=engine)
                     logger.info(f"Tablas para {service_id} creadas correctamente")
                 except ImportError:
                     logger.info(f"No se encontró modelo para {service_id}, continuando")

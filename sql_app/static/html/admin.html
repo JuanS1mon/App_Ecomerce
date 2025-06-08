@@ -7,8 +7,49 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
+    <!-- Interceptor de autenticación - DEBE cargarse ANTES que otros scripts -->    <!-- INTERCEPTOR DE AUTENTICACIÓN EMBEBIDO PARA ADMIN HTML -->
+    <script>
+        if (!window.AUTH_INTERCEPTOR_LOADED) {
+            console.log('🔐 Cargando interceptor embebido para admin html...');
+            const AUTH_CONFIG = {
+                TOKEN_KEY: 'access_token',
+                EXCLUDED_PATHS: ['/login', '/logout', '/loginpage', '/registerpage', '/static']
+            };
+            
+            const originalFetch = window.fetch;
+            window.fetch = function(url, options = {}) {
+                const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+                const shouldIncludeToken = token && 
+                    !AUTH_CONFIG.EXCLUDED_PATHS.some(path => url.includes(path));
+                
+                if (shouldIncludeToken) {
+                    options.headers = options.headers || {};
+                    const hasAuthHeader = Object.keys(options.headers).some(
+                        key => key.toLowerCase() === 'authorization'
+                    );
+                    
+                    if (!hasAuthHeader) {
+                        options.headers['Authorization'] = `Bearer ${token}`;
+                        console.log('🔐 Token agregado (admin html):', url);
+                    }
+                }
+                
+                return originalFetch.call(this, url, options)
+                    .then(response => {
+                        if (response.status === 401 && shouldIncludeToken) {
+                            console.log('🚨 Token rechazado, redirigiendo a login');
+                            localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+                            window.location.href = '/loginpage';
+                        }
+                        return response;
+                    });
+            };
+            
+            window.AUTH_INTERCEPTOR_LOADED = true;
+            console.log('✅ Interceptor admin html embebido cargado');
+        }
+    </script>
     <!-- Sistema de componentes y navegación -->
     <script src="/static/js/components.js"></script>
     <style>

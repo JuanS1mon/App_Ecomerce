@@ -1,9 +1,9 @@
+# Imports de terceros
 from sqlalchemy import Column, Integer, NVARCHAR, Table
-try:
-    from ...db.database import Base
-except ImportError:
-    from sql_app.db.database import Base
-class roles(Base):
+
+# Imports del proyecto
+from ...database import Baseclass roles(Base):
+
     __tablename__ = "Roles"
     
     id = Column(Integer, primary_key=True, index=True)

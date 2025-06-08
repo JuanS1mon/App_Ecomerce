@@ -5,11 +5,7 @@ Modelo SQLAlchemy para el sistema de tickets
 from sqlalchemy import Column, Integer, String, Text, DateTime, JSON
 from datetime import datetime
 
-try:
-    from ...database import Base
-except ImportError:
-    from sql_app.db.database import Base
-
+from ...database import Base
 class Ticket(Base):
     __tablename__ = 'tickets'
 

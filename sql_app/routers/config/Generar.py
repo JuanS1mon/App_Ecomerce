@@ -1,26 +1,35 @@
 #generar.py
-from fastapi import APIRouter, status, Depends, Request
-from starlette.responses import FileResponse
-import os
-import fileinput
-import logging
-import traceback
+
+
+
+
+
+
+
+
+
+
 from fastapi.security import OAuth2PasswordBearer
+from starlette.responses import FileResponse
+import logging
+import os
 
-from Services.security.security import get_current_user
-
-from .Generar_Funciones.Generar_Routes import generate_route
 from .Generar_Funciones.Generar_Cruds import generate_crud_functions
-from .Generar_Funciones.Generar_Schema import generate_schema
-from .Generar_Funciones.Generar_Models import generate_model
 from .Generar_Funciones.Generar_Html import generate_html_form
-from .Generar_Funciones.Generar_Test import generate_tests
 from .Generar_Funciones.Generar_Html_service import generate_html_for_service
+from .Generar_Funciones.Generar_Models import generate_model
+from .Generar_Funciones.Generar_Routes import generate_route
+from .Generar_Funciones.Generar_Schema import generate_schema
+from .Generar_Funciones.Generar_Test import generate_tests
+from fastapi import APIRouter, Depends, Request, status
 from fastapi.templating import Jinja2Templates
+import fileinput
+import traceback
 
+from sql_app.Services.security.security import get_current_user
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-templates = Jinja2Templates(directory="static/html")
+templates = Jinja2Templates(directory="sql_app/static")
 
 # Configurar logger para este módulo
 logger = logging.getLogger(__name__)
@@ -134,7 +143,7 @@ def generate_and_save_service(module_name, field_names, field_types):
         html_content, js_content = generate_html_for_service(module_name, field_names, field_types)
         
         # Crear directorio específico para el módulo dentro de static
-        module_dir = f"static/{module_name}"
+        module_dir = f"sql_app/static/{module_name}"
         os.makedirs(module_dir, exist_ok=True)
         
         # Guardar el archivo HTML en la carpeta específica del módulo
@@ -340,7 +349,7 @@ def generate_and_save_model(module_name, field_names, field_types):
 
 def save_html_form(module_name, html_content):
     import os
-    output_dir = "static/html"
+    output_dir = "sql_app/static/html"
     os.makedirs(output_dir, exist_ok=True)  # Crear el directorio si no existe
 
     file_path = f"{output_dir}/{module_name}.html"
