@@ -77,15 +77,15 @@ async def get_optional_user(request: Request, db: Session = Depends(get_db)):
                 logger.info(f"Usuario no encontrado en la base de datos: {username}")
                 return None
             
-            # Convertir a UserDB si es necesario
-            if isinstance(user, dict):
+            # Convertir a UserDB si es necesario            if isinstance(user, dict):
                 # Extraer los roles si existen
                 roles_data = user.get("roles", [])
                 roles = []
-                  # Convertir roles a objetos Role si son diccionarios
+                
+                # Convertir roles a objetos Role si son diccionarios
                 for role_data in roles_data:
                     if isinstance(role_data, dict):
-                        from db.schemas.config.Usuarios import Role
+                        from sql_app.db.schemas.config.Usuarios import Role
                         roles.append(Role(**role_data))
                     else:
                         roles.append(role_data)

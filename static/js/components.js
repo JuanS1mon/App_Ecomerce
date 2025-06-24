@@ -344,7 +344,7 @@ function executeComponentScripts(container) {
         const script = scripts[i];
         const scriptCode = script.innerText || script.textContent;
         try {
-            eval(scriptCode);
+            eval(scriptCode); // Evaluar el código del script
         } catch (e) {
             console.error('Error ejecutando script en componente:', e);
         }

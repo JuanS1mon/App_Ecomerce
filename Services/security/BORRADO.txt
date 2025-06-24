@@ -1,0 +1,2 @@
+# Carpeta eliminada: utils.py, roles_basicos.py, hybrid_validation.py, rate_limit.py y __pycache__
+# Solo quedan los archivos migrados a security/

@@ -63,8 +63,8 @@ class SecurityConfig:
     ALLOWED_IPS: List[str] = [ip.strip() for ip in os.getenv("ALLOWED_IPS", "").split(",") if ip.strip()]
     BLOCKED_USER_AGENTS: List[str] = [ua.strip() for ua in os.getenv("BLOCKED_USER_AGENTS", "").split(",") if ua.strip()]
     
-    # URL base de la aplicación
-    BASE_URL: str = os.getenv("BASE_URL", "http://localhost:8000")
+    # URL base de la aplicación (usa FRONTEND_URL si existe, sino BASE_URL)
+    BASE_URL: str = os.getenv("FRONTEND_URL", os.getenv("BASE_URL", "http://localhost:8000"))
     
     @classmethod
     def validate_config(cls) -> bool:

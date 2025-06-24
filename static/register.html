@@ -6,7 +6,11 @@
     <title>Registro de Usuario</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="/static/js/components.js"></script>
+    <script src="/static/js/                // Verificar caracteres especiales
+                if (!/[!@#$%^&*()_\-+=\[\]{}|\\:";?/><,.`~]/.test(password)) {
+                    validationFailed = true;
+                    errorMessage = 'La contraseña debe contener al menos un carácter especial (!@#$%^&*()_-+=[]{}|\\:";?/><,.`~).';
+                }nents.js"></script>
     <style>
         /* Estética actualizada similar al panel de administración */
         .gradient-bg {
@@ -170,19 +174,45 @@
                         <input type="text" id="usuario" name="usuario" class="input-with-icon mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                     </div>
                 </div>
-                
-                <div class="form-field relative">
-                    <label for="clave" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-                    <div class="relative">
-                        <span class="form-input-icon">
-                            <i class="fas fa-lock"></i>
-                        </span>
-                        <input type="password" id="clave" name="clave" class="input-with-icon mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                        <button type="button" id="toggle-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <i class="fas fa-eye"></i>
-                        </button>
+                  <div class="form-field relative">
+                    <label for="clave" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                    <div class="mt-1">
+                        <input id="clave" name="clave" type="password" required class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Mínimo 8 caracteres con letras y números</p>
+                    <p class="text-xs text-gray-600 mt-1 bg-yellow-100 p-2 rounded-md border border-yellow-200">
+                        <strong>Requisitos de contraseña:</strong>
+                        <br>• Mínimo 8 caracteres
+                        <br>• Al menos una letra <strong class="text-red-600">MAYÚSCULA</strong>
+                        <br>• Al menos una letra minúscula
+                        <br>• Al menos un número
+                        <br>• <strong class="text-red-600">Al menos un carácter especial</strong> (!@#$%^&*()_-+=[]{}|\\:";?/><,`~)
+                    </p>
+                    
+                    <div id="password-strength" class="mt-2">
+                        <div class="flex items-center mb-1">
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div id="password-strength-bar" class="h-2 rounded-full bg-red-500" style="width: 0%"></div>
+                            </div>
+                            <span id="password-strength-text" class="ml-2 text-xs text-gray-500">Débil</span>
+                        </div>
+                        <ul class="text-xs text-gray-500 mt-1 space-y-1">
+                            <li id="check-length" class="flex items-center">
+                                <i class="fas fa-times-circle text-red-500 mr-1"></i> Al menos 8 caracteres
+                            </li>
+                            <li id="check-uppercase" class="flex items-center font-medium">
+                                <i class="fas fa-times-circle text-red-500 mr-1"></i> <span class="text-red-600">Al menos una letra MAYÚSCULA</span>
+                            </li>
+                            <li id="check-lowercase" class="flex items-center">
+                                <i class="fas fa-times-circle text-red-500 mr-1"></i> Al menos una letra minúscula
+                            </li>
+                            <li id="check-number" class="flex items-center">
+                                <i class="fas fa-times-circle text-red-500 mr-1"></i> Al menos un número
+                            </li>
+                            <li id="check-special" class="flex items-center font-medium">
+                                <i class="fas fa-times-circle text-red-500 mr-1"></i> <span class="text-red-600">Al menos un carácter especial</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 
                 <div class="form-field relative">
@@ -269,9 +299,7 @@
                 <p>Tus datos están seguros y protegidos según nuestra política de privacidad.</p>
             </div>
         </div>
-    </div>
-
-    <script>
+    </div>    <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Toggle password visibility
             const togglePassword = document.getElementById('toggle-password');
@@ -288,12 +316,136 @@
                 });
             }
             
-            // Form submission
+            // Password strength checker
+            if (passwordInput) {
+                const strengthBar = document.getElementById('password-strength-bar');
+                const strengthText = document.getElementById('password-strength-text');
+                const checkLength = document.getElementById('check-length');
+                const checkUppercase = document.getElementById('check-uppercase');
+                const checkLowercase = document.getElementById('check-lowercase');
+                const checkNumber = document.getElementById('check-number');
+                const checkSpecial = document.getElementById('check-special');
+                
+                passwordInput.addEventListener('input', function() {
+                    const password = this.value;
+                    let strength = 0;
+                    let maxStrength = 5; // Aumentado a 5 para incluir el carácter especial
+                    
+                    // Check length (min 8 characters)
+                    const hasLength = password.length >= 8;
+                    if (hasLength) {
+                        strength++;
+                        checkLength.innerHTML = '<i class="fas fa-check-circle text-green-500 mr-1"></i> Al menos 8 caracteres';
+                    } else {
+                        checkLength.innerHTML = '<i class="fas fa-times-circle text-red-500 mr-1"></i> Al menos 8 caracteres';
+                    }
+                    
+                    // Check uppercase
+                    const hasUppercase = /[A-Z]/.test(password);
+                    if (hasUppercase) {
+                        strength++;
+                        checkUppercase.innerHTML = '<i class="fas fa-check-circle text-green-500 mr-1"></i> <span>Al menos una letra MAYÚSCULA</span>';
+                    } else {
+                        checkUppercase.innerHTML = '<i class="fas fa-times-circle text-red-500 mr-1"></i> <span class="text-red-600 font-medium">Al menos una letra MAYÚSCULA</span>';
+                    }
+                    
+                    // Check lowercase
+                    const hasLowercase = /[a-z]/.test(password);
+                    if (hasLowercase) {
+                        strength++;
+                        checkLowercase.innerHTML = '<i class="fas fa-check-circle text-green-500 mr-1"></i> Al menos una letra minúscula';
+                    } else {
+                        checkLowercase.innerHTML = '<i class="fas fa-times-circle text-red-500 mr-1"></i> Al menos una letra minúscula';
+                    }
+                    
+                    // Check numbers
+                    const hasNumber = /[0-9]/.test(password);
+                    if (hasNumber) {
+                        strength++;
+                        checkNumber.innerHTML = '<i class="fas fa-check-circle text-green-500 mr-1"></i> Al menos un número';
+                    } else {
+                        checkNumber.innerHTML = '<i class="fas fa-times-circle text-red-500 mr-1"></i> Al menos un número';
+                    }
+                    
+                    // Check special characters
+                    const hasSpecial = /[!@#$%^&*()_\-+=\[\]{}|\\:";?/><,.`~]/.test(password);
+                    if (hasSpecial) {
+                        strength++;
+                        checkSpecial.innerHTML = '<i class="fas fa-check-circle text-green-500 mr-1"></i> <span>Al menos un carácter especial</span>';
+                    } else {
+                        checkSpecial.innerHTML = '<i class="fas fa-times-circle text-red-500 mr-1"></i> <span class="text-red-600 font-medium">Al menos un carácter especial</span>';
+                    }
+                    
+                    // Update strength bar and text
+                    const percentage = (strength / maxStrength) * 100;
+                    strengthBar.style.width = `${percentage}%`;
+                    
+                    if (percentage <= 25) {
+                        strengthBar.className = 'h-2 rounded-full bg-red-500';
+                        strengthText.textContent = 'Muy débil';
+                        strengthText.className = 'ml-2 text-xs text-red-500';
+                    } else if (percentage <= 50) {
+                        strengthBar.className = 'h-2 rounded-full bg-orange-500';
+                        strengthText.textContent = 'Débil';
+                        strengthText.className = 'ml-2 text-xs text-orange-500';
+                    } else if (percentage <= 75) {
+                        strengthBar.className = 'h-2 rounded-full bg-yellow-500';
+                        strengthText.textContent = 'Media';
+                        strengthText.className = 'ml-2 text-xs text-yellow-600';
+                    } else {
+                        strengthBar.className = 'h-2 rounded-full bg-green-500';
+                        strengthText.textContent = 'Fuerte';
+                        strengthText.className = 'ml-2 text-xs text-green-500';
+                    }
+                });
+            }
+              // Form submission
             document.getElementById('register_form').addEventListener('submit', function(event) {
-                event.preventDefault();                // Validar la aceptación de términos
+                event.preventDefault();
+                
+                // Validar la aceptación de términos
                 const aceptaTerminos = document.getElementById('acepta_terminos');
                 if (!aceptaTerminos.checked) {
                     showNotification('Debes aceptar los términos y condiciones para continuar.', 'error');
+                    return;
+                }
+                
+                // Validar la contraseña
+                const password = document.getElementById('clave').value;
+                let validationFailed = false;
+                let errorMessage = '';
+                
+                // Verificar longitud mínima
+                if (password.length < 8) {
+                    validationFailed = true;
+                    errorMessage = 'La contraseña debe tener al menos 8 caracteres.';
+                }
+                
+                // Verificar mayúscula
+                if (!/[A-Z]/.test(password)) {
+                    validationFailed = true;
+                    errorMessage = 'La contraseña debe contener al menos una letra mayúscula.';
+                }
+                
+                // Verificar minúscula
+                if (!/[a-z]/.test(password)) {
+                    validationFailed = true;
+                    errorMessage = 'La contraseña debe contener al menos una letra minúscula.';
+                }
+                
+                // Verificar número
+                if (!/[0-9]/.test(password)) {
+                    validationFailed = true;
+                    errorMessage = 'La contraseña debe contener al menos un número.';
+                }
+                  // Verificar caracteres especiales
+                if (!/[!@#$%^&*()_\-+=\[\]{}|\\:"';?/>.<,`~]/.test(password)) {
+                    validationFailed = true;
+                    errorMessage = "La contraseña debe contener al menos un carácter especial (!@#$%^&*()_-+=[]{}|\\:\"';?/>.<,`~).";
+                }
+                
+                if (validationFailed) {
+                    showNotification(errorMessage, 'error');
                     return;
                 }
                 
@@ -305,7 +457,7 @@
                 
                 // Show loading state
                 submitButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Procesando...';
-                submitButton.disabled = true;                // Obtener datos del formulario
+                submitButton.disabled = true;// Obtener datos del formulario
                 let formData = new FormData(document.getElementById('register_form'));
                 let codigoPais = formData.get('codigo_pais');
                 let telefono = formData.get('telefono');
@@ -333,7 +485,7 @@
                     
                     if (response.status === 422) {
                         return response.json().then(errorData => {
-                            let errorMessage = 'Datos de registro inválidos. ';
+                let errorMessage = '';
                             
                             // Mostrar error completo en la consola para depuración
                             console.error("Error 422 completo:", JSON.stringify(errorData));
@@ -343,13 +495,87 @@
                                     if (error.loc && error.msg) {
                                         // Formatear mensaje de error
                                         const campo = error.loc[error.loc.length - 1];
-                                        errorMessage += `${campo}: ${error.msg}. `;
+                                        
+                                        // Mensaje específico para errores de contraseña
+                                        if (campo === "clave") {
+                                            errorMessage = "La contraseña no cumple con los requisitos: debe tener al menos 8 caracteres, una letra MAYÚSCULA, una letra minúscula, un número y un carácter especial (!@#$%^&*()_-+=[]{}|\\:\"';?/>.<,`~).";
+                                            // Resaltar visualmente el campo de contraseña para indicar el error
+                                            document.getElementById('clave').classList.add('border-red-500', 'ring-red-500');
+                                            // Desplazarse al campo de contraseña
+                                            document.getElementById('clave').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                            
+                                            // Mostrar el validador de contraseña y verificar qué requisitos no se cumplen
+                                            document.getElementById('password-strength').style.display = 'block';
+                                            const password = document.getElementById('clave').value;
+                                            
+                                            // Revisar cada requisito individualmente
+                                            const hasLength = password.length >= 8;
+                                            const hasUppercase = /[A-Z]/.test(password);
+                                            const hasLowercase = /[a-z]/.test(password);
+                                            const hasNumber = /[0-9]/.test(password);
+                                            const hasSpecial = /[!@#$%^&*()_\-+=\[\]{}|\\:";?/><,.`~]/.test(password);
+                                            
+                                            // Actualizar los indicadores visuales
+                                            document.getElementById('check-length').innerHTML = hasLength 
+                                                ? '<i class="fas fa-check-circle text-green-500 mr-1"></i> Al menos 8 caracteres' 
+                                                : '<i class="fas fa-times-circle text-red-500 mr-1"></i> Al menos 8 caracteres';
+                                            
+                                            document.getElementById('check-uppercase').innerHTML = hasUppercase 
+                                                ? '<i class="fas fa-check-circle text-green-500 mr-1"></i> <span>Al menos una letra MAYÚSCULA</span>' 
+                                                : '<i class="fas fa-times-circle text-red-500 mr-1"></i> <span class="text-red-600 font-medium">Al menos una letra MAYÚSCULA</span>';
+                                            
+                                            document.getElementById('check-lowercase').innerHTML = hasLowercase 
+                                                ? '<i class="fas fa-check-circle text-green-500 mr-1"></i> Al menos una letra minúscula' 
+                                                : '<i class="fas fa-times-circle text-red-500 mr-1"></i> Al menos una letra minúscula';
+                                            
+                                            document.getElementById('check-number').innerHTML = hasNumber 
+                                                ? '<i class="fas fa-check-circle text-green-500 mr-1"></i> Al menos un número' 
+                                                : '<i class="fas fa-times-circle text-red-500 mr-1"></i> Al menos un número';
+                                            
+                                            document.getElementById('check-special').innerHTML = hasSpecial 
+                                                ? '<i class="fas fa-check-circle text-green-500 mr-1"></i> <span>Al menos un carácter especial</span>' 
+                                                : '<i class="fas fa-times-circle text-red-500 mr-1"></i> <span class="text-red-600 font-medium">Al menos un carácter especial</span>';
+                                            
+                                            // Actualizar la barra de fortaleza
+                                            const strength = (hasLength ? 1 : 0) + (hasUppercase ? 1 : 0) + (hasLowercase ? 1 : 0) + (hasNumber ? 1 : 0) + (hasSpecial ? 1 : 0);
+                                            const strengthPercent = (strength / 5) * 100; // Cambiado de 4 a 5
+                                            document.getElementById('password-strength-bar').style.width = `${strengthPercent}%`;
+                                            
+                                            // Actualizar color y texto según fortaleza
+                                            const strengthBar = document.getElementById('password-strength-bar');
+                                            const strengthText = document.getElementById('password-strength-text');
+                                            
+                                            if (strength === 0) {
+                                                strengthBar.className = 'h-2 rounded-full bg-gray-200';
+                                                strengthText.textContent = 'Sin contraseña';
+                                            } else if (strength < 2) {
+                                                strengthBar.className = 'h-2 rounded-full bg-red-500';
+                                                strengthText.textContent = 'Débil';
+                                            } else if (strength < 4) {
+                                                strengthBar.className = 'h-2 rounded-full bg-yellow-500';
+                                                strengthText.textContent = 'Moderada';
+                                            } else {
+                                                strengthBar.className = 'h-2 rounded-full bg-green-500';
+                                                strengthText.textContent = 'Fuerte';
+                                            }
+                                            
+                                            // Enfocar al campo de contraseña
+                                            document.getElementById('clave').focus();
+                                            
+                                        } else {
+                                            errorMessage += `${campo}: ${error.msg}. `;
+                                        }
                                         console.log(`Error en campo ${campo}: ${error.msg}`);
                                     }
                                 });
                             } else if (errorData.detail) {
                                 errorMessage = errorData.detail;
                                 console.log(`Error detallado: ${errorData.detail}`);
+                            }
+                            
+                            // Si no hay mensaje específico, usar uno genérico
+                            if (!errorMessage) {
+                                errorMessage = 'Datos de registro inválidos. Por favor, verifica la información.';
                             }
                             
                             showNotification(errorMessage, 'error');

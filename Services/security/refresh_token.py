@@ -1,6 +1,6 @@
 # Imports de bibliotecas estándar
 from datetime import datetime, timedelta, timezone
-from db.crud.config.Usuarios import get_user_from_db
+from sql_app.db.crud.config.Usuarios import get_user_from_db
 from dotenv import load_dotenv
 from typing import Dict, Optional
 import logging

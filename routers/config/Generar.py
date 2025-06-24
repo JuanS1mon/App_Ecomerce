@@ -1,14 +1,4 @@
 #generar.py
-
-
-
-
-
-
-
-
-
-
 from fastapi.security import OAuth2PasswordBearer
 from starlette.responses import FileResponse
 import logging

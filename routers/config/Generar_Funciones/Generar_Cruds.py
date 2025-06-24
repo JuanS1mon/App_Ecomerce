@@ -25,13 +25,13 @@ def generate_crud_functions(module_name, field_names, field_types):
         'datetime': 'datetime',
         # Agrega más mapeos según sea necesario
     }
-
     primary_key_python_type = type_mapping.get(primary_key_type, 'str')  # Por defecto 'str' si no se encuentra
-
+    
     code = f'''from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException, status
-from db.models.{module_file_name} import {module_class_name}import logging
+from sql_app.db.models.{module_file_name} import {module_class_name}
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -117,9 +117,7 @@ logger = logging.getLogger(__name__)
         # Actualizar los campos del registro existente
         for key, value in {module_file_name}_data.items():
             if key != '{primary_key}':  # Evitar actualizar la clave primaria
-                setattr(record, key, value)
-
-        db.commit()
+                setattr(record, key, value)        db.commit()
         db.refresh(record)
         return record
     except SQLAlchemyError as e:

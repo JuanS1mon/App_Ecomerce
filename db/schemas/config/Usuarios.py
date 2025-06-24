@@ -126,3 +126,115 @@ class RoleAssignment(BaseModel):
 class RoleCreate(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
+
+# Esquemas adicionales necesarios para el router
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class Message(BaseModel):
+    message: str
+
+class UserCreate(BaseModel):
+    usuario: str
+    nombre: str
+    mail: str
+    clave: str
+    telefono: Optional[str] = None
+
+class UserLogin(BaseModel):
+    usuario: str
+    clave: str
+
+class PasswordResetResponse(BaseModel):
+    message: str
+    success: bool
+
+class ActivationResponse(BaseModel):
+    message: str
+    success: bool
+
+class ConfirmPasswordReset(BaseModel):
+    token: str
+    new_password: str
+    confirm_password: str
+
+class UserRegistration(BaseModel):
+    nombre: str
+    usuario: str
+    clave: str
+    mail: str
+    telefono: Optional[str] = None
+    acepta_terminos: bool = True
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
+
+class UserBase(BaseModel):
+    usuario: str
+    nombre: str
+    mail: str
+    telefono: Optional[str] = None
+
+class UserPublic(BaseModel):
+    codigo: int
+    usuario: str
+    nombre: str
+    mail: str
+    activo: bool
+    
+    class Config:
+        from_attributes = True
+
+class UserList(BaseModel):
+    usuarios: List[UserPublic]
+    total: int
+
+class UserUpdate(BaseModel):
+    nombre: Optional[str] = None
+    mail: Optional[str] = None
+    telefono: Optional[str] = None
+
+class UserUpdateByAdmin(BaseModel):
+    nombre: Optional[str] = None
+    mail: Optional[str] = None
+    telefono: Optional[str] = None
+    activo: Optional[bool] = None
+
+class UserUpdateByUser(BaseModel):
+    nombre: Optional[str] = None
+    mail: Optional[str] = None
+    telefono: Optional[str] = None
+
+class UserActivate(BaseModel):
+    token: str
+
+class AdminUpdate(BaseModel):
+    nombre: Optional[str] = None
+    mail: Optional[str] = None
+    activo: Optional[bool] = None
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+class PasswordChange(BaseModel):
+    password_actual: str
+    password_nueva: str
+
+class EmailRequest(BaseModel):
+    email: str
+
+class PhoneRequest(BaseModel):
+    telefono: str
+
+class ProfileUpdate(BaseModel):
+    nombre: Optional[str] = None
+    mail: Optional[str] = None
+    telefono: Optional[str] = None
+
+class ResendActivationRequest(BaseModel):
+    usuario: str
+
+class SecurePasswordResetRequest(BaseModel):
+    email: str

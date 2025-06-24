@@ -413,46 +413,50 @@
         // Intentar obtener datos del usuario actual
         fetchCurrentUser();
     }
-    
-    /**
+      /**
      * Obtiene información del usuario actual si está disponible
      */
     function fetchCurrentUser() {
-        // Actualizar inicial del usuario si está disponible en window.currentUser
+        // ✅ USAR EL SISTEMA CENTRALIZADO EN LUGAR DE LLAMADA DUPLICADA
         const userInitial = document.getElementById('user-initial');
         const userName = document.getElementById('user-name');
         const userEmail = document.getElementById('user-email');
         
+        // Si ya tenemos datos del usuario en window.currentUser, usarlos
         if (window.currentUser && window.currentUser.nombre) {
-            // Si hay datos del usuario en window.currentUser
-            if (userInitial) userInitial.textContent = window.currentUser.nombre.charAt(0).toUpperCase();
-            if (userName) userName.textContent = window.currentUser.nombre;
-            if (userEmail && window.currentUser.email) userEmail.textContent = window.currentUser.email;
+            updateUserElements(userInitial, userName, userEmail, window.currentUser);
+            return;
+        }
+        
+        // Si existe la función loadCurrentUser del sistema centralizado, usarla
+        if (typeof window.loadCurrentUser === 'function') {
+            console.log('🔄 Navbar: Usando sistema centralizado de usuario');
+            window.loadCurrentUser().then(data => {
+                updateUserElements(userInitial, userName, userEmail, data);
+            }).catch(error => {
+                console.warn('⚠️ Navbar: Error al cargar usuario:', error);
+            });
         } else {
-            // Intentar obtener datos del usuario desde la API
-            fetch('/usuarios/current', { 
-                credentials: 'include',
-                headers: { 'Accept': 'application/json' }
-            })
-            .then(response => {
-                if (response.ok) return response.json();
-                throw new Error('No se pudo obtener la información del usuario');
-            })
-            .then(data => {
-                console.log('Datos de usuario obtenidos:', data);
-                // Guardar para uso futuro
-                window.currentUser = data;
-                
-                // Actualizar interfaz
-                if (userInitial && data.nombre) {
-                    userInitial.textContent = data.nombre.charAt(0).toUpperCase();
-                }
-                if (userName && data.nombre) {
-                    userName.textContent = data.nombre;
-                }
-                if (userEmail && data.email) {
-                    userEmail.textContent = data.email;
-                }
+            // Si no hay sistema centralizado, escuchar el evento userLoaded
+            document.addEventListener('userLoaded', function(event) {
+                updateUserElements(userInitial, userName, userEmail, event.detail);
+            });
+        }
+    }
+    
+    /**
+     * Actualiza los elementos de la UI con los datos del usuario
+     */
+    function updateUserElements(userInitial, userName, userEmail, data) {
+        if (userInitial && data.nombre) {
+            userInitial.textContent = data.nombre.charAt(0).toUpperCase();
+        }
+        if (userName && data.nombre) {
+            userName.textContent = data.nombre;
+        }
+        if (userEmail && data.email) {
+            userEmail.textContent = data.email;
+        }
 
                 // Configurar manejo de cierre de sesión
                 const logoutForm = document.getElementById('logout-form');

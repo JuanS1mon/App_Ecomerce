@@ -42,6 +42,9 @@ PASSWORD = os.getenv('PASSWORD_EMAIL')  # Corregido el nombre de la variable
 MAIL_FROM = os.getenv('MAIL_FROM')
 MAIL_FROM_NAME = os.getenv('MAIL_FROM_NAME')
 
+# Validación centralizada para main.py
+MAIL_CONFIG_OK = all([SMTP_SERVER, SMTP_PORT, USERNAME, PASSWORD, MAIL_FROM])
+
 # Validar que las variables de entorno estén configuradas
 # Comentado temporalmente para evitar errores de inicio
 # if not all([SMTP_SERVER, USERNAME, PASSWORD]):
@@ -49,19 +52,18 @@ MAIL_FROM_NAME = os.getenv('MAIL_FROM_NAME')
 
 # Validación mejorada que permite el funcionamiento sin configuración de correo
 if not all([SMTP_SERVER, USERNAME, PASSWORD]):
-    print("⚠️  ADVERTENCIA: Variables de entorno de correo no configuradas.")
-    print("   El sistema funcionará pero las funciones de correo estarán deshabilitadas.")
-    print("   Para habilitar correo, configura: SMTP_SERVER, USERNAME_EMAIL, PASSWORD_EMAIL en .env")
-    print(f"   Debug - SMTP_SERVER: {SMTP_SERVER}")
-    print(f"   Debug - USERNAME: {USERNAME}")
-    print(f"   Debug - PASSWORD: {'*' * len(PASSWORD) if PASSWORD else 'None'}")
-    print(f"   Debug - Ruta .env: {env_path}")
-    
+    # print("⚠️  ADVERTENCIA: Variables de entorno de correo no configuradas.")
+    # print("   El sistema funcionará pero las funciones de correo estarán deshabilitadas.")
+    # print("   Para habilitar correo, configura: SMTP_SERVER, USERNAME_EMAIL, PASSWORD_EMAIL en .env")
+    # print(f"   Debug - SMTP_SERVER: {SMTP_SERVER}")
+    # print(f"   Debug - USERNAME: {USERNAME}")
+    # print(f"   Debug - PASSWORD: {'*' * len(PASSWORD) if PASSWORD else 'None'}")
+    # print(f"   Debug - Ruta .env: {env_path}")
     # Deshabilitar funciones de correo si no están configuradas
     MAIL_ENABLED = False
 else:
     MAIL_ENABLED = True
-    print("✅ Configuración de correo cargada correctamente")
+    # print("✅ Configuración de correo cargada correctamente")
 
 # Crear el router de FastAPI
 router = APIRouter(
@@ -384,3 +386,6 @@ async def enviar_email_con_adjunto_upload(
             status_code=500, 
             detail=f"Error al enviar el correo con adjuntos: {str(e)}"
         )
+
+# Al final del archivo, para exportar explícitamente MAIL_CONFIG_OK
+__all__ = ["router", "MAIL_CONFIG_OK"]
