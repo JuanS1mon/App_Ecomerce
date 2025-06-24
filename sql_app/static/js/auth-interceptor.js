@@ -269,11 +269,12 @@ window.debugAuthInterceptor = function() {
     console.log('🔧 Configuración AUTH_CONFIG:', AUTH_CONFIG);
     console.log('==========================================');
     
-    // Test rápido del interceptor
+    // Test rápido del interceptor (con credenciales incluidas)
     console.log('🧪 Ejecutando test rápido del interceptor...');
     fetch('/usuarios/current', {
         method: 'GET',
-        headers: {'Cache-Control': 'no-cache'}
+        headers: {'Cache-Control': 'no-cache'},
+        credentials: 'include'  // ✅ Incluir cookies para autenticación
     })
     .then(response => {
         console.log('📊 Respuesta del test:', response.status);

@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 import numpy as np
 import pandas as pd
 
-from sql_app.Services.security.security import get_current_user
+from sql_app.Services.security.jwt_auth import get_current_user
 from sql_app.db.crud.tablas import get_tables
 from sql_app.db.database import get_db
 from sql_app.db.schemas.config.Usuarios import UserDB
@@ -120,7 +120,7 @@ def guardar_resultados_sql(db: Session, user_name: str, resultados: Dict[str, An
         # No lanzar excepción para no interrumpir el flujo principal
 
 # Ajustar el directorio de las plantillas
-templates = Jinja2Templates(directory="sql_app/static")
+templates = Jinja2Templates(directory="sql_app/static/html")
 
 router = APIRouter(
     include_in_schema=False,  # Oculta todas las rutas de este router en la documentación
@@ -165,18 +165,97 @@ async def obtener_columnas(request: ColumnasRequest, db: Session = Depends(get_d
 
 
 @router.get("/admin", response_class=HTMLResponse)
-async def admin_page(request: Request, db: Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)):
-    # Ejemplo de datos para el gráfico
+async def admin_page(request: Request):
+    """
+    Página de análisis admin - se carga sin autenticación inicial.
+    La verificación de autenticación se hace en JavaScript del lado cliente.
+    """
+    print("=========== ACCESO A PÁGINA ANÁLISIS ADMIN ===========")
+    print("📄 Cargando analisis_admin.html sin verificación inicial")
+    print("🔍 La autenticación será verificada por JavaScript")
+    
+    # Cargar la página sin datos específicos del usuario
+    # El JavaScript se encargará de verificar el token y obtener datos
     chart_data = {
         "labels": ["2023-01-01", "2023-01-02", "2023-01-03"],
         "values": [10, 20, 30]
     }
-    return templates.TemplateResponse("analisis_admin.html", {"request": request, "user": current_user, "chart_data": chart_data})
+    return templates.TemplateResponse("analisis_admin.html", {
+        "request": request, 
+        "user": {"nombre": "Usuario", "roles": ["admin"]},
+        "chart_data": chart_data
+    })
+
+@router.get("/admin/data")
+async def admin_analisis_data(
+        current_user: UserDB = Depends(get_current_user),
+        db: Session = Depends(get_db)
+    ):
+    """
+    API protegida para obtener datos del usuario y análisis.
+    Requiere token JWT válido.
+    """
+    print("=========== API DE DATOS ANÁLISIS ADMIN ===========")
+    print(f"Usuario autenticado: {current_user.usuario}")
+    
+    # Aquí puedes agregar la lógica específica para obtener datos de análisis
+    chart_data = {
+        "labels": ["2023-01-01", "2023-01-02", "2023-01-03"],
+        "values": [10, 20, 30]
+    }
+    
+    return {
+        "user": {
+            "username": current_user.usuario,
+            "nombre": current_user.nombre,
+            "email": current_user.mail,
+            "roles": current_user.roles,
+            "activo": current_user.activo
+        },
+        "chart_data": chart_data,
+        "message": "Datos de análisis obtenidos exitosamente"
+    }
 
 @router.get("/nuevo", response_class=HTMLResponse)
-async def nuevo_analisis_page(request: Request, db: Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)):
+async def nuevo_analisis_page(request: Request):
+    """
+    Página de nuevo análisis - se carga sin autenticación inicial.
+    La verificación de autenticación se hace en JavaScript del lado cliente.
+    """
+    print("=========== ACCESO A PÁGINA NUEVO ANÁLISIS ===========")
+    print("📄 Cargando analisis_new.html sin verificación inicial")
+    
+    return templates.TemplateResponse("analisis_new.html", {
+        "request": request, 
+        "user": {"nombre": "Usuario", "roles": ["admin"]},
+        "tabla2": []  # Se cargará via API
+    })
+
+@router.get("/nuevo/data")
+async def nuevo_analisis_data(
+        current_user: UserDB = Depends(get_current_user),
+        db: Session = Depends(get_db)
+    ):
+    """
+    API protegida para obtener datos para nuevo análisis.
+    Requiere token JWT válido.
+    """
+    print("=========== API DE DATOS NUEVO ANÁLISIS ===========")
+    print(f"Usuario autenticado: {current_user.usuario}")
+    
     _, tabla2 = get_tables(db)  # Obtener tabla2
-    return templates.TemplateResponse("analisis_new.html", {"request": request, "user": current_user, "tabla2": tabla2})
+    
+    return {
+        "user": {
+            "username": current_user.usuario,
+            "nombre": current_user.nombre,
+            "email": current_user.mail,
+            "roles": current_user.roles,
+            "activo": current_user.activo
+        },
+        "tabla2": tabla2,
+        "message": "Datos para nuevo análisis obtenidos exitosamente"
+    }
 
 
 @router.post("/analizar_kpis")

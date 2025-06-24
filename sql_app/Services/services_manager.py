@@ -276,12 +276,12 @@ class ServicesManager:
                             importlib.import_module(full_module_path)
                         logger.info(f"Modelo importado: {full_module_path}")
                         models_imported += 1
-                    except Exception as e:
-                        logger.error(f"Error al importar modelo {full_module_path}: {str(e)}")
+                    except Exception as e:                        logger.error(f"Error al importar modelo {full_module_path}: {str(e)}")
         
         # Crear tablas en la base de datos
         try:
-from db.database import Base, engine            Base.metadata.create_all(bind=engine)
+            from sql_app.db.database import Base, engine
+            Base.metadata.create_all(bind=engine)
             logger.info(f"Tablas creadas para {models_imported} modelos importados")
         except Exception as e:
             logger.error(f"Error al crear tablas: {str(e)}")
@@ -528,9 +528,9 @@ from db.database import Base, engine            Base.metadata.create_all(bind=en
                         importlib.reload(sys.modules[module_path])
                     else:
                         importlib.import_module(module_path)
-                    
-                    # Crear tablas después de importar el modelo
-from db.database import Base, engine                    Base.metadata.create_all(bind=engine)
+                      # Crear tablas después de importar el modelo
+                    from sql_app.db.database import Base, engine
+                    Base.metadata.create_all(bind=engine)
                     logger.info(f"Tablas para {service_id} creadas correctamente")
                 except ImportError:
                     logger.info(f"No se encontró modelo para {service_id}, continuando")

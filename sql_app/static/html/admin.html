@@ -76,9 +76,8 @@
             <div class="gradient-bg text-white rounded-lg shadow-lg p-6 sm:p-10">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div>
-                        <h1 class="text-3xl font-bold mb-2">Panel de Administración</h1>
-                        <p class="text-white text-opacity-90">
-                            Bienvenido, <span class="font-semibold">{{ user.nombre }}</span>. Gestiona aplicaciones, usuarios y más desde este panel.
+                        <h1 class="text-3xl font-bold mb-2">Panel de Administración</h1>                        <p class="text-white text-opacity-90">
+                            Bienvenido, <span class="font-semibold" data-user-name>Usuario</span>. Gestiona aplicaciones, usuarios y más desde este panel.
                         </p>
                     </div>
                     <div class="mt-4 md:mt-0 bg-white bg-opacity-20 p-3 rounded-lg">
@@ -428,8 +427,64 @@
                         }
                     }
                 }
+            });        });
+    </script>    <!-- Script de verificación de token para acceso directo -->
+    <script>
+        (function() {
+            console.log('🔍 Verificando token para acceso directo al panel admin...');
+            
+            // Verificar si hay token en localStorage
+            const token = localStorage.getItem('access_token');
+            
+            if (!token) {
+                console.log('❌ No hay token - redirigiendo a login');
+                window.location.href = '/loginpage?error=token_required';
+                return;
+            }
+            
+            // Verificar que el token sea válido y obtener datos del usuario
+            fetch('/admin/data', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    console.log('❌ Token inválido - limpiando y redirigiendo');
+                    localStorage.removeItem('access_token');
+                    window.location.href = '/loginpage?error=token_invalid';
+                } else if (response.ok) {
+                    console.log('✅ Token válido - acceso autorizado al panel admin');
+                    return response.json();
+                } else {
+                    console.log('⚠️ Error obteniendo datos de usuario:', response.status);
+                    throw new Error('Error obteniendo datos');
+                }
+            })
+            .then(data => {
+                if (data && data.user) {
+                    console.log('✅ Datos de usuario obtenidos:', data.user);
+                    // Actualizar información del usuario en la página
+                    updateUserInfo(data.user);
+                }
+            })
+            .catch(error => {
+                console.log('❌ Error de conexión obteniendo datos:', error);
+                // En caso de error de red, mostrar mensaje pero no redirigir
+                console.log('⚠️ Continuando con datos por defecto');
             });
-        });
+        })();
+
+        function updateUserInfo(user) {
+            // Actualizar nombre del usuario en la página
+            const userNameElements = document.querySelectorAll('[data-user-name]');
+            userNameElements.forEach(element => {
+                element.textContent = user.nombre || user.username || 'Usuario';
+            });
+
+            // Actualizar otros elementos si es necesario
+            console.log('📝 Información de usuario actualizada en la página');
+        }
     </script>
 </body>
 </html>

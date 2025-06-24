@@ -65,10 +65,9 @@ def get_all_roles(db: Session, skip: int = 0, limit: int = 100):
 
 def delete_role(db: Session, role_id: int):
     """Elimina un rol"""
-    try:
-        # Primero eliminar todas las relaciones con usuarios
+    try:        # Primero eliminar todas las relaciones con usuarios
         db.execute(
-            text("DELETE FROM usuario_roles WHERE role_id = :role_id"),
+            text("DELETE FROM usuario_roles WHERE rol_id = :role_id"),
             {"role_id": role_id}
         )
         

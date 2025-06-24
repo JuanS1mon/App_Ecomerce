@@ -4,13 +4,38 @@
  * Este script debe incluirse antes de cualquier componente que necesite información del usuario
  */
 
+// Variable global para evitar llamadas duplicadas
+window._USER_LOADING = false;
+window._USER_LOADED = false;
+
 // Función para cargar los datos del usuario actual
 function loadCurrentUser() {
+    // ✅ PREVENIR LLAMADAS DUPLICADAS
+    if (window._USER_LOADING) {
+        console.log('🔄 Usuario ya cargándose, esperando...');
+        return new Promise((resolve) => {
+            const checkInterval = setInterval(() => {
+                if (window._USER_LOADED && window.currentUser) {
+                    clearInterval(checkInterval);
+                    resolve(window.currentUser);
+                } else if (!window._USER_LOADING) {
+                    clearInterval(checkInterval);
+                    loadCurrentUser().then(resolve);
+                }
+            }, 100);
+        });
+    }
+
     // Verificar si ya tenemos datos del usuario en window.currentUser
     if (window.currentUser && window.currentUser.autenticado) {
         console.log('Usando datos de usuario ya cargados');
+        window._USER_LOADED = true;
         return Promise.resolve(window.currentUser);
     }
+
+    // Marcar que estamos cargando para evitar duplicados
+    window._USER_LOADING = true;
+    console.log('🔄 Cargando datos de usuario...');
 
     // Si no hay datos, cargarlos desde la API
     return fetch('/usuarios/current', {
@@ -24,11 +49,14 @@ function loadCurrentUser() {
     .then(data => {
         // Guardar para uso futuro en toda la aplicación
         window.currentUser = data;
-        console.log('Datos de usuario obtenidos de API');
+        window._USER_LOADED = true;
+        window._USER_LOADING = false;
+        console.log('✅ Datos de usuario obtenidos de API');
         return data;
     })
     .catch(error => {
-        console.warn('Error al cargar usuario:', error);
+        window._USER_LOADING = false;
+        console.warn('⚠️ Error al cargar usuario:', error);
         // Crear un usuario genérico para evitar errores en la UI
         window.currentUser = {
             nombre: "Usuario",

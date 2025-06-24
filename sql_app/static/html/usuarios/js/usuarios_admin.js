@@ -63,35 +63,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 </td>
             </tr>
         `;
-        
+
         // Obtener parámetros de filtro
         const busqueda = searchUsuarios.value.trim();
         const rol = filterRol.value;
         const estado = filterEstado.value;
-        
+
         // Construir URL con parámetros de consulta
-        // CORREGIDO: Usar la ruta correcta del router sin /api/
         let url = '/usuarios_admin/usuarios?';
         if (busqueda) url += `search=${encodeURIComponent(busqueda)}&`;
         if (rol) url += `rol=${encodeURIComponent(rol)}&`;
         if (estado) url += `estado=${encodeURIComponent(estado)}&`;
-        
+
+        console.log("URL de la API:", url); // Depuración
+
         // Realizar la petición a la API
         fetch(url)
             .then(response => {
+                console.log("Estado de la respuesta:", response.status); // Depuración
+                if (response.status === 401) {
+                    console.error("Error de autorización: el usuario no tiene permisos.");
+                    throw new Error("No autorizado. Verifique sus permisos.");
+                }
                 if (!response.ok) {
-                    throw new Error('Error al cargar usuarios');
+                    throw new Error(`Error al cargar usuarios: ${response.statusText}`);
                 }
                 return response.json();
             })
             .then(data => {
-                usuarios = data.usuarios || [];
+                console.log("Datos recibidos:", data); // Depuración
+                if (!data || data.length === 0) {
+                    console.warn("No se encontraron usuarios en la respuesta de la API.");
+                }
+                usuarios = data;
                 renderizarUsuarios();
                 actualizarPaginacion();
             })
             .catch(error => {
-                console.error('Error:', error);
-                mostrarNotificacionError('Error al cargar los usuarios');
+                console.error('Error al cargar usuarios:', error);
+                mostrarNotificacionError(error.message);
                 usuariosTableBody.innerHTML = `
                     <tr>
                         <td colspan="7" class="px-6 py-4 whitespace-nowrap">
@@ -485,54 +495,26 @@ function mostrarModal() {
     // Guardar usuario (crear o actualizar)
     function guardarUsuario(event) {
         event.preventDefault();
-        
-        // PARA DEPURACIÓN
-        console.log("Guardando usuario...");
-        console.log("ID actual:", usuarioIdActual);
-        
-        // Obtener datos del formulario
+
         const datos = {
-            usuario: document.getElementById('usuario').value.trim(),
-            nombre: document.getElementById('nombre').value.trim(),
-            email: document.getElementById('email').value.trim(),
-            password: document.getElementById('password').value.trim(),
-            rol: document.getElementById('rol').value,
-            estado: document.getElementById('estado').value
+            usuario: formUsuario.usuario.value,
+            nombre: formUsuario.nombre.value,
+            email: formUsuario.email.value,
+            password: formUsuario.password.value
         };
-        
-        // Validación básica
-        if (!datos.usuario) {
-            mostrarNotificacionError('El nombre de usuario es obligatorio');
+
+        // Validar datos antes de enviar
+        if (!datos.usuario || !datos.nombre || !datos.email) {
+            mostrarNotificacionError('Todos los campos son obligatorios');
             return;
         }
-        
-        if (!datos.email) {
-            mostrarNotificacionError('El correo electrónico es obligatorio');
-            return;
-        }
-        
-        // Si es un nuevo usuario, la contraseña es obligatoria
-        if (!usuarioIdActual && !datos.password) {
-            mostrarNotificacionError('La contraseña es obligatoria para nuevos usuarios');
-            return;
-        }
-        
-        // Si no se proporciona contraseña en modo edición, no enviarla
-        if (usuarioIdActual && !datos.password) {
-            delete datos.password;
-        }
-        
-        // ACTUALIZADO: Usar la ruta correcta del router
+
+        // Determinar si es creación o edición
         const url = usuarioIdActual 
             ? `/usuarios_admin/usuarios/${usuarioIdActual}` 
             : '/usuarios_admin/usuarios';
         const method = usuarioIdActual ? 'PUT' : 'POST';
-        
-        console.log("URL:", url);
-        console.log("Método:", method);
-        console.log("Datos:", datos);
-        
-        // Enviar solicitud al servidor
+
         fetch(url, {
             method: method,
             headers: {
@@ -551,12 +533,12 @@ function mostrarModal() {
         .then(data => {
             // Cerrar modal
             ocultarModal();
-            
+
             // Mostrar notificación de éxito
             mostrarNotificacionExito(usuarioIdActual 
                 ? 'Usuario actualizado correctamente' 
                 : 'Usuario creado correctamente');
-            
+
             // Recargar lista de usuarios
             cargarUsuarios();
         })
@@ -757,4 +739,22 @@ function mostrarModal() {
     if (btnCerrarNotificacionError) {
         btnCerrarNotificacionError.addEventListener('click', ocultarNotificacionError);
     }
+    
+    // Interceptor global para fetch: agrega Authorization si hay token en localStorage
+    const originalFetch = window.fetch;
+    window.fetch = function(input, init = {}) {
+        // Si la URL es relativa y apunta a /usuarios_admin, agrega el header
+        let url = typeof input === 'string' ? input : input.url;
+        if (url && url.startsWith('/usuarios_admin')) {
+            const token = localStorage.getItem('access_token');
+            if (token) {
+                init.headers = init.headers || {};
+                // Si ya existe Authorization, no lo sobrescribas
+                if (!init.headers['Authorization'] && !init.headers['authorization']) {
+                    init.headers['Authorization'] = 'Bearer ' + token;
+                }
+            }
+        }
+        return originalFetch(input, init);
+    };
 });

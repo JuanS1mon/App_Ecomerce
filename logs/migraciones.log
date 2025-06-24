@@ -1,0 +1,1091 @@
+2025-06-23 22:29:42,934 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:29:42,934 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:29:42,976 - INFO - Tablas creadas exitosamente
+2025-06-23 22:29:43,104 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:29:43,105 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:29:43,105 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:29:43,105 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:30:15,930 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:30:15,941 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:30:23,763 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:30:23,763 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:30:23,795 - INFO - Tablas creadas exitosamente
+2025-06-23 22:30:23,940 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:30:23,940 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:30:23,940 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:30:23,940 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:35:19,435 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:35:19,435 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:35:22,357 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:35:22,357 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:35:22,397 - INFO - Tablas creadas exitosamente
+2025-06-23 22:35:22,527 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:35:22,527 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:35:22,527 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:35:22,527 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:35:22,527 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:35:22,528 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:35:25,365 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:35:25,365 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:35:25,401 - INFO - Tablas creadas exitosamente
+2025-06-23 22:35:25,524 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:35:25,524 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:35:25,525 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:35:25,525 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:35:28,267 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:35:28,268 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:35:35,245 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:35:35,245 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:35:35,274 - INFO - Tablas creadas exitosamente
+2025-06-23 22:35:35,405 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:35:35,406 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:35:35,406 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:35:35,406 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:37:25,137 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:37:25,137 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:37:27,980 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:37:27,980 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:37:28,007 - INFO - Tablas creadas exitosamente
+2025-06-23 22:37:28,131 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:37:28,132 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:37:28,132 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:37:28,132 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:37:32,653 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:37:32,653 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:37:38,546 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:37:38,546 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:37:38,562 - INFO - Tablas creadas exitosamente
+2025-06-23 22:37:38,695 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:37:38,695 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:37:38,695 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:37:38,696 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:41:46,513 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:41:46,514 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:41:52,549 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:41:52,549 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:41:52,565 - INFO - Tablas creadas exitosamente
+2025-06-23 22:41:52,692 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:41:52,692 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:41:52,692 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:41:52,692 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:44:59,238 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:44:59,239 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:49:29,063 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:49:29,063 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:49:29,080 - INFO - Tablas creadas exitosamente
+2025-06-23 22:49:29,211 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:49:29,211 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:49:29,212 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:49:29,212 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:49:53,988 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:49:53,989 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:49:56,858 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:49:56,858 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:49:56,874 - INFO - Tablas creadas exitosamente
+2025-06-23 22:49:57,000 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:49:57,000 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:49:57,001 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:49:57,001 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:49:59,952 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:49:59,953 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:50:05,800 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:50:05,800 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:50:05,817 - INFO - Tablas creadas exitosamente
+2025-06-23 22:50:05,952 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:50:05,952 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:50:05,953 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:50:05,953 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:52:04,947 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:52:04,948 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:52:16,155 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:52:16,155 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:52:16,182 - INFO - Tablas creadas exitosamente
+2025-06-23 22:52:16,309 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:52:16,309 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:52:16,309 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:52:16,309 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:54:02,558 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:54:02,559 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:54:24,992 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:54:24,992 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:54:25,078 - INFO - Tablas creadas exitosamente
+2025-06-23 22:54:25,206 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:54:25,206 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:54:25,207 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:54:25,207 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:54:59,900 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/
+2025-06-23 22:54:59,900 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 22:54:59,900 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 22:54:59,901 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 22:54:59,901 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 22:54:59,915 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-23 22:55:01,268 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage
+2025-06-23 22:55:01,268 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 22:55:01,268 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 22:55:01,268 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 22:55:01,269 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 22:55:01,303 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-23 22:55:03,373 - DEBUG - \U0001f50d Middleware procesando: POST http://127.0.0.1:8000/auth/login
+2025-06-23 22:55:03,373 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'content-length': '42', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'origin': 'http://127.0.0.1:8000', 'content-type': 'application/x-www-form-urlencoded', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 22:55:03,374 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 22:55:03,374 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 22:55:03,374 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 22:55:03,639 - INFO - Verificación de contraseña: exitosa
+2025-06-23 22:55:03,644 - INFO - Autenticación exitosa para usuario: admin
+2025-06-23 22:55:03,659 - INFO - Token JWT creado exitosamente para: admin
+2025-06-23 22:55:03,660 - INFO - [LOGIN_SUCCESS] {'username': 'admin', 'client_ip': '127.0.0.1', 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0'}
+2025-06-23 22:55:03,660 - ERROR - \U0001f6a8 LOGIN EXITOSO - INICIANDO LÓGICA DE REDIRECCIÓN
+2025-06-23 22:55:03,660 - ERROR - \U0001f6a8 next_url = '/admin'
+2025-06-23 22:55:03,660 - ERROR - \U0001f6a8 access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...'
+2025-06-23 22:55:03,661 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-23 22:55:03,668 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/admin?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDczMzcwM30.6eUbKieMLFM3xLFN6uhdQiPD8YoPkOfe9FpSqvfzc0k
+2025-06-23 22:55:03,668 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 22:55:03,668 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 22:55:03,668 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 22:55:03,669 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 22:55:03,672 - INFO - Verificando autenticación para: /admin
+2025-06-23 22:55:03,675 - INFO - Usuario autenticado exitosamente: admin
+2025-06-23 22:55:03,679 - INFO - Autenticación exitosa para usuario: admin
+2025-06-23 22:55:03,680 - INFO - Acceso de admin autorizado para: admin
+2025-06-23 22:55:03,686 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-23 22:55:06,728 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/usuarios_admin/
+2025-06-23 22:55:06,729 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/admin', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 22:55:06,729 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 22:55:06,729 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 22:55:06,729 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 22:55:06,733 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-23 22:55:06,740 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage?next=http://127.0.0.1:8000/usuarios_admin/
+2025-06-23 22:55:06,741 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/admin', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 22:55:06,741 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 22:55:06,741 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 22:55:06,741 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 22:55:06,744 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-23 22:59:22,194 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 22:59:22,195 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 22:59:25,215 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 22:59:25,215 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 22:59:25,302 - INFO - Tablas creadas exitosamente
+2025-06-23 22:59:25,426 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 22:59:25,426 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 22:59:25,426 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 22:59:25,427 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 22:59:50,024 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/usuarios_admin/
+2025-06-23 22:59:50,024 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/admin', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 22:59:50,024 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 22:59:50,025 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 22:59:50,025 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 22:59:50,029 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-23 22:59:50,039 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage?next=http://127.0.0.1:8000/usuarios_admin/
+2025-06-23 22:59:50,039 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/admin', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 22:59:50,039 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 22:59:50,039 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 22:59:50,039 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 22:59:50,042 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-23 22:59:56,793 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/.well-known/appspecific/com.chrome.devtools.json
+2025-06-23 22:59:56,794 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'no-cors', 'sec-fetch-dest': 'empty', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 22:59:56,794 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 22:59:56,794 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 22:59:56,794 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 22:59:56,909 - DEBUG - \U0001f4e4 Respuesta: 404 text/html; charset=utf-8
+2025-06-23 23:00:04,304 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/admin
+2025-06-23 23:00:04,305 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 23:00:04,305 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 23:00:04,305 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 23:00:04,305 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 23:00:04,309 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-23 23:00:04,317 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage?next=http://127.0.0.1:8000/admin
+2025-06-23 23:00:04,317 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 23:00:04,318 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 23:00:04,318 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 23:00:04,318 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 23:00:04,321 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-23 23:00:05,569 - DEBUG - \U0001f50d Middleware procesando: POST http://127.0.0.1:8000/auth/login
+2025-06-23 23:00:05,569 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'content-length': '71', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'origin': 'http://127.0.0.1:8000', 'content-type': 'application/x-www-form-urlencoded', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/loginpage?next=http://127.0.0.1:8000/admin', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 23:00:05,570 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 23:00:05,570 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 23:00:05,570 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 23:00:05,799 - INFO - Verificación de contraseña: exitosa
+2025-06-23 23:00:05,803 - INFO - Autenticación exitosa para usuario: admin
+2025-06-23 23:00:05,804 - INFO - Token JWT creado exitosamente para: admin
+2025-06-23 23:00:05,804 - INFO - [LOGIN_SUCCESS] {'username': 'admin', 'client_ip': '127.0.0.1', 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0'}
+2025-06-23 23:00:05,804 - ERROR - \U0001f6a8 LOGIN EXITOSO - INICIANDO LÓGICA DE REDIRECCIÓN
+2025-06-23 23:00:05,804 - ERROR - \U0001f6a8 next_url = 'http://127.0.0.1:8000/admin'
+2025-06-23 23:00:05,804 - ERROR - \U0001f6a8 access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...'
+2025-06-23 23:00:05,806 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-23 23:00:05,814 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/admin?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDczNDAwNX0.fN5mMiaA71NGsNfEfTuD4PyQy4XFYZ8zanqW6T5244A
+2025-06-23 23:00:05,814 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage?next=http://127.0.0.1:8000/admin', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 23:00:05,815 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 23:00:05,815 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 23:00:05,815 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 23:00:05,817 - INFO - Verificando autenticación para: /admin
+2025-06-23 23:00:05,820 - INFO - Usuario autenticado exitosamente: admin
+2025-06-23 23:00:05,824 - INFO - Autenticación exitosa para usuario: admin
+2025-06-23 23:00:05,824 - INFO - Acceso de admin autorizado para: admin
+2025-06-23 23:00:05,832 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-23 23:00:30,772 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-23 23:00:30,773 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-23 23:00:36,736 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-23 23:00:36,736 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-23 23:00:36,835 - INFO - Tablas creadas exitosamente
+2025-06-23 23:00:37,010 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-23 23:00:37,010 - INFO - \U0001f4c1 Directorios verificados
+2025-06-23 23:00:37,010 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-23 23:00:37,010 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-23 23:00:39,617 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/usuarios_admin/
+2025-06-23 23:00:39,617 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/admin', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 23:00:39,617 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 23:00:39,617 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 23:00:39,618 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 23:00:39,622 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-23 23:00:39,632 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage?next=http://127.0.0.1:8000/usuarios_admin/
+2025-06-23 23:00:39,632 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/admin', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-23 23:00:39,633 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-23 23:00:39,633 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-23 23:00:39,633 - DEBUG - \u274c Cookie access_token no presente
+2025-06-23 23:00:39,635 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 11:29:34,541 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 11:29:34,542 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 11:29:34,629 - INFO - Tablas creadas exitosamente
+2025-06-24 11:29:34,766 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 11:29:34,766 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 11:29:34,766 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 11:29:34,766 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 12:12:46,824 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/
+2025-06-24 12:12:46,824 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:46,825 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:46,825 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:46,825 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:46,887 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:12:47,090 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/static/img/dashboard_illustration.svg
+2025-06-24 12:12:47,090 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'no-cors', 'sec-fetch-dest': 'image', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4', 'if-none-match': '6c3c781a0759939b8e335e4dae371d93', 'if-modified-since': 'Thu, 12 Jun 2025 22:02:55 GMT'})
+2025-06-24 12:12:47,091 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:47,091 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:47,092 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:47,094 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/static/html/navbar.html
+2025-06-24 12:12:47,094 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': '*/*', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4', 'if-none-match': 'a46c0c3539c856f421dbba5be0fa6766', 'if-modified-since': 'Thu, 12 Jun 2025 20:39:04 GMT'})
+2025-06-24 12:12:47,094 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:47,094 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:47,095 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:47,196 - DEBUG - \U0001f4e4 Respuesta: 304 None
+2025-06-24 12:12:47,201 - DEBUG - \U0001f4e4 Respuesta: 304 None
+2025-06-24 12:12:47,209 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/favicon.ico
+2025-06-24 12:12:47,209 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'no-cors', 'sec-fetch-dest': 'image', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:47,209 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:47,209 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:47,210 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:47,213 - DEBUG - \U0001f4e4 Respuesta: 404 text/html; charset=utf-8
+2025-06-24 12:12:48,329 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage
+2025-06-24 12:12:48,329 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:48,331 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:48,331 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:48,331 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:48,359 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:12:49,526 - DEBUG - \U0001f50d Middleware procesando: POST http://127.0.0.1:8000/auth/login
+2025-06-24 12:12:49,526 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'content-length': '42', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'origin': 'http://127.0.0.1:8000', 'content-type': 'application/x-www-form-urlencoded', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:49,527 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:49,527 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:49,527 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:49,769 - INFO - Verificación de contraseña: exitosa
+2025-06-24 12:12:49,784 - INFO - Autenticación exitosa para usuario: admin
+2025-06-24 12:12:49,802 - INFO - Token JWT creado exitosamente para: admin
+2025-06-24 12:12:49,802 - INFO - [LOGIN_SUCCESS] {'username': 'admin', 'client_ip': '127.0.0.1', 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0'}
+2025-06-24 12:12:49,802 - ERROR - \U0001f6a8 LOGIN EXITOSO - INICIANDO LÓGICA DE REDIRECCIÓN
+2025-06-24 12:12:49,802 - ERROR - \U0001f6a8 next_url = '/admin'
+2025-06-24 12:12:49,802 - ERROR - \U0001f6a8 access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...'
+2025-06-24 12:12:49,804 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-24 12:12:49,810 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/admin?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU2OX0.1IuM_AEF7PrBuHCuhQFmLgLQaKAvL3Pw3xtQLp8DPBM
+2025-06-24 12:12:49,810 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:49,812 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:49,812 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:49,812 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:49,814 - INFO - Verificando autenticación para: /admin
+2025-06-24 12:12:49,817 - INFO - Usuario autenticado exitosamente: admin
+2025-06-24 12:12:49,822 - INFO - Autenticación exitosa para usuario: admin
+2025-06-24 12:12:49,822 - INFO - Acceso de admin autorizado para: admin
+2025-06-24 12:12:49,862 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:12:49,871 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/static/js/components.js
+2025-06-24 12:12:49,873 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': '*/*', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'no-cors', 'sec-fetch-dest': 'script', 'referer': 'http://127.0.0.1:8000/admin?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU2OX0.1IuM_AEF7PrBuHCuhQFmLgLQaKAvL3Pw3xtQLp8DPBM', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4', 'if-none-match': '4b174def64814818b67566e3dbef1cd5', 'if-modified-since': 'Fri, 13 Jun 2025 14:28:15 GMT'})
+2025-06-24 12:12:49,873 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:49,873 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:49,873 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:49,877 - DEBUG - \U0001f4e4 Respuesta: 304 None
+2025-06-24 12:12:49,900 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/static/components/footer.html
+2025-06-24 12:12:49,900 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': '*/*', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8000/admin', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4', 'if-none-match': '483e824bcd4f68c6608bd671e7c04353', 'if-modified-since': 'Mon, 28 Apr 2025 14:42:51 GMT'})
+2025-06-24 12:12:49,900 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:49,902 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:49,902 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:49,905 - DEBUG - \U0001f4e4 Respuesta: 304 None
+2025-06-24 12:12:51,505 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/usuarios_admin/
+2025-06-24 12:12:51,505 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/admin', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:51,506 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:51,506 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:51,506 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:51,509 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-24 12:12:51,515 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage?next=http://127.0.0.1:8000/usuarios_admin/
+2025-06-24 12:12:51,515 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/admin', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:51,516 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:51,516 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:51,516 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:51,519 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:12:56,043 - DEBUG - \U0001f50d Middleware procesando: POST http://127.0.0.1:8000/auth/login
+2025-06-24 12:12:56,043 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'content-length': '83', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'origin': 'http://127.0.0.1:8000', 'content-type': 'application/x-www-form-urlencoded', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/loginpage?next=http://127.0.0.1:8000/usuarios_admin/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:56,043 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:56,043 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:56,043 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:56,235 - INFO - Verificación de contraseña: exitosa
+2025-06-24 12:12:56,246 - INFO - Autenticación exitosa para usuario: admin
+2025-06-24 12:12:56,246 - INFO - Token JWT creado exitosamente para: admin
+2025-06-24 12:12:56,246 - INFO - [LOGIN_SUCCESS] {'username': 'admin', 'client_ip': '127.0.0.1', 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0'}
+2025-06-24 12:12:56,246 - ERROR - \U0001f6a8 LOGIN EXITOSO - INICIANDO LÓGICA DE REDIRECCIÓN
+2025-06-24 12:12:56,246 - ERROR - \U0001f6a8 next_url = 'http://127.0.0.1:8000/usuarios_admin/'
+2025-06-24 12:12:56,246 - ERROR - \U0001f6a8 access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...'
+2025-06-24 12:12:56,248 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-24 12:12:56,256 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/usuarios_admin/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU3Nn0.qM7R4rFBySYb6kL31zUhpL1C2PHB8oOM0B6Tb48i1Cc
+2025-06-24 12:12:56,257 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage?next=http://127.0.0.1:8000/usuarios_admin/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:56,257 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:56,257 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:56,257 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:56,259 - INFO - Verificando autenticación para: /usuarios_admin/
+2025-06-24 12:12:56,261 - INFO - Usuario autenticado exitosamente: admin
+2025-06-24 12:12:56,263 - INFO - Autenticación exitosa para usuario: admin
+2025-06-24 12:12:56,263 - INFO - Acceso de admin autorizado para: admin
+2025-06-24 12:12:56,286 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:12:56,295 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/static/html/usuarios/js/usuarios_admin_corregido.js
+2025-06-24 12:12:56,295 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': '*/*', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'no-cors', 'sec-fetch-dest': 'script', 'referer': 'http://127.0.0.1:8000/usuarios_admin/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU3Nn0.qM7R4rFBySYb6kL31zUhpL1C2PHB8oOM0B6Tb48i1Cc', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:56,296 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:56,296 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:12:56,296 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:56,300 - DEBUG - \U0001f4e4 Respuesta: 200 application/javascript
+2025-06-24 12:12:56,330 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/usuarios_admin/usuarios-con-detalles/?&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU3Nn0.qM7R4rFBySYb6kL31zUhpL1C2PHB8oOM0B6Tb48i1Cc
+2025-06-24 12:12:56,330 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU2OX0.1IuM_AEF7PrBuHCuhQFmLgLQaKAvL3Pw3xtQLp8DPBM', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': '*/*', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8000/usuarios_admin/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU3Nn0.qM7R4rFBySYb6kL31zUhpL1C2PHB8oOM0B6Tb48i1Cc', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:56,330 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:56,332 - DEBUG - \U0001f511 Encabezado Authorization detectado: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU2OX0.1IuM_AEF7PrBuHCuhQFmLgLQaKAvL3Pw3xtQLp8DPBM
+2025-06-24 12:12:56,332 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:56,334 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/usuarios_admin/estadisticas-avanzadas/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU3Nn0.qM7R4rFBySYb6kL31zUhpL1C2PHB8oOM0B6Tb48i1Cc
+2025-06-24 12:12:56,334 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU2OX0.1IuM_AEF7PrBuHCuhQFmLgLQaKAvL3Pw3xtQLp8DPBM', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': '*/*', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8000/usuarios_admin/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU3Nn0.qM7R4rFBySYb6kL31zUhpL1C2PHB8oOM0B6Tb48i1Cc', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:12:56,335 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:12:56,335 - DEBUG - \U0001f511 Encabezado Authorization detectado: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4MTU2OX0.1IuM_AEF7PrBuHCuhQFmLgLQaKAvL3Pw3xtQLp8DPBM
+2025-06-24 12:12:56,335 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:12:56,339 - INFO - Usuario autenticado exitosamente: admin
+2025-06-24 12:12:56,352 - INFO - Usuario autenticado exitosamente: admin
+2025-06-24 12:12:56,358 - ERROR - Error al obtener estadísticas avanzadas: type object 'Usuarios' has no attribute 'rol'
+2025-06-24 12:12:56,362 - DEBUG - \U0001f4e4 Respuesta: 200 application/json
+2025-06-24 12:12:56,362 - DEBUG - \U0001f4e4 Respuesta: 200 application/json
+2025-06-24 12:30:36,403 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 12:30:36,403 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 12:30:39,924 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 12:30:39,925 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 12:30:40,025 - INFO - Tablas creadas exitosamente
+2025-06-24 12:30:40,150 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 12:30:40,150 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 12:30:40,150 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 12:30:40,151 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 12:30:40,151 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 12:30:40,151 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 12:30:43,160 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 12:30:43,160 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 12:30:43,245 - INFO - Tablas creadas exitosamente
+2025-06-24 12:30:43,376 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 12:30:43,376 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 12:30:43,376 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 12:30:43,376 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 12:35:40,596 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 12:35:40,597 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 12:35:43,600 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 12:35:43,600 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 12:35:43,685 - INFO - Tablas creadas exitosamente
+2025-06-24 12:35:43,811 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 12:35:43,811 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 12:35:43,811 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 12:35:43,812 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 12:35:43,812 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 12:35:43,812 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 12:35:46,652 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 12:35:46,654 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 12:35:46,673 - INFO - Tablas creadas exitosamente
+2025-06-24 12:35:46,800 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 12:35:46,800 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 12:35:46,800 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 12:35:46,801 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 12:51:26,127 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 12:51:26,127 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 12:52:12,923 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 12:52:12,923 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 12:52:13,028 - INFO - Tablas creadas exitosamente
+2025-06-24 12:52:13,160 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 12:52:13,160 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 12:52:13,161 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 12:52:13,161 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 12:53:06,175 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/
+2025-06-24 12:53:06,175 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:53:06,175 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:06,175 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:06,176 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:06,224 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:53:10,250 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/
+2025-06-24 12:53:10,250 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:10,251 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:10,251 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:10,251 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:10,254 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:53:10,268 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/static/img/logo_mapache.gif
+2025-06-24 12:53:10,268 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'no-cors', 'sec-fetch-dest': 'image', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:10,268 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:10,268 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:10,269 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:10,272 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/static/img/th.jpg
+2025-06-24 12:53:10,272 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'no-cors', 'sec-fetch-dest': 'image', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:10,273 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:10,273 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:10,273 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:10,362 - DEBUG - \U0001f4e4 Respuesta: 200 image/gif
+2025-06-24 12:53:10,362 - DEBUG - \U0001f4e4 Respuesta: 200 image/jpeg
+2025-06-24 12:53:10,363 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/static/img/diagrama_app.jpg
+2025-06-24 12:53:10,363 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'no-cors', 'sec-fetch-dest': 'image', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:10,363 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:10,364 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:10,364 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:10,377 - DEBUG - \U0001f4e4 Respuesta: 200 image/jpeg
+2025-06-24 12:53:10,515 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/static/img/dashboard_illustration.svg
+2025-06-24 12:53:10,515 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'no-cors', 'sec-fetch-dest': 'image', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:10,516 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:10,516 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:10,516 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:10,521 - DEBUG - \U0001f4e4 Respuesta: 200 image/svg+xml
+2025-06-24 12:53:10,529 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/static/html/navbar.html
+2025-06-24 12:53:10,529 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': '*/*', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:10,530 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:10,530 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:10,530 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:10,531 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/static/html/footer.html
+2025-06-24 12:53:10,531 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'accept': '*/*', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:10,531 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:10,531 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:10,532 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:10,541 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:53:10,547 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:53:11,828 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage
+2025-06-24 12:53:11,829 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:11,829 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:11,829 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:11,829 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:11,863 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:53:14,756 - DEBUG - \U0001f50d Middleware procesando: POST http://127.0.0.1:8000/auth/login
+2025-06-24 12:53:14,756 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'content-length': '42', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'origin': 'http://127.0.0.1:8000', 'content-type': 'application/x-www-form-urlencoded', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:14,756 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:14,757 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:14,757 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:15,001 - INFO - Verificación de contraseña: exitosa
+2025-06-24 12:53:15,016 - INFO - Autenticación exitosa para usuario: admin
+2025-06-24 12:53:15,031 - INFO - Token JWT creado exitosamente para: admin
+2025-06-24 12:53:15,031 - INFO - [LOGIN_SUCCESS] {'username': 'admin', 'client_ip': '127.0.0.1', 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0'}
+2025-06-24 12:53:15,031 - ERROR - \U0001f6a8 LOGIN EXITOSO - INICIANDO LÓGICA DE REDIRECCIÓN
+2025-06-24 12:53:15,031 - ERROR - \U0001f6a8 next_url = '/admin'
+2025-06-24 12:53:15,031 - ERROR - \U0001f6a8 access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...'
+2025-06-24 12:53:15,033 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-24 12:53:15,039 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/admin?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4Mzk5NX0.riWSas4YMLYMuH62qeFnEw4Gu33N_LuT78j7dXuLhy8
+2025-06-24 12:53:15,039 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:15,039 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:15,039 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:15,040 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:15,085 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-24 12:53:15,091 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage
+2025-06-24 12:53:15,091 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:15,092 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:15,093 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:15,093 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:15,095 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:53:19,823 - DEBUG - \U0001f50d Middleware procesando: POST http://127.0.0.1:8000/auth/login
+2025-06-24 12:53:19,823 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'content-length': '42', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'origin': 'http://127.0.0.1:8000', 'content-type': 'application/x-www-form-urlencoded', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:19,823 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:19,824 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:19,824 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:20,022 - INFO - Verificación de contraseña: exitosa
+2025-06-24 12:53:20,025 - INFO - Autenticación exitosa para usuario: admin
+2025-06-24 12:53:20,025 - INFO - Token JWT creado exitosamente para: admin
+2025-06-24 12:53:20,025 - INFO - [LOGIN_SUCCESS] {'username': 'admin', 'client_ip': '127.0.0.1', 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0'}
+2025-06-24 12:53:20,025 - ERROR - \U0001f6a8 LOGIN EXITOSO - INICIANDO LÓGICA DE REDIRECCIÓN
+2025-06-24 12:53:20,025 - ERROR - \U0001f6a8 next_url = '/admin'
+2025-06-24 12:53:20,025 - ERROR - \U0001f6a8 access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...'
+2025-06-24 12:53:20,026 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-24 12:53:20,034 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/admin?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4NDAwMH0.Acf8QobEtbFWJMj65-0KI3ROIVA1zm0nCq7KgJ_Dyo8
+2025-06-24 12:53:20,034 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:20,035 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:20,035 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:20,035 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:20,039 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-24 12:53:20,045 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage
+2025-06-24 12:53:20,046 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9'})
+2025-06-24 12:53:20,046 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:20,046 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:20,047 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:20,049 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:53:24,373 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage
+2025-06-24 12:53:24,373 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:53:24,373 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:24,374 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:24,374 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:24,376 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:53:28,056 - DEBUG - \U0001f50d Middleware procesando: POST http://127.0.0.1:8000/auth/login
+2025-06-24 12:53:28,056 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'content-length': '42', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'origin': 'http://127.0.0.1:8000', 'content-type': 'application/x-www-form-urlencoded', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:53:28,056 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:28,056 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:28,057 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:28,253 - INFO - Verificación de contraseña: exitosa
+2025-06-24 12:53:28,253 - INFO - Autenticación exitosa para usuario: admin
+2025-06-24 12:53:28,253 - INFO - Token JWT creado exitosamente para: admin
+2025-06-24 12:53:28,253 - INFO - [LOGIN_SUCCESS] {'username': 'admin', 'client_ip': '127.0.0.1', 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0'}
+2025-06-24 12:53:28,253 - ERROR - \U0001f6a8 LOGIN EXITOSO - INICIANDO LÓGICA DE REDIRECCIÓN
+2025-06-24 12:53:28,253 - ERROR - \U0001f6a8 next_url = '/admin'
+2025-06-24 12:53:28,253 - ERROR - \U0001f6a8 access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...'
+2025-06-24 12:53:28,254 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-24 12:53:28,271 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/admin?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4NDAwOH0.ocJTTpXflmDF4OazO0ySVur8IHBIh_Rfwso3bzbIQPI
+2025-06-24 12:53:28,272 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:53:28,272 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:28,272 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:28,272 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:28,276 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-24 12:53:28,283 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage
+2025-06-24 12:53:28,284 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:53:28,284 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:28,284 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:28,284 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:28,287 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:53:30,039 - DEBUG - \U0001f50d Middleware procesando: POST http://127.0.0.1:8000/auth/login
+2025-06-24 12:53:30,039 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'content-length': '41', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'origin': 'http://127.0.0.1:8000', 'content-type': 'application/x-www-form-urlencoded', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:53:30,039 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:30,041 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:30,041 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:30,237 - INFO - Verificación de contraseña: fallida
+2025-06-24 12:53:30,237 - WARNING - Contraseña incorrecta para usuario: admin
+2025-06-24 12:53:30,237 - WARNING - [LOGIN_FAILED] {'username': 'admin', 'reason': 'invalid_credentials', 'client_ip': '127.0.0.1', 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0'}
+2025-06-24 12:53:30,237 - DEBUG - \U0001f4e4 Respuesta: 401 application/json
+2025-06-24 12:53:35,238 - DEBUG - \U0001f50d Middleware procesando: POST http://127.0.0.1:8000/auth/login
+2025-06-24 12:53:35,238 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'content-length': '41', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'origin': 'http://127.0.0.1:8000', 'content-type': 'application/x-www-form-urlencoded', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:53:35,239 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:53:35,239 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:53:35,239 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:53:35,436 - INFO - Verificación de contraseña: fallida
+2025-06-24 12:53:35,436 - WARNING - Contraseña incorrecta para usuario: admin
+2025-06-24 12:53:35,436 - WARNING - [LOGIN_FAILED] {'username': 'admin', 'reason': 'invalid_credentials', 'client_ip': '127.0.0.1', 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0'}
+2025-06-24 12:53:35,438 - DEBUG - \U0001f4e4 Respuesta: 401 application/json
+2025-06-24 12:56:21,769 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 12:56:21,769 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 12:56:21,850 - INFO - Tablas creadas exitosamente
+2025-06-24 12:56:21,977 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 12:56:21,978 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 12:56:21,978 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 12:56:21,978 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 12:56:26,161 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage
+2025-06-24 12:56:26,161 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:56:26,161 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:56:26,161 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:56:26,161 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:56:26,164 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 12:56:28,089 - DEBUG - \U0001f50d Middleware procesando: POST http://127.0.0.1:8000/auth/login
+2025-06-24 12:56:28,089 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'content-length': '42', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'origin': 'http://127.0.0.1:8000', 'content-type': 'application/x-www-form-urlencoded', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:56:28,090 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:56:28,090 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:56:28,090 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:56:28,318 - INFO - Verificación de contraseña: exitosa
+2025-06-24 12:56:28,321 - INFO - Autenticación exitosa para usuario: admin
+2025-06-24 12:56:28,322 - INFO - Token JWT creado exitosamente para: admin
+2025-06-24 12:56:28,322 - INFO - [LOGIN_SUCCESS] {'username': 'admin', 'client_ip': '127.0.0.1', 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0'}
+2025-06-24 12:56:28,322 - ERROR - \U0001f6a8 LOGIN EXITOSO - INICIANDO LÓGICA DE REDIRECCIÓN
+2025-06-24 12:56:28,322 - ERROR - \U0001f6a8 next_url = '/admin'
+2025-06-24 12:56:28,322 - ERROR - \U0001f6a8 access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...'
+2025-06-24 12:56:28,323 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-24 12:56:28,331 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/admin?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MDc4NDE4OH0.m7pLefZm4D5fNxADr_uowTbMcbJhhHYzpKQQceblj5I
+2025-06-24 12:56:28,331 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:56:28,331 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:56:28,331 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:56:28,331 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:56:28,342 - DEBUG - \U0001f4e4 Respuesta: 303 None
+2025-06-24 12:56:28,349 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage
+2025-06-24 12:56:28,350 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'referer': 'http://127.0.0.1:8000/loginpage', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 12:56:28,350 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 12:56:28,350 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 12:56:28,350 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 12:56:28,353 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 13:01:18,924 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:01:18,924 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:24:55,879 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:24:55,879 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:24:55,960 - INFO - Tablas creadas exitosamente
+2025-06-24 13:24:56,093 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:24:56,094 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:24:56,094 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:24:56,094 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:29:21,996 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:29:21,996 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:29:25,443 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:29:25,444 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:29:25,585 - INFO - Tablas creadas exitosamente
+2025-06-24 13:29:25,748 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:29:25,748 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:29:25,748 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:29:25,748 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:29:25,748 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:29:25,749 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:29:29,234 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:29:29,234 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:29:29,314 - INFO - Tablas creadas exitosamente
+2025-06-24 13:29:29,450 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:29:29,451 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:29:29,451 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:29:29,451 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:30:31,668 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:30:31,669 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:30:38,367 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:30:38,367 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:30:38,450 - INFO - Tablas creadas exitosamente
+2025-06-24 13:30:38,584 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:30:38,585 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:30:38,585 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:30:38,585 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:31:40,243 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:31:40,243 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:31:43,304 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:31:43,305 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:31:43,389 - INFO - Tablas creadas exitosamente
+2025-06-24 13:31:43,517 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:31:43,517 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:31:43,518 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:31:43,518 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:31:43,518 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:31:43,519 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:31:43,519 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:31:43,519 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:31:43,519 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:31:43,519 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:31:43,519 - INFO - ======================================================
+
+2025-06-24 13:31:43,520 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:31:43,520 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:31:43,520 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:31:43,520 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:35:35,434 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:35:35,434 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:35:38,476 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:35:38,476 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:35:38,564 - INFO - Tablas creadas exitosamente
+2025-06-24 13:35:38,691 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:35:38,691 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:35:38,691 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:35:38,693 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:35:38,693 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:35:38,693 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:35:38,693 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:35:38,694 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:35:38,694 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:35:38,694 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:35:38,694 - INFO - ======================================================
+
+2025-06-24 13:35:38,695 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:35:38,695 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:35:38,695 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:35:38,695 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:35:38,696 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:35:38,696 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:35:41,548 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:35:41,548 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:35:41,570 - INFO - Tablas creadas exitosamente
+2025-06-24 13:35:41,701 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:35:41,701 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:35:41,701 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:35:41,701 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:35:41,701 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:35:41,701 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:35:41,701 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:35:41,701 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:35:41,701 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:35:41,703 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:35:41,703 - INFO - ======================================================
+
+2025-06-24 13:35:41,703 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:35:41,703 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:35:41,704 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:35:41,704 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:39:00,573 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:39:00,573 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:39:03,679 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:39:03,679 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:39:03,767 - INFO - Tablas creadas exitosamente
+2025-06-24 13:39:10,729 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:39:10,730 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:39:10,751 - INFO - Tablas creadas exitosamente
+2025-06-24 13:39:10,879 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:39:10,880 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:39:10,880 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:39:10,880 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:39:10,880 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:39:10,881 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:39:10,881 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:39:10,881 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:39:10,881 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:39:10,881 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:39:10,882 - INFO - ======================================================
+
+2025-06-24 13:39:10,882 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:39:10,882 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:39:10,882 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:39:10,882 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:41:32,942 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:41:32,943 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:41:33,028 - INFO - Tablas creadas exitosamente
+2025-06-24 13:41:33,160 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:41:33,160 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:41:33,161 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:41:33,161 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:41:33,161 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:41:33,161 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:41:33,162 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:41:33,162 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:41:33,162 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:41:33,162 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:41:33,162 - INFO - ======================================================
+
+2025-06-24 13:41:33,163 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:41:33,163 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:41:33,163 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:41:33,164 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:41:33,377 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:41:33,377 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:46:49,308 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:46:49,308 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:46:49,393 - INFO - Tablas creadas exitosamente
+2025-06-24 13:46:49,976 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:46:49,976 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:46:49,976 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:46:49,976 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:46:49,976 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:46:49,977 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:46:49,977 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:46:49,977 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:46:49,977 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:46:49,978 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:46:49,978 - INFO - \u274c \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:46:49,978 - INFO - ======================================================
+
+2025-06-24 13:46:49,978 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:46:49,978 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:46:49,979 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:46:49,979 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:49:35,319 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:49:35,320 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:49:41,897 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:49:41,897 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:49:41,996 - INFO - Tablas creadas exitosamente
+2025-06-24 13:49:42,567 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:49:42,568 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:49:42,568 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:49:42,568 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:49:42,568 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:49:42,568 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:49:42,568 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:49:42,569 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:49:42,569 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:49:42,569 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:49:42,569 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:49:42,569 - INFO - ======================================================
+
+2025-06-24 13:49:42,569 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:49:42,569 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:49:42,569 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:49:42,570 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:50:39,362 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:50:39,362 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:50:42,397 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:50:42,397 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:50:42,482 - INFO - Tablas creadas exitosamente
+2025-06-24 13:50:43,048 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:50:43,048 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:50:43,049 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:50:43,049 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:50:43,049 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:50:43,049 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:50:43,050 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:50:43,050 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:50:43,050 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:50:43,050 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:50:43,050 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:50:43,051 - INFO - ======================================================
+
+2025-06-24 13:50:43,051 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:50:43,051 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:50:43,051 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:50:43,052 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:50:43,052 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:50:43,052 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:50:45,937 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:50:45,938 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:50:46,044 - INFO - Tablas creadas exitosamente
+2025-06-24 13:50:46,637 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:50:46,637 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:50:46,637 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:50:46,637 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:50:46,638 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:50:46,638 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:50:46,638 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:50:46,638 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:50:46,639 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:50:46,639 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:50:46,639 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:50:46,639 - INFO - ======================================================
+
+2025-06-24 13:50:46,639 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:50:46,640 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:50:46,640 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:50:46,640 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:50:47,724 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:50:47,724 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:50:53,371 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:50:53,371 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:50:53,446 - INFO - Tablas creadas exitosamente
+2025-06-24 13:50:54,008 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:50:54,008 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:50:54,008 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:50:54,009 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:50:54,009 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:50:54,009 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:50:54,010 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:50:54,010 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:50:54,010 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:50:54,010 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:50:54,010 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:50:54,010 - INFO - ======================================================
+
+2025-06-24 13:50:54,011 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:50:54,011 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:50:54,011 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:50:54,011 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:51:45,330 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:51:45,331 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:51:52,359 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:51:52,359 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:51:52,429 - INFO - Tablas creadas exitosamente
+2025-06-24 13:51:53,021 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:51:53,021 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:51:53,021 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:51:53,021 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:51:53,021 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:51:53,022 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:51:53,022 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:51:53,022 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:51:53,022 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:51:53,022 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:51:53,022 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:51:53,022 - INFO - ======================================================
+
+2025-06-24 13:51:53,023 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:51:53,023 - INFO - \U0001f4c1 Directorios verificados
+2025-06-24 13:51:53,023 - INFO - \U0001f5c4\ufe0f Base de datos inicializada
+2025-06-24 13:51:53,023 - INFO - \U0001f4ca Sistema de stock configurado
+2025-06-24 13:53:17,995 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:53:17,996 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:53:21,241 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:53:21,241 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:53:21,306 - INFO - Tablas creadas exitosamente
+2025-06-24 13:53:21,914 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:53:21,914 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:53:21,915 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:53:21,915 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada
+2025-06-24 13:53:21,915 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:53:21,915 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:53:21,916 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:53:21,916 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:53:21,916 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:53:21,916 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:53:21,916 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:53:21,917 - INFO - ======================================================
+
+2025-06-24 13:53:21,917 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:54:02,742 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:54:02,742 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:54:10,212 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:54:10,213 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:54:10,305 - INFO - Tablas creadas exitosamente
+2025-06-24 13:54:10,862 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:54:10,863 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:54:10,863 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:54:10,863 - INFO - \u274c \U0001f7e2 Configuración de correo cargada correctamente
+2025-06-24 13:54:10,863 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:54:10,864 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:54:10,864 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:54:10,864 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:54:10,864 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:54:10,864 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:54:10,864 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:54:10,865 - INFO - ======================================================
+
+2025-06-24 13:54:10,865 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:57:25,689 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:57:25,689 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:57:29,340 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:57:29,340 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:57:29,414 - INFO - Tablas creadas exitosamente
+2025-06-24 13:57:30,016 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:57:30,017 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:57:30,017 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:57:30,017 - INFO - \u274c \U0001f7e2 Configuración de correo cargada correctamente
+2025-06-24 13:57:30,017 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:57:30,017 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:57:30,017 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:57:30,018 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:57:30,018 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:57:30,018 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:57:30,019 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:57:30,019 - INFO - ======================================================
+
+2025-06-24 13:57:30,019 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:57:30,019 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:57:30,019 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:57:32,936 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:57:32,937 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:57:32,956 - INFO - Tablas creadas exitosamente
+2025-06-24 13:57:33,516 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:57:33,517 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:57:33,517 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:57:33,517 - INFO - \u274c \U0001f7e2 Configuración de correo cargada correctamente
+2025-06-24 13:57:33,517 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:57:33,518 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:57:33,518 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:57:33,518 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:57:33,518 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:57:33,519 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:57:33,519 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:57:33,519 - INFO - ======================================================
+
+2025-06-24 13:57:33,519 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:57:39,297 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:57:39,297 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:57:45,132 - INFO - Modelo importado: sql_app.db.models.config.usuarios
+2025-06-24 13:57:45,132 - INFO - Modelo importado: sql_app.db.models.config.tickets
+2025-06-24 13:57:45,152 - INFO - Tablas creadas exitosamente
+2025-06-24 13:57:45,734 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:57:45,734 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:57:45,734 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:57:45,735 - INFO - \u274c \U0001f7e2 Configuración de correo cargada correctamente
+2025-06-24 13:57:45,735 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:57:45,735 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:57:45,735 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:57:45,736 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:57:45,736 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:57:45,736 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:57:45,736 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:57:45,737 - INFO - ======================================================
+
+2025-06-24 13:57:45,737 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:58:33,224 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:58:33,224 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:58:40,662 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:58:40,664 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:58:40,664 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:58:40,664 - INFO - \u274c \U0001f7e2 Configuración de correo cargada correctamente
+2025-06-24 13:58:40,664 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:58:40,665 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:58:40,665 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:58:40,665 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:58:40,665 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:58:40,665 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:58:40,666 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:58:40,666 - INFO - ======================================================
+
+2025-06-24 13:58:40,666 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:58:58,122 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/
+2025-06-24 13:58:58,124 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 13:58:58,124 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 13:58:58,124 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 13:58:58,125 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 13:58:58,137 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 13:58:58,282 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:58:58,283 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:59:01,889 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:59:01,889 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:59:01,889 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:59:01,889 - INFO - \u274c \U0001f7e2 Configuración de correo cargada correctamente
+2025-06-24 13:59:01,889 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:59:01,890 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:59:01,890 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:59:01,890 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:59:01,890 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:59:01,890 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:59:01,890 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:59:01,890 - INFO - ======================================================
+
+2025-06-24 13:59:01,890 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:59:01,891 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 13:59:01,891 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 13:59:05,474 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:59:05,474 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:59:05,474 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:59:05,474 - INFO - \u274c \U0001f7e2 Configuración de correo cargada correctamente
+2025-06-24 13:59:05,475 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:59:05,475 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:59:05,475 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:59:05,475 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:59:05,475 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:59:05,476 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:59:05,476 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:59:05,476 - INFO - ======================================================
+
+2025-06-24 13:59:05,476 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 13:59:05,480 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/loginpage
+2025-06-24 13:59:05,481 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'referer': 'http://127.0.0.1:8000/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es-419,es;q=0.9,es-ES;q=0.8,en;q=0.7,en-GB;q=0.6,en-US;q=0.5,es-AR;q=0.4'})
+2025-06-24 13:59:05,481 - DEBUG - \U0001f4cd Cookies: {}
+2025-06-24 13:59:05,481 - DEBUG - \u274c Encabezado Authorization no presente
+2025-06-24 13:59:05,481 - DEBUG - \u274c Cookie access_token no presente
+2025-06-24 13:59:05,485 - DEBUG - \U0001f4e4 Respuesta: 200 text/html; charset=utf-8
+2025-06-24 13:59:26,194 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 13:59:26,194 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 13:59:26,194 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 13:59:26,196 - INFO - \u274c \U0001f7e2 Configuración de correo cargada correctamente
+2025-06-24 13:59:26,196 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 13:59:26,196 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 13:59:26,196 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 13:59:26,197 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 13:59:26,197 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 13:59:26,197 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 13:59:26,197 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 13:59:26,198 - INFO - ======================================================
+
+2025-06-24 13:59:26,198 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 14:04:22,714 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 14:04:22,714 - INFO - \U0001f4be Limpieza de recursos completada
+2025-06-24 14:10:40,780 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-06-24 14:10:40,780 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-06-24 14:10:40,780 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-06-24 14:10:40,781 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-06-24 14:10:40,781 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-06-24 14:10:40,781 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-06-24 14:10:40,782 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-06-24 14:10:40,782 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-06-24 14:10:40,782 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-06-24 14:10:40,782 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-06-24 14:10:40,783 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-06-24 14:10:40,783 - INFO - ======================================================
+
+2025-06-24 14:10:40,783 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-06-24 14:11:25,308 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-06-24 14:11:25,308 - INFO - \U0001f4be Limpieza de recursos completada

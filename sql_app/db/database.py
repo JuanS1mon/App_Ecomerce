@@ -1,107 +1,102 @@
+# =============================================================================
+# database.py - Configuración y utilidades de base de datos para SQL_APP
+# =============================================================================
+# Este módulo centraliza la configuración y utilidades de acceso a la base de datos
+# para la aplicación FastAPI. Incluye:
+# - Carga de variables de entorno y configuración de SQLAlchemy.
+# - Creación y verificación de la base de datos y tablas.
+# - Compatibilidad con SQL Server (prioridad), PostgreSQL y SQLite.
+# - Funciones utilitarias para migraciones y manejo de errores.
+#
+# Notas profesionales:
+# - No contiene lógica de negocio, solo inicialización y utilidades de infraestructura.
+# - Los mensajes de ayuda y advertencia son claros para facilitar el diagnóstico.
+# - Se recomienda mantener este archivo libre de prints de debug en producción.
+# =============================================================================
+
+import os
+import sys
+from dotenv import load_dotenv
+
 # Cargar variables de entorno
+load_dotenv()
 
-
-
-
-
+# =============================
+# CONFIGURACIÓN DE CONEXIÓN Y SQLALCHEMY
+# =============================
 from sqlalchemy import MetaData, Table, create_engine, inspect, text
 from sqlalchemy.exc import InterfaceError, NoReferencedTableError, OperationalError, ProgrammingError
 from sqlalchemy.ext.declarative import DeferredReflection
-import os
-import sys
-
-from dotenv import load_dotenv
 from fastapi import HTTPException
 from sqlalchemy.orm import declarative_base, sessionmaker
 import importlib
 
-load_dotenv()
+# Variables de entorno
+DB_TYPE = os.getenv("DB_TYPE", "sqlserver").split('#')[0].strip()
+DB_USER = os.getenv("DB_USER", "sa")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_NAME = os.getenv("DB_NAME", "sqlapp")
+DB_DRIVER = os.getenv("DB_DRIVER", "ODBC Driver 17 for SQL Server")
 
-# Detectar si estamos en Heroku
-DATABASE_URL = os.getenv("DATABASE_URL")
-is_heroku = DATABASE_URL is not None
+POOL_SIZE = int(os.getenv("POOL_SIZE", "5"))
+MAX_OVERFLOW = int(os.getenv("MAX_OVERFLOW", "10"))
+POOL_TIMEOUT = int(os.getenv("POOL_TIMEOUT", "30"))
+POOL_PRE_PING = os.getenv("POOL_PRE_PING", "True").lower() in ('true', '1', 't')
+POOL_RECYCLE = int(os.getenv("POOL_RECYCLE", "3600"))
 
-if is_heroku:
-    # Si estamos en Heroku, usar DATABASE_URL proporcionado
-    if DATABASE_URL.startswith("postgres://"):
-        # Convertir postgres:// a postgresql:// para SQLAlchemy
-        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-    
-    SQLALCHEMY_DATABASE_URL = DATABASE_URL
-    # No necesitamos una conexión master en Heroku
-    master_engine = None
-else:
-    # Configuración local usando variables de entorno
-    DB_TYPE = os.getenv("DB_TYPE", "postgresql").split('#')[0].strip()  # Limpiar comentarios
-    
-    if DB_TYPE == "sqlite":
-        # Configuración para SQLite
-        SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
-        master_engine = None
-    else:
-        # Configuración para PostgreSQL/SQL Server
-        DB_USER = os.getenv("DB_USER", "postgres")
-        DB_PASSWORD = os.getenv("DB_PASSWORD", "")
-        DB_HOST = os.getenv("DB_HOST", "localhost")
-        DB_NAME = os.getenv("DB_NAME", "sqlapp")
-        DB_DRIVER = os.getenv("DB_DRIVER", "ODBC Driver 17 for SQL Server")
-
-        # Valores seguros para el pool con predeterminados
-        POOL_SIZE = int(os.getenv("POOL_SIZE", "5"))
-        MAX_OVERFLOW = int(os.getenv("MAX_OVERFLOW", "10"))
-        POOL_TIMEOUT = int(os.getenv("POOL_TIMEOUT", "30"))
-        POOL_PRE_PING = os.getenv("POOL_PRE_PING", "True").lower() in ('true', '1', 't')
-        POOL_RECYCLE = int(os.getenv("POOL_RECYCLE", "3600"))
-        
-        # Construir URLs según el tipo de base de datos
-        if DB_TYPE == "sqlserver":
-            SQLALCHEMY_DATABASE_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?driver={DB_DRIVER}"
-            SQLALCHEMY_MASTER_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master?driver={DB_DRIVER}"
-        elif DB_TYPE == "postgresql":
-            SQLALCHEMY_DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
-            SQLALCHEMY_MASTER_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/postgres"
-        else:
-            raise ValueError("DB_TYPE debe ser 'sqlserver', 'postgresql' o 'sqlite'")
-        
-        # Crear el motor de conexión a la base de datos master (solo en desarrollo)
-        if DB_TYPE != "sqlite":
-            master_engine = create_engine(SQLALCHEMY_MASTER_URL, isolation_level="AUTOCOMMIT")
-
-# Configuración de pool para Heroku
-if is_heroku:
-    # Configuración recomendada para Heroku PostgreSQL
+# =============================
+# SECCIÓN: SQL SERVER (PRIORIDAD)
+# =============================
+if DB_TYPE == "sqlserver":
+    SQLALCHEMY_DATABASE_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?driver={DB_DRIVER}"
+    SQLALCHEMY_MASTER_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master?driver={DB_DRIVER}"
+    master_engine = create_engine(SQLALCHEMY_MASTER_URL, isolation_level="AUTOCOMMIT")
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL,
-        pool_size=5,
-        max_overflow=10,
-        pool_timeout=30,
-        pool_pre_ping=True,
-        pool_recycle=1800  # 30 minutos, recomendado para Heroku
+        pool_size=POOL_SIZE,
+        max_overflow=MAX_OVERFLOW,
+        pool_timeout=POOL_TIMEOUT,
+        pool_pre_ping=POOL_PRE_PING,
+        pool_recycle=POOL_RECYCLE
     )
+    # Validación y advertencias
+    if not SQLALCHEMY_DATABASE_URL.startswith("mssql+pyodbc://"):
+        raise ValueError(
+            f"SQLALCHEMY_DATABASE_URL no está configurado correctamente para SQL Server: {SQLALCHEMY_DATABASE_URL}\n"
+            "Ejemplo correcto: mssql+pyodbc://usuario:clave@host/basededatos?driver=ODBC+Driver+17+for+SQL+Server"
+        )
+    if "ODBC Driver 17 for SQL Server" not in DB_DRIVER and "ODBC Driver 18 for SQL Server" not in DB_DRIVER:
+        print("⚠️  ADVERTENCIA: El driver de SQL Server no es el recomendado. Usa 'ODBC Driver 17 for SQL Server' o 'ODBC Driver 18 for SQL Server'.")
+
+# =============================
+# SECCIÓN: POSTGRESQL
+# =============================
+elif DB_TYPE == "postgresql":
+    SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}")
+    master_engine = create_engine(
+        os.getenv("DATABASE_URL", f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/postgres"),
+        isolation_level="AUTOCOMMIT"
+    )
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        pool_size=POOL_SIZE,
+        max_overflow=MAX_OVERFLOW,
+        pool_timeout=POOL_TIMEOUT,
+        pool_pre_ping=POOL_PRE_PING,
+        pool_recycle=POOL_RECYCLE
+    )
+
+# =============================
+# SECCIÓN: SQLITE
+# =============================
 else:
-    # Usar configuración local
-    if os.getenv("DB_TYPE", "postgresql") == "sqlite":
-        # Configuración específica para SQLite
-        engine = create_engine(
-            SQLALCHEMY_DATABASE_URL,
-            connect_args={"check_same_thread": False}
-        )
-    else:
-        # Configuración para PostgreSQL/SQL Server
-        POOL_SIZE = int(os.getenv("POOL_SIZE", "5"))
-        MAX_OVERFLOW = int(os.getenv("MAX_OVERFLOW", "10"))
-        POOL_TIMEOUT = int(os.getenv("POOL_TIMEOUT", "30"))
-        POOL_PRE_PING = os.getenv("POOL_PRE_PING", "True").lower() in ('true', '1', 't')
-        POOL_RECYCLE = int(os.getenv("POOL_RECYCLE", "3600"))
-        
-        engine = create_engine(
-            SQLALCHEMY_DATABASE_URL,
-            pool_size=POOL_SIZE,
-            max_overflow=MAX_OVERFLOW,
-            pool_timeout=POOL_TIMEOUT,
-            pool_pre_ping=POOL_PRE_PING,
-            pool_recycle=POOL_RECYCLE
-        )
+    SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sql_app/sql_app.db")
+    master_engine = None
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        connect_args={"check_same_thread": False}
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=True, bind=engine)
 Base = declarative_base()
@@ -121,11 +116,9 @@ def get_db():
 
 # Crear la base de datos si no existe (solo en entorno local)
 def create_database():
-    # Omitir en Heroku
-    if is_heroku:
-        print("Ejecutando en Heroku - omitiendo creación de base de datos")
+    # Para SQLite, no necesitamos crear la base de datos manualmente
+    if DB_TYPE == "sqlite":
         return
-        
     try:
         with master_engine.connect() as connection:
             if DB_TYPE == "sqlserver":
@@ -136,11 +129,14 @@ def create_database():
                 result = connection.execute(text(f"SELECT 1 FROM pg_database WHERE datname = '{DB_NAME}'"))
                 if not result.scalar():
                     connection.execute(text(f"CREATE DATABASE {DB_NAME}"))
-                else:
-                    print(f"La base de datos '{DB_NAME}' ya existe.")
-        print("Base de datos verificada o creada exitosamente.")
     except (OperationalError, InterfaceError, ProgrammingError) as e:
-        print(f"Error al crear la base de datos: {e}")
+        msg = str(e)
+        if "Error de inicio de sesión" in msg or "login failed" in msg.lower():
+            print("⚠️  No se pudo conectar a la base de datos. Verifica usuario y contraseña.")
+        elif "ya existe" in msg.lower() or "already exists" in msg.lower():
+            pass
+        else:
+            print(f"⚠️  Error al crear la base de datos: {e}")
 
 # Función para cargar el modelo Roles primero
 def ensure_roles_model():
@@ -148,7 +144,6 @@ def ensure_roles_model():
         # Intentar importar el modelo Roles existente
         try:
             importlib.import_module("db.models.roles")
-            print("Modelo Roles importado correctamente.")
         except ImportError:
             # Si no existe, crearlo
             import os
@@ -159,17 +154,7 @@ def ensure_roles_model():
             
             if not os.path.exists(roles_file_path):
                 with open(roles_file_path, 'w') as f:
-                    f.write("""from sqlalchemy import Column, Integer, String
-from db.database import Baseclass Roles(Base):
-    __tablename__ = "Roles"
-    __table_args__ = {'extend_existing': True}
-    
-    id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String(50), unique=True)
-    descripcion = Column(String(255), nullable=True)
-""")
-                print(f"Modelo Roles creado en: {roles_file_path}")
-                # Recargar el módulo después de crearlo
+                    f.write("""from sqlalchemy import Column, Integer, String\nfrom db.database import Baseclass Roles(Base):\n    __tablename__ = \"Roles\"\n    __table_args__ = {'extend_existing': True}\n    \n    id = Column(Integer, primary_key=True, index=True)\n    nombre = Column(String(50), unique=True)\n    descripcion = Column(String(255), nullable=True)\n""")
                 importlib.import_module("db.models.roles")
         
         # Crear solo la tabla Roles primero
@@ -178,16 +163,20 @@ from db.database import Baseclass Roles(Base):
         for table_name, table in Base.metadata.tables.items():
             if table_name == "Roles":
                 table.tometadata(temp_metadata)
-                temp_metadata.create_all(bind=engine)
-                print("Tabla Roles creada exitosamente.")
+                try:
+                    temp_metadata.create_all(bind=engine)
+                except (OperationalError, InterfaceError, ProgrammingError) as e:
+                    msg = str(e)
+                    if "Error de inicio de sesión" in msg or "login failed" in msg.lower():
+                        print("⚠️  No se pudo conectar a la base de datos. Verifica usuario y contraseña.")
+                    elif "ya existe" in msg.lower() or "already exists" in msg.lower():
+                        pass
+                    else:
+                        print(f"⚠️  Error al crear tabla Roles: {e}")
                 break
                 
     except Exception as e:
         print(f"Error al asegurar el modelo Roles: {e}")
-        import traceback
-        traceback.print_exc()
-
-
 
 # Crear las tablas en la base de datos
 def create_tables():
@@ -196,20 +185,60 @@ def create_tables():
         ensure_roles_model()
         
         # Crear todas las demás tablas usando el método estándar de SQLAlchemy
-        Base.metadata.create_all(bind=engine)
-        print("Tablas creadas exitosamente.")
-        
+        try:
+            Base.metadata.create_all(bind=engine)
+        except (OperationalError, InterfaceError, ProgrammingError) as e:
+            msg = str(e)
+            if "Error de inicio de sesión" in msg or "login failed" in msg.lower():
+                print("⚠️  No se pudo conectar a la base de datos. Verifica usuario y contraseña.")
+            elif "ya existe" in msg.lower() or "already exists" in msg.lower():
+                pass
+            else:
+                print(f"⚠️  Error al crear tablas: {e}")
     except NoReferencedTableError as e:
         print(f"Error de tabla referenciada: {e}")
         # Si falla porque falta una tabla referenciada, intenta manejar caso por caso
         if "Roles" in str(e):
             ensure_roles_model()
-            # Intentar crear tablas nuevamente
-            Base.metadata.create_all(bind=engine)
-    except (OperationalError, InterfaceError, ProgrammingError) as e:
-        print(f"Error al crear tablas: {e}")
-        import traceback
-        traceback.print_exc()
+            try:
+                Base.metadata.create_all(bind=engine)
+            except Exception as e2:
+                print(f"⚠️  Error al crear tablas tras asegurar Roles: {e2}")
+    except Exception as e:
+        print(f"⚠️  Error inesperado al crear tablas: {e}")
+
+# Eliminar cualquier lógica residual de PostgreSQL
+if 'psycopg2' in sys.modules:
+    del sys.modules['psycopg2']
+    print("Referencia a psycopg2 eliminada.")
+
+# Asegurar que SQLALCHEMY_DATABASE_URL esté configurado para SQL Server
+if not SQLALCHEMY_DATABASE_URL.startswith("mssql+pyodbc://"):
+    raise ValueError("SQLALCHEMY_DATABASE_URL no está configurado correctamente para SQL Server.")
+
+# =============================
+# AUTO-ACTUALIZAR BASE DE DATOS CON ALEMBIC EN STARTUP
+# =============================
+def run_alembic_upgrade():
+    import subprocess
+    import logging
+    try:
+        result = subprocess.run([
+            sys.executable, '-m', 'alembic', 'upgrade', 'head'
+        ], cwd=os.path.dirname(os.path.dirname(__file__)), capture_output=True, text=True)
+        if result.returncode == 0:
+            return True
+        else:
+            # Solo mostrar error si es realmente crítico
+            if result.stderr.strip():
+                print(f"[Alembic] Error al aplicar migraciones: {result.stderr}")
+            return not result.stderr.strip()
+    except Exception as e:
+        print(f"[Alembic] Excepción al ejecutar migraciones: {e}")
+        return False
+
+# Ejecutar migraciones automáticamente al importar este módulo
+run_alembic_upgrade()
 
 # La base de datos se crea pero las tablas no se crean automáticamente
 # para evitar problemas de orden de creación

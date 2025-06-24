@@ -24,7 +24,7 @@ from sqlalchemy import desc, text
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.Services.security.security import get_current_user
+from sql_app.Services.security.security import get_current_user, get_current_user_for_admin
 from sql_app.Services.tickets.crud_ticket import (
     add_response_to_history,
     create_ticket,
@@ -155,7 +155,7 @@ async def responder_ticket(
     nuevo_estado: Optional[str] = Form(None),
     asignar_a: Optional[str] = Form(None),
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user_for_admin)
 ):
     """
     Procesa una respuesta a un ticket y/o actualización de estado.

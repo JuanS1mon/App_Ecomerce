@@ -1,216 +1,200 @@
-# Imports de bibliotecas estándar
-from datetime import date, timedelta
-import os
-import re
-
-# Imports de terceros
+# Imports necesarios
+from datetime import date, timedelta, timezone
+from typing import Optional, Dict, Any
 from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request, status
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import text
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-
-# Imports del proyecto
-from sql_app.Services.security.security import encriptar_clave, get_current_user  # Importar la función de seguridad
+from sql_app.Services.security.utils import encriptar_clave
+from sql_app.Services.security.jwt_auth import get_current_user, require_admin
+from sql_app.Services.security.auth_middleware import require_admin_for_template, get_authenticated_user
 from sql_app.db.database import get_db
-from sql_app.db.models.config.activityLog import ActivityLog
-from sql_app.db.models.config.usuarios import usuarios
-from sql_app.db.schemas.config.Usuarios import UserDB  # Asegúrate de importar UserDB
+from sql_app.db.models.config.usuarios import Usuarios
+from sql_app.db.schemas.config.Usuarios import UserDB
 
-templates = Jinja2Templates(directory="sql_app/static")  # Cambiado para coincidir con main.py
 
-def create_admin_router(app: FastAPI):
-    router = APIRouter(
-        include_in_schema=False,  # Oculta todas las rutas de este router en la documentación
-        prefix="/admin",
-        tags=["Admin"],
-        responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
-    )
-    @router.get("")
-    async def admin_page(request: Request, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-        # Verificar si el usuario es admin
-        is_admin = False
-        
-        if isinstance(current_user, dict):
-            # Si es un diccionario, verificamos en los roles (adaptado a la estructura de tu dict)
-            if "roles" in current_user:
-                is_admin = any(role["nombre"] == "admin" for role in current_user["roles"])
-        else:
-            # Si es un objeto UserDB
-            if hasattr(current_user, "roles"):
-                is_admin = any(role.nombre == "admin" for role in current_user.roles)
-        
-        # Si no es admin, denegar acceso
-        if not is_admin:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Se requiere rol de administrador para acceder a esta página",
-                headers={"Location": "/unauthorized"}
-            )
-        
-        # Obtener estadísticas
-        user_count = db.query(usuarios).count()
-        
-        # Obtener actividades usando SQL nativo para evitar errores de ORM
-        activity_query = text("""
-            SELECT a.id, a.action, a.timestamp, u.usuario, u.nombre
-            FROM activity_log a
-            LEFT JOIN Usuarios u ON a.user_id = u.codigo
-            ORDER BY a.timestamp DESC
-        """)
-        
-        activities_raw = db.execute(activity_query).fetchall()
-        
-        # Convertir a formato amigable para la plantilla
-        activities = []
-        for act in activities_raw:
-            activities.append({
-                "id": act[0],
-                "action": act[1],
-                "timestamp": act[2],
-                "usuario": {
-                    "usuario": act[3],
-                    "nombre": act[4]
-                } if act[3] else None
-            })
-        
-        # Preparar los datos para el gráfico usando SQL nativo para el recuento
-        activity_count_query = text("SELECT COUNT(*) FROM activity_log")
-        activity_count = db.execute(activity_count_query).scalar()
-        
-        # Preparar datos del gráfico
-        chart_data = prepare_activity_data(activities)
-        
-        return templates.TemplateResponse("admin.html", {
-            "request": request,
-            "user": current_user,
-            "user_count": user_count,
-            "activities": activities[:10],  # Mostrar las últimas 10 en la lista
-            "chart_data": chart_data,
-            "activity_count": activity_count
-        })
-    
-    @router.get("/perfil")
-    async def user_perfil(request: Request, user: UserDB = Depends(get_current_user)):
-        return templates.TemplateResponse("/usuarios/usuario_admin.html", {
-            "request": request,
-            "user": user
-        })
-    
-    @router.post("/perfil")
-    async def update_perfil(
-        request: Request,
-        nombre: str = Form(...),
-        telefono: str = Form(...),
-        email: str = Form(...),
-        direccion: str = Form(...),
-        fecha_nacimiento: str = Form(None),  # Cambiado de ... a None para hacerlo opcional
-        password: str = Form(None),
-        db: Session = Depends(get_db),
-        user: UserDB = Depends(get_current_user)
+# Definir la instancia de Jinja2Templates
+templates = Jinja2Templates(directory="sql_app/static")
+
+# Definir el router directamente
+router = APIRouter(
+    include_in_schema=False,
+    prefix="/admin",
+    tags=["Admin"],
+    responses={status.HTTP_404_NOT_FOUND: {"message": "Ruta no encontrada"}}
+)
+
+@router.get("")
+async def admin_page(request: Request, db: Session = Depends(get_db)):
+    """
+    Página de admin - Renderizado limpio, autenticación gestionada por middleware
+    """
+    try:
+        # Aquí podrías obtener datos adicionales del usuario si lo necesitas
+        # Por ejemplo, desde request.state.token_data si lo guardas en el middleware
+        user_data = {}
+        # Si necesitas datos del usuario autenticado:
+        # token_data = getattr(request.state, 'token_data', None)
+        # if token_data:
+        #     user_data["user"] = {"usuario": token_data.username}
+        return templates.TemplateResponse(
+            "admin.html",
+            {"request": request, **user_data}
+        )
+    except Exception as e:
+        # Manejo de error simple
+        return RedirectResponse(url="/loginpage", status_code=303)
+
+@router.get("/data")
+async def admin_data(
+        current_user: UserDB = Depends(require_admin)
     ):
+    """
+    API protegida para obtener datos del usuario admin.
+    Requiere token JWT válido.
+    """
+    print("=========== API DE DATOS ADMIN ===========")
+    print(f"Usuario autenticado: {current_user.usuario}")
+    print(f"Roles: {current_user.roles}")
+    
+    return {
+        "user": {
+            "username": current_user.usuario,
+            "nombre": current_user.nombre,
+            "email": current_user.mail,
+            "roles": current_user.roles,
+            "activo": current_user.activo
+        },
+        "message": "Datos de admin obtenidos exitosamente"
+    }
 
-        # Actualizar los datos del usuario en la base de datos
-        user.nombre = nombre
-        user.telefono = telefono
-        user.mail = email  # Asegúrate de que el campo se llame "mail" y no "email"
-        user.direccion = direccion
-        user.fecha_nacimiento = fecha_nacimiento
-        if password:
-            user.clave = encriptar_clave(password)  # Asegúrate de que el campo se llame "clave"
-            
-        # Actualizar el usuario en la base de datos
-        db_user = db.query(usuarios).filter(usuarios.codigo == user.codigo).first()
-        if db_user:
-            db_user.nombre = user.nombre
-            db_user.telefono = user.telefono
-            db_user.mail = user.mail
-            db_user.direccion = user.direccion
-            db_user.fecha_nacimiento = user.fecha_nacimiento
-            if password:
-                db_user.clave = user.clave
-                
-            db.commit()
-            db.refresh(db_user)
+@router.get("/perfil")
+async def user_perfil(
+    request: Request,
+    user_data: Dict[str, Any] = Depends(require_admin_for_template)
+):
+    """Página de perfil de usuario - AUTENTICACIÓN BACKEND"""
+    return templates.TemplateResponse(
+        "/usuarios/usuario_admin.html",
+        {
+            "request": request, 
+            **user_data
+        }
+    )
+
+@router.post("/perfil")
+async def update_perfil(
+    request: Request,
+    nombre: str = Form(...),
+    telefono: str = Form(...),
+    email: str = Form(...),
+    direccion: str = Form(...),
+    fecha_nacimiento: Optional[str] = Form(None),
+    password: Optional[str] = Form(None),
+    db: Session = Depends(get_db),
+    user: UserDB = Depends(get_authenticated_user)
+):
+    """Actualización del perfil de usuario - AUTENTICACIÓN BACKEND"""
+    db_user = db.query(Usuarios).filter(Usuarios.codigo == user.codigo).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    db_user.nombre = nombre
+    db_user.telefono = telefono
+    db_user.mail = email
+    db_user.direccion = direccion
+    if fecha_nacimiento:
+        db_user.fecha_nacimiento = fecha_nacimiento
+    if password:
+        db_user.clave = encriptar_clave(password)
+
+    try:
+        db.commit()
+        db.refresh(db_user)
+        message = "Perfil actualizado exitosamente"
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error al actualizar el perfil: {str(e)}")
+
+    return templates.TemplateResponse(
+        "/usuarios/usuario_admin.html",
+        {
+            "request": request, 
+            "user": user, 
+            "message": message,
+            "is_authenticated": True,
+            "is_admin": "admin" in getattr(user, 'roles', [])
+        }
+    )
+
+# ============================================================================
+# ROUTER DEBUG: Endpoint de admin simplificado para diagnóstico
+# ============================================================================
+
+@router.get("/debug")
+async def admin_debug(
+    request: Request,
+    current_user: UserDB = Depends(require_admin)
+):
+    """Endpoint de debug simplificado para admin"""
+    try:
+        print("🔍 DEBUG /admin/debug - Iniciando...")
+        print(f"Usuario: {current_user}")
+        print(f"Request: {request}")
         
-        return templates.TemplateResponse("/usuarios/usuario_admin.html", {
-            "request": request,
-            "user": user,
-            "message": "Perfil actualizado exitosamente"
-        })
-
-    @router.get("/")
-    async def read_admin(user: dict = Depends(get_current_user)):
-        return {"message": "Admin content"}
-
-    @router.get("/nonexistent")
-    async def read_nonexistent():
-        raise HTTPException(status_code=404, detail="Ruta no encontrada")
-
-    app.include_router(router)
-    
-    return router
-
-from collections import defaultdict
-from datetime import timezone
-def prepare_activity_data(activities):
-    """Prepara los datos de actividad para su visualización en gráficos"""
-    activity_counts = defaultdict(lambda: defaultdict(int))
-    
-    for activity in activities:
-        # Verificar si es un diccionario o un objeto
-        if isinstance(activity, dict):
-            # Es un diccionario
-            usuario_info = activity.get("usuario")
-            timestamp = activity.get("timestamp")
-            
-            if usuario_info:
-                user_name = usuario_info.get("nombre", "Desconocido")
-            else:
-                user_name = "Desconocido"
-        else:
-            # Es un objeto
-            usuario_info = getattr(activity, "usuario", None)
-            timestamp = getattr(activity, "timestamp", None)
-            
-            if usuario_info:
-                user_name = getattr(usuario_info, "nombre", "Desconocido")
-            else:
-                user_name = "Desconocido"
+        # Verificar usuario
+        if not current_user:
+            print("❌ Usuario no encontrado")
+            raise HTTPException(status_code=401, detail="Usuario no autenticado")
         
-        # Verificar si timestamp es None
-        if timestamp:
-            # Convertir a formato de fecha
-            if hasattr(timestamp, "tzinfo"):
-                if timestamp.tzinfo is None:
-                    timestamp = timestamp.replace(tzinfo=timezone.utc)
-                local_timestamp = timestamp.astimezone()
-                date_str = local_timestamp.date().isoformat()
-            else:
-                # Si no es un objeto datetime, convertir a string
-                date_str = str(timestamp).split()[0]
-            
-            # Incrementar contador para este usuario y fecha
-            activity_counts[user_name][date_str] += 1
-    
-    # Preparar los datos para Chart.js
-    datasets = []
-    colors = ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)', 
-              'rgba(255, 206, 86, 0.5)', 'rgba(75, 192, 192, 0.5)',
-              'rgba(153, 102, 255, 0.5)', 'rgba(255, 159, 64, 0.5)']
-    
-    for i, (user, dates) in enumerate(activity_counts.items()):
-        color = colors[i % len(colors)]  # Ciclar colores si hay más usuarios que colores
+        print(f"✅ Usuario válido: {current_user.usuario}")
         
-        data = []
-        for date_str, count in dates.items():
-            data.append({'x': date_str, 'y': count})
-            
-        datasets.append({
-            'label': user,
-            'data': sorted(data, key=lambda x: x['x']),  # Ordenar por fecha
-            'backgroundColor': color,
-            'borderColor': color.replace('0.5', '1.0'),
-            'borderWidth': 1
-        })
+        # Intentar devolver JSON simple primero
+        return {
+            "message": "Debug exitoso",
+            "user": {
+                "usuario": current_user.usuario,
+                "nombre": current_user.nombre,
+                "roles": getattr(current_user, 'roles', [])
+            }
+        }
+        
+    except Exception as e:
+        print(f"❌ Error en debug: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error debug: {str(e)}")
+
+@router.get("/test-template")
+async def test_template(request: Request):
+    """Endpoint de prueba para verificar que Jinja2 funciona"""
+    test_data = {
+        "user": {
+            "nombre": "Usuario de Prueba",
+            "usuario": "test"
+        },
+        "user_count": 42,
+        "activity_count": 5,
+        "activities": [],
+        "is_admin": True
+    }
     
-    return {'datasets': datasets}
+    try:
+        return templates.TemplateResponse(
+            "admin.html",
+            {
+                "request": request,
+                **test_data
+            }
+        )
+    except Exception as e:
+        return f"Error renderizando template: {str(e)}"
+
+@router.get("/debug-cookies")
+async def debug_cookies(request: Request):
+    """Debug para verificar cookies"""
+    return {
+        "cookies_recibidas": dict(request.cookies),
+        "headers": dict(request.headers),
+        "url": str(request.url)
+    }

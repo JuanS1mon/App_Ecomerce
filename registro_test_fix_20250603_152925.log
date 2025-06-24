@@ -1,8 +1,0 @@
-2025-06-03 15:29:25,240 - INFO - Iniciando prueba de registro con log (se guardará en c:\Users\PCJuan\Desktop\sql_app\registro_test_fix_20250603_152925.log)
-2025-06-03 15:29:25,240 - INFO - Enviando solicitud de registro con datos: {"nombre": "Juan Simon", "usuario": "juansimon", "clave": "123", "mail": "fjuansimon@gmail.com", "telefono": "+541159002769", "acepta_terminos": true}
-2025-06-03 15:29:25,244 - DEBUG - Starting new HTTP connection (1): localhost:8000
-2025-06-03 15:29:27,280 - DEBUG - http://localhost:8000 "POST /user/registro HTTP/1.1" 422 208
-2025-06-03 15:29:27,290 - INFO - Código de estado: 422
-2025-06-03 15:29:27,290 - INFO - Encabezados: {"date": "Tue, 03 Jun 2025 18:29:26 GMT", "server": "uvicorn", "content-length": "208", "content-type": "application/json"}
-2025-06-03 15:29:27,290 - INFO - Contenido: {"detail":[{"type":"string_too_short","loc":["body","clave"],"msg":"String should have at least 8 characters","input":"123","ctx":{"min_length":8},"url":"https://errors.pydantic.dev/2.5/v/string_too_short"}]}
-2025-06-03 15:29:27,290 - INFO - Resultado final: Fallo

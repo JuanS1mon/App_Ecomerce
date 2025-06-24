@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - Panel de Administración</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Interceptor de autenticación -->
+    <script>
+        if (!window.AUTH_INTERCEPTOR_LOADED) {
+            console.log('🔐 Cargando interceptor embebido para gestión de usuarios...');
+            const AUTH_CONFIG = {
+                TOKEN_KEY: 'access_token',
+                EXCLUDED_PATHS: ['/login', '/logout', '/loginpage', '/registerpage', '/static']
+            };
+            
+            const originalFetch = window.fetch;
+            window.fetch = function(url, options = {}) {
+                const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+                const shouldIncludeToken = token && 
+                    !AUTH_CONFIG.EXCLUDED_PATHS.some(path => url.includes(path));
+                
+                if (shouldIncludeToken) {
+                    options.headers = options.headers || {};
+                    const hasAuthHeader = Object.keys(options.headers).some(
+                        key => key.toLowerCase() === 'authorization'
+                    );
+                    
+                    if (!hasAuthHeader) {
+                        options.headers['Authorization'] = `Bearer ${token}`;
+                        console.log('🔐 Token agregado:', url);
+                    }
+                }
+                
+                return originalFetch.call(this, url, options)
+                    .then(response => {
+                        if (response.status === 401 && shouldIncludeToken) {
+                            console.log('🚨 Token rechazado, redirigiendo a login');
+                            localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+                            window.location.href = '/loginpage';
+                        }
+                        return response;
+                    });
+            };
+            
+            window.AUTH_INTERCEPTOR_LOADED = true;
+            console.log('✅ Interceptor embebido cargado');
+        }
+    </script>
+    
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -3px rgba(0, 0, 0, 0.1);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .status-active {
+            background-color: #10b981;
+        }
+        .status-inactive {
+            background-color: #ef4444;
+        }
+        .tab-button.active {
+            border-bottom-color: #3b82f6;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+
+    <!-- Contenido principal -->
+    <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
+        <!-- Header con información de la página -->
+        <div class="mb-8">
+            <div class="gradient-bg text-white rounded-lg shadow-lg p-6 sm:p-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">
+                            <i class="fas fa-users-cog mr-3"></i>
+                            Gestión de Usuarios
+                        </h1>
+                        <p class="text-white text-opacity-90">
+                            Administra usuarios, roles, permisos y configuraciones del sistema
+                        </p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <button id="btnNuevoUsuario" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Nuevo Usuario
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas de usuarios -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Usuarios</p>
+                        <p id="total-users" class="text-3xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="p-3 bg-blue-100 rounded-full">
+                        <i class="fas fa-users text-2xl text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Usuarios Activos</p>
+                        <p id="active-users" class="text-3xl font-bold text-green-600">0</p>
+                    </div>
+                    <div class="p-3 bg-green-100 rounded-full">
+                        <i class="fas fa-user-check text-2xl text-green-600"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Administradores</p>
+                        <p id="admin-users" class="text-3xl font-bold text-purple-600">0</p>
+                    </div>
+                    <div class="p-3 bg-purple-100 rounded-full">
+                        <i class="fas fa-user-shield text-2xl text-purple-600"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Roles Totales</p>
+                        <p id="total-roles" class="text-3xl font-bold text-orange-600">0</p>
+                    </div>
+                    <div class="p-3 bg-orange-100 rounded-full">
+                        <i class="fas fa-tags text-2xl text-orange-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegación de pestañas -->
+        <div class="bg-white rounded-lg shadow-md mb-8">
+            <div class="border-b border-gray-200">
+                <nav class="flex space-x-8 px-6">
+                    <button id="tab-usuarios" class="tab-button py-4 px-2 border-b-2 border-blue-500 text-blue-600 font-medium active">
+                        <i class="fas fa-users mr-2"></i>
+                        Usuarios
+                    </button>
+                    <button id="tab-roles" class="tab-button py-4 px-2 border-b-2 border-transparent text-gray-500 font-medium hover:text-gray-700">
+                        <i class="fas fa-tags mr-2"></i>
+                        Roles
+                    </button>
+                    <button id="tab-permisos" class="tab-button py-4 px-2 border-b-2 border-transparent text-gray-500 font-medium hover:text-gray-700">
+                        <i class="fas fa-shield-alt mr-2"></i>
+                        Permisos
+                    </button>
+                    <button id="tab-auditoria" class="tab-button py-4 px-2 border-b-2 border-transparent text-gray-500 font-medium hover:text-gray-700">
+                        <i class="fas fa-history mr-2"></i>
+                        Auditoría
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Contenido de las pestañas -->
+        <div id="content-usuarios" class="tab-content">
+            <!-- Filtros y búsqueda avanzada -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-filter mr-2"></i>
+                    Filtros y Búsqueda
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Buscar usuario</label>
+                        <div class="relative">
+                            <input type="text" id="searchUsuarios" placeholder="Nombre, usuario o email..." 
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                        <select id="filterEstado" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="">Todos los estados</option>
+                            <option value="true">Activos</option>
+                            <option value="false">Inactivos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Rol</label>
+                        <select id="filterRol" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="">Todos los roles</option>
+                            <option value="admin">Administrador</option>
+                            <option value="manager">Gestor</option>
+                            <option value="usuario">Usuario</option>
+                            <option value="tecnico">Técnico</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button id="btnAplicarFiltros" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-search mr-2"></i>
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de usuarios -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-users mr-2"></i>
+                        Lista de Usuarios
+                    </h3>
+                    <div class="flex space-x-3">
+                        <button id="btnExportarUsuarios" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200">
+                            <i class="fas fa-download mr-2"></i>
+                            Exportar
+                        </button>
+                        <button id="btnImportarUsuarios" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200">
+                            <i class="fas fa-upload mr-2"></i>
+                            Importar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <input type="checkbox" id="selectAll" class="rounded border-gray-300">
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Información</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roles</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Última Actividad</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Los usuarios se cargarán aquí dinámicamente -->
+                            <tr class="animate-pulse">
+                                <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>
+                                    Cargando usuarios...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginación -->
+                <div class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <button id="btnAnteriorMobile" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Anterior
+                        </button>
+                        <button id="btnSiguienteMobile" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Siguiente
+                        </button>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Mostrando <span id="startRange">1</span> a <span id="endRange">10</span> de 
+                                <span id="totalUsuarios">0</span> usuarios
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                                <button id="btnAnterior" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <div id="paginationNumbers" class="relative inline-flex items-center"></div>
+                                <button id="btnSiguiente" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido de roles (oculto inicialmente) -->
+        <div id="content-roles" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-tags mr-2"></i>
+                    Gestión de Roles
+                </h3>
+                <p class="text-gray-600">Funcionalidad de gestión de roles en desarrollo...</p>
+            </div>
+        </div>
+
+        <!-- Contenido de permisos (oculto inicialmente) -->
+        <div id="content-permisos" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    Gestión de Permisos
+                </h3>
+                <p class="text-gray-600">Funcionalidad de gestión de permisos en desarrollo...</p>
+            </div>
+        </div>
+
+        <!-- Contenido de auditoría (oculto inicialmente) -->
+        <div id="content-auditoria" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-history mr-2"></i>
+                    Auditoría y Logs
+                </h3>
+                <p class="text-gray-600">Funcionalidad de auditoría en desarrollo...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notificaciones -->
+    <div id="notificaciones" class="fixed top-4 right-4 z-50 space-y-2"></div>    <!-- Scripts -->
+    <script src="/static/html/usuarios/js/usuarios_admin_corregido.js"></script>
+</body>
+</html>

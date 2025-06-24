@@ -1,3 +1,0 @@
-Status Code: 201
-Headers: {"date": "Tue, 03 Jun 2025 18:05:00 GMT", "server": "uvicorn", "content-length": "59", "content-type": "application/json"}
-Contenido: {"message":"Usuario registrado exitosamente","user_id":123}

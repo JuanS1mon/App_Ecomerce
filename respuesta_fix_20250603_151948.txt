@@ -1,3 +1,0 @@
-Status Code: 422
-Headers: {"date": "Tue, 03 Jun 2025 18:19:47 GMT", "server": "uvicorn", "content-length": "208", "content-type": "application/json"}
-Contenido: {"detail":[{"type":"string_too_short","loc":["body","clave"],"msg":"String should have at least 8 characters","input":"123","ctx":{"min_length":8},"url":"https://errors.pydantic.dev/2.5/v/string_too_short"}]}
