@@ -9,7 +9,8 @@ LOGGING_CONFIG = {
             "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         },
         "access": {
-            "format": "%(asctime)s - %(levelname)s - %(client_addr)s - \"%(request_line)s\" %(status_code)s",
+            # Formato seguro para logs de acceso de Uvicorn
+            "format": "%(message)s",
         },
     },
     "handlers": {

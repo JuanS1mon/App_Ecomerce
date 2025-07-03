@@ -1,4 +1,3 @@
-
 # Imports de bibliotecas estándar
 import datetime
 import logging
@@ -14,6 +13,103 @@ from sqlalchemy.orm import Session
 from sql_app.Services.app_stock.ot.model_ot import OT as Ot, Operacion, ReporteTiempo
 
 logger = logging.getLogger(__name__)
+
+# ===== Funciones de cálculo de progreso =====
+def calcular_progreso_ot(db: Session, ot_id: int) -> float:
+    """
+    Calcula el progreso de una OT basado en el porcentaje de tareas completadas.
+    
+    Args:
+        db: Sesión de base de datos
+        ot_id: ID de la OT
+        
+    Returns:
+        float: Porcentaje de progreso (0-100)
+    """
+    try:
+        # Obtener todas las operaciones de la OT
+        operaciones = db.query(Operacion).filter(Operacion.ot_id == ot_id).all()
+        
+        if not operaciones:
+            return 0.0
+        
+        total_operaciones = len(operaciones)
+        operaciones_completadas = len([op for op in operaciones if op.estado == "finalizada"])
+        
+        progreso = (operaciones_completadas / total_operaciones) * 100
+        return round(progreso, 1)
+        
+    except Exception as e:
+        logger.error(f"Error al calcular progreso de OT {ot_id}: {e}")
+        return 0.0
+
+def actualizar_estado_ot_automatico(db: Session, ot_id: int) -> bool:
+    """
+    Actualiza automáticamente el estado de una OT basado en el progreso de sus tareas.
+    
+    Args:
+        db: Sesión de base de datos
+        ot_id: ID de la OT
+        
+    Returns:
+        bool: True si se actualizó el estado, False en caso contrario
+    """
+    try:
+        ot = db.query(Ot).filter(Ot.id == ot_id).first()
+        if not ot:
+            return False
+            
+        progreso = calcular_progreso_ot(db, ot_id)
+        
+        # Lógica para actualizar estado automáticamente
+        nuevo_estado = None
+        if progreso == 0:
+            nuevo_estado = "planificando"
+        elif 0 < progreso < 100:
+            nuevo_estado = "ejecutando"
+        elif progreso == 100:
+            nuevo_estado = "finalizada"
+            
+        if nuevo_estado and ot.estado != nuevo_estado:
+            ot.estado = nuevo_estado
+            if nuevo_estado == "ejecutando" and not ot.fecha_inicio:
+                ot.fecha_inicio = datetime.datetime.utcnow()
+            elif nuevo_estado == "finalizada" and not ot.fecha_fin:
+                ot.fecha_fin = datetime.datetime.utcnow()
+                
+            db.commit()
+            logger.info(f"Estado de OT {ot_id} actualizado automáticamente a: {nuevo_estado}")
+            return True
+            
+        return False
+        
+    except Exception as e:
+        logger.error(f"Error al actualizar estado automático de OT {ot_id}: {e}")
+        db.rollback()
+        return False
+
+def puede_modificar_ot(db: Session, ot_id: int) -> bool:
+    """
+    Verifica si una OT puede ser modificada basándose en su estado.
+    Las OT finalizadas no pueden modificarse.
+    
+    Args:
+        db: Sesión de base de datos
+        ot_id: ID de la OT
+        
+    Returns:
+        bool: True si se puede modificar, False si está finalizada
+    """
+    try:
+        ot = db.query(Ot).filter(Ot.id == ot_id).first()
+        if not ot:
+            return False
+            
+        return ot.estado != "finalizada"
+        
+    except Exception as e:
+        logger.error(f"Error al verificar si puede modificar OT {ot_id}: {e}")
+        return False
 
 # ===== Servicios de OT =====
 def create_ot(db: Session, ot: Ot) -> Ot:
@@ -43,7 +139,7 @@ def create_ot(db: Session, ot: Ot) -> Ot:
         
         # Asegurarnos de que estado tenga un valor predeterminado
         if not hasattr(ot, 'estado') or ot.estado is None:
-            ot.estado = "pendiente"
+            ot.estado = "planificando"
         
         for field in fields:
             if hasattr(ot, field) and getattr(ot, field) is not None:

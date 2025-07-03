@@ -4,7 +4,7 @@
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
 
 # Imports de terceros
@@ -29,7 +29,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 # Imports del proyecto
 from sql_app.Services.Analisis.analisis import clean_data
 from sql_app.Services.migracion.migracion import procesar_archivo
-from sql_app.Services.security.security import get_current_user
+from sql_app.Services.security.auth_middleware import require_role_api
 from sql_app.db.crud.tablas import get_tables
 from sql_app.db.database import get_db
 from sql_app.db.models.config.activityLog import ActivityLog
@@ -234,42 +234,73 @@ router = APIRouter(
 
 @router.get("/check_progress")
 async def check_progress(
-    current_user = Depends(get_current_user)  # Eliminamos la anotación de tipo
+    current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
-    # Obtenemos el usuario de forma segura
-    user_name = current_user["usuario"] if isinstance(current_user, dict) else current_user.usuario
-    
-    user_progress = progress_storage.get(user_name, MigracionProgress())
-    return JSONResponse(content=user_progress.to_dict())
+    """Verifica el progreso de la migración del usuario actual"""
+    try:
+        # Obtener el nombre de usuario
+        user_name = current_user.usuario
+        
+        if not user_name:
+            raise HTTPException(status_code=400, detail="Usuario no válido")
+        
+        user_progress = progress_storage.get(user_name, MigracionProgress())
+        return JSONResponse(content=user_progress.to_dict())
+    except Exception as e:
+        logging.error(f"Error al verificar progreso: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al verificar progreso: {str(e)}")
 
 @router.get("/nueva_migracion")
 async def migraciones_page(
     request: Request,
-    current_user = Depends(get_current_user)  # Eliminada la anotación de tipo
+    current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
-    return templates.TemplateResponse("/migraciones/migraciones_nueva.html", {"request": request, "user": current_user})
+    """Página para crear una nueva migración"""
+    try:
+        return templates.TemplateResponse(
+            "html/migraciones/migraciones_nueva.html", 
+            {"request": request, "user": current_user}
+        )
+    except Exception as e:
+        logging.error(f"Error al cargar página nueva migración: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error al cargar la página")
 @router.post("/upload")
 async def upload_migracion_file(
     request: Request,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
-    # Obtener el usuario_id según el tipo
-    user_id = current_user["codigo"] if isinstance(current_user, dict) else current_user.codigo
-    user_name = current_user["usuario"] if isinstance(current_user, dict) else current_user.usuario
-    
-    progress = MigracionProgress()
-    progress_storage[user_name] = progress
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    
+    """Sube y procesa archivos de migración (Excel/CSV)"""
     try:
+        # Obtener información del usuario
+        user_id = current_user.codigo
+        user_name = current_user.usuario
+        
+        if not user_id or not user_name:
+            raise HTTPException(status_code=400, detail="Usuario no válido")
+        
+        # Validar tamaño del archivo (50MB máximo)
+        if file.size and file.size > 50 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="El archivo es demasiado grande (máximo 50MB)")
+        
+        # Validar extensión del archivo
+        if not file.filename or not any(file.filename.lower().endswith(ext) for ext in ['.xlsx', '.xls', '.csv']):
+            raise HTTPException(status_code=400, detail="Tipo de archivo no soportado")
+        
+        progress = MigracionProgress()
+        progress_storage[user_name] = progress
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
         # Configuración inicial
-        user_results_dir = os.path.join(RESULTS_DIR, user_name)  # Usar user_name en lugar de current_user.usuario
+        user_results_dir = os.path.join(RESULTS_DIR, user_name)
         os.makedirs(user_results_dir, exist_ok=True)
         form = await request.form()
         nombre_migracion = form.get('migration_name', 'default_name')
+        
+        # Sanitizar nombre de migración
+        nombre_migracion = "".join(c for c in nombre_migracion if c.isalnum() or c in ['_', '-']).lower()
         
         # Verificar el tipo de archivo sin leer todo el contenido
         if file.content_type in ALLOWED_EXTENSIONS['EXCEL']:
@@ -278,13 +309,16 @@ async def upload_migracion_file(
             
             # Leer y escribir por chunks para archivos grandes
             CHUNK_SIZE = 1024 * 1024  # 1MB por chunk
-            with open(temp_file_path, 'wb') as f:
-                while chunk := await file.read(CHUNK_SIZE):
-                    if not chunk:
-                        break
-                    f.write(chunk)
+            try:
+                with open(temp_file_path, 'wb') as f:
+                    while chunk := await file.read(CHUNK_SIZE):
+                        if not chunk:
+                            break
+                        f.write(chunk)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error al guardar archivo: {str(e)}")
             
-            # Procesar Excel eficientemente - ELIMINAR 'await' aquí
+            # Procesar Excel en segundo plano
             background_tasks.add_task(
                 process_excel_file_in_background,
                 temp_file_path,
@@ -300,13 +334,7 @@ async def upload_migracion_file(
             # Para CSV, leer con una estrategia diferente por chunks
             contents = await file.read()
             if not contents:
-                return JSONResponse(
-                    content={
-                        "error": "El archivo está vacío.",
-                        "progress": progress.to_dict()
-                    },
-                    status_code=400
-                )
+                raise HTTPException(status_code=400, detail="El archivo está vacío")
             
             # Procesar CSV en segundo plano
             try:
@@ -321,20 +349,11 @@ async def upload_migracion_file(
                 )
                 return JSONResponse(content=result)
             except Exception as e:
-                return JSONResponse(
-                    content={
-                        "error": f"Error procesando CSV: {str(e)}",
-                        "progress": progress.to_dict()
-                    },
-                    status_code=500
-                )
+                raise HTTPException(status_code=500, detail=f"Error procesando CSV: {str(e)}")
         else:
-            return JSONResponse(
-                content={
-                    "error": f"Tipo de archivo no soportado: {file.content_type}",
-                    "progress": progress.to_dict()
-                },
-                status_code=400
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Tipo de archivo no soportado: {file.content_type}"
             )
 
         return JSONResponse(content={
@@ -343,115 +362,155 @@ async def upload_migracion_file(
             "progress": progress.to_dict()
         })
 
+    except HTTPException:
+        raise
     except Exception as e:
         error_msg = f"Error en el proceso de migración: {str(e)}"
         logging.error(error_msg)
-        return JSONResponse(
-            content={
-                "error": error_msg,
-                "progress": progress.to_dict()
-            },
-            status_code=500
-        )
+        raise HTTPException(status_code=500, detail=error_msg)
     
 @router.get("/control_migraciones")
 async def get_all_results(
     request: Request,
-    current_user = Depends(get_current_user)  # Eliminada la anotación de tipo
+    current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
+    """Página de control y resultados de migraciones"""
     try:
-        # Obtenemos el usuario de forma segura
-        user_name = current_user["usuario"] if isinstance(current_user, dict) else current_user.usuario
+        # Obtener el nombre de usuario
+        user_name = current_user.usuario
+        
+        if not user_name:
+            raise HTTPException(status_code=400, detail="Usuario no válido")
         
         user_results_dir = os.path.join(RESULTS_DIR, user_name)
-        # El resto del código permanece igual...
+        
+        # Verificar si existe el directorio de resultados
         if not os.path.exists(user_results_dir):
             return templates.TemplateResponse(
-                "/migraciones/migraciones_results.html",
+                "html/migraciones/migraciones_results.html",
                 {
                     "request": request,
-                    "message": "No se encontraron resultados para este usuario."
+                    "user": current_user,
+                    "message": "No se encontraron resultados para este usuario.",
+                    "results": []
                 }
             )
 
         # Obtener los archivos de resultados y ordenarlos por fecha de modificación (más reciente primero)
-        result_files = sorted(
-            [f for f in os.listdir(user_results_dir) if f.startswith("result_") and f.endswith(".json")],
-            key=lambda x: os.path.getmtime(os.path.join(user_results_dir, x)),
-            reverse=True
-        )
+        try:
+            result_files = sorted(
+                [f for f in os.listdir(user_results_dir) if f.startswith("result_") and f.endswith(".json")],
+                key=lambda x: os.path.getmtime(os.path.join(user_results_dir, x)),
+                reverse=True
+            )
+        except Exception as e:
+            logging.error(f"Error al listar archivos de resultados: {str(e)}")
+            result_files = []
 
         results = []
         for result_file in result_files:
-            result_path = os.path.join(user_results_dir, result_file)
-            with open(result_path, 'r', encoding='utf-8') as f:
-                result = json.load(f)
-                results.append(result)
+            try:
+                result_path = os.path.join(user_results_dir, result_file)
+                with open(result_path, 'r', encoding='utf-8') as f:
+                    result = json.load(f)
+                    # Agregar información adicional
+                    result['filename'] = result_file
+                    result['file_size'] = os.path.getsize(result_path)
+                    result['modified_time'] = datetime.fromtimestamp(
+                        os.path.getmtime(result_path)
+                    ).strftime('%Y-%m-%d %H:%M:%S')
+                    results.append(result)
+            except Exception as e:
+                logging.error(f"Error al leer archivo {result_file}: {str(e)}")
+                continue
+
+        # Obtener progreso actual
+        user_progress = progress_storage.get(user_name, MigracionProgress())
 
         return templates.TemplateResponse(
-            "/migraciones/migraciones_results.html",
+            "html/migraciones/migraciones_results.html",
             {
                 "request": request,
-                "results": results
+                "user": current_user,
+                "results": results,
+                "progress": user_progress.to_dict()
             }
         )
+    except HTTPException:
+        raise
     except Exception as e:
-        logging.error(f"Error al obtener los resultados: {str(e)}")
-        return templates.TemplateResponse(
-            "/migraciones/migraciones_results.html",
-            {
-                "request": request,
-                "error": f"Error al obtener los resultados: {str(e)}"
-            }
-        )
+        error_msg = f"Error al obtener los resultados: {str(e)}"
+        logging.error(error_msg)
+        raise HTTPException(status_code=500, detail=error_msg)
 @router.get("/admin_migraciones")
 async def admin_migraciones_page(
-        request: Request,
-        db: Session = Depends(get_db),
-        current_user = Depends(get_current_user)
-    ):
-        # Obtener el ID del usuario según si es un diccionario o un objeto
-        user_id = current_user["codigo"] if isinstance(current_user, dict) else current_user.codigo
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(require_role_api(["admin"]))
+):
+    """Página principal de administración de migraciones con estadísticas y tablas"""
+    try:
+        # Obtener el ID del usuario
+        user_id = current_user.codigo
+        user_name = current_user.usuario
+        
+        if not user_id:
+            raise HTTPException(status_code=400, detail="Usuario no válido")
         
         # Obtener las últimas actividades del usuario relacionadas con migraciones
-        actividades = db.query(ActivityLog).filter(
-            ActivityLog.user_id == user_id,
-            ActivityLog.action.ilike('%migración%')
-        ).order_by(ActivityLog.timestamp.desc()).limit(10).all()
-    
+        try:
+            actividades = db.query(ActivityLog).filter(
+                ActivityLog.user_id == user_id,  # Usar user_id consistentemente
+                ActivityLog.action.ilike('%migración%')
+            ).order_by(ActivityLog.timestamp.desc()).limit(10).all()
+        except Exception as e:
+            logging.warning(f"Error al obtener actividades: {str(e)}")
+            actividades = []
+
         # Contar el número total de migraciones realizadas por el usuario
-        total_migraciones = db.query(ActivityLog).filter(
-            ActivityLog.user_id == user_id,
-            ActivityLog.action.ilike('%migración%')
-        ).count()
-    
+        try:
+            total_migraciones = db.query(ActivityLog).filter(
+                ActivityLog.user_id == user_id,
+                ActivityLog.action.ilike('%migración%')
+            ).count()
+        except Exception as e:
+            logging.warning(f"Error al contar migraciones: {str(e)}")
+            total_migraciones = 0
+
         # Preparar datos para el gráfico (migraciones por día)
-        fecha_column = cast(ActivityLog.timestamp, Date)
-    
-        migraciones_por_dia = db.query(
-            fecha_column.label('fecha'),
-            func.count().label('cantidad')
-        ).filter(
-            ActivityLog.user_id == user_id,  # Corregido: ActivityLog.user_id en lugar de ActivityLog.usuario_id
-            ActivityLog.action.ilike('%migración%')
-        ).group_by(
-            fecha_column
-        ).order_by(
-            fecha_column
-        ).all()
-    
+        try:
+            fecha_column = cast(ActivityLog.timestamp, Date)
+            migraciones_por_dia = db.query(
+                fecha_column.label('fecha'),
+                func.count().label('cantidad')
+            ).filter(
+                ActivityLog.user_id == user_id,
+                ActivityLog.action.ilike('%migración%')
+            ).group_by(
+                fecha_column
+            ).order_by(
+                fecha_column
+            ).limit(30).all()  # Limitar a últimos 30 días
+        except Exception as e:
+            logging.warning(f"Error al obtener datos del gráfico: {str(e)}")
+            migraciones_por_dia = []
+
         labels = [str(record.fecha) for record in migraciones_por_dia]
         data = [record.cantidad for record in migraciones_por_dia]
-    
+
         # Obtener los nombres de las tablas
-        tables1, tables2 = get_tables(db)
-    
-        # Log las tablas obtenidas
-        logging.info(f"Tables1: {tables1}")
-    
+        try:
+            tables1, tables2 = get_tables(db)
+        except Exception as e:
+            logging.error(f"Error al obtener tablas: {str(e)}")
+            tables1, tables2 = [], []
+
+        # Obtener progreso actual del usuario
+        user_progress = progress_storage.get(user_name, MigracionProgress())
+
         # Renderizar la plantilla
         return templates.TemplateResponse(
-            "/migraciones/migraciones_admin.html",
+            "html/migraciones/migraciones_admin.html",
             {
                 "request": request,
                 "user": current_user,
@@ -460,47 +519,111 @@ async def admin_migraciones_page(
                 "data": data,
                 "total_migraciones": total_migraciones,
                 "tables1": tables1,
-                "tables2": tables2
+                "tables2": tables2,
+                "progress": user_progress.to_dict()
             }
         )
+    except HTTPException:
+        raise
+    except Exception as e:
+        error_msg = f"Error al cargar página de administración: {str(e)}"
+        logging.error(error_msg)
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 @router.get("/tablas_migraciones")
 async def migraciones_tablas(
     request: Request,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
-    tables1, tables2 = get_tables(db)
+    """Página para visualizar y gestionar tablas de migraciones"""
+    try:
+        tables1, tables2 = get_tables(db)
+        
+        # Obtener información adicional sobre las tablas
+        inspector = inspect(db.get_bind())
+        tables_info = []
+        
+        for table_name in tables1 + tables2:
+            try:
+                columns = inspector.get_columns(table_name)
+                row_count_result = db.execute(text(f"SELECT COUNT(*) FROM [{table_name}]")).scalar()
+                
+                tables_info.append({
+                    'name': table_name,
+                    'column_count': len(columns),
+                    'row_count': row_count_result or 0,
+                    'is_migration_table': table_name.startswith('migracion_')
+                })
+            except Exception as e:
+                logging.warning(f"Error al obtener info de tabla {table_name}: {str(e)}")
+                tables_info.append({
+                    'name': table_name,
+                    'column_count': 0,
+                    'row_count': 0,
+                    'is_migration_table': table_name.startswith('migracion_'),
+                    'error': str(e)
+                })
 
-    return templates.TemplateResponse(
-        "/migraciones/migraciones_tablas.html",
-        {
-            "request": request,
-            "user": current_user,
-            "tables1": tables1,
-            "tables2": tables2
-        }
-    )
+        return templates.TemplateResponse(
+            "html/migraciones/migraciones_tablas.html",
+            {
+                "request": request,
+                "user": current_user,
+                "tables1": tables1,
+                "tables2": tables2,
+                "tables_info": tables_info
+            }
+        )
+    except Exception as e:
+        error_msg = f"Error al cargar tablas: {str(e)}"
+        logging.error(error_msg)
+        raise HTTPException(status_code=500, detail=error_msg)
 
 @router.get("/get_table_fields/{table_name}")
 async def get_table_fields(
     table_name: str,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
-    # Obtener los nombres de las columnas y sus tipos de datos
-    inspector = inspect(db.get_bind())
-    columns = inspector.get_columns(table_name)
-    fields = [{"name": column["name"], "type": str(column["type"])} for column in columns]
+    """Obtiene los campos de una tabla específica"""
+    try:
+        # Validar nombre de tabla
+        if not table_name or not table_name.replace('_', '').replace('-', '').isalnum():
+            raise HTTPException(status_code=400, detail="Nombre de tabla no válido")
+        
+        # Obtener los nombres de las columnas y sus tipos de datos
+        inspector = inspect(db.get_bind())
+        
+        # Verificar que la tabla existe
+        if table_name not in inspector.get_table_names():
+            raise HTTPException(status_code=404, detail=f"La tabla '{table_name}' no existe")
+        
+        columns = inspector.get_columns(table_name)
+        fields = [
+            {
+                "name": column["name"], 
+                "type": str(column["type"]),
+                "nullable": column.get("nullable", True),
+                "default": column.get("default", None)
+            } 
+            for column in columns
+        ]
 
-    return {"fields": fields}
+        return {"fields": fields, "table_name": table_name}
+    except HTTPException:
+        raise
+    except Exception as e:
+        error_msg = f"Error al obtener campos de la tabla: {str(e)}"
+        logging.error(error_msg)
+        raise HTTPException(status_code=500, detail=error_msg)
 
 @router.get("/get_table_records/{table_name}")
 async def get_table_records(
     table_name: str,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
     # Asegurarse de que el nombre de la tabla es una cadena
     if isinstance(table_name, list):
@@ -521,7 +644,7 @@ async def get_table_records(
 async def migrate_data(
     migration_data: dict,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
     source_table_name = migration_data.get('source_table')
     target_table_name = migration_data.get('target_table')
@@ -638,7 +761,7 @@ class RenameTableRequest(BaseModel):
 async def rename_table(
     request: RenameTableRequest,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
     try:
         # Verificar que la tabla actual existe
@@ -669,7 +792,7 @@ async def rename_table(
         
         # Registrar la actividad
         log_entry = ActivityLog(
-            usuario_id=current_user.codigo,
+            user_id=current_user.codigo,
             action=f"Renombró tabla de '{request.current_name}' a '{request.new_name}'",
             timestamp=datetime.now()
         )
@@ -700,7 +823,7 @@ class ChangeFieldTypeRequest(BaseModel):
 async def change_field_type(
     request: ChangeFieldTypeRequest,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
     """Cambia el tipo de un campo en una tabla con validaciones y manejo seguro de conversiones."""
     try:
@@ -744,7 +867,7 @@ async def change_field_type(
         
         # Registrar la actividad
         log_entry = ActivityLog(
-            usuario_id=current_user.codigo,
+            user_id=current_user.codigo,
             action=f"Cambió el tipo de campo '{request.field_name}' en la tabla '{request.table_name}' de '{request.current_type}' a '{request.new_type}'",
             timestamp=datetime.now()
         )
@@ -781,8 +904,8 @@ async def change_field_type(
 async def _handle_date_conversion(request: ChangeFieldTypeRequest, db: Session, current_user):
     """Función auxiliar para manejar específicamente la conversión a tipo DATE con limpieza de datos."""
     try:
-        # Obtener el ID del usuario según si es diccionario u objeto
-        user_id = current_user["codigo"] if isinstance(current_user, dict) else current_user.codigo
+        # Obtener el ID del usuario
+        user_id = current_user.codigo
         
         # Primero cerramos la sesión existente para evitar conflictos
         db.close()
@@ -882,9 +1005,8 @@ async def _handle_date_conversion(request: ChangeFieldTypeRequest, db: Session, 
         
         # La transacción se ha completado exitosamente, ahora podemos registrar la actividad
         # Crear una nueva sesión para el registro
-        new_session = db.get_bind().connect()
         log_entry = ActivityLog(
-            user_id=user_id,  # Cambiado de usuario_id a user_id
+            user_id=user_id,  # Usar user_id consistentemente
             action=f"Cambió el tipo de campo '{request.field_name}' en la tabla '{request.table_name}' de '{request.current_type}' a 'DATE'",
             timestamp=datetime.now()
         )
@@ -1037,3 +1159,100 @@ async def process_excel_file_in_background(
         logging.error(error_msg)
         progress.status = "error"
         progress.errors.append({"sheet": "general", "error": error_msg})
+
+# Agregar ruta principal para breadcrumb
+@router.get("/")
+async def migraciones_index(
+    request: Request,
+    current_user: UserDB = Depends(require_role_api(["admin"]))
+):
+    """Página índice de migraciones - redirige a admin_migraciones"""
+    return RedirectResponse(url="/migraciones/admin_migraciones", status_code=302)
+
+# Agregar endpoint para estadísticas de migraciones
+@router.get("/api/stats")
+async def get_migration_stats(
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(require_role_api(["admin"]))
+):
+    """API para obtener estadísticas de migraciones"""
+    try:
+        user_id = current_user.codigo
+        
+        if not user_id:
+            raise HTTPException(status_code=400, detail="Usuario no válido")
+        
+        # Estadísticas básicas
+        total_migrations = db.query(ActivityLog).filter(
+            ActivityLog.user_id == user_id,
+            ActivityLog.action.ilike('%migración%')
+        ).count()
+        
+        # Migraciones por mes
+        monthly_migrations = db.query(
+            func.strftime('%Y-%m', ActivityLog.timestamp).label('month'),
+            func.count().label('count')
+        ).filter(
+            ActivityLog.user_id == user_id,
+            ActivityLog.action.ilike('%migración%')
+        ).group_by(
+            func.strftime('%Y-%m', ActivityLog.timestamp)
+        ).order_by('month').all()
+        
+        # Tablas de migración existentes
+        inspector = inspect(db.get_bind())
+        migration_tables = [
+            table for table in inspector.get_table_names() 
+            if table.startswith('migracion_')
+        ]
+        
+        return {
+            "total_migrations": total_migrations,
+            "monthly_data": [{"month": m.month, "count": m.count} for m in monthly_migrations],
+            "migration_tables_count": len(migration_tables),
+            "migration_tables": migration_tables[:10]  # Últimas 10 tablas
+        }
+    except Exception as e:
+        logging.error(f"Error al obtener estadísticas: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al obtener estadísticas: {str(e)}")
+
+# Endpoint para limpiar archivos temporales antiguos
+@router.delete("/api/cleanup")
+async def cleanup_old_files(
+    days: int = 30,
+    current_user: UserDB = Depends(require_role_api(["admin"]))
+):
+    """Limpia archivos temporales y de resultados antiguos"""
+    try:
+        user_name = current_user.usuario
+        
+        if not user_name:
+            raise HTTPException(status_code=400, detail="Usuario no válido")
+        
+        user_results_dir = os.path.join(RESULTS_DIR, user_name)
+        
+        if not os.path.exists(user_results_dir):
+            return {"message": "No hay archivos para limpiar", "files_deleted": 0}
+        
+        cutoff_date = datetime.now() - timedelta(days=days)
+        files_deleted = 0
+        
+        for filename in os.listdir(user_results_dir):
+            file_path = os.path.join(user_results_dir, filename)
+            file_modified = datetime.fromtimestamp(os.path.getmtime(file_path))
+            
+            if file_modified < cutoff_date and (filename.startswith('temp_') or filename.startswith('result_')):
+                try:
+                    os.remove(file_path)
+                    files_deleted += 1
+                    logging.info(f"Archivo eliminado: {filename}")
+                except Exception as e:
+                    logging.warning(f"No se pudo eliminar {filename}: {str(e)}")
+        
+        return {
+            "message": f"Limpieza completada. Archivos más antiguos que {days} días eliminados.",
+            "files_deleted": files_deleted
+        }
+    except Exception as e:
+        logging.error(f"Error en limpieza: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error en limpieza: {str(e)}")

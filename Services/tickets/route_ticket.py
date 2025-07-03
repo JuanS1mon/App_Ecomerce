@@ -155,7 +155,7 @@ async def responder_ticket(
     nuevo_estado: Optional[str] = Form(None),
     asignar_a: Optional[str] = Form(None),
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user_for_admin)
+    current_user = Depends(get_current_user_for_admin)
 ):
     """
     Procesa una respuesta a un ticket y/o actualización de estado.
@@ -289,7 +289,7 @@ async def crear_ticket_desde_formulario(
 async def get_ticket_details(
     ticket_id: int,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    current_user = Depends(get_current_user)
 ):
     """
     API para obtener detalles completos de un ticket específico, incluyendo su historial
@@ -563,7 +563,7 @@ async def get_ticket_statistics(
     start_date: Optional[str] = Query(None, description="Fecha inicio para período personalizado"),
     end_date: Optional[str] = Query(None, description="Fecha fin para período personalizado"),
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    current_user = Depends(get_current_user)
 ):
     """
     Obtiene estadísticas de tickets para el panel de administración.
@@ -624,47 +624,4 @@ async def get_ticket_statistics(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al obtener estadísticas de tickets: {str(e)}"
-        )
-
-# Ruta para obtener todos los tickets con filtros
-@router.get("/gets_tickets", response_model=List[TicketRead]) 
-async def get_all_tickets(
-    skip: int = 0,
-    limit: int = 100,
-    estado: Optional[str] = None,
-    prioridad: Optional[str] = None,
-    categoria: Optional[str] = None,
-    busqueda: Optional[str] = None,
-    solo_mis_tickets: bool = False,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
-    """
-    Obtiene todos los tickets, con opciones de filtrado.
-    Si solo_mis_tickets=True, solo devuelve tickets del usuario actual.
-    """
-    try:
-        usuario_id = None
-        if solo_mis_tickets:
-            usuario_id = current_user.get("id")
-        
-        tickets = gets_tickets(
-            db, 
-            usuario_id=usuario_id,
-            estado=estado, 
-            prioridad=prioridad,
-            categoria=categoria,
-            busqueda=busqueda,
-            skip=skip, 
-            limit=limit
-        )
-        
-        logger.info(f"Se encontraron {len(tickets)} tickets con los filtros aplicados")
-        return [TicketRead.model_validate(t) for t in tickets]
-        
-    except Exception as e:
-        logger.error(f"Error al obtener tickets: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error al obtener tickets: {str(e)}"
         )

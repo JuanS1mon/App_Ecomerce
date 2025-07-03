@@ -8,6 +8,13 @@ def create_all_tables(create_tables_func, logger=None):
         known_models = [
             'sql_app.db.models.config.usuarios',
             'sql_app.db.models.config.tickets',
+            'sql_app.Services.app_stock.ot.model_ot',
+            'sql_app.Services.app_stock.stock.model_stock',
+            'sql_app.Services.app_stock.stock.model_stock_movimientos',
+            'sql_app.Services.app_stock.articulos.model_articulos',
+            'sql_app.Services.app_stock.categorias.model_categorias',
+            'sql_app.Services.app_stock.proveedores.model_proveedores',
+            'sql_app.Services.app_stock.depositos.model_depositos',
         ]
         for module_name in known_models:
             try:

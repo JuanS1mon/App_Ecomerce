@@ -211,12 +211,268 @@
                 </form>
             </div>
             
+            <!-- Tab de Plantillas -->
+            <div id="content-plantillas" class="tab-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Plantilla API REST -->
+                    <div class="card-hover bg-white rounded-lg shadow border border-gray-200 p-6">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                <i class="fas fa-server text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">API REST Básica</h3>
+                                <p class="text-sm text-gray-500">CRUD completo con autenticación</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">Plantilla para crear una API REST con operaciones CRUD básicas, autenticación JWT y documentación automática.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">FastAPI</span>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">SQLAlchemy</span>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">JWT</span>
+                        </div>
+                        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors">
+                            Usar plantilla
+                        </button>
+                    </div>
+
+                    <!-- Plantilla Microservicio -->
+                    <div class="card-hover bg-white rounded-lg shadow border border-gray-200 p-6">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                                <i class="fas fa-cubes text-purple-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">Microservicio</h3>
+                                <p class="text-sm text-gray-500">Servicio independiente escalable</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">Plantilla para microservicio con comunicación asíncrona, monitoreo y gestión de configuración.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded">Async</span>
+                            <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">Redis</span>
+                            <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded">Docker</span>
+                        </div>
+                        <button class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors">
+                            Usar plantilla
+                        </button>
+                    </div>
+
+                    <!-- Plantilla Admin Panel -->
+                    <div class="card-hover bg-white rounded-lg shadow border border-gray-200 p-6">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                                <i class="fas fa-tachometer-alt text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">Panel Admin</h3>
+                                <p class="text-sm text-gray-500">Dashboard administrativo</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">Plantilla completa de panel administrativo con gestión de usuarios, roles y permisos.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Dashboard</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">Roles</span>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">Charts</span>
+                        </div>
+                        <button class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors">
+                            Usar plantilla
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab de Historial -->
+            <div id="content-historial" class="tab-content hidden">
+                <div class="space-y-4">
+                    <!-- Elemento de historial -->
+                    <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <i class="fas fa-cube text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">usuario</h3>
+                                    <p class="text-sm text-gray-500">Generado el 28 de junio de 2025</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Completado</span>
+                                <button class="text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">CRUD</span>
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Esquema</span>
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Rutas</span>
+                        </div>
+                    </div>
+
+                    <!-- Más elementos de historial -->
+                    <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i class="fas fa-cube text-green-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">producto</h3>
+                                    <p class="text-sm text-gray-500">Generado el 27 de junio de 2025</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Completado</span>
+                                <button class="text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Servicio</span>
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">HTML</span>
+                        </div>
+                    </div>
+
+                    <!-- Estado vacío cuando no hay historial -->
+                    <div class="text-center py-12 hidden" id="empty-history">
+                        <div class="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-history text-gray-400 text-3xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">No hay historial disponible</h3>
+                        <p class="text-gray-500">Comienza generando tu primera aplicación para ver el historial aquí.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
     
     <div id="footer-container"></div>
 
-    <!-- Scripts -->
-    <script>
+    <!-- Scripts para funcionalidad de pestañas y formularios -->
+       <script>
+        // Funcionalidad de pestañas
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            function switchTab(tabId) {
+                // Ocultar todos los contenidos
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                    content.classList.remove('block');
+                });
+                
+                // Mostrar el contenido seleccionado
+                const targetContent = document.getElementById('content-' + tabId);
+                if (targetContent) {
+                    targetContent.classList.remove('hidden');
+                    targetContent.classList.add('block');
+                }
+                
+                // Actualizar estilos de los botones
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('border-indigo-500', 'text-gray-700', 'active');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                });
+                
+                const activeButton = document.getElementById('tab-' + tabId);
+                if (activeButton) {
+                    activeButton.classList.remove('border-transparent', 'text-gray-500');
+                    activeButton.classList.add('border-indigo-500', 'text-gray-700', 'active');
+                }
+            }
+            
+            // Asignar eventos de clic a los botones de pestañas
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.id.replace('tab-', '');
+                    switchTab(tabId);
+                });
+            });
+            
+            // Inicializar en la primera pestaña
+            switchTab('nueva-app');
+            
+            // Agregar el primer campo automáticamente
+            if (document.getElementById('add_field')) {
+                document.getElementById('add_field').click();
+            }
+            
+            // Funcionalidad para los botones de usar plantilla
+            document.querySelectorAll('#content-plantillas button').forEach(btn => {
+                if (btn.textContent.includes('Usar plantilla')) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const templateTitle = this.closest('.card-hover').querySelector('h3').textContent;
+                        
+                        // Cargar datos de la plantilla según el tipo
+                        loadTemplate(templateTitle);
+                        
+                        // Cambiar a la pestaña de nueva aplicación
+                        switchTab('nueva-app');
+                    });
+                }
+            });
+        });
+
+        // Función para cargar plantillas
+        function loadTemplate(templateName) {
+            const moduleNameInput = document.getElementById('module_name');
+            const fieldsContainer = document.getElementById('fields');
+            
+            // Limpiar campos existentes
+            fieldsContainer.innerHTML = '';
+            
+            switch(templateName) {
+                case 'API REST Básica':
+                    moduleNameInput.value = 'api_module';
+                    addTemplateField('nombre', 'str');
+                    addTemplateField('descripcion', 'str');
+                    addTemplateField('activo', 'bool');
+                    // Marcar opciones recomendadas
+                    document.getElementById('generate_crud').checked = true;
+                    document.getElementById('generate_schema').checked = true;
+                    document.getElementById('generate_route').checked = true;
+                    break;
+                    
+                case 'Microservicio':
+                    moduleNameInput.value = 'microservice';
+                    addTemplateField('servicio_id', 'str');
+                    addTemplateField('estado', 'str');
+                    addTemplateField('configuracion', 'str');
+                    document.getElementById('generate_service').checked = true;
+                    break;
+                    
+                case 'Panel Admin':
+                    moduleNameInput.value = 'admin_entity';
+                    addTemplateField('titulo', 'str');
+                    addTemplateField('orden', 'int');
+                    addTemplateField('visible', 'bool');
+                    document.getElementById('generate_html_form').checked = true;
+                    document.getElementById('generate_crud').checked = true;
+                    break;
+                    
+                default:
+                    alert('Plantilla cargada: ' + templateName);
+            }
+        }
+
+        // Función auxiliar para agregar campos de plantilla
+        function addTemplateField(name, type) {
+            document.getElementById('add_field').click();
+            const lastField = document.querySelector('#fields > div:last-child');
+            if (lastField) {
+                const nameInput = lastField.querySelector('input[name="field_names[]"]');
+                const typeSelect = lastField.querySelector('select[name="field_types[]"]');
+                if (nameInput) nameInput.value = name;
+                if (typeSelect) typeSelect.value = type;
+            }
+        }
+        
+        // Funcionalidad para agregar campos dinámicamente
         document.getElementById('add_field').addEventListener('click', function() {
             const fieldsCount = document.querySelectorAll('#fields > div').length;
             const fieldNumber = fieldsCount + 1;
@@ -279,24 +535,20 @@
             document.getElementById('fields').appendChild(div);
             input.focus();
             
-            // Agregar un campo automáticamente al inicio
+            // Marcar el primer campo como especial
             if (fieldNumber === 1) {
                 div.classList.add('border-yellow-300', 'bg-yellow-50');
             }
         });
-        
-        // Agregar el primer campo automáticamente al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('add_field').click();
-        });
 
+        // Eliminar campos
         document.addEventListener('click', function(e) {
             if (e.target && e.target.closest('button') && e.target.closest('button').innerHTML.includes('fa-trash')) {
                 e.target.closest('.field-container').remove();
             }
         });
 
-        // Actualizar el evento submit del formulario
+        // Validación del formulario
         document.getElementById('generador').addEventListener('submit', function(event) {
             // Validar nombre del módulo
             const moduleName = document.getElementById('module_name').value.trim();
@@ -325,64 +577,15 @@
                     return;
                 }
             }
-        });
-    </script>
-       <!-- Agregar al script existente para manejar el cambio de pestañas -->
-       <script>
-        // Código existente...
-        
-        // Funcionalidad de pestañas
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
             
-            function switchTab(tabId) {
-                // Ocultar todos los contenidos
-                tabContents.forEach(content => {
-                    content.classList.add('hidden');
-                    content.classList.remove('block');
-                });
-                
-                // Mostrar el contenido seleccionado
-                document.getElementById('content-' + tabId).classList.remove('hidden');
-                document.getElementById('content-' + tabId).classList.add('block');
-                
-                // Actualizar estilos de los botones
-                tabButtons.forEach(btn => {
-                    btn.classList.remove('border-indigo-500', 'text-gray-700');
-                    btn.classList.add('border-transparent', 'text-gray-500');
-                });
-                
-                document.getElementById('tab-' + tabId).classList.remove('border-transparent', 'text-gray-500');
-                document.getElementById('tab-' + tabId).classList.add('border-indigo-500', 'text-gray-700');
+            // Validar que al menos una opción esté seleccionada
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+            if (!anyChecked) {
+                event.preventDefault();
+                alert('Por favor, seleccione al menos una opción de generación.');
+                return;
             }
-            
-            // Asignar eventos de clic a los botones de pestañas
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const tabId = this.id.replace('tab-', '');
-                    switchTab(tabId);
-                });
-            });
-            
-            // Inicializar en la primera pestaña
-            switchTab('nueva-app');
-            
-            // Funcionalidad para los botones de usar plantilla
-            document.querySelectorAll('#content-plantillas button').forEach(btn => {
-                if (btn.textContent.includes('Usar plantilla')) {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const templateTitle = this.closest('.card-hover').querySelector('h3').textContent;
-                        
-                        // Aquí puedes implementar la lógica para cargar la plantilla
-                        alert('Cargando plantilla: ' + templateTitle);
-                        
-                        // Cambiar a la pestaña de nueva aplicación
-                        switchTab('nueva-app');
-                    });
-                }
-            });
         });
     </script>
 </body>

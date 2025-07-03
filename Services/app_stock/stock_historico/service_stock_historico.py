@@ -1,5 +1,5 @@
 # Imports de bibliotecas estándar
-from sql_app.Services.app_stock.articulos.model_stock_historico import Stock_historico  # Corregida la importación
+from sql_app.Services.app_stock.stock_historico.model_stock_historico import Stock_historico  # Corregida la importación
 from typing import List, Optional, Dict, Any
 import logging
 

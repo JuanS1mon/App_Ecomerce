@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exposiciones - Sistema de Obras de Arte</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts - Estilo Brooklyn Museum -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Scripts locales -->
+    <script src="/static/js/obras_dashboard.js" defer></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+        }
+        
+        .brooklyn-title {
+            font-family: 'Crimson Text', serif;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        
+        .exhibition-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .exhibition-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        
+        .section-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #374151;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+   
+    <!-- Contenido principal estilo Brooklyn Museum -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">   
+        
+        <!-- Header principal -->
+        <div class="mb-12">
+            <h1 class="brooklyn-title text-5xl md:text-6xl text-gray-900 mb-4">EXPOSICIONES</h1>
+            <p class="text-gray-600 text-lg max-w-2xl">
+                Descubre nuestras exposiciones actuales y próximas. Desde arte contemporáneo hasta colecciones históricas.
+            </p>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 py-8 border-t border-b border-gray-200">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-1" id="total-obras">247</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Obras Activas</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-1" id="total-artistas">89</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Artistas</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-1" id="exposiciones-activas">12</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Exposiciones</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-1" id="valor-total">€2.4M</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Valor Total</div>
+            </div>
+        </div>
+
+        <!-- Exposición destacada -->
+        <section class="mb-16">
+            <h2 class="section-title mb-8">Exposición con entrada</h2>
+            <div class="exhibition-card bg-white rounded-lg overflow-hidden mb-4">
+                <div class="md:flex">
+                    <div class="md:w-1/3">
+                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop" 
+                             alt="Exposición destacada" 
+                             class="w-full h-48 md:h-64 object-cover">
+                    </div>
+                    <div class="p-8 md:w-2/3">
+                        <div class="flex items-center mb-4">
+                            <span class="status-badge bg-red-100 text-red-800 px-3 py-1 rounded">
+                                Cerrando pronto
+                            </span>
+                        </div>
+                        <h3 class="brooklyn-title text-2xl md:text-3xl text-gray-900 mb-4">
+                            Oro Sólido: Tesoros de la Antigüedad
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            Una colección extraordinaria de joyas y objetos de oro de civilizaciones antiguas. 
+                            Entrada con horario programado requerida. Gratis para miembros del museo.
+                        </p>
+                        <p class="text-sm text-gray-500 mb-4">16 de noviembre, 2024 – 6 de julio, 2025</p>
+                        <a href="/exposiciones/oro-solido" class="inline-flex items-center text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                            Ver detalles
+                            <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500">
+                <i class="fas fa-clock mr-2"></i>
+                Entrada con horario programado requerida. Gratis y sin horario para miembros del museo.
+            </p>
+        </section>
+
+        <!-- Exposiciones incluidas en admisión general -->
+        <section class="mb-16">
+            <h2 class="section-title mb-8">Incluido en admisión general</h2>
+            <p class="text-gray-600 mb-8">Ve las exposiciones a continuación con cualquier entrada.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Exposición 1 -->
+                <div class="exhibition-card bg-white rounded-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=250&fit=crop" 
+                         alt="Arte Contemporáneo" 
+                         class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <span class="status-badge bg-green-100 text-green-800 px-3 py-1 rounded">
+                                Recién abierto
+                            </span>
+                        </div>
+                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
+                            Arte Digital Contemporáneo
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">Hasta 12 de abril, 2026</p>
+                        <a href="/exposiciones/arte-digital" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                            Ver exposición
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Exposición 2 -->
+                <div class="exhibition-card bg-white rounded-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1594736797933-d0501ba71fe6?w=400&h=250&fit=crop" 
+                         alt="Escultura Moderna" 
+                         class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <span class="status-badge bg-green-100 text-green-800 px-3 py-1 rounded">
+                                Recién abierto
+                            </span>
+                        </div>
+                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
+                            Esculturas del Siglo XXI
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">Hasta 2 de noviembre</p>
+                        <a href="/exposiciones/esculturas" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                            Ver exposición
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Exposición 3 -->
+                <div class="exhibition-card bg-white rounded-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=250&fit=crop" 
+                         alt="Pintura Clásica" 
+                         class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <span class="status-badge bg-amber-100 text-amber-800 px-3 py-1 rounded">
+                                Cerrando pronto
+                            </span>
+                        </div>
+                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
+                            Maestros del Renacimiento
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">14 de marzo – 27 de julio, 2025</p>
+                        <a href="/exposiciones/renacimiento" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                            Ver exposición
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Exposición 4 -->
+                <div class="exhibition-card bg-white rounded-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=400&h=250&fit=crop" 
+                         alt="Fotografía" 
+                         class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
+                            Fotografía: Capturando el Espíritu
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">14 de marzo – 3 de agosto, 2025</p>
+                        <a href="/exposiciones/fotografia" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                            Ver exposición
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Exposición 5 -->
+                <div class="exhibition-card bg-white rounded-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1578320404570-e9169bb79cec?w=400&h=250&fit=crop" 
+                         alt="Arte Abstracto" 
+                         class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
+                            Abstracción Contemporánea
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">12 de agosto, 2022 – 4 de enero, 2026</p>
+                        <a href="/exposiciones/abstraccion" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                            Ver exposición
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Exposición 6 -->
+                <div class="exhibition-card bg-white rounded-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400&h=250&fit=crop" 
+                         alt="Historia del Arte" 
+                         class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
+                            200 Años de Historia Artística
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">28 de febrero, 2025 – 22 de febrero, 2026</p>
+                        <a href="/exposiciones/historia" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                            Ver exposición
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Colección permanente -->
+        <section class="mb-16">
+            <h2 class="section-title mb-8">Colección permanente</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <a href="/colecciones/arte-americano" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900 mb-1">Arte Americano</div>
+                    <div class="text-xs text-gray-500">Permanente</div>
+                </a>
+                <a href="/colecciones/arte-egipcio" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900 mb-1">Arte Egipcio Antiguo</div>
+                    <div class="text-xs text-gray-500">Permanente</div>
+                </a>
+                <a href="/colecciones/artes-asia" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900 mb-1">Artes de Asia</div>
+                    <div class="text-xs text-gray-500">Permanente</div>
+                </a>
+                <a href="/colecciones/arte-islamico" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900 mb-1">Arte Islámico</div>
+                    <div class="text-xs text-gray-500">Permanente</div>
+                </a>
+                <a href="/colecciones/diseño-moderno" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900 mb-1">Diseño: 1880 al Presente</div>
+                    <div class="text-xs text-gray-500">Permanente</div>
+                </a>
+                <a href="/colecciones/salas-periodo" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900 mb-1">Salas de Época</div>
+                    <div class="text-xs text-gray-500">Permanente</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Herramientas administrativas -->
+        <section class="mb-16">
+            <h2 class="section-title mb-8">Herramientas del museo</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Exposiciones itinerantes -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-route text-gray-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Exposiciones itinerantes</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Lleva nuestra colección enciclopédica, arte de clase mundial y erudición rigurosa a tu institución.
+                    </p>
+                    <a href="/exposiciones/itinerantes" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                        Ver exposiciones itinerantes
+                    </a>
+                </div>
+
+                <!-- Premios -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-award text-gray-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Premio UOVO</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Conoce a los artistas emergentes que hemos reconocido con el Premio UOVO.
+                    </p>
+                    <a href="/premios/uovo" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                        Conocer sobre el Premio UOVO
+                    </a>
+                </div>
+
+                <!-- Exposiciones pasadas -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-history text-gray-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Exposiciones pasadas</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Explora nuestra larga historia de exposiciones audaces que celebran el poder del arte.
+                    </p>
+                    <a href="/exposiciones/pasadas" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                        Explorar exposiciones pasadas
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accesos rápidos administrativos -->
+        <section class="mb-16">
+            <h2 class="section-title mb-8">Administración</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="/obras/nueva" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-plus text-gray-600 mr-3"></i>
+                    <span class="text-sm font-medium text-gray-900">Nueva Obra</span>
+                </a>
+                <a href="/exposiciones/nueva" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-calendar-plus text-gray-600 mr-3"></i>
+                    <span class="text-sm font-medium text-gray-900">Nueva Exposición</span>
+                </a>
+                <a href="/inventario" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-clipboard-list text-gray-600 mr-3"></i>
+                    <span class="text-sm font-medium text-gray-900">Inventario</span>
+                </a>
+                <a href="/reportes" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-chart-line text-gray-600 mr-3"></i>
+                    <span class="text-sm font-medium text-gray-900">Reportes</span>
+                </a>
+                <a href="/admin/usuarios" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-users text-gray-600 mr-3"></i>
+                    <span class="text-sm font-medium text-gray-900">Usuarios</span>
+                </a>
+                <a href="/admin/backup" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-download text-gray-600 mr-3"></i>
+                    <span class="text-sm font-medium text-gray-900">Backup</span>
+                </a>
+                <a href="/admin/configuracion" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-cog text-gray-600 mr-3"></i>
+                    <span class="text-sm font-medium text-gray-900">Configuración</span>
+                </a>
+                <a href="/admin/logs" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-file-alt text-gray-600 mr-3"></i>
+                    <span class="text-sm font-medium text-gray-900">Logs</span>
+                </a>
+            </div>
+        </section>
+    </main>
+    
+    <div id="footer-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbarContainer = document.getElementById('navbar-container');
+            if (navbarContainer) {
+                loadNavbar(navbarContainer);
+            }
+        });
+    </script>
+
+</body>
+</html>

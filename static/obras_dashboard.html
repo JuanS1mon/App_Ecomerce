@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Obras de Arte</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    
+    <!-- Google Fonts - Elementos del Brooklyn Museum -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    
+    <!-- Scripts locales -->
+    <script src="/static/js/obras_dashboard.js" defer></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+        }
+        
+        .brooklyn-title {
+            font-family: 'Crimson Text', serif;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .section-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #374151;
+        }
+        
+        .stats-minimal {
+            border-top: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .museum-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .museum-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+   
+    <!-- Contenido principal estilo Brooklyn Museum -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">   
+        
+        <!-- Header principal estilo Brooklyn Museum -->
+        <div class="mb-12">
+            <h1 class="brooklyn-title text-5xl md:text-6xl text-gray-900 mb-4">DASHBOARD</h1>
+            <p class="text-gray-600 text-lg max-w-2xl">
+                Centro de control del sistema integral de gestión de obras de arte y exposiciones
+            </p>
+        </div>
+
+        <!-- Estadísticas minimalistas estilo Brooklyn -->
+        <div class="stats-minimal grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6 mb-16 py-8">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-1" id="total-obras">247</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Obras de Arte</div>
+                <a href="/app_obras/artworks/html/" class="text-xs text-gray-500 hover:text-gray-700 mt-1 inline-block">Ver catálogo</a>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-1" id="total-artistas">89</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Artistas</div>
+                <a href="/app_obras/artists/html/" class="text-xs text-gray-500 hover:text-gray-700 mt-1 inline-block">Ver directorio</a>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-1" id="total-exhibiciones">12</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Exhibiciones</div>
+                <a href="/app_obras/exhibitions/html/" class="text-xs text-gray-500 hover:text-gray-700 mt-1 inline-block">Ver exhibiciones</a>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-1" id="total-ventas">€2.4M</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Ventas</div>
+                <a href="/app_obras/sales/html/" class="text-xs text-gray-500 hover:text-gray-700 mt-1 inline-block">Ver ventas</a>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-1" id="total-instituciones">15</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Instituciones</div>
+                <a href="/app_obras/institutions/html/" class="text-xs text-gray-500 hover:text-gray-700 mt-1 inline-block">Ver instituciones</a>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-1" id="total-documentos">156</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Documentos</div>
+                <a href="/app_obras/documents/html/" class="text-xs text-gray-500 hover:text-gray-700 mt-1 inline-block">Ver documentos</a>
+            </div>
+        </div>
+
+        <!-- Gestión Principal estilo museo -->
+        <section class="mb-16">
+            <h2 class="section-title mb-8">Gestión Principal</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Catálogo de Obras -->
+                <div class="museum-card bg-white rounded-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=200&fit=crop" 
+                         alt="Catálogo de Obras" 
+                         class="w-full h-32 object-cover">
+                    <div class="p-6">
+                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
+                            Catálogo de Obras
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">Gestionar obras de arte</p>
+                        <a href="/app_obras/artworks/html/" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                            Acceder al catálogo
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Directorio de Artistas -->
+                <div class="museum-card bg-white rounded-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1594736797933-d0501ba71fe6?w=400&h=200&fit=crop" 
+                         alt="Directorio de Artistas" 
+                         class="w-full h-32 object-cover">
+                    <div class="p-6">
+                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
+                            Directorio de Artistas
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">Gestionar artistas</p>
+                        <a href="/app_obras/artists/html/" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                            Ver directorio
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Exhibiciones -->
+                <div class="museum-card bg-white rounded-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=200&fit=crop" 
+                         alt="Exhibiciones" 
+                         class="w-full h-32 object-cover">
+                    <div class="p-6">
+                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
+                            Exhibiciones
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">Gestionar exhibiciones</p>
+                        <a href="/app_obras/exhibitions/html/" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                            Ver exhibiciones
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Gestión de Ventas -->
+                <div class="museum-card bg-white rounded-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=400&h=200&fit=crop" 
+                         alt="Gestión de Ventas" 
+                         class="w-full h-32 object-cover">
+                    <div class="p-6">
+                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
+                            Gestión de Ventas
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">Transacciones y pagos</p>
+                        <a href="/app_obras/sales/html/" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                            Ver ventas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configuración y soporte estilo minimalista -->
+        <section class="mb-16">
+            <h2 class="section-title mb-8">Configuración y Soporte</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="/app_obras/institutions/html/" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900 mb-1">Instituciones</div>
+                    <div class="text-xs text-gray-500">Museos y galerías</div>
+                </a>
+                <a href="/app_obras/locations/html/" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900 mb-1">Ubicaciones</div>
+                    <div class="text-xs text-gray-500">Gestionar ubicaciones</div>
+                </a>
+                <a href="/app_obras/artwork_states/html/" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900 mb-1">Estados de Obras</div>
+                    <div class="text-xs text-gray-500">Configurar estados</div>
+                </a>
+                <a href="/app_obras/documents/html/" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900 mb-1">Documentación</div>
+                    <div class="text-xs text-gray-500">Certificados y archivos</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Herramientas del sistema -->
+        <section class="mb-16">
+            <h2 class="section-title mb-8">Herramientas del sistema</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Actividad reciente -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-history text-gray-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Actividad Reciente</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Monitorea las últimas acciones realizadas en el sistema de gestión.
+                    </p>
+                    <button onclick="showRecentActivity()" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                        Ver actividad reciente
+                    </button>
+                </div>
+
+                <!-- Análisis del sistema -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-gray-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Análisis del Sistema</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Visualiza las métricas y tendencias del sistema de obras de arte.
+                    </p>
+                    <button onclick="showAnalytics()" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                        Ver análisis
+                    </button>
+                </div>
+
+                <!-- Administración -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-cogs text-gray-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Administración</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Accede a las herramientas de administración y configuración del sistema.
+                    </p>
+                    <a href="/admin" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
+                        Panel de administración
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Panel de actividad reciente (oculto por defecto) -->
+        <div id="recent-activity-panel" class="hidden mb-16">
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="section-title">
+                        <i class="fas fa-history mr-2 text-blue-500"></i>
+                        Actividad reciente
+                    </h3>
+                    <button onclick="hideRecentActivity()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="p-6 max-h-96 overflow-y-auto">
+                    <ul class="space-y-4">
+                        <li class="pb-3 border-b border-gray-100 last:border-0 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-medium">Sistema</span> - Nueva obra registrada
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">hace 2 horas</p>
+                            </div>
+                        </li>
+                        <li class="pb-3 border-b border-gray-100 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-medium">Sistema</span> - Exhibición actualizada
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">hace 5 horas</p>
+                            </div>
+                        </li>
+                        <li class="pb-3 border-b border-gray-100 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-medium">Sistema</span> - Venta completada
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">hace 1 día</p>
+                            </div>
+                        </li>
+                        <li class="pb-3 border-b border-gray-100 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-medium">Sistema</span> - Nueva institución registrada
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">hace 2 días</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de análisis (oculto por defecto) -->
+        <div id="analytics-panel" class="hidden mb-16">
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-line mr-2 text-gray-600"></i>
+                        Análisis del Sistema
+                    </h3>
+                    <button onclick="hideAnalytics()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <!-- Gráfico principal -->
+                    <div class="mb-8">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-4" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
+                            Actividad Semanal del Sistema
+                        </h4>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="activityChart"></canvas>
+                            <!-- Fallback en caso de que el gráfico no cargue -->
+                            <div id="chart-fallback" style="display: none; height: 300px; display: flex; align-items: center; justify-content: center; border: 1px dashed #d1d5db; border-radius: 8px;">
+                                <div class="text-center text-gray-500">
+                                    <i class="fas fa-chart-line text-3xl mb-2"></i>
+                                    <p>Cargando gráfico...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Métricas resumidas -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-gray-100">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-900 mb-1">127</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">Total esta semana</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-900 mb-1">+18%</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">Vs. semana anterior</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-900 mb-1">22</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">Pico de actividad</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-900 mb-1">18.1</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">Promedio diario</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div id="footer-container"></div>
+
+    <script>
+        // Funciones para mostrar/ocultar paneles
+        function showRecentActivity() {
+            document.getElementById('recent-activity-panel').classList.remove('hidden');
+            document.getElementById('analytics-panel').classList.add('hidden');
+        }
+
+        function hideRecentActivity() {
+            document.getElementById('recent-activity-panel').classList.add('hidden');
+        }
+
+        function showAnalytics() {
+            console.log('Showing analytics panel');
+            document.getElementById('analytics-panel').classList.remove('hidden');
+            document.getElementById('recent-activity-panel').classList.add('hidden');
+            
+            // Esperar a que el panel sea visible y Chart.js esté listo
+            setTimeout(() => {
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js not loaded yet, retrying...');
+                    setTimeout(showAnalytics, 500);
+                    return;
+                }
+                
+                // Siempre recrear el gráfico para evitar problemas
+                if (window.activityChart) {
+                    console.log('Destroying existing chart');
+                    try {
+                        window.activityChart.destroy();
+                    } catch (e) {
+                        console.log('Error destroying chart, will recreate:', e);
+                    }
+                    window.activityChart = null;
+                }
+                
+                console.log('Initializing activity chart');
+                initActivityChart();
+            }, 200);
+        }
+
+        function hideAnalytics() {
+            document.getElementById('analytics-panel').classList.add('hidden');
+        }
+
+        // Inicializar gráfico estilo minimalista
+        function initActivityChart() {
+            try {
+                console.log('Starting chart initialization...');
+                
+                const canvas = document.getElementById('activityChart');
+                if (!canvas) {
+                    console.error('Canvas element not found');
+                    return;
+                }
+                console.log('Canvas found:', canvas);
+                
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js not loaded');
+                    return;
+                }
+                console.log('Chart.js loaded, version:', Chart.version);
+                
+                // Asegurarse de que no hay gráfico anterior
+                if (window.activityChart) {
+                    try {
+                        window.activityChart.destroy();
+                    } catch (e) {
+                        console.log('Error destroying previous chart:', e);
+                    }
+                    window.activityChart = null;
+                }
+                
+                // Crear nuevo gráfico
+                window.activityChart = new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                        datasets: [{
+                            label: 'Actividad',
+                            data: [12, 19, 8, 15, 22, 8, 14],
+                            backgroundColor: 'rgba(107, 114, 128, 0.2)',
+                            borderColor: 'rgba(75, 85, 99, 1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            pointBackgroundColor: 'rgba(55, 65, 81, 1)',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(229, 231, 235, 0.5)'
+                                },
+                                ticks: {
+                                    color: '#6b7280'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#6b7280'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#111827',
+                                bodyColor: '#4b5563',
+                                borderColor: 'rgba(229, 231, 235, 1)',
+                                borderWidth: 1,
+                                cornerRadius: 6
+                            }
+                        }
+                    }
+                });
+                
+                console.log('Chart created successfully:', window.activityChart);
+                
+                // Ocultar fallback si está visible
+                const fallback = document.getElementById('chart-fallback');
+                if (fallback) {
+                    fallback.style.display = 'none';
+                }
+                
+            } catch (error) {
+                console.error('Error initializing chart:', error);
+                console.error('Error stack:', error.stack);
+                
+                // Mostrar fallback
+                const canvas = document.getElementById('activityChart');
+                const fallback = document.getElementById('chart-fallback');
+                if (canvas && fallback) {
+                    canvas.style.display = 'none';
+                    fallback.style.display = 'flex';
+                    fallback.innerHTML = `
+                        <div class="text-center text-gray-500">
+                            <i class="fas fa-exclamation-triangle text-3xl mb-2 text-yellow-500"></i>
+                            <p>Error cargando el gráfico</p>
+                            <button onclick="initActivityChart()" class="mt-2 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm">
+                                Reintentar
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Función para cargar estadísticas del dashboard
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch('/app_obras/dashboard/api/stats');
+                if (response.ok) {
+                    const stats = await response.json();
+                    // Actualizar los elementos con las estadísticas reales
+                    document.getElementById('total-obras').textContent = stats.total_obras || '247';
+                    document.getElementById('total-artistas').textContent = stats.total_artistas || '89';
+                    document.getElementById('total-exhibiciones').textContent = stats.total_exhibiciones || '12';
+                    document.getElementById('total-ventas').textContent = stats.total_ventas || '€2.4M';
+                    document.getElementById('total-instituciones').textContent = stats.total_instituciones || '15';
+                    document.getElementById('total-documentos').textContent = stats.total_documentos || '156';
+                }
+            } catch (error) {
+                console.log('Error cargando estadísticas:', error);
+                // Las estadísticas por defecto ya están en el HTML
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded');
+            
+            // Verificar que Chart.js esté disponible
+            if (typeof Chart !== 'undefined') {
+                console.log('Chart.js loaded successfully, version:', Chart.version);
+            } else {
+                console.error('Chart.js not loaded on DOM ready');
+            }
+            
+            const navbarContainer = document.getElementById('navbar-container');
+            if (navbarContainer) {
+                loadNavbar(navbarContainer);
+            }
+            
+            // También cargar el footer si existe
+            const footerContainer = document.getElementById('footer-container');
+            if (footerContainer) {
+                loadFooter(footerContainer);
+            }
+
+            // Cargar estadísticas desde la API
+            loadDashboardStats();
+        });
+    </script>
+
+</body>
+</html>

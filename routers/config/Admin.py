@@ -25,25 +25,57 @@ router = APIRouter(
 )
 
 @router.get("")
-async def admin_page(request: Request, db: Session = Depends(get_db)):
+async def admin_page(
+    request: Request, 
+    db: Session = Depends(get_db)
+):
     """
-    Página de admin - Renderizado limpio, autenticación gestionada por middleware
+    Página de admin - Versión simplificada para debug
     """
     try:
-        # Aquí podrías obtener datos adicionales del usuario si lo necesitas
-        # Por ejemplo, desde request.state.token_data si lo guardas en el middleware
-        user_data = {}
-        # Si necesitas datos del usuario autenticado:
-        # token_data = getattr(request.state, 'token_data', None)
-        # if token_data:
-        #     user_data["user"] = {"usuario": token_data.username}
-        return templates.TemplateResponse(
-            "admin.html",
-            {"request": request, **user_data}
-        )
+        # Verificar si el middleware ya validó la autenticación
+        is_authenticated = getattr(request.state, 'authenticated', False)
+        token_data = getattr(request.state, 'token_data', None)
+        
+        print(f"🔍 ADMIN DEBUG: is_authenticated = {is_authenticated}")
+        print(f"🔍 ADMIN DEBUG: token_data = {token_data}")
+        print(f"🔍 ADMIN DEBUG: request.state = {request.state.__dict__}")
+        
+        if not is_authenticated:
+            print("❌ Usuario no autenticado, redirigiendo...")
+            return RedirectResponse(url="/loginpage", status_code=303)
+        
+        username = getattr(token_data, 'username', 'Unknown') if token_data else 'Unknown'
+        print(f"✅ Usuario autenticado: {username}")
+        
+        # Datos mínimos para la template
+        template_data = {
+            "request": request,
+            "user": {
+                "usuario": username,
+                "nombre": username,
+                "mail": f"{username}@example.com",
+                "roles": ["admin"],
+                "activo": True
+            },
+            "user_count": 1,
+            "activity_count": 0,
+            "activities": [],
+            "is_admin": True,
+            "is_authenticated": True
+        }
+        
+        print(f"🔍 Renderizando template con datos: {template_data.keys()}")
+        return templates.TemplateResponse("admin.html", template_data)
+        
     except Exception as e:
-        # Manejo de error simple
-        return RedirectResponse(url="/loginpage", status_code=303)
+        print(f"❌ ERROR EN ADMIN: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error en admin: {str(e)}"
+        )
 
 @router.get("/data")
 async def admin_data(
@@ -197,4 +229,18 @@ async def debug_cookies(request: Request):
         "cookies_recibidas": dict(request.cookies),
         "headers": dict(request.headers),
         "url": str(request.url)
+    }
+
+# ============================================================================
+# ROUTER DEBUG: Endpoint de admin simplificado para diagnóstico
+# ============================================================================
+
+@router.get("/simple-debug")
+async def simple_admin_debug(request: Request):
+    """Endpoint de debug sin autenticación para verificar básico"""
+    return {
+        "message": "Endpoint debug sin autenticación funcionando",
+        "url": str(request.url),
+        "cookies": dict(request.cookies),
+        "has_access_token": "access_token" in request.cookies
     }

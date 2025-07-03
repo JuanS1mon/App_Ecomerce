@@ -1,5 +1,4 @@
 #generar.py
-from fastapi.security import OAuth2PasswordBearer
 from starlette.responses import FileResponse
 import logging
 import os
@@ -16,9 +15,8 @@ from fastapi.templating import Jinja2Templates
 import fileinput
 import traceback
 
-from sql_app.Services.security.security import get_current_user
+from sql_app.Services.security.auth_middleware import require_auth_for_template
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 templates = Jinja2Templates(directory="sql_app/static")
 
 # Configurar logger para este módulo
@@ -34,9 +32,40 @@ router = APIRouter(
 @router.get("/")
 async def migraciones_page(
     request: Request,
-    current_user: dict = Depends(get_current_user)
+    user_data: dict = Depends(require_auth_for_template)
 ):
-    return templates.TemplateResponse("generar.html", {"request": request, "user": current_user})
+    try:
+        logger.info("Intentando renderizar template generar.html")
+        logger.debug(f"User data keys: {user_data.keys()}")
+        
+        # Verificar si el archivo existe
+        import os
+        template_path = "sql_app/static/html/generar.html"
+        if os.path.exists(template_path):
+            logger.info(f"✅ Template file exists: {template_path}")
+        else:
+            logger.error(f"❌ Template file not found: {template_path}")
+            
+        return templates.TemplateResponse("html/generar.html", {
+            "request": request, 
+            **user_data  # Esto incluye user, user_count, activities, is_admin, is_authenticated, etc.
+        })
+    except Exception as e:
+        logger.error(f"Error al renderizar template: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        
+        # Fallback a una respuesta simple en caso de error
+        from fastapi.responses import HTMLResponse
+        return HTMLResponse(content="""
+        <html>
+            <head><title>Error Temporal</title></head>
+            <body>
+                <h1>Generador de Aplicaciones</h1>
+                <p>Error temporal al cargar la página. Por favor, inténtelo de nuevo.</p>
+                <p>Error: """ + str(e) + """</p>
+            </body>
+        </html>
+        """, status_code=200)
 
 @router.post("/generate")
 async def generate(request: Request):

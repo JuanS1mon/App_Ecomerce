@@ -14,7 +14,6 @@ from .service_articulos import (
 )
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from sql_app.Services.security.security import get_current_user  # Importamos la función de seguridad
 from typing import List, Optional, Dict, Any
 import logging
 from datetime import datetime, timedelta
@@ -211,7 +210,7 @@ async def actualizar_precios_masivo(
         )
 
 @router.get("/dashboard", response_class=HTMLResponse)
-async def get_articulos_dashboard(request: Request, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+async def get_articulos_dashboard(request: Request, db: Session = Depends(get_db)):
     """
     Muestra el dashboard de análisis y gestión de artículos.
     """
@@ -226,8 +225,7 @@ async def get_articulos_dashboard(request: Request, db: Session = Depends(get_db
         # Procesamos los datos para el formato que espera el gráfico
         meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
         actual_month = datetime.now().month - 1  # 0-indexed para array
-        
-        # Procesamos datos para el gráfico como antes y creamos price_data
+          # Procesamos datos para el gráfico como antes y creamos price_data
         # ... (código existente para price_data)
         
         # En lugar de cargar directamente el archivo HTML, usamos Jinja2 para pasar el contexto
@@ -235,7 +233,6 @@ async def get_articulos_dashboard(request: Request, db: Session = Depends(get_db
             "app_stock/articulos/articulos_dashboard.html", 
             {
                 "request": request,
-                "user": current_user,  # Pasamos la información del usuario
                 "articulos_count": stats.get("total_articulos", 0),
                 "precio_cambios_count": stats.get("cambios_precio_30_dias", 0),
                 "barcode_count": stats.get("total_codigos_barras", 0),
@@ -335,7 +332,83 @@ async def get_estadisticas_articulos(db: Session = Depends(get_db)):
             detail=f"Error al obtener estadísticas: {str(e)}"
         )
 
-# Se eliminó la ruta /historial-precios que ahora está en route_historial_precios.py
+@router.get("/estadisticas-consultas", response_class=HTMLResponse)
+async def get_estadisticas_consultas():
+    """
+    Muestra la página de estadísticas detalladas de consultas de artículos.
+    """
+    try:
+        # Esta página aún no existe, redireccionamos temporalmente al dashboard
+        with open("sql_app/static/app_stock/articulos/articulos_dashboard.html", "r", encoding="utf-8") as file:
+            html_content = file.read()
+            
+        # En el futuro, aquí iría la página específica de estadísticas de consultas
+        return HTMLResponse(content=html_content)
+    except Exception as e:
+        logger.error(f"Error al obtener la página de estadísticas de consultas: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail="Error al obtener la página de estadísticas de consultas."
+        )
+
+@router.get("/stock-bajo", response_model=List[Dict[str, Any]])
+async def get_articulos_stock_bajo(
+    limite_minimo: int = Query(10, description="Cantidad límite para considerar stock bajo"),
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene artículos con stock bajo o crítico
+    """
+    try:
+        # Esta función debería implementarse en service_articulos.py
+        # Por ahora retornamos datos de ejemplo
+        return [
+            {
+                "id": 1,
+                "codigo": "ART-001",
+                "descripcion": "Artículo de ejemplo",
+                "stock_actual": 5,
+                "stock_minimo": 10,
+                "estado": "crítico"
+            }
+        ]
+    except Exception as e:
+        logger.error(f"Error al obtener artículos con stock bajo: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener artículos con stock bajo: {str(e)}"
+        )
+
+@router.get("/rotacion-inventario", response_model=List[Dict[str, Any]])
+async def get_rotacion_inventario(
+    dias: int = Query(30, description="Número de días para calcular la rotación"),
+    limit: int = Query(10, description="Número máximo de artículos a retornar"),
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene artículos con mayor rotación de inventario
+    """
+    try:
+        # Esta función debería implementarse en service_articulos.py
+        # Por ahora retornamos datos de ejemplo
+        return [
+            {
+                "id": 1,
+                "codigo": "ART-001",
+                "descripcion": "Artículo de alta rotación",
+                "movimientos_periodo": 45,
+                "stock_promedio": 25,
+                "rotacion": 1.8
+            }
+        ]
+    except Exception as e:
+        logger.error(f"Error al obtener rotación de inventario: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener rotación de inventario: {str(e)}"
+        )
+
+# ...existing code...
 
 # Método para obtener un artículo por código
 @router.get("/codigo/{codigo}")

@@ -208,7 +208,8 @@ async function cargarTickets() {
             headers: {
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache'
-            }
+            },
+            credentials: 'include'  // ✅ Incluir cookies para autenticación
         });
         
         console.log('Estado de la respuesta:', response.status);
@@ -429,7 +430,9 @@ function verDetalleTicket(ticketId) {
         modal.classList.remove('hidden');
         
         // Aquí cargar los datos del ticket desde el backend
-        fetch(`/tickets/${ticketId}`)
+        fetch(`/tickets/${ticketId}`, {
+            credentials: 'include'  // ✅ Incluir cookies para autenticación
+        })
             .then(response => {
                 if (!response.ok) throw new Error('Error al cargar el ticket');
                 return response.json();
@@ -459,7 +462,8 @@ async function diagnosticoAPI() {
             headers: {
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache'
-            }
+            },
+            credentials: 'include'  // ✅ Incluir cookies para autenticación
         });
         
         console.log("Estado de respuesta:", response.status);

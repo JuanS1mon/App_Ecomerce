@@ -30,6 +30,7 @@ from sql_app.middleware.custom import (
     RequestLoggingMiddleware, FrontendRedirectMiddleware, CustomErrorMiddleware, UserTemplateMiddleware, DebugMiddleware
 )
 from sql_app.exception_handlers import register_exception_handlers
+from sql_app.middleware.jwt_middleware import JWTMiddleware
 
 # =============================
 # IMPORTACIONES DE DB Y ROUTERS
@@ -47,6 +48,8 @@ from sql_app.Services.security.admin_roles import router as roles_router
 from sql_app.Services.mail.mail import MAIL_CONFIG_OK, router as mail_router
 from sql_app.Services.tickets import route_ticket
 from sql_app.Services.app_stock.route_config_stock import configure_stock_routes
+from sql_app.Services.app_obras.route_config_obras import configure_obras_routes
+
 from sql_app.routers.static_pages import router as static_pages_router
 from sql_app.logging_config import LOG_CONFIG
 from sql_app.app_settings import CORS_CONFIG, DOCS_URL, REDOC_URL
@@ -77,6 +80,7 @@ app.add_middleware(
 )
 app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(DebugMiddleware)
+app.add_middleware(JWTMiddleware)
 
 # =============================
 # EXCEPTION HANDLERS
@@ -174,7 +178,14 @@ app.include_router(Scraping.router)
 app.include_router(route_ticket.router)
 app.include_router(roles_router)
 app.include_router(static_pages_router)
+from sql_app.routers.usuarios import usuarios_router
+app.include_router(usuarios_router)
 configure_stock_routes(app)
+configure_obras_routes(app)
+
+# Importar y registrar el router de restablecimiento de contraseña
+from sql_app.routers.password_reset import router as password_reset_router
+app.include_router(password_reset_router)
 
 # ============================================================================# ============================================================================
 # EJECUCIÓN DEL SERVIDOR

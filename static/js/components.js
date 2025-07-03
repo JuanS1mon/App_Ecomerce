@@ -340,13 +340,54 @@ function generateInlineNavbar(container) {
  */
 function executeComponentScripts(container) {
     const scripts = container.getElementsByTagName('script');
+    console.log(`Ejecutando ${scripts.length} script(s) de componente...`);
+    
     for (let i = 0; i < scripts.length; i++) {
         const script = scripts[i];
         const scriptCode = script.innerText || script.textContent;
+        
+        // Verificar que hay código para ejecutar
+        if (!scriptCode || scriptCode.trim().length === 0) {
+            console.warn(`Script ${i + 1} está vacío, omitiendo...`);
+            continue;
+        }
+        
         try {
-            eval(scriptCode); // Evaluar el código del script
+            console.log(`Ejecutando script ${i + 1} (${scriptCode.length} caracteres)...`);
+            
+            // Crear una función para evaluar el script de manera más segura que eval()
+            const func = new Function(scriptCode);
+            func();
+            
+            console.log(`✅ Script ${i + 1} ejecutado correctamente`);
         } catch (e) {
-            console.error('Error ejecutando script en componente:', e);
+            console.error(`❌ Error ejecutando script ${i + 1} en componente:`, e);
+            console.error('Tipo de error:', e.name);
+            console.error('Mensaje:', e.message);
+            console.error('Stack trace:', e.stack);
+            
+            // Mostrar una parte del script problemático para debug
+            const preview = scriptCode.length > 200 ? 
+                scriptCode.substring(0, 200) + '...' : 
+                scriptCode;
+            console.error('Script problemático (preview):', preview);
+            
+            // Intentar identificar la línea del error si está disponible
+            if (e.lineNumber) {
+                console.error('Línea del error:', e.lineNumber);
+                
+                // Mostrar contexto alrededor de la línea del error
+                const lines = scriptCode.split('\n');
+                const errorLine = e.lineNumber - 1;
+                const start = Math.max(0, errorLine - 2);
+                const end = Math.min(lines.length, errorLine + 3);
+                
+                console.error('Contexto del error:');
+                for (let j = start; j < end; j++) {
+                    const marker = j === errorLine ? '>>> ' : '    ';
+                    console.error(`${marker}${j + 1}: ${lines[j]}`);
+                }
+            }
         }
     }
 }

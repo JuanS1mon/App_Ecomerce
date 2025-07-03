@@ -7,7 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>    <!-- INTERCEPTOR DE AUTENTICACIÓN EMBEBIDO PARA ADMIN -->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script> 
+       <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>    <!-- INTERCEPTOR DE AUTENTICACIÓN EMBEBIDO PARA ADMIN -->
   
     <!-- Sistema de componentes y navegación -->
     <script src="/static/js/components.js"></script>
@@ -152,8 +153,28 @@
                 </h3>
             </div>
             <div class="p-6">
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dashboard de Obras de Arte -->
+                    <a href="/app_obras/dashboard" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Dashboard Obras de Arte</h4>
+                            <p class="mt-1 text-sm text-gray-500">Gestión integral de obras y exposiciones</p>
+                        </div>
+                    </a>
+
+                    <!-- Dashboard de Stock -->
+                    <a href="/stock_admin/dashboard" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-green-100 text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Dashboard Stock</h4>
+                            <p class="mt-1 text-sm text-gray-500">Control de inventario y almacén</p>
+                        </div>
+                    </a>
                     <!-- Acceso rápido para el sistema de Tickets -->
                     <a href="/tickets/admin" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
                         <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-red-100 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
