@@ -126,6 +126,12 @@ async def prometheus_metrics():
     """Endpoint de métricas para Prometheus"""
     return await metrics_endpoint()
 
+# Phase 3: Endpoint de health avanzado
+@app.get("/health/detailed", include_in_schema=False)
+async def detailed_health_check():
+    """Health check detallado con múltiples verificaciones"""
+    return await get_health_status()
+
 # =============================
 # INICIALIZACIÓN DE BASE DE DATOS Y DIRECTORIOS
 # =============================
@@ -173,6 +179,11 @@ from sql_app.cache.redis_cache import cache_manager
 from sql_app.monitoring.metrics import init_metrics
 from sql_app.utils.sql_optimizer import init_sql_optimizations
 
+# Phase 3: Importar sistemas de monitoreo avanzado
+from sql_app.monitoring.health_checks import init_health_checks, get_health_status
+from sql_app.monitoring.backup_manager import init_backup_system
+from sql_app.monitoring.notifications import notification_manager
+
 @app.on_event("startup")
 async def startup_event():
     alembic_ok = run_alembic_upgrade()
@@ -200,6 +211,32 @@ async def startup_event():
         logger.warning(f"⚠️ Optimizaciones SQL fallaron: {e}")
         sql_opt_ok = False
     
+    # Phase 3: Inicializar sistemas de monitoreo avanzado
+    try:
+        await init_health_checks()
+        health_checks_ok = True
+    except Exception as e:
+        logger.warning(f"⚠️ Health checks no disponibles: {e}")
+        health_checks_ok = False
+    
+    try:
+        init_backup_system()
+        backup_ok = True
+    except Exception as e:
+        logger.warning(f"⚠️ Sistema de backup no disponible: {e}")
+        backup_ok = False
+    
+    # Enviar notificación de inicio
+    try:
+        await notification_manager.send_alert({
+            'severity': 'info',
+            'summary': 'Sistema iniciado correctamente',
+            'description': f'Aplicación iniciada en modo {ENVIRONMENT}',
+            'service': 'system-startup'
+        })
+    except Exception as e:
+        logger.warning(f"⚠️ Notificaciones no disponibles: {e}")
+    
     checklist = [
         ("🟢 .env cargado correctamente", True),
         ("🟢 Configuración de base de datos cargada", db_status),
@@ -214,6 +251,8 @@ async def startup_event():
         ("🚀 Sistema de cache inicializado", cache_ok),
         ("📊 Sistema de métricas inicializado", metrics_ok),
         ("⚡ Optimizaciones SQL aplicadas", sql_opt_ok),
+        ("🔍 Health checks avanzados", health_checks_ok),
+        ("💾 Sistema de backup configurado", backup_ok),
     ]
     logger.info("\n================= CHECKLIST DE INICIO =================")
     for item, ok in checklist:

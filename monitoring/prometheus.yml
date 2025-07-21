@@ -9,7 +9,7 @@ global:
 
 # Configuración de alertas (futuro)
 rule_files:
-  # - "alert_rules.yml"
+  - "alert_rules.yml"
 
 # Configuración de targets para scraping
 scrape_configs:
