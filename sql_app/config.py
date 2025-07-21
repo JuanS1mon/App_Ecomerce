@@ -11,7 +11,8 @@ ACCESS_TOKEN_DURATION = int(os.getenv("ACCESS_TOKEN_DURATION", "30"))
 
 # Configuración de la aplicación
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
-BASE_URL = FRONTEND_URL  # Alias para compatibilidad retroactiva
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+BASE_URL = BACKEND_URL  # Ahora BASE_URL apunta al backend
 ORIGINS = os.getenv("ORIGINS", "*").split(",")
 STATIC_DIR = os.getenv("STATIC_DIR", "sql_app/static")
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")

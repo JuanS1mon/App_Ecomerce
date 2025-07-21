@@ -259,7 +259,8 @@ async function crearOt(event) {
         personal: document.getElementById('personal').value,
         tiempo_estimado: document.getElementById('tiempo_estimado').value,
         descripcion: document.getElementById('descripcion').value,
-        id_deposito: document.getElementById('id_deposito').value || null
+        id_deposito: document.getElementById('id_deposito').value || null,
+        tareas: obtenerTareas()
     };
     
     try {
@@ -1132,4 +1133,61 @@ function mostrarToast(message, type = 'success') {
             container.removeChild(toast);
         }, 300);
     }, 5000);
+}
+
+/**
+ * Agrega una nueva tarea al contenedor de tareas
+ */
+function agregarTarea() {
+    const template = document.getElementById('tarea-template');
+    const container = document.getElementById('tareas-container');
+    const placeholder = document.getElementById('tareas-placeholder');
+
+    if (placeholder) {
+        placeholder.remove();
+    }
+
+    const nuevaTarea = template.content.cloneNode(true);
+    container.appendChild(nuevaTarea);
+}
+
+/**
+ * Elimina una tarea específica del formulario
+ * @param {HTMLElement} boton - El botón que activó la eliminación
+ */
+function eliminarTarea(boton) {
+    const tareaItem = boton.closest('.tarea-item');
+    tareaItem.remove();
+
+    const container = document.getElementById('tareas-container');
+    if (container.children.length === 0) {
+        const placeholder = document.createElement('div');
+        placeholder.id = 'tareas-placeholder';
+        placeholder.className = 'text-center text-gray-500 py-4 border-2 border-dashed border-gray-300 rounded-lg';
+        placeholder.innerHTML = '<i class="fas fa-info-circle mr-2"></i>No hay tareas definidas. Haz clic en "Agregar Tarea" para comenzar.';
+        container.appendChild(placeholder);
+    }
+}
+
+/**
+ * Obtiene todas las tareas ingresadas en el formulario
+ * @returns {Array} - Lista de tareas con sus datos
+ */
+function obtenerTareas() {
+    const tareas = [];
+    const container = document.getElementById('tareas-container');
+    const tareaItems = container.querySelectorAll('.tarea-item');
+
+    tareaItems.forEach(item => {
+        const nombre = item.querySelector('input[type="text"]').value;
+        const estado = item.querySelector('select:nth-of-type(1)').value;
+        const horas = parseFloat(item.querySelector('input[type="number"]').value);
+        const prioridad = item.querySelector('select:nth-of-type(2)').value;
+
+        if (nombre && estado && !isNaN(horas) && prioridad) {
+            tareas.push({ nombre, estado, horas, prioridad });
+        }
+    });
+
+    return tareas;
 }

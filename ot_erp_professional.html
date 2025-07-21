@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Gestión de Órdenes de Trabajo - ERP Professional | SQL App Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Estilos ERP Professional */
+        .erp-sidebar {
+            background: linear-gradient(180deg, #1a365d 0%, #2d3748 100%);
+            border-right: 2px solid #4a5568;
+        }
+        
+        .erp-main-content {
+            background: #f7fafc;
+            min-height: calc(100vh - 60px);
+        }
+        
+        .erp-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .erp-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+        
+        .kpi-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        
+        .status-pendiente { background-color: #fef3c7; color: #92400e; }
+        .status-en_proceso { background-color: #dbeafe; color: #1e40af; }
+        .status-finalizada { background-color: #d1fae5; color: #065f46; }
+        .status-cancelada { background-color: #fee2e2; color: #b91c1c; }
+        .status-critica { background-color: #fecaca; color: #991b1b; }
+        
+        .priority-alta { border-left: 4px solid #ef4444; }
+        .priority-media { border-left: 4px solid #f59e0b; }
+        .priority-baja { border-left: 4px solid #10b981; }
+        
+        .toolbar {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .advanced-filter {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .data-grid {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .grid-header {
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .action-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .action-button:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .action-button.secondary {
+            background: #6b7280;
+        }
+        
+        .action-button.secondary:hover {
+            background: #4b5563;
+        }
+        
+        .action-button.success {
+            background: #10b981;
+        }
+        
+        .action-button.success:hover {
+            background: #059669;
+        }
+        
+        .action-button.danger {
+            background: #ef4444;
+        }
+        
+        .action-button.danger:hover {
+            background: #dc2626;
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .erp-sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+                transition: transform 0.3s ease;
+            }
+            
+            .erp-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .erp-main-content {
+                margin-left: 0;
+            }
+        }
+        
+        /* Loading states */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Modern scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header ERP -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+        <div class="px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <button id="sidebar-toggle" class="lg:hidden text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <img src="/static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
+                    <h1 class="text-xl font-semibold text-gray-900">SQL App Studio ERP</h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Notificaciones -->
+                    <button class="relative text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                    </button>
+                    
+                    <!-- Usuario -->
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
+                            U
+                        </div>
+                        <span class="text-sm font-medium text-gray-700">Usuario Admin</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <!-- Sidebar ERP -->
+        <aside id="sidebar" class="erp-sidebar w-64 min-h-screen">
+            <nav class="p-4">
+                <div class="space-y-2">
+                    <!-- Dashboard -->
+                    <div class="text-gray-300 font-medium text-sm uppercase tracking-wider mb-3">Dashboard</div>
+                    <a href="#" class="flex items-center space-x-3 text-white bg-blue-600 bg-opacity-50 rounded-lg px-3 py-2">
+                        <i class="fas fa-tachometer-alt w-5"></i>
+                        <span>Panel Principal</span>
+                    </a>
+                    
+                    <!-- Órdenes de Trabajo -->
+                    <div class="text-gray-300 font-medium text-sm uppercase tracking-wider mb-3 mt-6">Operaciones</div>
+                    <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-blue-600 hover:bg-opacity-50 rounded-lg px-3 py-2 transition-colors">
+                        <i class="fas fa-clipboard-list w-5"></i>
+                        <span>Órdenes de Trabajo</span>
+                        <span class="ml-auto bg-blue-500 text-white text-xs rounded-full px-2 py-1">12</span>
+                    </a>
+                    
+                    <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-blue-600 hover:bg-opacity-50 rounded-lg px-3 py-2 transition-colors">
+                        <i class="fas fa-users w-5"></i>
+                        <span>Recursos Humanos</span>
+                    </a>
+                    
+                    <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-blue-600 hover:bg-opacity-50 rounded-lg px-3 py-2 transition-colors">
+                        <i class="fas fa-boxes w-5"></i>
+                        <span>Inventario</span>
+                    </a>
+                    
+                    <!-- Finanzas -->
+                    <div class="text-gray-300 font-medium text-sm uppercase tracking-wider mb-3 mt-6">Finanzas</div>
+                    <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-blue-600 hover:bg-opacity-50 rounded-lg px-3 py-2 transition-colors">
+                        <i class="fas fa-chart-line w-5"></i>
+                        <span>Costos y Presupuestos</span>
+                    </a>
+                    
+                    <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-blue-600 hover:bg-opacity-50 rounded-lg px-3 py-2 transition-colors">
+                        <i class="fas fa-file-invoice-dollar w-5"></i>
+                        <span>Facturación</span>
+                    </a>
+                    
+                    <!-- Reportes -->
+                    <div class="text-gray-300 font-medium text-sm uppercase tracking-wider mb-3 mt-6">Análisis</div>
+                    <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-blue-600 hover:bg-opacity-50 rounded-lg px-3 py-2 transition-colors">
+                        <i class="fas fa-chart-bar w-5"></i>
+                        <span>Reportes</span>
+                    </a>
+                    
+                    <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-blue-600 hover:bg-opacity-50 rounded-lg px-3 py-2 transition-colors">
+                        <i class="fas fa-cog w-5"></i>
+                        <span>Configuración</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="erp-main-content flex-1 lg:ml-0">
+            <!-- Dashboard de KPIs -->
+            <section class="p-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Dashboard de Órdenes de Trabajo</h2>
+                    <p class="text-gray-600">Gestión integral de mantenimiento y operaciones</p>
+                </div>
+
+                <!-- KPIs Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- KPI 1: Total OTs -->
+                    <div class="kpi-card">
+                        <div class="flex items-center justify-between relative z-10">
+                            <div>
+                                <p class="text-blue-100 text-sm">Total OTs</p>
+                                <p class="text-3xl font-bold" id="kpi-total">24</p>
+                                <p class="text-blue-100 text-xs mt-1">+12% vs mes anterior</p>
+                            </div>
+                            <i class="fas fa-clipboard-list text-3xl text-blue-200"></i>
+                        </div>
+                    </div>
+
+                    <!-- KPI 2: En Proceso -->
+                    <div class="kpi-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="flex items-center justify-between relative z-10">
+                            <div>
+                                <p class="text-pink-100 text-sm">En Proceso</p>
+                                <p class="text-3xl font-bold" id="kpi-proceso">8</p>
+                                <p class="text-pink-100 text-xs mt-1">33% del total</p>
+                            </div>
+                            <i class="fas fa-cogs text-3xl text-pink-200"></i>
+                        </div>
+                    </div>
+
+                    <!-- KPI 3: Finalizadas -->
+                    <div class="kpi-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="flex items-center justify-between relative z-10">
+                            <div>
+                                <p class="text-cyan-100 text-sm">Finalizadas</p>
+                                <p class="text-3xl font-bold" id="kpi-finalizadas">14</p>
+                                <p class="text-cyan-100 text-xs mt-1">58% del total</p>
+                            </div>
+                            <i class="fas fa-check-circle text-3xl text-cyan-200"></i>
+                        </div>
+                    </div>
+
+                    <!-- KPI 4: Críticas -->
+                    <div class="kpi-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="flex items-center justify-between relative z-10">
+                            <div>
+                                <p class="text-red-100 text-sm">Críticas</p>
+                                <p class="text-3xl font-bold" id="kpi-criticas">2</p>
+                                <p class="text-red-100 text-xs mt-1">Requieren atención</p>
+                            </div>
+                            <i class="fas fa-exclamation-triangle text-3xl text-red-200"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos Dashboard -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Gráfico de Estados -->
+                    <div class="erp-card p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Estados de OT</h3>
+                        <canvas id="estadosChart" width="400" height="200"></canvas>
+                    </div>
+
+                    <!-- Gráfico de Tendencias -->
+                    <div class="erp-card p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Tendencia Mensual</h3>
+                        <canvas id="tendenciaChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Toolbar de Acciones -->
+            <section class="toolbar">
+                <div class="flex items-center space-x-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Gestión de Órdenes de Trabajo</h3>
+                    <span class="text-sm text-gray-500" id="record-count">24 registros</span>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <button class="action-button success" onclick="showCreateModal()">
+                        <i class="fas fa-plus"></i>
+                        Nueva OT
+                    </button>
+                    <button class="action-button secondary" onclick="exportData()">
+                        <i class="fas fa-download"></i>
+                        Exportar
+                    </button>
+                    <button class="action-button" onclick="toggleAdvancedFilters()">
+                        <i class="fas fa-filter"></i>
+                        Filtros Avanzados
+                    </button>
+                </div>
+            </section>
+
+            <!-- Filtros Avanzados -->
+            <section class="px-6">
+                <div id="advanced-filters" class="advanced-filter hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                            <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                                <option value="">Todos los estados</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="en_proceso">En Proceso</option>
+                                <option value="finalizada">Finalizada</option>
+                                <option value="cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Prioridad</label>
+                            <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                                <option value="">Todas las prioridades</option>
+                                <option value="alta">Alta</option>
+                                <option value="media">Media</option>
+                                <option value="baja">Baja</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Técnico</label>
+                            <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                                <option value="">Todos los técnicos</option>
+                                <option value="juan">Juan Pérez</option>
+                                <option value="maria">María García</option>
+                                <option value="carlos">Carlos López</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Rango de Fechas</label>
+                            <input type="date" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 mt-4">
+                        <button class="action-button secondary">
+                            <i class="fas fa-undo"></i>
+                            Limpiar
+                        </button>
+                        <button class="action-button">
+                            <i class="fas fa-search"></i>
+                            Aplicar Filtros
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Grid de Datos Avanzado -->
+            <section class="p-6">
+                <div class="data-grid">
+                    <div class="grid-header">
+                        <div class="flex items-center space-x-4">
+                            <input type="checkbox" class="rounded border-gray-300">
+                            <span class="text-sm font-medium text-gray-700">Seleccionar todo</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2">
+                            <button class="text-gray-600 hover:text-gray-900">
+                                <i class="fas fa-th-list"></i>
+                            </button>
+                            <button class="text-gray-600 hover:text-gray-900">
+                                <i class="fas fa-th"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tabla Mejorada -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">
+                                        <input type="checkbox" class="rounded border-gray-300">
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                                        <div class="flex items-center space-x-1">
+                                            <span>OT #</span>
+                                            <i class="fas fa-sort text-gray-400"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                                        <div class="flex items-center space-x-1">
+                                            <span>Cliente</span>
+                                            <i class="fas fa-sort text-gray-400"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prioridad</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Técnico</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Límite</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progreso</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="data-table-body">
+                                <!-- Los datos se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    <div class="bg-white px-6 py-3 border-t border-gray-200 flex items-center justify-between">
+                        <div class="flex items-center text-sm text-gray-700">
+                            <span>Mostrando</span>
+                            <select class="mx-2 border border-gray-300 rounded px-2 py-1">
+                                <option>10</option>
+                                <option>25</option>
+                                <option>50</option>
+                                <option>100</option>
+                            </select>
+                            <span>de 24 registros</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2">
+                            <button class="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
+                                Anterior
+                            </button>
+                            <button class="px-3 py-2 bg-blue-600 text-white rounded-md text-sm">1</button>
+                            <button class="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">2</button>
+                            <button class="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">3</button>
+                            <button class="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
+                                Siguiente
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Configuración de gráficos
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadOTData();
+            setupEventListeners();
+        });
+
+        function initializeCharts() {
+            // Gráfico de Estados
+            const estadosCtx = document.getElementById('estadosChart').getContext('2d');
+            new Chart(estadosCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pendiente', 'En Proceso', 'Finalizada', 'Cancelada'],
+                    datasets: [{
+                        data: [4, 8, 14, 2],
+                        backgroundColor: ['#fbbf24', '#3b82f6', '#10b981', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Tendencias
+            const tendenciaCtx = document.getElementById('tendenciaChart').getContext('2d');
+            new Chart(tendenciaCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'OTs Creadas',
+                        data: [12, 19, 15, 25, 22, 24],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'OTs Finalizadas',
+                        data: [8, 15, 12, 20, 18, 21],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadOTData() {
+            // Datos de ejemplo para la tabla
+            const sampleData = [
+                {
+                    id: 1,
+                    numero: 'OT-001',
+                    cliente: 'Empresa ABC S.A.',
+                    prioridad: 'alta',
+                    estado: 'en_proceso',
+                    tecnico: 'Juan Pérez',
+                    fechaLimite: '2025-07-05',
+                    progreso: 65
+                },
+                {
+                    id: 2,
+                    numero: 'OT-002',
+                    cliente: 'Corporación XYZ Ltda.',
+                    prioridad: 'media',
+                    estado: 'pendiente',
+                    tecnico: 'María García',
+                    fechaLimite: '2025-07-10',
+                    progreso: 15
+                },
+                {
+                    id: 3,
+                    numero: 'OT-003',
+                    cliente: 'Industrias DEF S.R.L.',
+                    prioridad: 'baja',
+                    estado: 'finalizada',
+                    tecnico: 'Carlos López',
+                    fechaLimite: '2025-06-28',
+                    progreso: 100
+                }
+            ];
+
+            renderTable(sampleData);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('data-table-body');
+            
+            tbody.innerHTML = data.map(item => `
+                <tr class="hover:bg-gray-50 ${getPriorityClass(item.prioridad)} transition-colors">
+                    <td class="px-6 py-4">
+                        <input type="checkbox" class="rounded border-gray-300">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${item.numero}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.cliente}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="status-badge ${getPriorityBadgeClass(item.prioridad)}">
+                            ${formatPrioridad(item.prioridad)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="status-badge status-${item.estado}">
+                            ${formatEstado(item.estado)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${item.tecnico}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${formatDate(item.fechaLimite)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${item.progreso}%"></div>
+                            </div>
+                            <span class="ml-2 text-sm text-gray-600">${item.progreso}%</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex justify-end space-x-2">
+                            <button class="text-blue-600 hover:text-blue-900" onclick="viewOT(${item.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="text-green-600 hover:text-green-900" onclick="editOT(${item.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="text-purple-600 hover:text-purple-900" onclick="manageMaterials(${item.id})">
+                                <i class="fas fa-boxes"></i>
+                            </button>
+                            <button class="text-red-600 hover:text-red-900" onclick="deleteOT(${item.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function setupEventListeners() {
+            // Toggle sidebar móvil
+            document.getElementById('sidebar-toggle')?.addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('mobile-open');
+            });
+        }
+
+        // Funciones auxiliares
+        function getPriorityClass(priority) {
+            return `priority-${priority}`;
+        }
+
+        function getPriorityBadgeClass(priority) {
+            const classes = {
+                'alta': 'bg-red-100 text-red-800',
+                'media': 'bg-yellow-100 text-yellow-800',
+                'baja': 'bg-green-100 text-green-800'
+            };
+            return classes[priority] || 'bg-gray-100 text-gray-800';
+        }
+
+        function formatPrioridad(priority) {
+            const formats = {
+                'alta': 'Alta',
+                'media': 'Media',
+                'baja': 'Baja'
+            };
+            return formats[priority] || priority;
+        }
+
+        function formatEstado(estado) {
+            const estados = {
+                'pendiente': 'Pendiente',
+                'en_proceso': 'En Proceso',
+                'finalizada': 'Finalizada',
+                'cancelada': 'Cancelada'
+            };
+            return estados[estado] || estado;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
+        }
+
+        function toggleAdvancedFilters() {
+            const filters = document.getElementById('advanced-filters');
+            filters.classList.toggle('hidden');
+        }
+
+        function showCreateModal() {
+            alert('Modal de creación de OT - En desarrollo');
+        }
+
+        function exportData() {
+            alert('Función de exportación - En desarrollo');
+        }
+
+        function viewOT(id) {
+            alert(`Ver detalles de OT ${id}`);
+        }
+
+        function editOT(id) {
+            alert(`Editar OT ${id}`);
+        }
+
+        function manageMaterials(id) {
+            window.location.href = `/ot/${id}/materiales`;
+        }
+
+        function deleteOT(id) {
+            if (confirm('¿Está seguro de eliminar esta OT?')) {
+                alert(`Eliminar OT ${id}`);
+            }
+        }
+    </script>
+</body>
+</html>

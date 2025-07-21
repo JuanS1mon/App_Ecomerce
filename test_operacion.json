@@ -1,0 +1,8 @@
+{
+  "ot_id": 5,
+  "descripcion": "Tarea de prueba",
+  "responsable": "Juan Pérez",
+  "tiempo_estimado": 2.0,
+  "orden": 1,
+  "estado": "planificando"
+}

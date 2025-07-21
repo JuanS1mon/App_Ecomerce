@@ -14,6 +14,16 @@ from ...db.schemas.Scraping import ScraperTestConfig, SelectorConfig
 def extract_with_beautifulsoup(config: ScraperTestConfig, max_items: int = 10):
     """
     Realiza la extracción de datos utilizando Beautiful Soup
+    
+    Args:
+        config: Configuración del scraper
+        max_items: Número máximo de elementos a extraer
+    
+    Returns:
+        List[Dict]: Lista de elementos extraídos
+    
+    Raises:
+        Exception: Si hay errores en la extracción
     """
     # Configuración de sesión y proxies
     session = requests.Session()
@@ -145,6 +155,16 @@ def extract_element_data(element, selector: SelectorConfig):
 def extract_with_selenium(config: ScraperTestConfig, max_items: int = 10):
     """
     Realiza la extracción de datos utilizando Selenium
+    
+    Args:
+        config: Configuración del scraper
+        max_items: Número máximo de elementos a extraer
+    
+    Returns:
+        List[Dict]: Lista de elementos extraídos
+    
+    Raises:
+        Exception: Si hay errores en la extracción
     """
     from selenium import webdriver
     from selenium.webdriver.chrome.options import Options

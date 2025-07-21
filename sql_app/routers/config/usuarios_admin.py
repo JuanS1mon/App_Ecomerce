@@ -1242,29 +1242,40 @@ async def eliminar_rol(
         logger.error(f"Error al eliminar rol: {str(e)}")
         raise HTTPException(status_code=500, detail="Error interno del servidor")
 
-# ==================== ENDPOINT DE PRUEBA ====================
-
-@router.get("/test-auth", response_model=Dict[str, Any])
-async def test_auth(request: Request):
-    """Endpoint simple para probar autenticación"""
-    return {
-        "message": "Endpoint alcanzado sin autenticación",
-        "headers": dict(request.headers),
-        "query_params": dict(request.query_params),
-        "cookies": dict(request.cookies)
-    }
-
-@router.get("/test-auth-with-role", response_model=Dict[str, Any])
-async def test_auth_with_role(
-    request: Request,
-    db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin"]))
-):
-    """Endpoint simple para probar autenticación con rol"""
-    return {
-        "message": "Endpoint alcanzado con autenticación",
-        "user": current_user.usuario,
-        "user_id": current_user.codigo
-    }
-
 # ==================== ENDPOINTS PRINCIPALES ====================
+
+@router.get("/usuario-rol")
+async def get_usuario_rol(
+    current_user = Depends(get_current_user)
+):
+    """
+    Obtiene información del rol del usuario actual.
+    Retorna el rol principal del usuario para determinar permisos.
+    """
+    try:
+        # Determinar el rol según el tipo de current_user
+        rol_principal = "admin"  # Por defecto
+        
+        if isinstance(current_user, dict):
+            # Si es un diccionario (JWT)
+            rol_principal = current_user.get("rol", "admin")
+        else:
+            # Si es un objeto UserDB
+            rol_principal = getattr(current_user, "rol", "admin")
+        
+        logger.info(f"Verificando rol del usuario: {rol_principal}")
+        
+        return {
+            "rol_principal": rol_principal,
+            "is_admin": rol_principal.lower() in ["admin", "administrador"],
+            "can_manage_tickets": rol_principal.lower() in ["admin", "administrador", "soporte"]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error al obtener rol del usuario: {str(e)}")
+        # En caso de error, asumir rol básico por seguridad
+        return {
+            "rol_principal": "usuario",
+            "is_admin": False,
+            "can_manage_tickets": False
+        }

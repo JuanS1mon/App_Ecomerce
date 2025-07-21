@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactos - Sistema de Obras de Arte</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts - Elementos del Brooklyn Museum -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+        }
+        
+        .brooklyn-title {
+            font-family: 'Crimson Text', serif;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        
+        .contact-card {
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+        }
+        
+        .contact-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .search-input {
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #6b7280;
+            box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
+        }
+        
+        .contact-type-chip {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .contact-type-institution { background-color: #dbeafe; color: #1e40af; }
+        .contact-type-individual { background-color: #dcfce7; color: #166534; }
+        .contact-type-gallery { background-color: #fef3c7; color: #92400e; }
+        .contact-type-museum { background-color: #e0e7ff; color: #3730a3; }
+        .contact-type-collector { background-color: #fce7f3; color: #be185d; }
+        
+        .no-contacts {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+   
+    <!-- Contenido principal estilo Brooklyn Museum -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">   
+        
+        <!-- Header principal estilo Brooklyn Museum -->
+        <div class="mb-12">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="brooklyn-title text-4xl md:text-5xl text-gray-900 mb-4">CONTACTOS</h1>
+                    <p class="text-gray-600 text-lg max-w-2xl">
+                        Gestión de contactos para movimientos de obras de arte
+                    </p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="/app_obras/movements/html/" class="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors rounded-lg">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver a Movimientos
+                    </a>
+                    <a href="/app_obras/movements/contacts/create.html" class="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors rounded-lg">
+                        <i class="fas fa-plus mr-2"></i>
+                        Nuevo Contacto
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Barra de búsqueda y filtros -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Búsqueda por nombre -->
+                <div class="md:col-span-2">
+                    <label for="search-input" class="block text-sm font-medium text-gray-700 mb-2">
+                        Buscar Contactos
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="Buscar por nombre, email o institución..."
+                            class="search-input w-full pl-10"
+                        >
+                        <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filtro por tipo -->
+                <div>
+                    <label for="type-filter" class="block text-sm font-medium text-gray-700 mb-2">
+                        Tipo de Contacto
+                    </label>
+                    <select id="type-filter" class="search-input w-full">
+                        <option value="">Todos los tipos</option>
+                        <option value="INSTITUTION">Institución</option>
+                        <option value="INDIVIDUAL">Individual</option>
+                        <option value="GALLERY">Galería</option>
+                        <option value="MUSEUM">Museo</option>
+                        <option value="COLLECTOR">Coleccionista</option>
+                    </select>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="flex items-end space-x-2">
+                    <button id="search-button" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-search mr-2"></i>
+                        Buscar
+                    </button>
+                    <button id="clear-search" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Estadísticas rápidas -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center">
+                    <div class="p-2 bg-blue-100 rounded-lg mr-3">
+                        <i class="fas fa-users text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Total Contactos</p>
+                        <p id="total-contacts" class="text-2xl font-bold text-gray-900">--</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center">
+                    <div class="p-2 bg-green-100 rounded-lg mr-3">
+                        <i class="fas fa-building text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Instituciones</p>
+                        <p id="institutions-count" class="text-2xl font-bold text-gray-900">--</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center">
+                    <div class="p-2 bg-purple-100 rounded-lg mr-3">
+                        <i class="fas fa-user text-purple-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Individuales</p>
+                        <p id="individuals-count" class="text-2xl font-bold text-gray-900">--</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center">
+                    <div class="p-2 bg-yellow-100 rounded-lg mr-3">
+                        <i class="fas fa-exchange-alt text-yellow-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Con Movimientos</p>
+                        <p id="active-contacts" class="text-2xl font-bold text-gray-900">--</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading indicator -->
+        <div id="loading" class="text-center py-8 hidden">
+            <i class="fas fa-spinner fa-spin text-2xl text-gray-600 mb-4"></i>
+            <p class="text-gray-600">Cargando contactos...</p>
+        </div>
+        
+        <!-- Lista de contactos -->
+        <div id="contacts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Se llenarán dinámicamente -->
+        </div>
+        
+        <!-- Paginación -->
+        <div id="pagination" class="flex justify-center items-center space-x-4 mt-8 hidden">
+            <button id="prev-page" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-chevron-left mr-2"></i>
+                Anterior
+            </button>
+            <span id="page-info" class="text-gray-600"></span>
+            <button id="next-page" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                Siguiente
+                <i class="fas fa-chevron-right ml-2"></i>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        let currentPage = 1;
+        let pageSize = 12;
+        let totalContacts = 0;
+        let searchTerm = '';
+        let typeFilter = '';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar navbar
+            loadNavbar();
+            
+            // Cargar datos iniciales
+            loadContacts();
+            loadStats();
+            
+            // Configurar event listeners
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Búsqueda
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
+            const clearSearch = document.getElementById('clear-search');
+            const typeFilter = document.getElementById('type-filter');
+            
+            searchButton.addEventListener('click', performSearch);
+            clearSearch.addEventListener('click', clearSearch);
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            typeFilter.addEventListener('change', performSearch);
+            
+            // Paginación
+            document.getElementById('prev-page').addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadContacts();
+                }
+            });
+            
+            document.getElementById('next-page').addEventListener('click', function() {
+                const totalPages = Math.ceil(totalContacts / pageSize);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    loadContacts();
+                }
+            });
+        }
+
+        function performSearch() {
+            searchTerm = document.getElementById('search-input').value;
+            typeFilter = document.getElementById('type-filter').value;
+            currentPage = 1;
+            loadContacts();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('type-filter').value = '';
+            searchTerm = '';
+            typeFilter = '';
+            currentPage = 1;
+            loadContacts();
+        }
+
+        async function loadContacts() {
+            const loading = document.getElementById('loading');
+            const grid = document.getElementById('contacts-grid');
+            
+            loading.classList.remove('hidden');
+            grid.innerHTML = '';
+            
+            try {
+                // Construir URL con parámetros
+                const params = new URLSearchParams({
+                    skip: (currentPage - 1) * pageSize,
+                    limit: pageSize
+                });
+                
+                if (searchTerm) params.append('search', searchTerm);
+                if (typeFilter) params.append('contact_type', typeFilter);
+                
+                const response = await fetch(`/app_obras/movements/contacts/?${params}`);
+                if (response.ok) {
+                    const contacts = await response.json();
+                    
+                    // También obtener el total para paginación
+                    const countResponse = await fetch(`/app_obras/movements/contacts/count?${params}`);
+                    if (countResponse.ok) {
+                        const countData = await countResponse.json();
+                        totalContacts = countData.total;
+                    }
+                    
+                    displayContacts(contacts);
+                    updatePagination();
+                } else {
+                    showNoContacts('Error al cargar los contactos');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNoContacts('Error de conexión al servidor');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function displayContacts(contacts) {
+            const grid = document.getElementById('contacts-grid');
+            
+            if (contacts.length === 0) {
+                showNoContacts('No se encontraron contactos');
+                return;
+            }
+            
+            contacts.forEach(contact => {
+                const contactCard = document.createElement('div');
+                contactCard.className = 'contact-card rounded-lg p-6';
+                
+                contactCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-1">
+                                ${contact.name}
+                            </h3>
+                            ${contact.institution ? `
+                                <p class="text-sm text-gray-600 mb-2">${contact.institution}</p>
+                            ` : ''}
+                            ${contact.contact_type ? `
+                                <span class="contact-type-chip contact-type-${contact.contact_type.toLowerCase()}">
+                                    ${contact.contact_type}
+                                </span>
+                            ` : ''}
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="/app_obras/movements/contacts/edit.html?id=${contact.id}" 
+                               class="text-blue-600 hover:text-blue-800 p-2">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button onclick="deleteContact(${contact.id})" 
+                                    class="text-red-600 hover:text-red-800 p-2">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 text-sm">
+                        ${contact.email ? `
+                            <div class="flex items-center text-gray-600">
+                                <i class="fas fa-envelope mr-2 w-4"></i>
+                                <a href="mailto:${contact.email}" class="hover:text-blue-600">
+                                    ${contact.email}
+                                </a>
+                            </div>
+                        ` : ''}
+                        ${contact.phone ? `
+                            <div class="flex items-center text-gray-600">
+                                <i class="fas fa-phone mr-2 w-4"></i>
+                                <a href="tel:${contact.phone}" class="hover:text-blue-600">
+                                    ${contact.phone}
+                                </a>
+                            </div>
+                        ` : ''}
+                        ${contact.address ? `
+                            <div class="flex items-center text-gray-600">
+                                <i class="fas fa-map-marker-alt mr-2 w-4"></i>
+                                <span>${contact.address}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${contact.notes ? `
+                        <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+                            <p class="text-sm text-gray-600">${contact.notes}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="mt-4 pt-3 border-t border-gray-200">
+                        <div class="flex justify-between items-center text-xs text-gray-500">
+                            <span>Creado: ${formatDate(contact.created_at)}</span>
+                            ${contact.movement_count ? `
+                                <span class="font-medium">${contact.movement_count} movimiento(s)</span>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(contactCard);
+            });
+        }
+
+        function showNoContacts(message) {
+            const grid = document.getElementById('contacts-grid');
+            grid.innerHTML = `
+                <div class="no-contacts col-span-full">
+                    <i class="fas fa-address-book text-4xl mb-4"></i>
+                    <p class="text-lg">${message}</p>
+                    <a href="/app_obras/movements/contacts/create.html" 
+                       class="inline-block mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>
+                        Crear Primer Contacto
+                    </a>
+                </div>
+            `;
+            document.getElementById('pagination').classList.add('hidden');
+        }
+
+        function updatePagination() {
+            const pagination = document.getElementById('pagination');
+            const pageInfo = document.getElementById('page-info');
+            const prevButton = document.getElementById('prev-page');
+            const nextButton = document.getElementById('next-page');
+            
+            const totalPages = Math.ceil(totalContacts / pageSize);
+            
+            if (totalPages <= 1) {
+                pagination.classList.add('hidden');
+                return;
+            }
+            
+            pagination.classList.remove('hidden');
+            pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
+            
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = currentPage === totalPages;
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/app_obras/movements/contacts/stats');
+                if (response.ok) {
+                    const stats = await response.json();
+                    
+                    document.getElementById('total-contacts').textContent = stats.total || 0;
+                    document.getElementById('institutions-count').textContent = stats.institutions || 0;
+                    document.getElementById('individuals-count').textContent = stats.individuals || 0;
+                    document.getElementById('active-contacts').textContent = stats.withMovements || 0;
+                }
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        async function deleteContact(contactId) {
+            if (!confirm('¿Está seguro de que desea eliminar este contacto? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/app_obras/movements/contacts/${contactId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // Recargar la lista
+                    loadContacts();
+                    loadStats();
+                } else {
+                    alert('Error al eliminar el contacto');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión al servidor');
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return new Date(dateString).toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+    </script>
+</body>
+</html>

@@ -214,22 +214,37 @@ def authenticate_user_jwt(db: Session, username: str, password: str) -> Optional
         Diccionario con información del usuario si es válido, None si no
     """
     try:
+        # DEBUG: Log detallado de credenciales recibidas
+        logger.debug(f"🔐 AUTHENTICATE_USER_JWT DEBUG:")
+        logger.debug(f"  Username recibido: '{username}'")
+        logger.debug(f"  Password recibido: {'*' * len(password) if password else 'None'} (longitud: {len(password) if password else 0})")
+        
         # Buscar usuario
         user = db.query(Usuarios).filter(Usuarios.usuario == username).first()
         
         if not user:
-            logger.warning(f"Intento de login con usuario inexistente: {username}")
+            logger.warning(f"❌ Intento de login con usuario inexistente: {username}")
             return None
-        
+            
+        logger.debug(f"✅ Usuario encontrado en BD: {user.usuario}")
+        logger.debug(f"  Usuario activo: {user.activo}")
+        logger.debug(f"  Hash en BD: {user.clave[:20]}... (longitud: {len(user.clave) if user.clave else 0})")
+
         if not user.activo:
-            logger.warning(f"Intento de login con usuario inactivo: {username}")
+            logger.warning(f"❌ Intento de login con usuario inactivo: {username}")
             return None
         
         # Verificar contraseña
-        if not verificar_clave(password, user.clave):
-            logger.warning(f"Contraseña incorrecta para usuario: {username}")
-            return None
+        logger.debug(f"🔑 Verificando contraseña...")
+        password_valid = verificar_clave(password, user.clave)
+        logger.debug(f"🔑 Resultado verificación: {password_valid}")
         
+        if not password_valid:
+            logger.warning(f"❌ Contraseña incorrecta para usuario: {username}")
+            return None
+            
+        logger.info(f"✅ Autenticación exitosa para usuario: {username}")
+
         # Cargar roles
         roles_query = db.query(Roles.nombre).join(
             usuario_roles, 

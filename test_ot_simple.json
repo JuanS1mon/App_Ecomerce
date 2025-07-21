@@ -1,0 +1,8 @@
+{
+  "numero": "OT-TEST-002",
+  "fecha": "2025-06-30T12:00:00",
+  "cliente": "Cliente Test",
+  "descripcion": "OT simple sin tareas",
+  "id_trabajo": "TEST002",
+  "estado": "planificando"
+}

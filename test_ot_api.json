@@ -1,0 +1,33 @@
+{
+  "numero": "OT-TEST-001",
+  "fecha": "2025-06-30T12:00:00",
+  "cliente": "Cliente Test",
+  "tipo": "Mantenimiento",
+  "tecnico": "Juan Pérez",
+  "descripcion": "OT de prueba para verificar funcionalidad",
+  "id_deposito": 1,
+  "estado": "planificando",
+  "id_trabajo": "TEST001",
+  "titulo": "OT de Prueba",
+  "area": "Mantenimiento",
+  "personal": "Juan Pérez",
+  "tiempo_estimado": "4.0",
+  "tareas": [
+    {
+      "ot_id": 1,
+      "descripcion": "Inspección inicial",
+      "responsable": "Juan Pérez",
+      "tiempo_estimado": 2.0,
+      "orden": 1,
+      "estado": "planificando"
+    },
+    {
+      "ot_id": 1,
+      "descripcion": "Limpieza de equipos",
+      "responsable": "María García",
+      "tiempo_estimado": 1.5,
+      "orden": 2,
+      "estado": "planificando"
+    }
+  ]
+}

@@ -35,7 +35,6 @@ class JWTMiddleware(BaseHTTPMiddleware):
     - Si la ruta es protegida y el token es válido, permite el acceso.
     - Si la ruta es protegida y el token es inválido o falta, responde con 401 (API) o redirige a /login (HTML).
     """
-    
     def __init__(self, app, protected_paths: list = None):
         """
         Inicializa el middleware.
@@ -54,7 +53,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/api/protected"
         ]
         self.public_paths = [
-            "/", "/auth/login", "/auth/logout", "/docs", "/redoc", "/openapi.json", "/static", "/favicon.ico"
+            "/", "/auth/login", "/auth/logout", "/docs", "/redoc", "/openapi.json", "/static", "/favicon.ico", "/loginpage"
         ]
 
     def is_protected_path(self, path: str) -> bool:
@@ -119,7 +118,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
                 logger.warning(f"Acceso denegado a {path}: No se proporcionó token")
                 if self.is_html_request(request):
                     # Redirigir a login si es HTML
-                    return RedirectResponse(url=f"/login?next={path}", status_code=302)
+                    return RedirectResponse(url=f"/loginpage?next={path}", status_code=302)
                 else:
                     return JSONResponse(
                         status_code=status.HTTP_401_UNAUTHORIZED,

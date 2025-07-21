@@ -7,7 +7,7 @@ from datetime import timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status, Form
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -117,8 +117,6 @@ async def login(
             accept_header = request.headers.get("Accept", "")
             content_type = request.headers.get("Content-Type", "")
             user_agent = request.headers.get("User-Agent", "")
-            
-            # Mejorar detección: petición API solo si explícitamente pide JSON
             is_api_request = (
                 "application/json" in accept_header and 
                 "text/html" not in accept_header
@@ -139,10 +137,16 @@ async def login(
                 {"reason": "empty_credentials", **client_info},
                 "WARNING"
             )
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Credenciales requeridas"
-            )
+            if is_api_request:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Credenciales requeridas"
+                )
+            else:
+                from fastapi.responses import HTMLResponse
+                with open("sql_app/static/login_error.html", "r", encoding="utf-8") as f:
+                    html = f.read()
+                return HTMLResponse(content=html, status_code=400)
         
         # Autenticar usuario
         user = authenticate_user_jwt(db, username, password)
@@ -153,11 +157,17 @@ async def login(
                 {"username": username, "reason": "invalid_credentials", **client_info},
                 "WARNING"
             )
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Credenciales incorrectas",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+            if is_api_request:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Credenciales incorrectas",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+            else:
+                from fastapi.responses import HTMLResponse
+                with open("sql_app/static/html/error_login.html", "r", encoding="utf-8") as f:
+                    html = f.read()
+                return HTMLResponse(content=html, status_code=401)
         
         # Crear token de acceso JWT
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -188,27 +198,23 @@ async def login(
         
         # Si es petición API, devolver JSON sin redirección
         if is_api_request:
-            logger.debug("🔄 Devolviendo respuesta JSON (API request detectada)")
             return JSONResponse(
                 content={
-                    "message": "Login exitoso",
                     "access_token": access_token,
                     "token_type": "bearer",
-                    "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,
                     "user": user_info
                 },
-                status_code=status.HTTP_200_OK
-            )        # Para peticiones web: redirigir con token en query param
-        redirect_url = next_url or "/admin"  # Por defecto redirigir a /admin
-        logger.debug(f"🔄 URL base para redirección: {redirect_url}")
-        
-        # SOLUCIÓN PARA NAVEGADOR VS CODE: Agregar token como query param también
-        separator = "&" if "?" in redirect_url else "?"
-        redirect_url_with_token = f"{redirect_url}{separator}token={access_token}"
-        
-        logger.debug(f"🔄 URL FINAL con token: {redirect_url_with_token}")
-        response = RedirectResponse(url=redirect_url_with_token, status_code=status.HTTP_303_SEE_OTHER)
-        # NOTA: Ya no se setea cookie, solo se pasa el token por la URL
+                status_code=200
+            )
+
+        # Si es formulario HTML, establecer el token como cookie HttpOnly y redirigir
+        response = RedirectResponse(url=next_url or "/", status_code=303)
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        )
         return response
         
     except HTTPException:

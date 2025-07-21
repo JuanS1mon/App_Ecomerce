@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movimientos de Obras - Sistema de Obras de Arte</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts - Elementos del Brooklyn Museum -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+        }
+        
+        .brooklyn-title {
+            font-family: 'Crimson Text', serif;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        
+        .movement-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .movement-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-activo { background-color: #dbeafe; color: #1e40af; }
+        .status-finalizado { background-color: #d1fae5; color: #065f46; }
+        .status-cancelado { background-color: #fee2e2; color: #991b1b; }
+        
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .type-prestamo { background-color: #fef3c7; color: #92400e; }
+        .type-venta { background-color: #dcfce7; color: #166534; }
+        .type-cesion { background-color: #e0e7ff; color: #3730a3; }
+        .type-traslado { background-color: #fed7e2; color: #9f1239; }
+        .type-exhibicion { background-color: #f3e8ff; color: #6b21a8; }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+   
+    <!-- Contenido principal estilo Brooklyn Museum -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">   
+        
+        <!-- Header principal estilo Brooklyn Museum -->
+        <div class="mb-12">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="brooklyn-title text-4xl md:text-5xl text-gray-900 mb-4">MOVIMIENTOS DE OBRAS</h1>
+                    <p class="text-gray-600 text-lg max-w-2xl">
+                        Gestión y seguimiento de préstamos, traslados, ventas y exhibiciones
+                    </p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="/app_obras/movements/html/dashboard" class="inline-flex items-center px-6 py-3 bg-blue-100 text-blue-700 font-medium hover:bg-blue-200 transition-colors rounded-lg">
+                        <i class="fas fa-chart-pie mr-2"></i>
+                        Dashboard
+                    </a>
+                    <a href="/app_obras/movements/html/create" class="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors rounded-lg">
+                        <i class="fas fa-plus mr-2"></i>
+                        Nuevo Movimiento
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros y búsqueda -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Movimiento</label>
+                    <select id="filter-type" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="">Todos los tipos</option>
+                        <option value="PRESTAMO">Préstamo</option>
+                        <option value="VENTA">Venta</option>
+                        <option value="CESION">Cesión</option>
+                        <option value="TRASLADO">Traslado</option>
+                        <option value="EXHIBICION">Exhibición</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                    <select id="filter-status" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="">Todos los estados</option>
+                        <option value="ACTIVO">Activo</option>
+                        <option value="FINALIZADO">Finalizado</option>
+                        <option value="CANCELADO">Cancelado</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Búsqueda</label>
+                    <input type="text" id="search-input" placeholder="Buscar movimientos..." class="w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="applyFilters()" class="w-full bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors">
+                        <i class="fas fa-search mr-2"></i>Filtrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de movimientos -->
+        <div id="movements-list" class="space-y-6">
+            {% for movement in movements %}
+            <div class="movement-card bg-white rounded-lg p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="type-badge type-{{ movement.movement_type.lower() }}">
+                                {% if movement.movement_type == 'PRESTAMO' %}
+                                    <i class="fas fa-handshake mr-1"></i>Préstamo
+                                {% elif movement.movement_type == 'VENTA' %}
+                                    <i class="fas fa-dollar-sign mr-1"></i>Venta
+                                {% elif movement.movement_type == 'CESION' %}
+                                    <i class="fas fa-gift mr-1"></i>Cesión
+                                {% elif movement.movement_type == 'TRASLADO' %}
+                                    <i class="fas fa-truck mr-1"></i>Traslado
+                                {% elif movement.movement_type == 'EXHIBICION' %}
+                                    <i class="fas fa-eye mr-1"></i>Exhibición
+                                {% endif %}
+                            </span>
+                            <span class="status-badge status-{{ movement.status.lower() }}">
+                                {% if movement.status == 'ACTIVO' %}
+                                    <i class="fas fa-play-circle mr-1"></i>Activo
+                                {% elif movement.status == 'FINALIZADO' %}
+                                    <i class="fas fa-check-circle mr-1"></i>Finalizado
+                                {% elif movement.status == 'CANCELADO' %}
+                                    <i class="fas fa-times-circle mr-1"></i>Cancelado
+                                {% endif %}
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                            {{ movement.artwork.title if movement.artwork else 'Obra no especificada' }}
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-3">
+                            <strong>Artista:</strong> {{ movement.artwork.artist.name if movement.artwork and movement.artwork.artist else 'No especificado' }}
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                            <div>
+                                <strong>Desde:</strong> {{ movement.from_location.name if movement.from_location else 'No especificado' }}
+                            </div>
+                            <div>
+                                <strong>Hacia:</strong> {{ movement.to_location.name if movement.to_location else 'No especificado' }}
+                            </div>
+                            <div>
+                                <strong>Fecha inicio:</strong> {{ movement.start_date.strftime('%d/%m/%Y') if movement.start_date else 'No especificada' }}
+                            </div>
+                            <div>
+                                <strong>Fecha fin:</strong> {{ movement.end_date.strftime('%d/%m/%Y') if movement.end_date else 'No especificada' }}
+                            </div>
+                        </div>
+                        {% if movement.contact_name %}
+                        <div class="mt-3 text-sm text-gray-600">
+                            <strong>Contacto:</strong> {{ movement.contact_name }}
+                            {% if movement.contact_email %}
+                                ({{ movement.contact_email }})
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex space-x-2 ml-4">
+                        <a href="/app_obras/movements/html/edit/{{ movement.id }}" class="text-blue-600 hover:text-blue-800 p-2">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        {% if movement.status == 'ACTIVO' %}
+                        <button onclick="finalizeMovement({{ movement.id }})" class="text-green-600 hover:text-green-800 p-2" title="Finalizar movimiento">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        {% endif %}
+                        <button onclick="deleteMovement({{ movement.id }})" class="text-red-600 hover:text-red-800 p-2" title="Eliminar movimiento">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                {% if movement.notes %}
+                <div class="border-t pt-3">
+                    <p class="text-sm text-gray-600"><strong>Notas:</strong> {{ movement.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-box-open text-gray-400 text-6xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No hay movimientos registrados</h3>
+                <p class="text-gray-600 mb-6">Comienza creando tu primer movimiento de obra</p>
+                <a href="/app_obras/movements/html/create" class="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors rounded-lg">
+                    <i class="fas fa-plus mr-2"></i>
+                    Crear Primer Movimiento
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar navbar
+            loadNavbar();
+        });
+
+        function applyFilters() {
+            const type = document.getElementById('filter-type').value;
+            const status = document.getElementById('filter-status').value;
+            const search = document.getElementById('search-input').value;
+            
+            let url = '/app_obras/movements/html/?';
+            const params = new URLSearchParams();
+            
+            if (type) params.append('movement_type', type);
+            if (status) params.append('status', status);
+            if (search) params.append('search', search);
+            
+            window.location.href = url + params.toString();
+        }
+
+        async function finalizeMovement(id) {
+            if (confirm('¿Estás seguro de que deseas finalizar este movimiento?')) {
+                try {
+                    const response = await fetch(`/app_obras/movements/id/${id}/finalize`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Error al finalizar el movimiento');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al finalizar el movimiento');
+                }
+            }
+        }
+
+        async function deleteMovement(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este movimiento? Esta acción no se puede deshacer.')) {
+                try {
+                    const response = await fetch(`/app_obras/movements/id/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Error al eliminar el movimiento');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al eliminar el movimiento');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

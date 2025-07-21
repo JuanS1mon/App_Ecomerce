@@ -14,5 +14,5 @@ class Depositos(Base):
     codigo = Column(String(255))
     observacion = Column(String(255))
     
-    # Relaciones
-    ots = relationship("OT", back_populates="deposito", foreign_keys="OT.id_deposito")
+    # Relaciones (temporalmente comentadas hasta resolver la estructura de FK)
+    # ots = relationship("OT", back_populates="deposito", foreign_keys="OT.id_deposito")
