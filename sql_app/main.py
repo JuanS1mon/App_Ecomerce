@@ -75,8 +75,18 @@ app.mount("/static", StaticFiles(directory="sql_app/static"), name="static")
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
+# Phase 2: Importar nuevos middlewares de rendimiento
+from sql_app.middleware.rate_limit import RateLimitMiddleware
+from sql_app.monitoring.metrics import MetricsMiddleware
+
 # Compresión gzip para mejorar performance
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# Middleware de métricas (debe ir primero para capturar todo)
+app.add_middleware(MetricsMiddleware)
+
+# Rate limiting middleware
+app.add_middleware(RateLimitMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -98,6 +108,7 @@ register_exception_handlers(app)
 # HEALTH CHECK ENDPOINT
 # =============================
 from datetime import datetime
+from sql_app.monitoring.metrics import metrics_endpoint
 
 @app.get("/health", include_in_schema=False)
 async def health_check():
@@ -108,6 +119,12 @@ async def health_check():
         "version": "1.0.0",
         "environment": ENVIRONMENT
     }
+
+# Endpoint de métricas para Prometheus
+@app.get("/metrics", include_in_schema=False)
+async def prometheus_metrics():
+    """Endpoint de métricas para Prometheus"""
+    return await metrics_endpoint()
 
 # =============================
 # INICIALIZACIÓN DE BASE DE DATOS Y DIRECTORIOS
@@ -151,10 +168,38 @@ ensure_directories()
 # =============================
 # EVENTOS DE CICLO DE VIDA
 # =============================
+# Phase 2: Importar inicializadores de optimización
+from sql_app.cache.redis_cache import cache_manager
+from sql_app.monitoring.metrics import init_metrics
+from sql_app.utils.sql_optimizer import init_sql_optimizations
+
 @app.on_event("startup")
 async def startup_event():
     alembic_ok = run_alembic_upgrade()
     mail_ok = check_mail_config()
+    
+    # Phase 2: Inicializar sistemas de rendimiento
+    try:
+        cache_manager.initialize()
+        cache_ok = True
+    except Exception as e:
+        logger.warning(f"⚠️ Cache no disponible: {e}")
+        cache_ok = False
+    
+    try:
+        init_metrics()
+        metrics_ok = True
+    except Exception as e:
+        logger.warning(f"⚠️ Métricas no disponibles: {e}")
+        metrics_ok = False
+    
+    try:
+        await init_sql_optimizations()
+        sql_opt_ok = True
+    except Exception as e:
+        logger.warning(f"⚠️ Optimizaciones SQL fallaron: {e}")
+        sql_opt_ok = False
+    
     checklist = [
         ("🟢 .env cargado correctamente", True),
         ("🟢 Configuración de base de datos cargada", db_status),
@@ -166,16 +211,28 @@ async def startup_event():
         ("🟢 Middlewares y rutas registradas", True),
         ("🟢 Logging inicializado", True),
         ("🟢 Migraciones Alembic aplicadas", alembic_ok),
+        ("🚀 Sistema de cache inicializado", cache_ok),
+        ("📊 Sistema de métricas inicializado", metrics_ok),
+        ("⚡ Optimizaciones SQL aplicadas", sql_opt_ok),
     ]
     logger.info("\n================= CHECKLIST DE INICIO =================")
     for item, ok in checklist:
-        logger.info(f"{'✅' if ok else '❌'} {item}")
+        logger.info(f"{'✅' if ok else '⚠️'} {item}")
     logger.info("======================================================\n")
     logger.info("🚀 Iniciando aplicación FastAPI")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     logger.info("🛑 Cerrando aplicación FastAPI")
+    
+    # Phase 2: Limpiar recursos de cache
+    try:
+        from sql_app.cache.redis_cache import cache_manager
+        if hasattr(cache_manager, 'close'):
+            await cache_manager.close()
+    except Exception as e:
+        logger.warning(f"⚠️ Error cerrando cache: {e}")
+    
     logger.info("💾 Limpieza de recursos completada")
 
 # =============================
