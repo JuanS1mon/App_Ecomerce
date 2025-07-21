@@ -9,18 +9,33 @@ from sql_app.config import ORIGINS, ENVIRONMENT
 
 # CORS_CONFIG:
 # Diccionario con la configuración de CORS (Cross-Origin Resource Sharing).
-# Permite definir desde qué orígenes externos se puede acceder a la API, qué métodos y headers están permitidos,
-# y si se permiten credenciales (cookies, headers de autenticación, etc.).
-# - allow_origins: Lista de orígenes permitidos. En producción usa los definidos en ORIGINS, en desarrollo permite todos.
-# - allow_credentials: Si se permiten credenciales (True recomendado para APIs autenticadas).
-# - allow_methods: Métodos HTTP permitidos ("*" para todos).
-# - allow_headers: Headers permitidos ("*" para todos).
-CORS_CONFIG = {
-    "allow_origins": ORIGINS if ENVIRONMENT == "production" else ["*"],
-    "allow_credentials": True,
-    "allow_methods": ["*"],
-    "allow_headers": ["*"],
-}
+# Configuración optimizada para producción vs desarrollo
+def get_cors_config():
+    if ENVIRONMENT == "production":
+        # Configuración restrictiva para producción
+        return {
+            "allow_origins": ORIGINS if ORIGINS != ["*"] else [],
+            "allow_credentials": True,
+            "allow_methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+            "allow_headers": [
+                "Authorization", 
+                "Content-Type", 
+                "Accept", 
+                "Origin", 
+                "X-Requested-With",
+                "X-CSRF-Token"
+            ],
+        }
+    else:
+        # Configuración permisiva para desarrollo
+        return {
+            "allow_origins": ["*"],
+            "allow_credentials": True,
+            "allow_methods": ["*"],
+            "allow_headers": ["*"],
+        }
+
+CORS_CONFIG = get_cors_config()
 
 # DOCS_URL y REDOC_URL:
 # URLs para la documentación interactiva de la API.

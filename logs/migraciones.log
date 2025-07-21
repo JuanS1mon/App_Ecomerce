@@ -27748,3 +27748,25 @@ sqlalchemy.exc.CompileError: MSSQL requires an order_by when using an OFFSET or 
 2025-07-21 10:11:05,617 - DEBUG - \u274c Encabezado Authorization no presente
 2025-07-21 10:11:05,619 - DEBUG - \u274c Cookie access_token no presente
 2025-07-21 10:11:05,622 - DEBUG - \U0001f4e4 Respuesta: 404 text/html; charset=utf-8
+2025-07-21 10:32:14,881 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-07-21 10:32:14,881 - INFO - \U0001f4be Limpieza de recursos completada
+2025-07-21 10:32:18,693 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-07-21 10:32:18,694 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-07-21 10:32:18,694 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-07-21 10:32:19,493 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-07-21 10:32:19,493 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-07-21 10:32:19,494 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-07-21 10:32:19,494 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-07-21 10:32:19,494 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-07-21 10:32:19,495 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-07-21 10:32:19,495 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-07-21 10:32:19,495 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-07-21 10:32:19,495 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-07-21 10:32:19,495 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-07-21 10:32:19,496 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-07-21 10:32:19,496 - INFO - ======================================================
+
+2025-07-21 10:32:19,496 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-07-21 10:32:19,497 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-07-21 10:32:19,497 - INFO - \U0001f4be Limpieza de recursos completada

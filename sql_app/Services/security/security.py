@@ -304,7 +304,11 @@ def get_current_user_secure(token: str, db = None):
     """Obtiene usuario actual desde token con validación de seguridad"""
     try:
         payload = decodifica_token(token)
-        print(f"DIAGNÓSTICO GET_CURRENT_USER_SECURE - Payload decodificado: {payload}")
+        # Debug solo en desarrollo
+        from sql_app.config import ENVIRONMENT
+        if ENVIRONMENT == "development":
+            logger.debug(f"Token payload decodificado para usuario: {payload.get('sub', 'unknown')}")
+        
         username = payload.get("sub")
         
         if not username:
@@ -322,15 +326,19 @@ def get_current_user_secure(token: str, db = None):
         # Buscar el usuario en la base de datos
         from sql_app.db.models.config.usuarios import Usuarios as UsuariosModel
         user = db.query(UsuariosModel).filter(UsuariosModel.usuario == username).first()
-        print(f"DIAGNÓSTICO GET_CURRENT_USER_SECURE - Usuario consultado: {user}")
+        
+        if ENVIRONMENT == "development":
+            logger.debug(f"Usuario consultado: {username} - {'Encontrado' if user else 'No encontrado'}")
         
         if not user:
+            logger.warning(f"Usuario no encontrado: {username}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"Usuario {username} no encontrado"
             )
         
         if not user.activo:
+            logger.warning(f"Usuario inactivo: {username}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Usuario inactivo"

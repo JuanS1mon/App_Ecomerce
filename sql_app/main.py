@@ -41,7 +41,6 @@ from sql_app.routers import usuarios as aut_usuario
 from sql_app.routers import auth as auth_router
 from sql_app.routers import Blog
 from sql_app.routers.config import Generar, configDB, Migraciones, Analisis, Scraping, usuarios_admin
-from sql_app.routers.config import AdminNew as admin_router
 from sql_app.routers.config.Admin import router as admin_router
 from sql_app.routers import frontend_pages
 from sql_app.Services.security.admin_roles import router as roles_router
@@ -74,6 +73,11 @@ app.mount("/static", StaticFiles(directory="sql_app/static"), name="static")
 # MIDDLEWARES
 # =============================
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+
+# Compresión gzip para mejorar performance
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_CONFIG["allow_origins"],
@@ -89,6 +93,21 @@ app.add_middleware(JWTMiddleware)
 # EXCEPTION HANDLERS
 # =============================
 register_exception_handlers(app)
+
+# =============================
+# HEALTH CHECK ENDPOINT
+# =============================
+from datetime import datetime
+
+@app.get("/health", include_in_schema=False)
+async def health_check():
+    """Endpoint de salud para load balancers y monitoreo"""
+    return {
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat(),
+        "version": "1.0.0",
+        "environment": ENVIRONMENT
+    }
 
 # =============================
 # INICIALIZACIÓN DE BASE DE DATOS Y DIRECTORIOS
@@ -109,13 +128,11 @@ except Exception as e:
     db_status = False
     msg = str(e)
     if "Error de inicio de sesión" in msg or "login failed" in msg.lower():
-        print("⚠️  No se pudo conectar a la base de datos. Verifica usuario y contraseña.")
-        logger.warning("No se pudo conectar a la base de datos. Verifica usuario y contraseña.")
+        logger.error("No se pudo conectar a la base de datos. Verifica usuario y contraseña.")
     elif "ya existe" in msg.lower() or "already exists" in msg.lower():
         pass  # No loguear, solo reflejar en checklist
     else:
-        print(f"⚠️  Error al crear la base de datos: {e}")
-        logger.warning(f"Error al crear la base de datos: {e}")
+        logger.error(f"Error al crear la base de datos: {e}")
 
 # Manejo amigable de errores al crear las tablas
 tablas_status = True
@@ -127,8 +144,7 @@ except Exception as e:
     if "ya existe" in msg.lower() or "already exists" in msg.lower():
         pass  # No loguear, solo reflejar en checklist
     else:
-        print(f"⚠️  Error al crear tablas: {e}")
-        logger.warning(f"Error al crear tablas: {e}")
+        logger.error(f"Error al crear tablas: {e}")
 
 ensure_directories()
 
@@ -201,14 +217,16 @@ if __name__ == "__main__":
     logger.info("🛡️ Admin panel en: http://localhost:8000/admin")
     logger.info("⚠️  Usa Ctrl+C para detener el servidor")
     try:
+        # Configuración optimizada para producción
         uvicorn.run(
             app=app,
             host="0.0.0.0",
-            port=8001,
+            port=int(os.getenv("PORT", "8000")),
+            workers=int(os.getenv("WORKERS", "1")),
             reload=False,
-            log_level="debug",  # Cambiado a debug para más logs
-            access_log=True,    # Habilitar access logs
-            use_colors=True,    # Usar colores en los logs
+            log_level=os.getenv("LOG_LEVEL", "info"),
+            access_log=ENVIRONMENT == "development",
+            use_colors=ENVIRONMENT == "development",
             log_config=LOG_CONFIG
         )
     except KeyboardInterrupt:

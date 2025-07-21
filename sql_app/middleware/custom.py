@@ -3,46 +3,58 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, HTML
 import logging
 import os
 import httpx
+from sql_app.config import ENVIRONMENT
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
         self.logger = logging.getLogger("uvicorn.error")
+        self.is_production = ENVIRONMENT == "production"
+        
     async def dispatch(self, request, call_next):
         import time
         start_time = time.time()
         client_ip = request.client.host if request.client else "unknown"
         method = request.method
         url = str(request.url)
-        headers = dict(request.headers)
-        user_agent = headers.get("user-agent", "unknown")
-        self.logger.info(f"🌐 {method} {url}")
-        self.logger.info(f"   📍 IP: {client_ip}")
-        self.logger.info(f"   🔍 User-Agent: {user_agent[:100]}...")
-        self.logger.debug(f"📍 Encabezados: {headers}")
-        self.logger.debug(f"📍 Cookies: {request.cookies}")
-        auth_header = request.headers.get("Authorization")
-        if auth_header:
-            self.logger.debug(f"🔑 Encabezado Authorization detectado: {auth_header}")
-        else:
-            self.logger.debug("❌ Encabezado Authorization no presente")
-        access_token_cookie = request.cookies.get("access_token")
-        if access_token_cookie:
-            self.logger.debug(f"🔑 Cookie access_token detectada: {access_token_cookie}")
-        else:
-            self.logger.debug("❌ Cookie access_token no presente")
+        
+        # Log básico siempre
+        self.logger.info(f"{method} {url}")
+        
+        # Información detallada solo en desarrollo
+        if not self.is_production:
+            headers = dict(request.headers)
+            user_agent = headers.get("user-agent", "unknown")
+            self.logger.info(f"   📍 IP: {client_ip}")
+            self.logger.info(f"   🔍 User-Agent: {user_agent[:100]}...")
+            self.logger.debug(f"📍 Encabezados: {headers}")
+            self.logger.debug(f"📍 Cookies: {request.cookies}")
+            
+            auth_header = request.headers.get("Authorization")
+            if auth_header:
+                self.logger.debug(f"🔑 Encabezado Authorization detectado")
+            
+            access_token_cookie = request.cookies.get("access_token")
+            if access_token_cookie:
+                self.logger.debug(f"🔑 Cookie access_token detectada")
+        
         try:
             response = await call_next(request)
             process_time = time.time() - start_time
-            self.logger.info(f"✅ {method} {url} -> {response.status_code}")
-            self.logger.info(f"   ⏱️  Tiempo: {process_time:.3f}s")
-            self.logger.info(f"   📤 Content-Type: {response.headers.get('content-type', 'unknown')}")
+            
+            if self.is_production:
+                # Log mínimo en producción
+                self.logger.info(f"{method} {url} -> {response.status_code} ({process_time:.3f}s)")
+            else:
+                # Log detallado en desarrollo
+                self.logger.info(f"✅ {method} {url} -> {response.status_code}")
+                self.logger.info(f"   ⏱️  Tiempo: {process_time:.3f}s")
+                self.logger.info(f"   📤 Content-Type: {response.headers.get('content-type', 'unknown')}")
+            
             response.headers["X-Process-Time"] = str(process_time)
         except Exception as e:
             process_time = time.time() - start_time
-            self.logger.error(f"❌ {method} {url} -> ERROR")
-            self.logger.error(f"   ⏱️  Tiempo: {process_time:.3f}s")
-            self.logger.error(f"   💥 Error: {str(e)}")
+            self.logger.error(f"❌ {method} {url} -> ERROR ({process_time:.3f}s): {str(e)}")
             raise
         return response
 
