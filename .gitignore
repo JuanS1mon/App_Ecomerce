@@ -143,7 +143,7 @@ __pycache__/
 .vscode/
 **/.vscode/
 
-# Excluir archivos grandes
+# Excluir archivos grandes y comprimidos
 *.zip
 *.rar
 *.7z
@@ -151,19 +151,59 @@ __pycache__/
 *.tar
 *.bz2
 *.xz
+
+# Documentos grandes (solo ejemplos grandes, permite imágenes necesarias para la app)
 *.pdf
 *.docx
 *.xlsx
 *.pptx
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.tif
-*.tiff
+
+# Videos y archivos multimedia grandes
 *.mp4
 *.avi
 *.mov
 *.wmv
 *.flv
+*.mkv
+*.mpg
+*.mpeg
+*.webm
+
+# Imágenes grandes (permite íconos y logos pequeños)
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# *.bmp
+# *.tif
+# *.tiff
+
+# Archivos de backup y temporales
+*.backup
+*.bak
+*.tmp
+*.temp
+*.old
+*.orig
+*.swp
+*.swo
+*~
+
+# Bases de datos grandes (mantener sql_app.db para desarrollo)
+# *.db (comentado para permitir la BD de desarrollo)
+*.sqlite
+*.sqlite3-journal
+*.db-journal
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Archivos de desarrollo y testing grandes
+test_data/
+test_files/
+sample_data/
+mock_data/
+dump/
+dumps/
