@@ -75,7 +75,7 @@ class FrontendRedirectMiddleware(BaseHTTPMiddleware):
 class CustomErrorMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
-        excluded_paths = ["/docs", "/redoc", "/openapi.json"]
+        excluded_paths = ["/docs", "/redoc", "/openapi.json", "/api"]
         if any(request.url.path.startswith(path) for path in excluded_paths):
             return response
         static_dir = os.path.join(os.path.dirname(__file__), "..", "static")

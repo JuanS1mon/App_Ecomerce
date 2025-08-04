@@ -12,6 +12,15 @@
   
     <!-- Sistema de componentes y navegación -->
     <script src="/static/js/components.js"></script>
+    <!-- Sistema de widgets integrado -->
+    <script>
+        // Configuración específica para widgets en admin
+        window.adminWidgetsConfig = {
+            autoInit: true,
+            floatingControls: true,
+            position: 'bottom-right'
+        };
+    </script>
     <style>
         .card-hover {
             transition: all 0.3s ease;
@@ -22,6 +31,55 @@
         }
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Estilos para widgets de comunicación */
+        @keyframes notification-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .notification-count {
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        #communication-notification-badge {
+            animation: notification-pulse 2s infinite;
+        }
+        
+        .communication-widget-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .communication-widget-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .communication-widget-card:hover::before {
+            left: 100%;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
         }
     </style>
 </head>
@@ -144,6 +202,8 @@
             </div>
         </div>
 
+
+
         <!-- Accesos rápidos -->
         <div class="bg-white rounded-xl shadow-md mb-8 overflow-hidden border border-gray-100">
             <div class="px-6 py-4 border-b border-gray-200">
@@ -254,6 +314,52 @@
                         <div class="ml-4">
                             <h4 class="text-base font-medium text-gray-900">Gestor de Servicios</h4>
                             <p class="mt-1 text-sm text-gray-500">Administra servicios y módulos</p>
+                        </div>
+                    </a>
+                    
+                    <!-- ACCESO DIRECTO: CHAT & MENSAJES -->
+                    <a href="/chat-testing" class="communication-widget-card flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 transition-all duration-300 group shadow-sm hover:shadow-md" 
+                       onmouseenter="showCommunicationTooltip(this)"
+                       onmouseleave="hideCommunicationTooltip()">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white group-hover:scale-110 transition-transform duration-300 relative">
+                            <i class="fas fa-comments"></i>
+                            <!-- Indicador de notificaciones -->
+                            <span id="communication-notification-badge" class="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse hidden">
+                                <span class="notification-count">0</span>
+                            </span>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-base font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                                    Chat & Mensajes
+                                    <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                        En Línea
+                                    </span>
+                                </h4>
+                                <div class="text-xs text-gray-400 group-hover:text-blue-500 transition-colors">
+                                    <i class="fas fa-circle text-green-400 mr-1 status-indicator"></i>
+                                    Conectado
+                                </div>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500 group-hover:text-gray-700">
+                                Centro de comunicación • Chat en tiempo real • Mensajes directos
+                            </p>
+                            <div class="mt-2 flex items-center space-x-4 text-xs text-gray-400">
+                                <span class="flex items-center">
+                                    <i class="fas fa-envelope mr-1"></i>
+                                    <span id="unread-messages-count">0</span> Sin leer
+                                </span>
+                                <span class="flex items-center">
+                                    <i class="fas fa-user-friends mr-1"></i>
+                                    <span id="online-users-count">1</span> En línea
+                                </span>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex flex-col items-center">
+                            <i class="fas fa-external-link-alt text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300 mb-1"></i>
+                            <div class="text-xs text-gray-400 group-hover:text-blue-500 transition-colors">
+                                Abrir
+                            </div>
                         </div>
                     </a>
                 </div>
@@ -454,6 +560,313 @@
     // Documentación:
     // - Si accedes a /admin?token=... el token se guarda y se limpia la URL.
     // - El resto del frontend usará el token desde localStorage para autenticación.
+    </script>
+
+    <!-- SISTEMA DE WIDGETS PARA ADMIN -->
+    <script>
+        // Variables de estado para widgets
+        let communicationWidgetsVisible = false;
+        let messageWidgetLoaded = false;
+        let chatWidgetLoaded = false;
+        let notificationUpdateInterval = null;
+
+        // Función para actualizar contadores de comunicación
+        function updateCommunicationCounters() {
+            // Simular llamada a API para obtener contadores actuales
+            fetch('/api/chat/stats')
+                .then(response => response.json())
+                .then(data => {
+                    const unreadCount = data.unread_messages || 0;
+                    const onlineUsers = data.online_users || 1;
+                    
+                    // Actualizar contador de mensajes sin leer
+                    const unreadElement = document.getElementById('unread-messages-count');
+                    if (unreadElement) {
+                        unreadElement.textContent = unreadCount;
+                    }
+                    
+                    // Actualizar contador de usuarios en línea
+                    const onlineElement = document.getElementById('online-users-count');
+                    if (onlineElement) {
+                        onlineElement.textContent = onlineUsers;
+                    }
+                    
+                    // Mostrar/ocultar badge de notificación
+                    const badge = document.getElementById('communication-notification-badge');
+                    if (badge) {
+                        if (unreadCount > 0) {
+                            badge.classList.remove('hidden');
+                            badge.querySelector('.notification-count').textContent = unreadCount > 99 ? '99+' : unreadCount;
+                        } else {
+                            badge.classList.add('hidden');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.warn('No se pudieron obtener estadísticas de comunicación:', error);
+                    // Valores por defecto en caso de error
+                    const unreadElement = document.getElementById('unread-messages-count');
+                    const onlineElement = document.getElementById('online-users-count');
+                    if (unreadElement) unreadElement.textContent = '0';
+                    if (onlineElement) onlineElement.textContent = '1';
+                });
+        }
+
+        // Función para mostrar tooltip de estado rápido
+        function showCommunicationTooltip(element) {
+            // Crear tooltip si no existe
+            let tooltip = document.getElementById('communication-tooltip');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = 'communication-tooltip';
+                tooltip.className = 'absolute z-50 bg-gray-900 text-white p-3 rounded-lg shadow-lg text-sm max-w-xs opacity-0 transition-opacity duration-200 pointer-events-none';
+                document.body.appendChild(tooltip);
+            }
+            
+            // Obtener datos actuales
+            const unreadCount = document.getElementById('unread-messages-count')?.textContent || '0';
+            const onlineCount = document.getElementById('online-users-count')?.textContent || '1';
+            
+            // Contenido del tooltip
+            tooltip.innerHTML = `
+                <div class="font-semibold mb-2 flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Estado de Comunicación
+                </div>
+                <div class="space-y-1 text-xs">
+                    <div class="flex justify-between">
+                        <span>Mensajes sin leer:</span>
+                        <span class="font-bold text-yellow-300">${unreadCount}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Usuarios en línea:</span>
+                        <span class="font-bold text-green-300">${onlineCount}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Estado del chat:</span>
+                        <span class="font-bold text-green-300">
+                            <i class="fas fa-circle text-green-400 mr-1"></i>
+                            Conectado
+                        </span>
+                    </div>
+                </div>
+                <div class="mt-2 pt-2 border-t border-gray-700 text-xs text-gray-300">
+                    Clic para abrir el centro de comunicación
+                </div>
+            `;
+            
+            // Posicionar tooltip
+            const rect = element.getBoundingClientRect();
+            tooltip.style.left = `${rect.left + window.scrollX}px`;
+            tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 10}px`;
+            
+            // Mostrar tooltip
+            tooltip.classList.remove('opacity-0');
+            tooltip.classList.add('opacity-100');
+        }
+        
+        function hideCommunicationTooltip() {
+            const tooltip = document.getElementById('communication-tooltip');
+            if (tooltip) {
+                tooltip.classList.remove('opacity-100');
+                tooltip.classList.add('opacity-0');
+                setTimeout(() => {
+                    if (tooltip.parentNode) {
+                        tooltip.parentNode.removeChild(tooltip);
+                    }
+                }, 200);
+            }
+        }
+
+        // Función para alternar la sección de widgets de comunicación
+        function toggleCommunicationWidgets() {
+            const section = document.getElementById('communication-widgets-section');
+            
+            if (communicationWidgetsVisible) {
+                section.style.display = 'none';
+                communicationWidgetsVisible = false;
+            } else {
+                section.style.display = 'block';
+                communicationWidgetsVisible = true;
+                
+                // Inicializar el sistema de widgets si no está cargado
+                if (!window.widgetSystemLoaded) {
+                    loadWidgetSystemForAdmin();
+                }
+            }
+        }
+
+        // Cargar el sistema de widgets específicamente para admin
+        function loadWidgetSystemForAdmin() {
+            if (window.loadMessageWidget && window.loadChatWidget) {
+                window.widgetSystemLoaded = true;
+                return Promise.resolve();
+            }
+
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = '/widgets/loader.js';
+                script.onload = () => {
+                    console.log('✅ Sistema de widgets cargado en panel admin');
+                    window.widgetSystemLoaded = true;
+                    resolve();
+                };
+                script.onerror = () => {
+                    console.error('❌ Error al cargar widgets en panel admin');
+                    reject();
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        // Función para cargar widget de mensajes en el admin
+        function toggleMessageWidget() {
+            const container = document.getElementById('admin-message-widget-container');
+            
+            if (messageWidgetLoaded) {
+                // Limpiar y mostrar placeholder
+                container.innerHTML = `
+                    <div class="text-center text-gray-500">
+                        <i class="fas fa-envelope text-4xl mb-2"></i>
+                        <p>Haz clic en "Mensajes" para cargar el widget</p>
+                    </div>
+                `;
+                container.className = 'border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[300px] flex items-center justify-center text-gray-500';
+                messageWidgetLoaded = false;
+            } else {
+                // Cargar widget
+                loadWidgetSystemForAdmin().then(() => {
+                    if (window.loadMessageWidget) {
+                        // Preparar el contenedor
+                        container.innerHTML = '';
+                        container.className = 'border border-gray-300 rounded-lg overflow-hidden';
+                        
+                        // Cargar el widget
+                        window.loadMessageWidget('admin-message-widget-container', {
+                            position: 'inline',
+                            showHeader: true,
+                            maxHeight: '350px',
+                            adminMode: true
+                        });
+                        messageWidgetLoaded = true;
+                    } else {
+                        showWidgetError('mensajes');
+                    }
+                }).catch(() => {
+                    showWidgetError('mensajes');
+                });
+            }
+        }
+
+        // Función para cargar widget de chat en el admin
+        function toggleChatWidget() {
+            const container = document.getElementById('admin-chat-widget-container');
+            
+            if (chatWidgetLoaded) {
+                // Limpiar y mostrar placeholder
+                container.innerHTML = `
+                    <div class="text-center text-gray-500">
+                        <i class="fas fa-comments text-4xl mb-2"></i>
+                        <p>Haz clic en "Chat" para cargar el widget</p>
+                    </div>
+                `;
+                container.className = 'border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[300px] flex items-center justify-center text-gray-500';
+                chatWidgetLoaded = false;
+            } else {
+                // Cargar widget
+                loadWidgetSystemForAdmin().then(() => {
+                    if (window.loadChatWidget) {
+                        // Preparar el contenedor
+                        container.innerHTML = '';
+                        container.className = 'border border-gray-300 rounded-lg overflow-hidden';
+                        
+                        // Cargar el widget
+                        window.loadChatWidget('admin-chat-widget-container', {
+                            position: 'inline',
+                            showHeader: true,
+                            maxHeight: '350px',
+                            adminMode: true
+                        });
+                        chatWidgetLoaded = true;
+                    } else {
+                        showWidgetError('chat');
+                    }
+                }).catch(() => {
+                    showWidgetError('chat');
+                });
+            }
+        }
+
+        // Función para mostrar errores de widgets
+        function showWidgetError(type) {
+            const containerId = type === 'chat' ? 'admin-chat-widget-container' : 'admin-message-widget-container';
+            const container = document.getElementById(containerId);
+            const icon = type === 'chat' ? 'fa-comments' : 'fa-envelope';
+            
+            container.innerHTML = `
+                <div class="text-center text-red-500">
+                    <i class="fas ${icon} text-4xl mb-2"></i>
+                    <p>Error al cargar widget de ${type}</p>
+                    <button onclick="toggle${type === 'chat' ? 'Chat' : 'Message'}Widget()" class="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                        Reintentar
+                    </button>
+                </div>
+            `;
+        }
+
+        // Función para cargar un widget específico (API pública)
+        function loadAdminWidget(type, containerId, options = {}) {
+            return loadWidgetSystemForAdmin().then(() => {
+                const defaultOptions = {
+                    position: 'inline',
+                    showHeader: true,
+                    adminMode: true,
+                    ...options
+                };
+
+                if (type === 'message' && window.loadMessageWidget) {
+                    window.loadMessageWidget(containerId, defaultOptions);
+                    return true;
+                } else if (type === 'chat' && window.loadChatWidget) {
+                    window.loadChatWidget(containerId, defaultOptions);
+                    return true;
+                } else {
+                    throw new Error(`Widget tipo "${type}" no disponible`);
+                }
+            });
+        }
+
+        // Hacer funciones disponibles globalmente
+        window.toggleCommunicationWidgets = toggleCommunicationWidgets;
+        window.toggleMessageWidget = toggleMessageWidget;
+        window.toggleChatWidget = toggleChatWidget;
+        window.loadAdminWidget = loadAdminWidget;
+        window.updateCommunicationCounters = updateCommunicationCounters;
+        window.showCommunicationTooltip = showCommunicationTooltip;
+        window.hideCommunicationTooltip = hideCommunicationTooltip;
+
+        // Inicialización adicional cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Actualizar contadores inmediatamente
+            updateCommunicationCounters();
+            
+            // Configurar actualización automática de contadores cada 30 segundos
+            notificationUpdateInterval = setInterval(updateCommunicationCounters, 30000);
+            
+            // Precargar el sistema de widgets si estamos en admin
+            setTimeout(() => {
+                loadWidgetSystemForAdmin().catch(() => {
+                    console.warn('Sistema de widgets no disponible');
+                });
+            }, 2000);
+        });
+
+        // Limpiar interval al salir de la página
+        window.addEventListener('beforeunload', function() {
+            if (notificationUpdateInterval) {
+                clearInterval(notificationUpdateInterval);
+            }
+        });
     </script>
 </body>
 </html>

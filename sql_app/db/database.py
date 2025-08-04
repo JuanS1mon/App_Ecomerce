@@ -91,7 +91,7 @@ elif DB_TYPE == "postgresql":
 # SECCIÓN: SQLITE
 # =============================
 else:
-    SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sql_app/sql_app.db")
+    SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sql_app.db")
     master_engine = None
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL,
@@ -212,9 +212,9 @@ if 'psycopg2' in sys.modules:
     del sys.modules['psycopg2']
     print("Referencia a psycopg2 eliminada.")
 
-# Asegurar que SQLALCHEMY_DATABASE_URL esté configurado para SQL Server
-if not SQLALCHEMY_DATABASE_URL.startswith("mssql+pyodbc://"):
-    raise ValueError("SQLALCHEMY_DATABASE_URL no está configurado correctamente para SQL Server.")
+# Asegurar que SQLALCHEMY_DATABASE_URL esté configurado correctamente
+if not (SQLALCHEMY_DATABASE_URL.startswith("mssql+pyodbc://") or SQLALCHEMY_DATABASE_URL.startswith("sqlite:///")):
+    raise ValueError("SQLALCHEMY_DATABASE_URL no está configurado correctamente para la base de datos seleccionada.")
 
 # =============================
 # AUTO-ACTUALIZAR BASE DE DATOS CON ALEMBIC EN STARTUP

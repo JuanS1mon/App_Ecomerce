@@ -53,7 +53,15 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/api/protected"
         ]
         self.public_paths = [
-            "/", "/auth/login", "/auth/logout", "/docs", "/redoc", "/openapi.json", "/static", "/favicon.ico", "/loginpage"
+            "/", "/auth/login", "/auth/logout", "/docs", "/redoc", "/openapi.json", "/static", "/favicon.ico", "/loginpage",
+            "/administracion",     # Rutas de administración sin protección
+            "/chat-test",          # Página de pruebas de chat
+            "/mensajes-admin-public",  # Página de admin mensajes sin autenticación
+            "/routes-info",        # Información de rutas disponibles
+            "/api/test",           # Endpoint de prueba de API (incluye todos los sub-endpoints)
+            "/test-simple",        # Endpoint simple de prueba
+            "/debug",              # Endpoints de debugging
+            "/api/public"          # Endpoints públicos para testing de mensajes
         ]
 
     def is_protected_path(self, path: str) -> bool:
@@ -61,14 +69,19 @@ class JWTMiddleware(BaseHTTPMiddleware):
         Determina si una ruta requiere autenticación.
         Devuelve True si la ruta está en la lista de protegidas y no es pública.
         """
+        logger.info(f"Verificando ruta: {path}")
         for public_path in self.public_paths:
             if public_path == "/" and path == "/":
+                logger.info(f"Ruta {path} es pública (raíz)")
                 return False
             elif public_path != "/" and path.startswith(public_path):
+                logger.info(f"Ruta {path} es pública (coincide con {public_path})")
                 return False
         for protected_path in self.protected_paths:
             if path.startswith(protected_path):
+                logger.info(f"Ruta {path} es protegida (coincide con {protected_path})")
                 return True
+        logger.info(f"Ruta {path} no requiere protección")
         return False
 
     def extract_token_from_request(self, request: Request) -> Optional[str]:

@@ -9,6 +9,11 @@ import os
 def register_exception_handlers(app, templates=None):
     @app.exception_handler(StarletteHTTPException)
     async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+        # Excluir rutas de API de la personalización de páginas de error
+        excluded_paths = ["/docs", "/redoc", "/openapi.json", "/api"]
+        if any(request.url.path.startswith(path) for path in excluded_paths):
+            return JSONResponse(status_code=exc.status_code, content=jsonable_encoder({"detail": exc.detail}))
+        
         static_dir = os.path.join(os.path.dirname(__file__), "static")
         if exc.status_code == 404:
             return FileResponse(os.path.join(static_dir, '404.html'), status_code=404)

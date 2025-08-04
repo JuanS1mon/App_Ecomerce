@@ -16,11 +16,20 @@ from ..Services.app_obras.documents.model_documents import Documents
 from ..Services.app_obras.movements.model_movements import Movements, MovementType, MovementStatus
 from ..Services.app_obras.movements.model_contacts import Contacts
 
+# Modelos de configuración de usuarios
+from .models.config.usuarios import Usuarios
+
+# Modelos de chat
+from ..Services.chat.models import ChatRoom, ChatMessage, ChatMember, ChatReadStatus
+
+# Modelo de mensajes
+from .models.config.mensajes import Mensajes
+
 # Modelos de usuarios (comentado por ahora para evitar conflictos)
 # from .models.Maestro.Usuarios import Modulos
 
 __all__ = [
     "Artworks", "Artists", "ArtworkStates", "Locations", "Institutions", 
     "Exhibitions", "Sales", "Documents", "Movements", "MovementType", 
-    "MovementStatus", "Contacts"
+    "MovementStatus", "Contacts", "Usuarios", "Mensajes"
 ]

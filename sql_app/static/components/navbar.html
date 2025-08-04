@@ -30,6 +30,34 @@
             
             <div class="h-6 border-r border-gray-200 mx-2"></div>
             
+            <!-- Sistema de Mensajes/Notificaciones -->
+            <div class="relative">
+                <button id="mensajes-btn" class="flex items-center focus:outline-none hover:bg-gray-50 px-3 py-2 rounded-lg transition-all duration-200 group relative">
+                    <i class="fas fa-bell text-gray-600 group-hover:text-gray-900 transition-colors"></i>
+                    <span id="mensajes-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">0</span>
+                </button>
+                <div id="mensajes-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg z-50 border border-gray-200 overflow-hidden" style="box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                        <div class="text-sm font-semibold text-gray-900" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">Mensajes</div>
+                        <button id="marcar-todos-leidos" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Marcar todos como leídos</button>
+                    </div>
+                    <div id="mensajes-lista" class="max-h-64 overflow-y-auto">
+                        <div class="flex items-center justify-center py-8 text-gray-500">
+                            <i class="fas fa-inbox mr-2"></i>
+                            <span class="text-sm">No hay mensajes</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 border-t border-gray-100">
+                        <a href="/admin/mensajes" class="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center justify-center">
+                            <i class="fas fa-external-link-alt mr-1"></i>
+                            Ver todos los mensajes
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="h-6 border-r border-gray-200 mx-2"></div>
+            
             <span class="text-xs text-gray-500 flex items-center" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
                 <i class="far fa-calendar-alt mr-1.5 text-gray-400"></i>
                 <span id="current-date">29 Jun, 2025</span>
@@ -347,6 +375,236 @@
         }
     }
 
+    // Sistema de Mensajes/Notificaciones
+    function initializeMensajesSystem() {
+        console.log('🔔 Inicializando sistema de mensajes desde navbar...');
+        var mensajesBtn = document.getElementById('mensajes-btn');
+        var mensajesDropdown = document.getElementById('mensajes-dropdown');
+        var mensajesBadge = document.getElementById('mensajes-badge');
+        var mensajesLista = document.getElementById('mensajes-lista');
+        var marcarTodosBtn = document.getElementById('marcar-todos-leidos');
+        
+        if (!mensajesBtn || !mensajesDropdown) {
+            console.log('❌ Elementos del sistema de mensajes no encontrados');
+            return;
+        }
+        
+        console.log('✅ Elementos encontrados, configurando eventos...');
+        
+        // Toggle dropdown
+        mensajesBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log('🔔 Click en botón mensajes');
+            mensajesDropdown.classList.toggle('hidden');
+            
+            // Si se abre el dropdown, cargar mensajes
+            if (!mensajesDropdown.classList.contains('hidden')) {
+                console.log('📂 Dropdown abierto, cargando mensajes...');
+                cargarMensajes();
+            }
+        });
+        
+        // Cerrar dropdown al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            if (!mensajesBtn.contains(event.target) && !mensajesDropdown.contains(event.target)) {
+                mensajesDropdown.classList.add('hidden');
+            }
+        });
+        
+        // Marcar todos como leídos
+        if (marcarTodosBtn) {
+            marcarTodosBtn.addEventListener('click', function() {
+                console.log('✅ Marcando todos como leídos...');
+                marcarTodosComoLeidos();
+            });
+        }
+        
+        // Cargar contador inicial
+        console.log('📊 Cargando contador inicial...');
+        actualizarContadorMensajes();
+        
+        // Actualizar cada 30 segundos
+        setInterval(actualizarContadorMensajes, 30000);
+        console.log('✅ Sistema de mensajes inicializado');
+    }
+    
+    function actualizarContadorMensajes() {
+        console.log('📊 Actualizando contador de mensajes...');
+        fetch('/api/mensajes/no-leidos/count', {
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(function(response) {
+            console.log('📊 Respuesta contador:', response.status);
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Error al obtener contador: ' + response.status);
+        })
+        .then(function(data) {
+            console.log('📊 Datos contador:', data);
+            var badge = document.getElementById('mensajes-badge');
+            if (badge) {
+                if (data.count > 0) {
+                    badge.textContent = data.count > 99 ? '99+' : data.count;
+                    badge.classList.remove('hidden');
+                    console.log('📊 Badge visible con', data.count, 'mensajes');
+                } else {
+                    badge.classList.add('hidden');
+                    console.log('📊 Badge oculto (sin mensajes)');
+                }
+            }
+        })
+        .catch(function(error) {
+            console.warn('❌ Error al actualizar contador de mensajes:', error);
+        });
+    }
+    
+    function cargarMensajes() {
+        var mensajesLista = document.getElementById('mensajes-lista');
+        if (!mensajesLista) return;
+        
+        // Mostrar loading
+        mensajesLista.innerHTML = '<div class="flex items-center justify-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i><span class="text-sm text-gray-500">Cargando...</span></div>';
+        
+        fetch('/api/mensajes/navbar', {
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(function(response) {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Error al cargar mensajes');
+        })
+        .then(function(mensajes) {
+            mostrarMensajes(mensajes);
+        })
+        .catch(function(error) {
+            console.error('Error al cargar mensajes:', error);
+            mensajesLista.innerHTML = '<div class="flex items-center justify-center py-4 text-red-500"><i class="fas fa-exclamation-triangle mr-2"></i><span class="text-sm">Error al cargar mensajes</span></div>';
+        });
+    }
+    
+    function mostrarMensajes(mensajes) {
+        var mensajesLista = document.getElementById('mensajes-lista');
+        if (!mensajesLista) return;
+        
+        if (mensajes.length === 0) {
+            mensajesLista.innerHTML = '<div class="flex items-center justify-center py-8 text-gray-500"><i class="fas fa-inbox mr-2"></i><span class="text-sm">No hay mensajes</span></div>';
+            return;
+        }
+        
+        var html = '';
+        mensajes.forEach(function(mensaje) {
+            var fechaRelativa = formatearFechaRelativa(mensaje.fecha_creacion);
+            var iconoTipo = getIconoTipoMensaje(mensaje.tipo);
+            var colorPrioridad = getColorPrioridad(mensaje.prioridad);
+            var fondoClase = mensaje.leido ? 'bg-white' : 'bg-blue-50 border-l-4 border-blue-400';
+            
+            html += '<div class="' + fondoClase + ' p-4 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-100" onclick="abrirMensaje(' + mensaje.id + ')">';
+            html += '<div class="flex items-start space-x-3">';
+            html += '<div class="flex-shrink-0">';
+            html += '<i class="' + iconoTipo + ' ' + colorPrioridad + ' text-sm"></i>';
+            html += '</div>';
+            html += '<div class="flex-1 min-w-0">';
+            html += '<div class="flex items-center justify-between">';
+            html += '<p class="text-sm font-medium text-gray-900 truncate" style="font-family: \'Inter\', -apple-system, BlinkMacSystemFont, sans-serif;">' + (mensaje.titulo || 'Sin título') + '</p>';
+            if (!mensaje.leido) {
+                html += '<span class="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full"></span>';
+            }
+            html += '</div>';
+            html += '<p class="text-xs text-gray-500 mt-1" style="font-family: \'Inter\', -apple-system, BlinkMacSystemFont, sans-serif;">';
+            html += (mensaje.nombre_emisor || 'Sistema') + ' • ' + fechaRelativa;
+            html += '</p>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+        });
+        
+        mensajesLista.innerHTML = html;
+    }
+    
+    function getIconoTipoMensaje(tipo) {
+        switch(tipo) {
+            case 'sistema': return 'fas fa-cog';
+            case 'alerta': return 'fas fa-exclamation-triangle';
+            case 'notificacion': return 'fas fa-info-circle';
+            default: return 'fas fa-envelope';
+        }
+    }
+    
+    function getColorPrioridad(prioridad) {
+        switch(prioridad) {
+            case 'urgente': return 'text-red-600';
+            case 'alta': return 'text-orange-600';
+            case 'normal': return 'text-blue-600';
+            case 'baja': return 'text-gray-600';
+            default: return 'text-blue-600';
+        }
+    }
+    
+    function formatearFechaRelativa(fechaStr) {
+        var fecha = new Date(fechaStr);
+        var ahora = new Date();
+        var diff = Math.floor((ahora - fecha) / 1000);
+        
+        if (diff < 60) return 'ahora';
+        if (diff < 3600) return Math.floor(diff / 60) + 'm';
+        if (diff < 86400) return Math.floor(diff / 3600) + 'h';
+        if (diff < 2592000) return Math.floor(diff / 86400) + 'd';
+        return fecha.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    }
+    
+    function abrirMensaje(mensajeId) {
+        // Marcar como leído al abrir
+        fetch('/api/mensajes/' + mensajeId + '/leido', {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(function(response) {
+            if (response.ok) {
+                // Actualizar contador
+                actualizarContadorMensajes();
+                // Recargar mensajes
+                cargarMensajes();
+            }
+        })
+        .catch(function(error) {
+            console.warn('Error al marcar mensaje como leído:', error);
+        });
+        
+        // Redirigir a la página de mensajes (implementar más tarde)
+        // window.location.href = '/admin/mensajes/' + mensajeId;
+    }
+    
+    function marcarTodosComoLeidos() {
+        fetch('/api/mensajes/todos/leido', {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(function(response) {
+            if (response.ok) {
+                actualizarContadorMensajes();
+                cargarMensajes();
+            }
+        })
+        .catch(function(error) {
+            console.error('Error al marcar todos como leídos:', error);
+        });
+    }
+
     // Función principal de inicialización
     function initializeNavbar() {
         // Configurar fecha actual
@@ -376,6 +634,12 @@
 
         // Actualizar navegación
         updateNavigation();
+        
+        // Inicializar sistema de mensajes solo si no está ya inicializado
+        if (!window.mensajeSystemInitialized) {
+            initializeMensajesSystem();
+            window.mensajeSystemInitialized = true;
+        }
     }
 
     // Exponer funciones globalmente
