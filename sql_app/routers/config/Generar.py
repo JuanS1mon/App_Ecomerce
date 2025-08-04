@@ -1,26 +1,34 @@
-#generar.py
+# ============================================================================
+# GENERAR.PY - GENERADOR DE CÓDIGO MEJORADO
+# ============================================================================
+"""
+Generador automático de código para aplicaciones FastAPI.
+Sistema refactorizado con arquitectura mejorada, validaciones robustas y logging unificado.
+"""
+
 from starlette.responses import FileResponse
 import logging
 import os
+import time
+from typing import Dict, Any, List
 
-from .Generar_Funciones.Generar_Cruds import generate_crud_functions
-from .Generar_Funciones.Generar_Html import generate_html_form
-from .Generar_Funciones.Generar_Html_service import generate_html_for_service
-from .Generar_Funciones.Generar_Models import generate_model
-from .Generar_Funciones.Generar_Routes import generate_route
-from .Generar_Funciones.Generar_Schema import generate_schema
-from .Generar_Funciones.Generar_Test import generate_tests
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 import fileinput
 import traceback
 
 from sql_app.Services.security.auth_middleware import require_auth_for_template
 
+# Importar el nuevo sistema de generación
+from .generator_config import GENERATOR_CONFIG, VALIDATOR, PATH_MANAGER
+from .generator_logger import main_logger, GenerationSession, error_handler
+from .generator_factory import generator_factory
+
 templates = Jinja2Templates(directory="sql_app/static")
 
-# Configurar logger para este módulo
-logger = logging.getLogger(__name__)
+# Logger principal del módulo
+logger = main_logger
 
 router = APIRouter(
     include_in_schema=False ,  # Oculta todas las rutas de este router en la documentación
@@ -69,340 +77,126 @@ async def migraciones_page(
 
 @router.post("/generate")
 async def generate(request: Request):
-    form_data = await request.form()
-    module_name = form_data["module_name"]
-    field_names = form_data.getlist("field_names[]")
-    field_types = form_data.getlist("field_types[]")
+    """Endpoint principal para la generación de código"""
+    start_time = time.time()
+    
+    try:
+        # Obtener datos del formulario
+        form_data = await request.form()
+        module_name = form_data["module_name"]
+        field_names = form_data.getlist("field_names[]")
+        field_types = form_data.getlist("field_types[]")
 
-    # Procesar opciones elegidas por el usuario
-    generate_crud = form_data.get('generate_crud') == 'true'
-    generate_route_opt = form_data.get('generate_route') == 'true'
-    generate_schema_opt = form_data.get('generate_schema') == 'true'
-    generate_html_form_opt = form_data.get('generate_html_form') == 'true'
-    generate_tests_opt = form_data.get('generate_tests') == 'true'
-    agregar_rutas = form_data.get('agregar_rutas') == 'true'
-    generate_service = form_data.get('generate_service') == 'true'  # Opción de servicio
-    
-    result_message = "Generación completada exitosamente"
-    
-    # Si generate_service está marcado, no usamos generate_crud
-    if generate_service:
-        generate_crud = False
-        try:
-            success = generate_and_save_service(module_name, field_names, field_types)
-            if success:
-                result_message += f". Servicio '{module_name}' generado y registrado."
-            else:
-                return {"message": f"Error al generar el servicio '{module_name}'"}
-        except Exception as e:
-            logger.error(f"Error al generar servicio: {str(e)}")
-            traceback.print_exc()
-            return {"message": f"Error al generar y guardar el servicio: {str(e)}"}
-    elif generate_crud:
-        generate_and_save_crud(module_name, field_names, field_types)
+        # Procesar opciones elegidas por el usuario
+        options = {
+            'generate_crud': form_data.get('generate_crud') == 'true',
+            'generate_route': form_data.get('generate_route') == 'true',
+            'generate_schema': form_data.get('generate_schema') == 'true',
+            'generate_html_form': form_data.get('generate_html_form') == 'true',
+            'generate_tests': form_data.get('generate_tests') == 'true',
+            'agregar_rutas': form_data.get('agregar_rutas') == 'true',
+            'generate_service': form_data.get('generate_service') == 'true'
+        }
         
-        # Generación individual según opciones
-        if generate_route_opt:
-            generate_and_save_route(module_name, field_names, field_types)
-            if agregar_rutas:
+        logger.log_user_action(f"Solicitud de generación - Módulo: {module_name}")
+        logger.log_debug_info("Opciones de generación", options)
+        
+        # Validar datos de entrada
+        try:
+            VALIDATOR.validate_all(module_name, field_names, field_types, options)
+        except ValueError as e:
+            return {"success": False, "message": str(e)}
+        
+        # Determinar tipo de generación
+        if options['generate_service']:
+            return await generate_complete_service(module_name, field_names, field_types)
+        else:
+            return await generate_individual_components(module_name, field_names, field_types, options)
+            
+    except Exception as e:
+        logger.log_generation_error(e, "endpoint principal")
+        return {"success": False, "message": f"Error interno: {str(e)}"}
+    finally:
+        duration = time.time() - start_time
+        logger.log_performance("Endpoint generate", duration)
+
+async def generate_complete_service(module_name: str, field_names: List[str], field_types: List[str]) -> Dict[str, Any]:
+    """Generar un servicio completo"""
+    try:
+        service_generator = generator_factory.create_generator('service')
+        result = service_generator.generate_service_components(module_name, field_names, field_types)
+        
+        if result["success"]:
+            message = f"✅ Servicio '{module_name}' generado exitosamente"
+            if result["generated_files"]:
+                message += f"\n📁 Archivos generados: {len(result['generated_files'])}"
+            if result["errors"]:
+                message += f"\n⚠️ Errores encontrados: {len(result['errors'])}"
+            
+            return {"success": True, "message": message, "details": result}
+        else:
+            return {"success": False, "message": f"❌ Error generando servicio '{module_name}'", "details": result}
+            
+    except Exception as e:
+        return error_handler.handle_generation_error(e, "servicio", module_name)
+
+async def generate_individual_components(module_name: str, field_names: List[str], 
+                                       field_types: List[str], options: Dict[str, bool]) -> Dict[str, Any]:
+    """Generar componentes individuales según las opciones seleccionadas"""
+    results = {"success": True, "generated_files": [], "errors": []}
+    
+    with GenerationSession(module_name, "componentes individuales", logger) as session:
+        
+        # Mapeo de opciones a generadores
+        component_map = {
+            'generate_crud': 'crud',
+            'generate_route': 'route', 
+            'generate_schema': 'schema',
+            'generate_html_form': 'html',
+            'generate_tests': 'test'
+        }
+        
+        for option, generator_type in component_map.items():
+            if options.get(option, False):
+                try:
+                    generator = generator_factory.create_generator(generator_type)
+                    result = generator.generate_and_save(module_name, field_names, field_types)
+                    
+                    if result["success"]:
+                        session.add_generated_file(result["file_path"])
+                        results["generated_files"].append(result["file_path"])
+                    else:
+                        session.add_error(Exception(result.get("message", "Error desconocido")), generator_type)
+                        results["errors"].append(result.get("message", f"Error en {generator_type}"))
+                        
+                except Exception as e:
+                    session.add_error(e, generator_type)
+                    results["errors"].append(f"Error en {generator_type}: {str(e)}")
+        
+        # Agregar rutas al main.py si está habilitado
+        if options.get('agregar_rutas', False) and options.get('generate_route', False):
+            try:
                 add_new_route_to_main(module_name)
+                session.add_generated_file("main.py (actualizado)")
+            except Exception as e:
+                session.add_error(e, "agregar rutas a main.py")
+                results["errors"].append(f"Error agregando rutas: {str(e)}")
         
-        if generate_schema_opt:
-            generate_and_save_schema(module_name, field_names, field_types)
-            
-        if generate_html_form_opt:
-            html_content = generate_html_form(module_name, field_names, field_types)
-            save_html_form(module_name, html_content)
-            
-        if generate_tests_opt:
-            generate_and_save_tests(module_name, field_names, field_types)
+        # Determinar resultado final
+        if results["errors"]:
+            results["success"] = len(results["generated_files"]) > 0
+        
+        # Preparar mensaje de respuesta
+        if results["success"]:
+            message = f"✅ Generación completada - {len(results['generated_files'])} archivos creados"
+            if results["errors"]:
+                message += f" (con {len(results['errors'])} errores)"
+        else:
+            message = f"❌ Error en la generación - {len(results['errors'])} errores encontrados"
     
-    return {"message": result_message}
-def generate_and_save_service(module_name, field_names, field_types):
-    """
-    Genera y guarda un servicio completo (modelo, schema, crud, rutas).
-    Devuelve True si fue exitoso, False en caso contrario.
-    """
-    module_name = module_name.lower()
-    field_names = [field_name.lower() for field_name in field_names]
-    field_types = [field_type.lower() for field_type in field_types]
-
-    # Creamos la estructura de directorios si no existe
-    service_dir = f"Services/{module_name}"
-    os.makedirs(service_dir, exist_ok=True)
-    
-    # Generar todos los componentes dentro de la carpeta de servicios
-    try:
-        # 1. Generar y guardar el servicio (CRUD con SQL)
-        from .Generar_Funciones.Generar_Cruds_sql import generate_crud_functions
-        service_code = generate_crud_functions(module_name, field_names, field_types)
-        save_file_to_service(f"{service_dir}/service_{module_name}.py", service_code)
-        
-        # 2. Generar y guardar las rutas
-        from .Generar_Funciones.Generar_Routes_service import generate_route
-        route_code = generate_route(module_name, field_names, field_types)
-        save_file_to_service(f"{service_dir}/route_{module_name}.py", route_code)
-        
-        # 3. Generar y guardar los schemas
-        from .Generar_Funciones.Generar_Schema_serice import generate_schema
-        schema_code = generate_schema(module_name, field_names, field_types)
-        save_file_to_service(f"{service_dir}/schema_{module_name}.py", schema_code)
-        
-        # 4. Generar y guardar el modelo
-        from .Generar_Funciones.Generar_Models_service import generate_model
-        model_code = generate_model(module_name, field_names, field_types)
-        save_file_to_service(f"{service_dir}/model_{module_name}.py", model_code)
-        
-        # 5. Generar archivo __init__.py para hacer el servicio importable
-        module_name_cap = module_name.capitalize()
-        init_code = generate_init_file(module_name, module_name_cap)
-        save_file_to_service(f"{service_dir}/__init__.py", init_code)
-        
-        # 6. Generar el archivo HTML y JS para la ruta /pagina
-        html_content, js_content = generate_html_for_service(module_name, field_names, field_types)
-        
-        # Crear directorio específico para el módulo dentro de static
-        module_dir = f"sql_app/static/{module_name}"
-        os.makedirs(module_dir, exist_ok=True)
-        
-        # Guardar el archivo HTML en la carpeta específica del módulo
-        html_path = f"{module_dir}/index.html"
-        
-        with open(html_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
-        logger.info(f"Archivo HTML {html_path} generado para la ruta /pagina")
-        
-        # Guardar el archivo JavaScript en la carpeta específica del módulo
-        js_path = f"{module_dir}/{module_name}_service.js"
-        
-        with open(js_path, 'w', encoding='utf-8') as f:
-            f.write(js_content)
-        logger.info(f"Archivo JavaScript {js_path} generado para complementar la interfaz")
-        
-        # 7. Registrar el servicio en el gestor de servicios
-        register_service_in_manager(module_name)
-        
-        logger.info(f"Servicio completo generado exitosamente en {service_dir}")
-        return True
-    except Exception as e:
-        logger.error(f"Error al generar el servicio completo: {str(e)}")
-        traceback.print_exc()
-        return False
-
-def save_file_to_service(file_path, content):
-    """
-    Guarda el contenido en el archivo especificado, creando directorios si es necesario.
-    """
-    try:
-        # Asegurar que exista el directorio
-        dir_path = os.path.dirname(file_path)
-        os.makedirs(dir_path, exist_ok=True)
-        
-        # Escribir el archivo
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(content)
-        
-        logger.info(f"Archivo {file_path} guardado exitosamente")
-        return True
-    except Exception as e:
-        logger.error(f"Error al guardar el archivo {file_path}: {str(e)}")
-        return False
-
-def register_service_in_manager(module_name):
-    """
-    Registra el nuevo servicio en el ServicesManager
-    """
-    try:
-        # Importamos el gestor de servicios
-        from routers.config import service_manager
-        
-        # El ID del servicio según la convención del gestor
-        service_id = f"{module_name}.route_{module_name}"
-        
-        if service_manager.services_manager is None:
-            logger.warning("El gestor de servicios no está inicializado")
-            return False
-            
-        # También registrar en ServicesManager para su gestión futura
-        services_manager = service_manager.services_manager
-        
-        # Forzar un nuevo escaneo para detectar el nuevo servicio
-        services_manager.scan_services()
-        
-        # Registrar y activar el servicio
-        if service_id not in services_manager.active_services:
-            services_manager.active_services[service_id] = True
-            
-        # Intentar registrar el servicio inmediatamente
-        try:
-            success = services_manager.register_service(service_id)
-            logger.info(f"Servicio {service_id} registro inmediato: {'exitoso' if success else 'fallido'}")
-        except Exception as e:
-            logger.warning(f"No se pudo registrar inmediatamente el servicio {service_id}: {str(e)}")
-            
-        # Guardar el estado actualizado
-        services_manager.save_state()
-        
-        logger.info(f"Servicio {service_id} registrado en el gestor de servicios")
-        return True
-    except Exception as e:
-        logger.error(f"Error al registrar el servicio en el gestor: {str(e)}")
-        traceback.print_exc()
-        return False
-
-def generate_init_file(module_name, module_name_cap):
-    """
-    Genera el contenido del archivo __init__.py para el servicio
-    """
-    init_code = f"""# Archivo __init__.py para el servicio {module_name}
-# Este archivo permite importar componentes del servicio desde otras partes de la aplicación
-
-from .model_{module_name} import {module_name_cap}
-from .schema_{module_name} import {module_name_cap}Create, {module_name_cap}Update, {module_name_cap}Read
-from .service_{module_name} import (
-    create_{module_name}, 
-    get_{module_name}, 
-    gets_{module_name},
-    update_{module_name},
-    delete_{module_name}
-)
-from .route_{module_name} import router
-
-# Para facilitar la inclusión del router en la aplicación principal
-{module_name}_router = router
-
-__all__ = [
-    '{module_name_cap}',
-    '{module_name_cap}Create',
-    '{module_name_cap}Update', 
-    '{module_name_cap}Read',
-    'create_{module_name}',
-    'get_{module_name}',
-    'gets_{module_name}',
-    'update_{module_name}',
-    'delete_{module_name}',
-    'router',
-    '{module_name}_router'
-]
-"""
-    return init_code
-
-def generate_and_save_route(module_name, field_names, field_types):
-    module_name = module_name.lower()
-    field_names = [field_name.lower() for field_name in field_names]
-    field_types = [field_type.lower() for field_type in field_types]
-
-    route_code = generate_route(module_name, field_names, field_types)
-
-    file_path = f"routers/Maestros/Route_{module_name}.py"
-
-    if os.path.exists(file_path):
-        logger.warning(f"El archivo {file_path} ya existe.")
-    else:
-        try:
-            # Asegurar que exista el directorio
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            
-            with open(file_path, 'w') as file:
-                file.write(route_code)
-                logger.info(f"Archivo {file_path} creado con éxito.")
-        except Exception as e:
-            logger.error(f"Error al guardar el archivo {file_path}: {e}")
-
-def generate_and_save_crud(module_name, field_names, field_types):
-    module_name = module_name.lower()
-    field_names = [field_name.lower() for field_name in field_names]
-    field_types = [field_type.lower() for field_type in field_types]
-
-    crud_code = generate_crud_functions(module_name, field_names, field_types)
-
-    file_path = f"db/crud/Maestro/Crud_{module_name}.py"
-
-    if os.path.exists(file_path):
-        print(f"El archivo {file_path} ya existe.")
-    else:
-        try:
-            with open(file_path, 'w') as file:
-                file.write(crud_code)
-                print(f"Archivo {file_path} creado con éxito.")
-        except Exception as e:
-            print(f"Error al guardar el archivo {file_path}: {e}")
-
-def generate_and_save_schema(module_name, field_names, field_types):
-    module_name = module_name.lower()
-    field_names = [field_name.lower() for field_name in field_names]
-    field_types = [field_type.lower() for field_type in field_types]
-
-    schema_code = generate_schema(module_name, field_names, field_types)
-
-    file_path = f"db/schemas/Maestro/Schema_{module_name}.py"
-
-    if os.path.exists(file_path):
-        print(f"El archivo {file_path} ya existe.")
-    else:
-        try:
-            with open(file_path, 'w') as file:
-                file.write(schema_code)
-                print(f"Archivo {file_path} creado con éxito.")
-        except Exception as e:
-            print(f"Error al guardar el archivo {file_path}: {e}")
-
-def generate_and_save_model(module_name, field_names, field_types):
-    module_name = module_name.lower()
-    field_names = [field_name.lower() for field_name in field_names]
-    field_types = [field_type.lower() for field_type in field_types]
-
-    model_code = generate_model(module_name, field_names, field_types)
-
-    file_path = f"db/models/{module_name}.py"
-
-    if os.path.exists(file_path):
-        print(f"El archivo {file_path} ya existe.")
-    else:
-        try:
-            with open(file_path, 'w') as file:
-                file.write(model_code)
-                print(f"Archivo {file_path} creado con éxito.")
-        except Exception as e:
-            print(f"Error al guardar el archivo {file_path}: {e}")
-
-def save_html_form(module_name, html_content):
-    import os
-    output_dir = "sql_app/static/html"
-    os.makedirs(output_dir, exist_ok=True)  # Crear el directorio si no existe
-
-    file_path = f"{output_dir}/{module_name}.html"
-
-    if os.path.exists(file_path):
-        print(f"El archivo {file_path} ya existe.")
-    else:
-        try:
-            with open(file_path, 'w', encoding='utf-8') as file:
-                file.write(html_content)
-                print(f"Archivo {file_path} creado con éxito.")
-        except Exception as e:
-            print(f"Error al guardar el archivo {file_path}: {e}")
-
-def generate_and_save_tests(module_name, field_names, field_types):
-    module_name = module_name.lower()
-    field_names = [field_name.lower() for field_name in field_names]
-    field_types = [field_type.lower() for field_type in field_types]
-
-    test_code = generate_tests(module_name, field_names, field_types)
-
-    file_path = f"tests/test_{module_name}.py"
-
-    if os.path.exists(file_path):
-        print(f"El archivo {file_path} ya existe.")
-    else:
-        try:
-            with open(file_path, 'w') as file:
-                file.write(test_code)
-                print(f"Archivo {file_path} creado con éxito.")
-        except Exception as e:
-            print(f"Error al guardar el archivo {file_path}: {e}")
-
+    return {"success": results["success"], "message": message, "details": results}
 def add_new_route_to_main(new_route):
+    """Agregar nueva ruta al archivo main.py"""
     try:
         with fileinput.FileInput('main.py', inplace=False) as file:
             lines = list(file)
@@ -417,5 +211,10 @@ def add_new_route_to_main(new_route):
             lines.insert(last_maestros_index + 1, f'app.include_router(Route_{new_route}.router)\n')
         with open('main.py', 'w') as file:
             file.writelines(lines)
+        
+        logger.log_file_operation("actualización de rutas en main.py", "main.py", True)
+        return True
     except Exception as e:
-        print(f"Error al agregar la nueva ruta al main.py: {e}")
+        logger.log_file_operation("actualización de rutas en main.py", "main.py", False)
+        logger.log_generation_error(e, "agregar rutas a main.py")
+        return False

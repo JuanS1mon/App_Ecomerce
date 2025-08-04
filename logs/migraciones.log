@@ -88757,3 +88757,1374 @@ rollo)
 2025-08-02 17:25:25,374 - DEBUG - \u274c Encabezado Authorization no presente
 2025-08-02 17:25:25,374 - DEBUG - \U0001f511 Cookie access_token detectada: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqdWFuIiwiZXhwIjoxNzU0MTY5OTIwfQ.bUDe_qmiGJrvn2QEmjFv8k9vCU06q7eV5WQD8MapDSM
 2025-08-02 17:25:25,378 - DEBUG - \U0001f4e4 Respuesta: 422 application/json
+2025-08-04 10:47:19,020 - INFO - \U0001f515 Sistema de notificaciones deshabilitado (desarrollo)
+2025-08-04 10:47:19,034 - INFO - \U0001f4be Sistema de backup deshabilitado (desarrollo)
+2025-08-04 10:47:19,036 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-08-04 10:47:19,036 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-08-04 10:47:19,037 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-08-04 10:47:19,183 - INFO - \U0001f514 Registrando router de mensajes...
+2025-08-04 10:47:19,188 - INFO - \u2705 Router de mensajes registrado con prefix: /api/mensajes
+2025-08-04 10:47:19,188 - INFO - \U0001f4cb 12 rutas de mensajes registradas
+2025-08-04 10:47:19,189 - INFO - \U0001f6e0\ufe0f Registrando router de administración de mensajes...
+2025-08-04 10:47:19,196 - INFO - \u2705 Router de administración de mensajes registrado con prefix: /admin/api/mensajes
+2025-08-04 10:47:19,197 - INFO - \U0001f4c1 Registrando router de archivos estáticos de mensajes...
+2025-08-04 10:47:19,197 - INFO - \u2705 Router de estáticos de mensajes registrado con prefix: /mensajes/static
+2025-08-04 10:47:19,197 - INFO - \U0001f4ac Registrando router de API de chat...
+2025-08-04 10:47:19,200 - INFO - \u2705 Router de API de chat registrado con prefix: /api/chat
+2025-08-04 10:47:19,200 - INFO - \U0001f50c Registrando router WebSocket de mensajes...
+2025-08-04 10:47:19,201 - INFO - \u2705 Router WebSocket de mensajes registrado con prefix: /ws
+2025-08-04 10:47:19,201 - INFO - \U0001f4ac Registrando router WebSocket de chat...
+2025-08-04 10:47:19,238 - INFO - \u2705 Router WebSocket de chat registrado con prefix: /chat
+2025-08-04 10:47:19,239 - INFO - \U0001f4ac Registrando router API REST del chat...
+2025-08-04 10:47:19,255 - INFO - \u2705 Router API REST del chat registrado
+2025-08-04 10:47:19,255 - INFO - \U0001f4c1 Registrando archivos estáticos del chat...
+2025-08-04 10:47:19,255 - INFO - \u2705 Archivos estáticos del chat registrados en /static/chat
+2025-08-04 10:47:19,255 - INFO - \U0001f9ea Registrando endpoint directo para página de pruebas de chat...
+2025-08-04 10:47:19,256 - INFO - \u2705 Endpoints /chat-test y /mensajes-admin-public registrados correctamente
+2025-08-04 10:47:19,256 - INFO - \U0001f9ea Registrando endpoints de testing para mensajes...
+2025-08-04 10:47:19,256 - INFO - \u2705 Endpoints de testing para mensajes registrados correctamente
+2025-08-04 10:47:19,256 - INFO - \U0001f9ea Registrando endpoints públicos para testing de mensajes...
+2025-08-04 10:47:19,257 - INFO - \u2705 Endpoints públicos de mensajes registrados correctamente
+2025-08-04 10:47:19,257 - INFO - \U0001f9e9 Registrando router de widgets...
+2025-08-04 10:47:19,258 - INFO - \u2705 Router de widgets registrado con prefix: /widgets
+2025-08-04 10:47:19,258 - INFO - \U0001f4c4 Registrando router de páginas de administración...
+2025-08-04 10:47:19,258 - INFO - \u2705 Router de páginas de administración registrado con prefix: /admin
+2025-08-04 10:47:19,258 - INFO - \U0001f513 Registrando router simple de administración...
+2025-08-04 10:47:19,259 - INFO - \u2705 Router simple de administración registrado con prefix: /administracion
+2025-08-04 10:47:23,940 - WARNING - \u26a0\ufe0f Redis no disponible: Error 10061 connecting to localhost:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+2025-08-04 10:47:23,940 - INFO - \U0001f504 Usando caché en memoria como fallback
+2025-08-04 10:47:23,940 - INFO - \U0001f4ca Sistema de métricas inicializado
+2025-08-04 10:47:23,940 - INFO - \U0001f4ca Métricas disponibles en /metrics (desarrollo)
+2025-08-04 10:47:23,940 - INFO - \U0001f680 Inicializando optimizaciones SQL...
+2025-08-04 10:47:23,940 - INFO - \U0001f527 Creando índices de rendimiento...
+2025-08-04 10:47:23,954 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_fecha_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_fecha_estado ON movements(fecha, estado) INCLUDE (cantidad, observaciones)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,955 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_ot_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_ot_id_fecha ON movements(ot_id, fecha) INCLUDE (cantidad, tipo_movimiento)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,955 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_location_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_location_id_fecha ON movements(location_id, fecha DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,956 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_estado_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_estado_fecha ON ots(estado, fecha_inicio) INCLUDE (titulo, descripcion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,957 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_institution_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_institution_id_estado ON ots(institution_id, estado)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,957 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_users_email_active'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_users_email_active ON users(email, is_active) INCLUDE (username, role)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,957 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_locations_institution_id'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_locations_institution_id ON locations(institution_id) INCLUDE (nombre, tipo)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,958 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_artworks_artist_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_artworks_artist_id_estado ON artworks(artist_id, estado) INCLUDE (titulo, fecha_creacion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,958 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_auth_tokens_user_expiry'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_auth_tokens_user_expiry ON auth_tokens(user_id, expires_at) WHERE is_revoked = 0]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,959 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_activity_logs_user_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_activity_logs_user_fecha ON activity_logs(user_id, timestamp DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,959 - INFO - \U0001f4ca Índices procesados: 0/10
+2025-08-04 10:47:23,959 - INFO - \U0001f680 Optimizando consultas comunes...
+2025-08-04 10:47:23,959 - INFO - \u2705 4 consultas optimizadas preparadas
+2025-08-04 10:47:23,960 - INFO - \u26a1 Configuraciones de conexión optimizadas
+2025-08-04 10:47:23,960 - INFO - \U0001f4c8 Actualizando estadísticas de tablas...
+2025-08-04 10:47:23,967 - INFO - \u2705 Estadísticas actualizadas para: movements
+2025-08-04 10:47:23,971 - WARNING - \u26a0\ufe0f Error actualizando stats de ots: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'ots' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS ots WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,971 - WARNING - \u26a0\ufe0f Error actualizando stats de users: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'users' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS users WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,973 - INFO - \u2705 Estadísticas actualizadas para: locations
+2025-08-04 10:47:23,975 - INFO - \u2705 Estadísticas actualizadas para: institutions
+2025-08-04 10:47:23,976 - INFO - \u2705 Estadísticas actualizadas para: artworks
+2025-08-04 10:47:23,977 - WARNING - \u26a0\ufe0f Error actualizando stats de auth_tokens: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'auth_tokens' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS auth_tokens WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,977 - WARNING - \u26a0\ufe0f Error actualizando stats de activity_logs: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'activity_logs' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS activity_logs WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 10:47:23,977 - INFO - \U0001f50d Analizando consultas lentas...
+2025-08-04 10:47:24,016 - INFO - \u2705 No se encontraron consultas significativamente lentas
+2025-08-04 10:47:24,020 - INFO - \u2705 Optimizaciones SQL completadas
+2025-08-04 10:47:24,020 - INFO - \u2705 Health check registrado: database
+2025-08-04 10:47:24,020 - INFO - \u2705 Health check registrado: cache
+2025-08-04 10:47:24,020 - INFO - \u2705 Health check registrado: system_resources
+2025-08-04 10:47:24,020 - INFO - \u2705 Health check registrado: application_metrics
+2025-08-04 10:47:24,020 - INFO - \U0001f50d Health checks inicializados
+2025-08-04 10:47:24,020 - INFO - \U0001f4be Sistema de backup inicializado
+2025-08-04 10:47:24,020 - INFO - \U0001f515 Alerta omitida (dev): Sistema iniciado correctamente
+2025-08-04 10:47:24,020 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-08-04 10:47:24,020 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-08-04 10:47:24,021 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-08-04 10:47:24,021 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-08-04 10:47:24,021 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-08-04 10:47:24,021 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-08-04 10:47:24,021 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-08-04 10:47:24,021 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-08-04 10:47:24,021 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-08-04 10:47:24,022 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-08-04 10:47:24,022 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-08-04 10:47:24,022 - INFO - \u2705 \U0001f680 Sistema de cache inicializado
+2025-08-04 10:47:24,022 - INFO - \u2705 \U0001f4ca Sistema de métricas inicializado
+2025-08-04 10:47:24,022 - INFO - \u2705 \u26a1 Optimizaciones SQL aplicadas
+2025-08-04 10:47:24,022 - INFO - \u2705 \U0001f50d Health checks avanzados
+2025-08-04 10:47:24,022 - INFO - \u2705 \U0001f4be Sistema de backup configurado
+2025-08-04 10:47:24,023 - INFO - ======================================================
+
+2025-08-04 10:47:24,023 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-08-04 11:00:08,348 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-08-04 11:00:08,348 - INFO - \U0001f4be Limpieza de recursos completada
+2025-08-04 11:00:12,740 - INFO - \U0001f515 Sistema de notificaciones deshabilitado (desarrollo)
+2025-08-04 11:00:12,742 - INFO - \U0001f4be Sistema de backup deshabilitado (desarrollo)
+2025-08-04 11:00:12,758 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-08-04 11:00:12,759 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-08-04 11:00:12,759 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-08-04 11:00:12,880 - INFO - \U0001f514 Registrando router de mensajes...
+2025-08-04 11:00:12,885 - INFO - \u2705 Router de mensajes registrado con prefix: /api/mensajes
+2025-08-04 11:00:12,885 - INFO - \U0001f4cb 12 rutas de mensajes registradas
+2025-08-04 11:00:12,886 - INFO - \U0001f6e0\ufe0f Registrando router de administración de mensajes...
+2025-08-04 11:00:12,892 - INFO - \u2705 Router de administración de mensajes registrado con prefix: /admin/api/mensajes
+2025-08-04 11:00:12,893 - INFO - \U0001f4c1 Registrando router de archivos estáticos de mensajes...
+2025-08-04 11:00:12,894 - INFO - \u2705 Router de estáticos de mensajes registrado con prefix: /mensajes/static
+2025-08-04 11:00:12,894 - INFO - \U0001f4ac Registrando router de API de chat...
+2025-08-04 11:00:12,896 - INFO - \u2705 Router de API de chat registrado con prefix: /api/chat
+2025-08-04 11:00:12,897 - INFO - \U0001f50c Registrando router WebSocket de mensajes...
+2025-08-04 11:00:12,898 - INFO - \u2705 Router WebSocket de mensajes registrado con prefix: /ws
+2025-08-04 11:00:12,898 - INFO - \U0001f4ac Registrando router WebSocket de chat...
+2025-08-04 11:00:12,911 - INFO - \u2705 Router WebSocket de chat registrado con prefix: /chat
+2025-08-04 11:00:12,911 - INFO - \U0001f4ac Registrando router API REST del chat...
+2025-08-04 11:00:12,917 - INFO - \u2705 Router API REST del chat registrado
+2025-08-04 11:00:12,917 - INFO - \U0001f4c1 Registrando archivos estáticos del chat...
+2025-08-04 11:00:12,918 - INFO - \u2705 Archivos estáticos del chat registrados en /static/chat
+2025-08-04 11:00:12,918 - INFO - \U0001f9ea Registrando endpoint directo para página de pruebas de chat...
+2025-08-04 11:00:12,919 - INFO - \u2705 Endpoints /chat-test y /mensajes-admin-public registrados correctamente
+2025-08-04 11:00:12,919 - INFO - \U0001f9ea Registrando endpoints de testing para mensajes...
+2025-08-04 11:00:12,920 - INFO - \u2705 Endpoints de testing para mensajes registrados correctamente
+2025-08-04 11:00:12,920 - INFO - \U0001f9ea Registrando endpoints públicos para testing de mensajes...
+2025-08-04 11:00:12,920 - INFO - \u2705 Endpoints públicos de mensajes registrados correctamente
+2025-08-04 11:00:12,920 - INFO - \U0001f9e9 Registrando router de widgets...
+2025-08-04 11:00:12,921 - INFO - \u2705 Router de widgets registrado con prefix: /widgets
+2025-08-04 11:00:12,921 - INFO - \U0001f4c4 Registrando router de páginas de administración...
+2025-08-04 11:00:12,921 - INFO - \u2705 Router de páginas de administración registrado con prefix: /admin
+2025-08-04 11:00:12,922 - INFO - \U0001f513 Registrando router simple de administración...
+2025-08-04 11:00:12,922 - INFO - \u2705 Router simple de administración registrado con prefix: /administracion
+2025-08-04 11:00:17,697 - WARNING - \u26a0\ufe0f Redis no disponible: Error 10061 connecting to localhost:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+2025-08-04 11:00:17,697 - INFO - \U0001f504 Usando caché en memoria como fallback
+2025-08-04 11:00:17,697 - INFO - \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:00:17,697 - INFO - \U0001f4ca Métricas disponibles en /metrics (desarrollo)
+2025-08-04 11:00:17,697 - INFO - \U0001f680 Inicializando optimizaciones SQL...
+2025-08-04 11:00:17,697 - INFO - \U0001f527 Creando índices de rendimiento...
+2025-08-04 11:00:17,698 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_fecha_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_fecha_estado ON movements(fecha, estado) INCLUDE (cantidad, observaciones)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,698 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_ot_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_ot_id_fecha ON movements(ot_id, fecha) INCLUDE (cantidad, tipo_movimiento)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,699 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_location_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_location_id_fecha ON movements(location_id, fecha DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,699 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_estado_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_estado_fecha ON ots(estado, fecha_inicio) INCLUDE (titulo, descripcion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,699 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_institution_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_institution_id_estado ON ots(institution_id, estado)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,700 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_users_email_active'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_users_email_active ON users(email, is_active) INCLUDE (username, role)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,700 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_locations_institution_id'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_locations_institution_id ON locations(institution_id) INCLUDE (nombre, tipo)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,701 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_artworks_artist_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_artworks_artist_id_estado ON artworks(artist_id, estado) INCLUDE (titulo, fecha_creacion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,701 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_auth_tokens_user_expiry'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_auth_tokens_user_expiry ON auth_tokens(user_id, expires_at) WHERE is_revoked = 0]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,701 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_activity_logs_user_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_activity_logs_user_fecha ON activity_logs(user_id, timestamp DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,701 - INFO - \U0001f4ca Índices procesados: 0/10
+2025-08-04 11:00:17,702 - INFO - \U0001f680 Optimizando consultas comunes...
+2025-08-04 11:00:17,702 - INFO - \u2705 4 consultas optimizadas preparadas
+2025-08-04 11:00:17,703 - INFO - \u26a1 Configuraciones de conexión optimizadas
+2025-08-04 11:00:17,703 - INFO - \U0001f4c8 Actualizando estadísticas de tablas...
+2025-08-04 11:00:17,705 - INFO - \u2705 Estadísticas actualizadas para: movements
+2025-08-04 11:00:17,705 - WARNING - \u26a0\ufe0f Error actualizando stats de ots: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'ots' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS ots WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,706 - WARNING - \u26a0\ufe0f Error actualizando stats de users: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'users' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS users WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,707 - INFO - \u2705 Estadísticas actualizadas para: locations
+2025-08-04 11:00:17,708 - INFO - \u2705 Estadísticas actualizadas para: institutions
+2025-08-04 11:00:17,709 - INFO - \u2705 Estadísticas actualizadas para: artworks
+2025-08-04 11:00:17,709 - WARNING - \u26a0\ufe0f Error actualizando stats de auth_tokens: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'auth_tokens' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS auth_tokens WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,710 - WARNING - \u26a0\ufe0f Error actualizando stats de activity_logs: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'activity_logs' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS activity_logs WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:17,710 - INFO - \U0001f50d Analizando consultas lentas...
+2025-08-04 11:00:17,722 - INFO - \u2705 No se encontraron consultas significativamente lentas
+2025-08-04 11:00:17,724 - INFO - \u2705 Optimizaciones SQL completadas
+2025-08-04 11:00:17,725 - INFO - \u2705 Health check registrado: database
+2025-08-04 11:00:17,725 - INFO - \u2705 Health check registrado: cache
+2025-08-04 11:00:17,725 - INFO - \u2705 Health check registrado: system_resources
+2025-08-04 11:00:17,725 - INFO - \u2705 Health check registrado: application_metrics
+2025-08-04 11:00:17,725 - INFO - \U0001f50d Health checks inicializados
+2025-08-04 11:00:17,725 - INFO - \U0001f4be Sistema de backup inicializado
+2025-08-04 11:00:17,725 - INFO - \U0001f515 Alerta omitida (dev): Sistema iniciado correctamente
+2025-08-04 11:00:17,725 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-08-04 11:00:17,725 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-08-04 11:00:17,725 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-08-04 11:00:17,725 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-08-04 11:00:17,725 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-08-04 11:00:17,726 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-08-04 11:00:17,726 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-08-04 11:00:17,726 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-08-04 11:00:17,726 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-08-04 11:00:17,726 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-08-04 11:00:17,726 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-08-04 11:00:17,726 - INFO - \u2705 \U0001f680 Sistema de cache inicializado
+2025-08-04 11:00:17,727 - INFO - \u2705 \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:00:17,727 - INFO - \u2705 \u26a1 Optimizaciones SQL aplicadas
+2025-08-04 11:00:17,727 - INFO - \u2705 \U0001f50d Health checks avanzados
+2025-08-04 11:00:17,727 - INFO - \u2705 \U0001f4be Sistema de backup configurado
+2025-08-04 11:00:17,727 - INFO - ======================================================
+
+2025-08-04 11:00:17,727 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-08-04 11:00:17,728 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-08-04 11:00:17,728 - INFO - \U0001f4be Limpieza de recursos completada
+2025-08-04 11:00:20,853 - INFO - \U0001f515 Sistema de notificaciones deshabilitado (desarrollo)
+2025-08-04 11:00:20,855 - INFO - \U0001f4be Sistema de backup deshabilitado (desarrollo)
+2025-08-04 11:00:20,858 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-08-04 11:00:20,858 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-08-04 11:00:20,859 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-08-04 11:00:20,899 - INFO - \U0001f514 Registrando router de mensajes...
+2025-08-04 11:00:20,905 - INFO - \u2705 Router de mensajes registrado con prefix: /api/mensajes
+2025-08-04 11:00:20,905 - INFO - \U0001f4cb 12 rutas de mensajes registradas
+2025-08-04 11:00:20,905 - INFO - \U0001f6e0\ufe0f Registrando router de administración de mensajes...
+2025-08-04 11:00:20,912 - INFO - \u2705 Router de administración de mensajes registrado con prefix: /admin/api/mensajes
+2025-08-04 11:00:20,912 - INFO - \U0001f4c1 Registrando router de archivos estáticos de mensajes...
+2025-08-04 11:00:20,913 - INFO - \u2705 Router de estáticos de mensajes registrado con prefix: /mensajes/static
+2025-08-04 11:00:20,913 - INFO - \U0001f4ac Registrando router de API de chat...
+2025-08-04 11:00:20,915 - INFO - \u2705 Router de API de chat registrado con prefix: /api/chat
+2025-08-04 11:00:20,916 - INFO - \U0001f50c Registrando router WebSocket de mensajes...
+2025-08-04 11:00:20,916 - INFO - \u2705 Router WebSocket de mensajes registrado con prefix: /ws
+2025-08-04 11:00:20,916 - INFO - \U0001f4ac Registrando router WebSocket de chat...
+2025-08-04 11:00:20,929 - INFO - \u2705 Router WebSocket de chat registrado con prefix: /chat
+2025-08-04 11:00:20,929 - INFO - \U0001f4ac Registrando router API REST del chat...
+2025-08-04 11:00:20,934 - INFO - \u2705 Router API REST del chat registrado
+2025-08-04 11:00:20,934 - INFO - \U0001f4c1 Registrando archivos estáticos del chat...
+2025-08-04 11:00:20,935 - INFO - \u2705 Archivos estáticos del chat registrados en /static/chat
+2025-08-04 11:00:20,935 - INFO - \U0001f9ea Registrando endpoint directo para página de pruebas de chat...
+2025-08-04 11:00:20,936 - INFO - \u2705 Endpoints /chat-test y /mensajes-admin-public registrados correctamente
+2025-08-04 11:00:20,936 - INFO - \U0001f9ea Registrando endpoints de testing para mensajes...
+2025-08-04 11:00:20,937 - INFO - \u2705 Endpoints de testing para mensajes registrados correctamente
+2025-08-04 11:00:20,937 - INFO - \U0001f9ea Registrando endpoints públicos para testing de mensajes...
+2025-08-04 11:00:20,937 - INFO - \u2705 Endpoints públicos de mensajes registrados correctamente
+2025-08-04 11:00:20,937 - INFO - \U0001f9e9 Registrando router de widgets...
+2025-08-04 11:00:20,938 - INFO - \u2705 Router de widgets registrado con prefix: /widgets
+2025-08-04 11:00:20,938 - INFO - \U0001f4c4 Registrando router de páginas de administración...
+2025-08-04 11:00:20,939 - INFO - \u2705 Router de páginas de administración registrado con prefix: /admin
+2025-08-04 11:00:20,939 - INFO - \U0001f513 Registrando router simple de administración...
+2025-08-04 11:00:20,939 - INFO - \u2705 Router simple de administración registrado con prefix: /administracion
+2025-08-04 11:00:25,615 - WARNING - \u26a0\ufe0f Redis no disponible: Error 10061 connecting to localhost:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+2025-08-04 11:00:25,615 - INFO - \U0001f504 Usando caché en memoria como fallback
+2025-08-04 11:00:25,615 - INFO - \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:00:25,615 - INFO - \U0001f4ca Métricas disponibles en /metrics (desarrollo)
+2025-08-04 11:00:25,615 - INFO - \U0001f680 Inicializando optimizaciones SQL...
+2025-08-04 11:00:25,615 - INFO - \U0001f527 Creando índices de rendimiento...
+2025-08-04 11:00:25,616 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_fecha_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_fecha_estado ON movements(fecha, estado) INCLUDE (cantidad, observaciones)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,616 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_ot_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_ot_id_fecha ON movements(ot_id, fecha) INCLUDE (cantidad, tipo_movimiento)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,617 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_location_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_location_id_fecha ON movements(location_id, fecha DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,618 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_estado_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_estado_fecha ON ots(estado, fecha_inicio) INCLUDE (titulo, descripcion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,618 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_institution_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_institution_id_estado ON ots(institution_id, estado)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,618 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_users_email_active'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_users_email_active ON users(email, is_active) INCLUDE (username, role)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,619 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_locations_institution_id'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_locations_institution_id ON locations(institution_id) INCLUDE (nombre, tipo)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,619 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_artworks_artist_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_artworks_artist_id_estado ON artworks(artist_id, estado) INCLUDE (titulo, fecha_creacion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,619 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_auth_tokens_user_expiry'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_auth_tokens_user_expiry ON auth_tokens(user_id, expires_at) WHERE is_revoked = 0]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,620 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_activity_logs_user_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_activity_logs_user_fecha ON activity_logs(user_id, timestamp DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,620 - INFO - \U0001f4ca Índices procesados: 0/10
+2025-08-04 11:00:25,620 - INFO - \U0001f680 Optimizando consultas comunes...
+2025-08-04 11:00:25,620 - INFO - \u2705 4 consultas optimizadas preparadas
+2025-08-04 11:00:25,621 - INFO - \u26a1 Configuraciones de conexión optimizadas
+2025-08-04 11:00:25,621 - INFO - \U0001f4c8 Actualizando estadísticas de tablas...
+2025-08-04 11:00:25,632 - INFO - \u2705 Estadísticas actualizadas para: movements
+2025-08-04 11:00:25,632 - WARNING - \u26a0\ufe0f Error actualizando stats de ots: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'ots' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS ots WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,633 - WARNING - \u26a0\ufe0f Error actualizando stats de users: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'users' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS users WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,634 - INFO - \u2705 Estadísticas actualizadas para: locations
+2025-08-04 11:00:25,636 - INFO - \u2705 Estadísticas actualizadas para: institutions
+2025-08-04 11:00:25,637 - INFO - \u2705 Estadísticas actualizadas para: artworks
+2025-08-04 11:00:25,638 - WARNING - \u26a0\ufe0f Error actualizando stats de auth_tokens: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'auth_tokens' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS auth_tokens WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,638 - WARNING - \u26a0\ufe0f Error actualizando stats de activity_logs: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'activity_logs' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS activity_logs WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:00:25,638 - INFO - \U0001f50d Analizando consultas lentas...
+2025-08-04 11:00:25,655 - INFO - \U0001f4ca Encontradas 1 consultas para optimización
+2025-08-04 11:00:25,655 - INFO - \U0001f40c Query lenta #1: 2760.00ms promedio
+2025-08-04 11:00:25,655 - INFO - \u2705 Optimizaciones SQL completadas
+2025-08-04 11:00:25,655 - INFO - \u2705 Health check registrado: database
+2025-08-04 11:00:25,655 - INFO - \u2705 Health check registrado: cache
+2025-08-04 11:00:25,655 - INFO - \u2705 Health check registrado: system_resources
+2025-08-04 11:00:25,655 - INFO - \u2705 Health check registrado: application_metrics
+2025-08-04 11:00:25,655 - INFO - \U0001f50d Health checks inicializados
+2025-08-04 11:00:25,655 - INFO - \U0001f4be Sistema de backup inicializado
+2025-08-04 11:00:25,655 - INFO - \U0001f515 Alerta omitida (dev): Sistema iniciado correctamente
+2025-08-04 11:00:25,655 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-08-04 11:00:25,655 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-08-04 11:00:25,655 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-08-04 11:00:25,656 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-08-04 11:00:25,656 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-08-04 11:00:25,656 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-08-04 11:00:25,656 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-08-04 11:00:25,656 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-08-04 11:00:25,656 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-08-04 11:00:25,656 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-08-04 11:00:25,656 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-08-04 11:00:25,657 - INFO - \u2705 \U0001f680 Sistema de cache inicializado
+2025-08-04 11:00:25,657 - INFO - \u2705 \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:00:25,657 - INFO - \u2705 \u26a1 Optimizaciones SQL aplicadas
+2025-08-04 11:00:25,657 - INFO - \u2705 \U0001f50d Health checks avanzados
+2025-08-04 11:00:25,657 - INFO - \u2705 \U0001f4be Sistema de backup configurado
+2025-08-04 11:00:25,657 - INFO - ======================================================
+
+2025-08-04 11:00:25,657 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-08-04 11:01:22,971 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-08-04 11:01:22,971 - INFO - \U0001f4be Limpieza de recursos completada
+2025-08-04 11:01:26,744 - INFO - \U0001f515 Sistema de notificaciones deshabilitado (desarrollo)
+2025-08-04 11:01:26,747 - INFO - \U0001f4be Sistema de backup deshabilitado (desarrollo)
+2025-08-04 11:01:26,749 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-08-04 11:01:26,749 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-08-04 11:01:26,750 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-08-04 11:01:26,838 - INFO - \U0001f514 Registrando router de mensajes...
+2025-08-04 11:01:26,844 - INFO - \u2705 Router de mensajes registrado con prefix: /api/mensajes
+2025-08-04 11:01:26,844 - INFO - \U0001f4cb 12 rutas de mensajes registradas
+2025-08-04 11:01:26,844 - INFO - \U0001f6e0\ufe0f Registrando router de administración de mensajes...
+2025-08-04 11:01:26,852 - INFO - \u2705 Router de administración de mensajes registrado con prefix: /admin/api/mensajes
+2025-08-04 11:01:26,853 - INFO - \U0001f4c1 Registrando router de archivos estáticos de mensajes...
+2025-08-04 11:01:26,853 - INFO - \u2705 Router de estáticos de mensajes registrado con prefix: /mensajes/static
+2025-08-04 11:01:26,854 - INFO - \U0001f4ac Registrando router de API de chat...
+2025-08-04 11:01:26,856 - INFO - \u2705 Router de API de chat registrado con prefix: /api/chat
+2025-08-04 11:01:26,856 - INFO - \U0001f50c Registrando router WebSocket de mensajes...
+2025-08-04 11:01:26,857 - INFO - \u2705 Router WebSocket de mensajes registrado con prefix: /ws
+2025-08-04 11:01:26,857 - INFO - \U0001f4ac Registrando router WebSocket de chat...
+2025-08-04 11:01:26,870 - INFO - \u2705 Router WebSocket de chat registrado con prefix: /chat
+2025-08-04 11:01:26,870 - INFO - \U0001f4ac Registrando router API REST del chat...
+2025-08-04 11:01:26,875 - INFO - \u2705 Router API REST del chat registrado
+2025-08-04 11:01:26,875 - INFO - \U0001f4c1 Registrando archivos estáticos del chat...
+2025-08-04 11:01:26,876 - INFO - \u2705 Archivos estáticos del chat registrados en /static/chat
+2025-08-04 11:01:26,876 - INFO - \U0001f9ea Registrando endpoint directo para página de pruebas de chat...
+2025-08-04 11:01:26,876 - INFO - \u2705 Endpoints /chat-test y /mensajes-admin-public registrados correctamente
+2025-08-04 11:01:26,876 - INFO - \U0001f9ea Registrando endpoints de testing para mensajes...
+2025-08-04 11:01:26,877 - INFO - \u2705 Endpoints de testing para mensajes registrados correctamente
+2025-08-04 11:01:26,877 - INFO - \U0001f9ea Registrando endpoints públicos para testing de mensajes...
+2025-08-04 11:01:26,878 - INFO - \u2705 Endpoints públicos de mensajes registrados correctamente
+2025-08-04 11:01:26,878 - INFO - \U0001f9e9 Registrando router de widgets...
+2025-08-04 11:01:26,878 - INFO - \u2705 Router de widgets registrado con prefix: /widgets
+2025-08-04 11:01:26,878 - INFO - \U0001f4c4 Registrando router de páginas de administración...
+2025-08-04 11:01:26,879 - INFO - \u2705 Router de páginas de administración registrado con prefix: /admin
+2025-08-04 11:01:26,879 - INFO - \U0001f513 Registrando router simple de administración...
+2025-08-04 11:01:26,879 - INFO - \u2705 Router simple de administración registrado con prefix: /administracion
+2025-08-04 11:01:31,609 - WARNING - \u26a0\ufe0f Redis no disponible: Error 10061 connecting to localhost:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+2025-08-04 11:01:31,609 - INFO - \U0001f504 Usando caché en memoria como fallback
+2025-08-04 11:01:31,609 - INFO - \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:01:31,609 - INFO - \U0001f4ca Métricas disponibles en /metrics (desarrollo)
+2025-08-04 11:01:31,609 - INFO - \U0001f680 Inicializando optimizaciones SQL...
+2025-08-04 11:01:31,609 - INFO - \U0001f527 Creando índices de rendimiento...
+2025-08-04 11:01:31,610 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_fecha_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_fecha_estado ON movements(fecha, estado) INCLUDE (cantidad, observaciones)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,611 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_ot_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_ot_id_fecha ON movements(ot_id, fecha) INCLUDE (cantidad, tipo_movimiento)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,611 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_location_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_location_id_fecha ON movements(location_id, fecha DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,611 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_estado_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_estado_fecha ON ots(estado, fecha_inicio) INCLUDE (titulo, descripcion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,612 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_institution_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_institution_id_estado ON ots(institution_id, estado)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,612 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_users_email_active'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_users_email_active ON users(email, is_active) INCLUDE (username, role)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,612 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_locations_institution_id'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_locations_institution_id ON locations(institution_id) INCLUDE (nombre, tipo)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,613 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_artworks_artist_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_artworks_artist_id_estado ON artworks(artist_id, estado) INCLUDE (titulo, fecha_creacion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,613 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_auth_tokens_user_expiry'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_auth_tokens_user_expiry ON auth_tokens(user_id, expires_at) WHERE is_revoked = 0]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,613 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_activity_logs_user_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_activity_logs_user_fecha ON activity_logs(user_id, timestamp DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,614 - INFO - \U0001f4ca Índices procesados: 0/10
+2025-08-04 11:01:31,614 - INFO - \U0001f680 Optimizando consultas comunes...
+2025-08-04 11:01:31,614 - INFO - \u2705 4 consultas optimizadas preparadas
+2025-08-04 11:01:31,615 - INFO - \u26a1 Configuraciones de conexión optimizadas
+2025-08-04 11:01:31,615 - INFO - \U0001f4c8 Actualizando estadísticas de tablas...
+2025-08-04 11:01:31,617 - INFO - \u2705 Estadísticas actualizadas para: movements
+2025-08-04 11:01:31,617 - WARNING - \u26a0\ufe0f Error actualizando stats de ots: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'ots' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS ots WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,618 - WARNING - \u26a0\ufe0f Error actualizando stats de users: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'users' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS users WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,619 - INFO - \u2705 Estadísticas actualizadas para: locations
+2025-08-04 11:01:31,620 - INFO - \u2705 Estadísticas actualizadas para: institutions
+2025-08-04 11:01:31,622 - INFO - \u2705 Estadísticas actualizadas para: artworks
+2025-08-04 11:01:31,622 - WARNING - \u26a0\ufe0f Error actualizando stats de auth_tokens: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'auth_tokens' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS auth_tokens WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,623 - WARNING - \u26a0\ufe0f Error actualizando stats de activity_logs: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'activity_logs' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS activity_logs WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:01:31,623 - INFO - \U0001f50d Analizando consultas lentas...
+2025-08-04 11:01:31,634 - INFO - \u2705 No se encontraron consultas significativamente lentas
+2025-08-04 11:01:31,638 - INFO - \u2705 Optimizaciones SQL completadas
+2025-08-04 11:01:31,638 - INFO - \u2705 Health check registrado: database
+2025-08-04 11:01:31,638 - INFO - \u2705 Health check registrado: cache
+2025-08-04 11:01:31,638 - INFO - \u2705 Health check registrado: system_resources
+2025-08-04 11:01:31,638 - INFO - \u2705 Health check registrado: application_metrics
+2025-08-04 11:01:31,638 - INFO - \U0001f50d Health checks inicializados
+2025-08-04 11:01:31,638 - INFO - \U0001f4be Sistema de backup inicializado
+2025-08-04 11:01:31,638 - INFO - \U0001f515 Alerta omitida (dev): Sistema iniciado correctamente
+2025-08-04 11:01:31,638 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-08-04 11:01:31,638 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-08-04 11:01:31,639 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-08-04 11:01:31,639 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-08-04 11:01:31,639 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-08-04 11:01:31,639 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-08-04 11:01:31,639 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-08-04 11:01:31,639 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-08-04 11:01:31,640 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-08-04 11:01:31,640 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-08-04 11:01:31,640 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-08-04 11:01:31,640 - INFO - \u2705 \U0001f680 Sistema de cache inicializado
+2025-08-04 11:01:31,640 - INFO - \u2705 \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:01:31,640 - INFO - \u2705 \u26a1 Optimizaciones SQL aplicadas
+2025-08-04 11:01:31,640 - INFO - \u2705 \U0001f50d Health checks avanzados
+2025-08-04 11:01:31,641 - INFO - \u2705 \U0001f4be Sistema de backup configurado
+2025-08-04 11:01:31,641 - INFO - ======================================================
+
+2025-08-04 11:01:31,641 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-08-04 11:02:53,604 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-08-04 11:02:53,604 - INFO - \U0001f4be Limpieza de recursos completada
+2025-08-04 11:02:57,483 - INFO - \U0001f515 Sistema de notificaciones deshabilitado (desarrollo)
+2025-08-04 11:02:57,486 - INFO - \U0001f4be Sistema de backup deshabilitado (desarrollo)
+2025-08-04 11:02:57,489 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-08-04 11:02:57,489 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-08-04 11:02:57,489 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-08-04 11:02:57,576 - INFO - \U0001f514 Registrando router de mensajes...
+2025-08-04 11:02:57,581 - INFO - \u2705 Router de mensajes registrado con prefix: /api/mensajes
+2025-08-04 11:02:57,581 - INFO - \U0001f4cb 12 rutas de mensajes registradas
+2025-08-04 11:02:57,581 - INFO - \U0001f6e0\ufe0f Registrando router de administración de mensajes...
+2025-08-04 11:02:57,589 - INFO - \u2705 Router de administración de mensajes registrado con prefix: /admin/api/mensajes
+2025-08-04 11:02:57,589 - INFO - \U0001f4c1 Registrando router de archivos estáticos de mensajes...
+2025-08-04 11:02:57,590 - INFO - \u2705 Router de estáticos de mensajes registrado con prefix: /mensajes/static
+2025-08-04 11:02:57,590 - INFO - \U0001f4ac Registrando router de API de chat...
+2025-08-04 11:02:57,592 - INFO - \u2705 Router de API de chat registrado con prefix: /api/chat
+2025-08-04 11:02:57,592 - INFO - \U0001f50c Registrando router WebSocket de mensajes...
+2025-08-04 11:02:57,592 - INFO - \u2705 Router WebSocket de mensajes registrado con prefix: /ws
+2025-08-04 11:02:57,592 - INFO - \U0001f4ac Registrando router WebSocket de chat...
+2025-08-04 11:02:57,605 - INFO - \u2705 Router WebSocket de chat registrado con prefix: /chat
+2025-08-04 11:02:57,606 - INFO - \U0001f4ac Registrando router API REST del chat...
+2025-08-04 11:02:57,611 - INFO - \u2705 Router API REST del chat registrado
+2025-08-04 11:02:57,611 - INFO - \U0001f4c1 Registrando archivos estáticos del chat...
+2025-08-04 11:02:57,611 - INFO - \u2705 Archivos estáticos del chat registrados en /static/chat
+2025-08-04 11:02:57,611 - INFO - \U0001f9ea Registrando endpoint directo para página de pruebas de chat...
+2025-08-04 11:02:57,612 - INFO - \u2705 Endpoints /chat-test y /mensajes-admin-public registrados correctamente
+2025-08-04 11:02:57,612 - INFO - \U0001f9ea Registrando endpoints de testing para mensajes...
+2025-08-04 11:02:57,613 - INFO - \u2705 Endpoints de testing para mensajes registrados correctamente
+2025-08-04 11:02:57,613 - INFO - \U0001f9ea Registrando endpoints públicos para testing de mensajes...
+2025-08-04 11:02:57,613 - INFO - \u2705 Endpoints públicos de mensajes registrados correctamente
+2025-08-04 11:02:57,613 - INFO - \U0001f9e9 Registrando router de widgets...
+2025-08-04 11:02:57,614 - INFO - \u2705 Router de widgets registrado con prefix: /widgets
+2025-08-04 11:02:57,614 - INFO - \U0001f4c4 Registrando router de páginas de administración...
+2025-08-04 11:02:57,614 - INFO - \u2705 Router de páginas de administración registrado con prefix: /admin
+2025-08-04 11:02:57,615 - INFO - \U0001f513 Registrando router simple de administración...
+2025-08-04 11:02:57,615 - INFO - \u2705 Router simple de administración registrado con prefix: /administracion
+2025-08-04 11:03:02,348 - WARNING - \u26a0\ufe0f Redis no disponible: Error 10061 connecting to localhost:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+2025-08-04 11:03:02,348 - INFO - \U0001f504 Usando caché en memoria como fallback
+2025-08-04 11:03:02,348 - INFO - \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:03:02,348 - INFO - \U0001f4ca Métricas disponibles en /metrics (desarrollo)
+2025-08-04 11:03:02,348 - INFO - \U0001f680 Inicializando optimizaciones SQL...
+2025-08-04 11:03:02,348 - INFO - \U0001f527 Creando índices de rendimiento...
+2025-08-04 11:03:02,349 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_fecha_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_fecha_estado ON movements(fecha, estado) INCLUDE (cantidad, observaciones)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,350 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_ot_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_ot_id_fecha ON movements(ot_id, fecha) INCLUDE (cantidad, tipo_movimiento)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,350 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_location_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_location_id_fecha ON movements(location_id, fecha DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,351 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_estado_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_estado_fecha ON ots(estado, fecha_inicio) INCLUDE (titulo, descripcion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,351 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_institution_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_institution_id_estado ON ots(institution_id, estado)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,351 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_users_email_active'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_users_email_active ON users(email, is_active) INCLUDE (username, role)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,352 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_locations_institution_id'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_locations_institution_id ON locations(institution_id) INCLUDE (nombre, tipo)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,352 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_artworks_artist_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_artworks_artist_id_estado ON artworks(artist_id, estado) INCLUDE (titulo, fecha_creacion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,352 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_auth_tokens_user_expiry'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_auth_tokens_user_expiry ON auth_tokens(user_id, expires_at) WHERE is_revoked = 0]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,353 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_activity_logs_user_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_activity_logs_user_fecha ON activity_logs(user_id, timestamp DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,353 - INFO - \U0001f4ca Índices procesados: 0/10
+2025-08-04 11:03:02,353 - INFO - \U0001f680 Optimizando consultas comunes...
+2025-08-04 11:03:02,353 - INFO - \u2705 4 consultas optimizadas preparadas
+2025-08-04 11:03:02,354 - INFO - \u26a1 Configuraciones de conexión optimizadas
+2025-08-04 11:03:02,354 - INFO - \U0001f4c8 Actualizando estadísticas de tablas...
+2025-08-04 11:03:02,365 - INFO - \u2705 Estadísticas actualizadas para: movements
+2025-08-04 11:03:02,366 - WARNING - \u26a0\ufe0f Error actualizando stats de ots: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'ots' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS ots WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,366 - WARNING - \u26a0\ufe0f Error actualizando stats de users: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'users' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS users WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,367 - INFO - \u2705 Estadísticas actualizadas para: locations
+2025-08-04 11:03:02,369 - INFO - \u2705 Estadísticas actualizadas para: institutions
+2025-08-04 11:03:02,370 - INFO - \u2705 Estadísticas actualizadas para: artworks
+2025-08-04 11:03:02,371 - WARNING - \u26a0\ufe0f Error actualizando stats de auth_tokens: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'auth_tokens' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS auth_tokens WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,371 - WARNING - \u26a0\ufe0f Error actualizando stats de activity_logs: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'activity_logs' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS activity_logs WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:02,371 - INFO - \U0001f50d Analizando consultas lentas...
+2025-08-04 11:03:02,382 - INFO - \u2705 No se encontraron consultas significativamente lentas
+2025-08-04 11:03:02,382 - INFO - \u2705 Optimizaciones SQL completadas
+2025-08-04 11:03:02,382 - INFO - \u2705 Health check registrado: database
+2025-08-04 11:03:02,382 - INFO - \u2705 Health check registrado: cache
+2025-08-04 11:03:02,382 - INFO - \u2705 Health check registrado: system_resources
+2025-08-04 11:03:02,382 - INFO - \u2705 Health check registrado: application_metrics
+2025-08-04 11:03:02,382 - INFO - \U0001f50d Health checks inicializados
+2025-08-04 11:03:02,382 - INFO - \U0001f4be Sistema de backup inicializado
+2025-08-04 11:03:02,383 - INFO - \U0001f515 Alerta omitida (dev): Sistema iniciado correctamente
+2025-08-04 11:03:02,383 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-08-04 11:03:02,383 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-08-04 11:03:02,383 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-08-04 11:03:02,383 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-08-04 11:03:02,383 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-08-04 11:03:02,384 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-08-04 11:03:02,384 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-08-04 11:03:02,384 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-08-04 11:03:02,384 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-08-04 11:03:02,384 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-08-04 11:03:02,385 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-08-04 11:03:02,385 - INFO - \u2705 \U0001f680 Sistema de cache inicializado
+2025-08-04 11:03:02,385 - INFO - \u2705 \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:03:02,385 - INFO - \u2705 \u26a1 Optimizaciones SQL aplicadas
+2025-08-04 11:03:02,385 - INFO - \u2705 \U0001f50d Health checks avanzados
+2025-08-04 11:03:02,385 - INFO - \u2705 \U0001f4be Sistema de backup configurado
+2025-08-04 11:03:02,385 - INFO - ======================================================
+
+2025-08-04 11:03:02,385 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-08-04 11:03:02,386 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-08-04 11:03:02,386 - INFO - \U0001f4be Limpieza de recursos completada
+2025-08-04 11:03:05,433 - INFO - \U0001f515 Sistema de notificaciones deshabilitado (desarrollo)
+2025-08-04 11:03:05,436 - INFO - \U0001f4be Sistema de backup deshabilitado (desarrollo)
+2025-08-04 11:03:05,438 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-08-04 11:03:05,438 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-08-04 11:03:05,439 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-08-04 11:03:05,472 - INFO - \U0001f514 Registrando router de mensajes...
+2025-08-04 11:03:05,478 - INFO - \u2705 Router de mensajes registrado con prefix: /api/mensajes
+2025-08-04 11:03:05,478 - INFO - \U0001f4cb 12 rutas de mensajes registradas
+2025-08-04 11:03:05,479 - INFO - \U0001f6e0\ufe0f Registrando router de administración de mensajes...
+2025-08-04 11:03:05,486 - INFO - \u2705 Router de administración de mensajes registrado con prefix: /admin/api/mensajes
+2025-08-04 11:03:05,486 - INFO - \U0001f4c1 Registrando router de archivos estáticos de mensajes...
+2025-08-04 11:03:05,487 - INFO - \u2705 Router de estáticos de mensajes registrado con prefix: /mensajes/static
+2025-08-04 11:03:05,487 - INFO - \U0001f4ac Registrando router de API de chat...
+2025-08-04 11:03:05,489 - INFO - \u2705 Router de API de chat registrado con prefix: /api/chat
+2025-08-04 11:03:05,489 - INFO - \U0001f50c Registrando router WebSocket de mensajes...
+2025-08-04 11:03:05,490 - INFO - \u2705 Router WebSocket de mensajes registrado con prefix: /ws
+2025-08-04 11:03:05,490 - INFO - \U0001f4ac Registrando router WebSocket de chat...
+2025-08-04 11:03:05,502 - INFO - \u2705 Router WebSocket de chat registrado con prefix: /chat
+2025-08-04 11:03:05,503 - INFO - \U0001f4ac Registrando router API REST del chat...
+2025-08-04 11:03:05,508 - INFO - \u2705 Router API REST del chat registrado
+2025-08-04 11:03:05,508 - INFO - \U0001f4c1 Registrando archivos estáticos del chat...
+2025-08-04 11:03:05,508 - INFO - \u2705 Archivos estáticos del chat registrados en /static/chat
+2025-08-04 11:03:05,508 - INFO - \U0001f9ea Registrando endpoint directo para página de pruebas de chat...
+2025-08-04 11:03:05,509 - INFO - \u2705 Endpoints /chat-test y /mensajes-admin-public registrados correctamente
+2025-08-04 11:03:05,509 - INFO - \U0001f9ea Registrando endpoints de testing para mensajes...
+2025-08-04 11:03:05,509 - INFO - \u2705 Endpoints de testing para mensajes registrados correctamente
+2025-08-04 11:03:05,510 - INFO - \U0001f9ea Registrando endpoints públicos para testing de mensajes...
+2025-08-04 11:03:05,510 - INFO - \u2705 Endpoints públicos de mensajes registrados correctamente
+2025-08-04 11:03:05,510 - INFO - \U0001f9e9 Registrando router de widgets...
+2025-08-04 11:03:05,511 - INFO - \u2705 Router de widgets registrado con prefix: /widgets
+2025-08-04 11:03:05,511 - INFO - \U0001f4c4 Registrando router de páginas de administración...
+2025-08-04 11:03:05,511 - INFO - \u2705 Router de páginas de administración registrado con prefix: /admin
+2025-08-04 11:03:05,511 - INFO - \U0001f513 Registrando router simple de administración...
+2025-08-04 11:03:05,512 - INFO - \u2705 Router simple de administración registrado con prefix: /administracion
+2025-08-04 11:03:10,191 - WARNING - \u26a0\ufe0f Redis no disponible: Error 10061 connecting to localhost:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+2025-08-04 11:03:10,191 - INFO - \U0001f504 Usando caché en memoria como fallback
+2025-08-04 11:03:10,191 - INFO - \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:03:10,191 - INFO - \U0001f4ca Métricas disponibles en /metrics (desarrollo)
+2025-08-04 11:03:10,191 - INFO - \U0001f680 Inicializando optimizaciones SQL...
+2025-08-04 11:03:10,191 - INFO - \U0001f527 Creando índices de rendimiento...
+2025-08-04 11:03:10,191 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_fecha_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_fecha_estado ON movements(fecha, estado) INCLUDE (cantidad, observaciones)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,192 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_ot_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_ot_id_fecha ON movements(ot_id, fecha) INCLUDE (cantidad, tipo_movimiento)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,192 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_location_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_location_id_fecha ON movements(location_id, fecha DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,192 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_estado_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_estado_fecha ON ots(estado, fecha_inicio) INCLUDE (titulo, descripcion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,193 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_institution_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_institution_id_estado ON ots(institution_id, estado)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,193 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_users_email_active'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_users_email_active ON users(email, is_active) INCLUDE (username, role)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,193 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_locations_institution_id'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_locations_institution_id ON locations(institution_id) INCLUDE (nombre, tipo)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,194 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_artworks_artist_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_artworks_artist_id_estado ON artworks(artist_id, estado) INCLUDE (titulo, fecha_creacion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,194 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_auth_tokens_user_expiry'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_auth_tokens_user_expiry ON auth_tokens(user_id, expires_at) WHERE is_revoked = 0]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,194 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_activity_logs_user_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_activity_logs_user_fecha ON activity_logs(user_id, timestamp DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,194 - INFO - \U0001f4ca Índices procesados: 0/10
+2025-08-04 11:03:10,194 - INFO - \U0001f680 Optimizando consultas comunes...
+2025-08-04 11:03:10,195 - INFO - \u2705 4 consultas optimizadas preparadas
+2025-08-04 11:03:10,195 - INFO - \u26a1 Configuraciones de conexión optimizadas
+2025-08-04 11:03:10,195 - INFO - \U0001f4c8 Actualizando estadísticas de tablas...
+2025-08-04 11:03:10,196 - INFO - \u2705 Estadísticas actualizadas para: movements
+2025-08-04 11:03:10,197 - WARNING - \u26a0\ufe0f Error actualizando stats de ots: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'ots' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS ots WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,197 - WARNING - \u26a0\ufe0f Error actualizando stats de users: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'users' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS users WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,198 - INFO - \u2705 Estadísticas actualizadas para: locations
+2025-08-04 11:03:10,198 - INFO - \u2705 Estadísticas actualizadas para: institutions
+2025-08-04 11:03:10,199 - INFO - \u2705 Estadísticas actualizadas para: artworks
+2025-08-04 11:03:10,200 - WARNING - \u26a0\ufe0f Error actualizando stats de auth_tokens: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'auth_tokens' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS auth_tokens WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,200 - WARNING - \u26a0\ufe0f Error actualizando stats de activity_logs: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'activity_logs' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS activity_logs WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:03:10,200 - INFO - \U0001f50d Analizando consultas lentas...
+2025-08-04 11:03:10,208 - INFO - \U0001f4ca Encontradas 1 consultas para optimización
+2025-08-04 11:03:10,208 - INFO - \U0001f40c Query lenta #1: 3750.00ms promedio
+2025-08-04 11:03:10,208 - INFO - \u2705 Optimizaciones SQL completadas
+2025-08-04 11:03:10,208 - INFO - \u2705 Health check registrado: database
+2025-08-04 11:03:10,208 - INFO - \u2705 Health check registrado: cache
+2025-08-04 11:03:10,208 - INFO - \u2705 Health check registrado: system_resources
+2025-08-04 11:03:10,208 - INFO - \u2705 Health check registrado: application_metrics
+2025-08-04 11:03:10,208 - INFO - \U0001f50d Health checks inicializados
+2025-08-04 11:03:10,209 - INFO - \U0001f4be Sistema de backup inicializado
+2025-08-04 11:03:10,209 - INFO - \U0001f515 Alerta omitida (dev): Sistema iniciado correctamente
+2025-08-04 11:03:10,209 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-08-04 11:03:10,209 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-08-04 11:03:10,209 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-08-04 11:03:10,209 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-08-04 11:03:10,209 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-08-04 11:03:10,209 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-08-04 11:03:10,209 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-08-04 11:03:10,209 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-08-04 11:03:10,210 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-08-04 11:03:10,210 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-08-04 11:03:10,210 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-08-04 11:03:10,210 - INFO - \u2705 \U0001f680 Sistema de cache inicializado
+2025-08-04 11:03:10,210 - INFO - \u2705 \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:03:10,210 - INFO - \u2705 \u26a1 Optimizaciones SQL aplicadas
+2025-08-04 11:03:10,210 - INFO - \u2705 \U0001f50d Health checks avanzados
+2025-08-04 11:03:10,211 - INFO - \u2705 \U0001f4be Sistema de backup configurado
+2025-08-04 11:03:10,211 - INFO - ======================================================
+
+2025-08-04 11:03:10,211 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-08-04 11:03:17,412 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-08-04 11:03:17,412 - INFO - \U0001f4be Limpieza de recursos completada
+2025-08-04 11:34:34,512 - INFO - \U0001f515 Sistema de notificaciones deshabilitado (desarrollo)
+2025-08-04 11:34:34,516 - INFO - \U0001f4be Sistema de backup deshabilitado (desarrollo)
+2025-08-04 11:34:34,519 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-08-04 11:34:34,520 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-08-04 11:34:34,520 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-08-04 11:34:34,631 - INFO - \U0001f514 Registrando router de mensajes...
+2025-08-04 11:34:34,640 - INFO - \u2705 Router de mensajes registrado con prefix: /api/mensajes
+2025-08-04 11:34:34,641 - INFO - \U0001f4cb 12 rutas de mensajes registradas
+2025-08-04 11:34:34,641 - INFO - \U0001f6e0\ufe0f Registrando router de administración de mensajes...
+2025-08-04 11:34:34,652 - INFO - \u2705 Router de administración de mensajes registrado con prefix: /admin/api/mensajes
+2025-08-04 11:34:34,652 - INFO - \U0001f4c1 Registrando router de archivos estáticos de mensajes...
+2025-08-04 11:34:34,653 - INFO - \u2705 Router de estáticos de mensajes registrado con prefix: /mensajes/static
+2025-08-04 11:34:34,653 - INFO - \U0001f4ac Registrando router de API de chat...
+2025-08-04 11:34:34,657 - INFO - \u2705 Router de API de chat registrado con prefix: /api/chat
+2025-08-04 11:34:34,657 - INFO - \U0001f50c Registrando router WebSocket de mensajes...
+2025-08-04 11:34:34,658 - INFO - \u2705 Router WebSocket de mensajes registrado con prefix: /ws
+2025-08-04 11:34:34,658 - INFO - \U0001f4ac Registrando router WebSocket de chat...
+2025-08-04 11:34:34,680 - INFO - \u2705 Router WebSocket de chat registrado con prefix: /chat
+2025-08-04 11:34:34,680 - INFO - \U0001f4ac Registrando router API REST del chat...
+2025-08-04 11:34:34,689 - INFO - \u2705 Router API REST del chat registrado
+2025-08-04 11:34:34,689 - INFO - \U0001f4c1 Registrando archivos estáticos del chat...
+2025-08-04 11:34:34,690 - INFO - \u2705 Archivos estáticos del chat registrados en /static/chat
+2025-08-04 11:34:34,690 - INFO - \U0001f9ea Registrando endpoint directo para página de pruebas de chat...
+2025-08-04 11:34:34,690 - INFO - \u2705 Endpoints /chat-test y /mensajes-admin-public registrados correctamente
+2025-08-04 11:34:34,690 - INFO - \U0001f9ea Registrando endpoints de testing para mensajes...
+2025-08-04 11:34:34,692 - INFO - \u2705 Endpoints de testing para mensajes registrados correctamente
+2025-08-04 11:34:34,692 - INFO - \U0001f9ea Registrando endpoints públicos para testing de mensajes...
+2025-08-04 11:34:34,692 - INFO - \u2705 Endpoints públicos de mensajes registrados correctamente
+2025-08-04 11:34:34,693 - INFO - \U0001f9e9 Registrando router de widgets...
+2025-08-04 11:34:34,693 - INFO - \u2705 Router de widgets registrado con prefix: /widgets
+2025-08-04 11:34:34,693 - INFO - \U0001f4c4 Registrando router de páginas de administración...
+2025-08-04 11:34:34,694 - INFO - \u2705 Router de páginas de administración registrado con prefix: /admin
+2025-08-04 11:34:34,694 - INFO - \U0001f513 Registrando router simple de administración...
+2025-08-04 11:34:34,694 - INFO - \u2705 Router simple de administración registrado con prefix: /administracion
+2025-08-04 11:34:39,471 - WARNING - \u26a0\ufe0f Redis no disponible: Error 10061 connecting to localhost:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+2025-08-04 11:34:39,472 - INFO - \U0001f504 Usando caché en memoria como fallback
+2025-08-04 11:34:39,472 - INFO - \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:34:39,472 - INFO - \U0001f4ca Métricas disponibles en /metrics (desarrollo)
+2025-08-04 11:34:39,472 - INFO - \U0001f680 Inicializando optimizaciones SQL...
+2025-08-04 11:34:39,472 - INFO - \U0001f527 Creando índices de rendimiento...
+2025-08-04 11:34:39,474 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_fecha_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_fecha_estado ON movements(fecha, estado) INCLUDE (cantidad, observaciones)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,475 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_ot_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_ot_id_fecha ON movements(ot_id, fecha) INCLUDE (cantidad, tipo_movimiento)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,475 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_location_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_location_id_fecha ON movements(location_id, fecha DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,476 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_estado_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_estado_fecha ON ots(estado, fecha_inicio) INCLUDE (titulo, descripcion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,476 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_institution_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_institution_id_estado ON ots(institution_id, estado)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,477 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_users_email_active'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_users_email_active ON users(email, is_active) INCLUDE (username, role)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,477 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_locations_institution_id'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_locations_institution_id ON locations(institution_id) INCLUDE (nombre, tipo)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,478 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_artworks_artist_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_artworks_artist_id_estado ON artworks(artist_id, estado) INCLUDE (titulo, fecha_creacion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,478 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_auth_tokens_user_expiry'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_auth_tokens_user_expiry ON auth_tokens(user_id, expires_at) WHERE is_revoked = 0]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,479 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_activity_logs_user_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_activity_logs_user_fecha ON activity_logs(user_id, timestamp DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,479 - INFO - \U0001f4ca Índices procesados: 0/10
+2025-08-04 11:34:39,479 - INFO - \U0001f680 Optimizando consultas comunes...
+2025-08-04 11:34:39,479 - INFO - \u2705 4 consultas optimizadas preparadas
+2025-08-04 11:34:39,480 - INFO - \u26a1 Configuraciones de conexión optimizadas
+2025-08-04 11:34:39,480 - INFO - \U0001f4c8 Actualizando estadísticas de tablas...
+2025-08-04 11:34:39,483 - INFO - \u2705 Estadísticas actualizadas para: movements
+2025-08-04 11:34:39,484 - WARNING - \u26a0\ufe0f Error actualizando stats de ots: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'ots' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS ots WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,484 - WARNING - \u26a0\ufe0f Error actualizando stats de users: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'users' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS users WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,486 - INFO - \u2705 Estadísticas actualizadas para: locations
+2025-08-04 11:34:39,487 - INFO - \u2705 Estadísticas actualizadas para: institutions
+2025-08-04 11:34:39,488 - INFO - \u2705 Estadísticas actualizadas para: artworks
+2025-08-04 11:34:39,490 - WARNING - \u26a0\ufe0f Error actualizando stats de auth_tokens: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'auth_tokens' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS auth_tokens WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,490 - WARNING - \u26a0\ufe0f Error actualizando stats de activity_logs: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'activity_logs' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS activity_logs WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:34:39,490 - INFO - \U0001f50d Analizando consultas lentas...
+2025-08-04 11:34:39,500 - INFO - \u2705 No se encontraron consultas significativamente lentas
+2025-08-04 11:34:39,502 - INFO - \u2705 Optimizaciones SQL completadas
+2025-08-04 11:34:39,502 - INFO - \u2705 Health check registrado: database
+2025-08-04 11:34:39,502 - INFO - \u2705 Health check registrado: cache
+2025-08-04 11:34:39,502 - INFO - \u2705 Health check registrado: system_resources
+2025-08-04 11:34:39,502 - INFO - \u2705 Health check registrado: application_metrics
+2025-08-04 11:34:39,502 - INFO - \U0001f50d Health checks inicializados
+2025-08-04 11:34:39,502 - INFO - \U0001f4be Sistema de backup inicializado
+2025-08-04 11:34:39,503 - INFO - \U0001f515 Alerta omitida (dev): Sistema iniciado correctamente
+2025-08-04 11:34:39,503 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-08-04 11:34:39,503 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-08-04 11:34:39,503 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-08-04 11:34:39,503 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-08-04 11:34:39,503 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-08-04 11:34:39,504 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-08-04 11:34:39,504 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-08-04 11:34:39,504 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-08-04 11:34:39,504 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-08-04 11:34:39,504 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-08-04 11:34:39,505 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-08-04 11:34:39,505 - INFO - \u2705 \U0001f680 Sistema de cache inicializado
+2025-08-04 11:34:39,505 - INFO - \u2705 \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:34:39,505 - INFO - \u2705 \u26a1 Optimizaciones SQL aplicadas
+2025-08-04 11:34:39,505 - INFO - \u2705 \U0001f50d Health checks avanzados
+2025-08-04 11:34:39,505 - INFO - \u2705 \U0001f4be Sistema de backup configurado
+2025-08-04 11:34:39,505 - INFO - ======================================================
+
+2025-08-04 11:34:39,505 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-08-04 11:35:16,777 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-08-04 11:35:16,777 - INFO - \U0001f4be Limpieza de recursos completada
+2025-08-04 11:35:20,821 - INFO - \U0001f515 Sistema de notificaciones deshabilitado (desarrollo)
+2025-08-04 11:35:20,824 - INFO - \U0001f4be Sistema de backup deshabilitado (desarrollo)
+2025-08-04 11:35:20,842 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-08-04 11:35:20,843 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-08-04 11:35:20,843 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-08-04 11:35:20,973 - INFO - \U0001f514 Registrando router de mensajes...
+2025-08-04 11:35:20,978 - INFO - \u2705 Router de mensajes registrado con prefix: /api/mensajes
+2025-08-04 11:35:20,978 - INFO - \U0001f4cb 12 rutas de mensajes registradas
+2025-08-04 11:35:20,979 - INFO - \U0001f6e0\ufe0f Registrando router de administración de mensajes...
+2025-08-04 11:35:20,985 - INFO - \u2705 Router de administración de mensajes registrado con prefix: /admin/api/mensajes
+2025-08-04 11:35:20,986 - INFO - \U0001f4c1 Registrando router de archivos estáticos de mensajes...
+2025-08-04 11:35:20,986 - INFO - \u2705 Router de estáticos de mensajes registrado con prefix: /mensajes/static
+2025-08-04 11:35:20,987 - INFO - \U0001f4ac Registrando router de API de chat...
+2025-08-04 11:35:20,989 - INFO - \u2705 Router de API de chat registrado con prefix: /api/chat
+2025-08-04 11:35:20,990 - INFO - \U0001f50c Registrando router WebSocket de mensajes...
+2025-08-04 11:35:20,990 - INFO - \u2705 Router WebSocket de mensajes registrado con prefix: /ws
+2025-08-04 11:35:20,991 - INFO - \U0001f4ac Registrando router WebSocket de chat...
+2025-08-04 11:35:21,003 - INFO - \u2705 Router WebSocket de chat registrado con prefix: /chat
+2025-08-04 11:35:21,003 - INFO - \U0001f4ac Registrando router API REST del chat...
+2025-08-04 11:35:21,008 - INFO - \u2705 Router API REST del chat registrado
+2025-08-04 11:35:21,009 - INFO - \U0001f4c1 Registrando archivos estáticos del chat...
+2025-08-04 11:35:21,009 - INFO - \u2705 Archivos estáticos del chat registrados en /static/chat
+2025-08-04 11:35:21,010 - INFO - \U0001f9ea Registrando endpoint directo para página de pruebas de chat...
+2025-08-04 11:35:21,010 - INFO - \u2705 Endpoints /chat-test y /mensajes-admin-public registrados correctamente
+2025-08-04 11:35:21,010 - INFO - \U0001f9ea Registrando endpoints de testing para mensajes...
+2025-08-04 11:35:21,011 - INFO - \u2705 Endpoints de testing para mensajes registrados correctamente
+2025-08-04 11:35:21,011 - INFO - \U0001f9ea Registrando endpoints públicos para testing de mensajes...
+2025-08-04 11:35:21,011 - INFO - \u2705 Endpoints públicos de mensajes registrados correctamente
+2025-08-04 11:35:21,011 - INFO - \U0001f9e9 Registrando router de widgets...
+2025-08-04 11:35:21,013 - INFO - \u2705 Router de widgets registrado con prefix: /widgets
+2025-08-04 11:35:21,013 - INFO - \U0001f4c4 Registrando router de páginas de administración...
+2025-08-04 11:35:21,013 - INFO - \u2705 Router de páginas de administración registrado con prefix: /admin
+2025-08-04 11:35:21,013 - INFO - \U0001f513 Registrando router simple de administración...
+2025-08-04 11:35:21,014 - INFO - \u2705 Router simple de administración registrado con prefix: /administracion
+2025-08-04 11:35:25,748 - WARNING - \u26a0\ufe0f Redis no disponible: Error 10061 connecting to localhost:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+2025-08-04 11:35:25,748 - INFO - \U0001f504 Usando caché en memoria como fallback
+2025-08-04 11:35:25,748 - INFO - \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:35:25,748 - INFO - \U0001f4ca Métricas disponibles en /metrics (desarrollo)
+2025-08-04 11:35:25,748 - INFO - \U0001f680 Inicializando optimizaciones SQL...
+2025-08-04 11:35:25,748 - INFO - \U0001f527 Creando índices de rendimiento...
+2025-08-04 11:35:25,749 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_fecha_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_fecha_estado ON movements(fecha, estado) INCLUDE (cantidad, observaciones)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,750 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_ot_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_ot_id_fecha ON movements(ot_id, fecha) INCLUDE (cantidad, tipo_movimiento)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,750 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_location_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_location_id_fecha ON movements(location_id, fecha DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,750 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_estado_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_estado_fecha ON ots(estado, fecha_inicio) INCLUDE (titulo, descripcion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,750 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_institution_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_institution_id_estado ON ots(institution_id, estado)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,751 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_users_email_active'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_users_email_active ON users(email, is_active) INCLUDE (username, role)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,751 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_locations_institution_id'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_locations_institution_id ON locations(institution_id) INCLUDE (nombre, tipo)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,752 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_artworks_artist_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_artworks_artist_id_estado ON artworks(artist_id, estado) INCLUDE (titulo, fecha_creacion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,752 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_auth_tokens_user_expiry'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_auth_tokens_user_expiry ON auth_tokens(user_id, expires_at) WHERE is_revoked = 0]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,752 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_activity_logs_user_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_activity_logs_user_fecha ON activity_logs(user_id, timestamp DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,753 - INFO - \U0001f4ca Índices procesados: 0/10
+2025-08-04 11:35:25,753 - INFO - \U0001f680 Optimizando consultas comunes...
+2025-08-04 11:35:25,753 - INFO - \u2705 4 consultas optimizadas preparadas
+2025-08-04 11:35:25,754 - INFO - \u26a1 Configuraciones de conexión optimizadas
+2025-08-04 11:35:25,754 - INFO - \U0001f4c8 Actualizando estadísticas de tablas...
+2025-08-04 11:35:25,768 - INFO - \u2705 Estadísticas actualizadas para: movements
+2025-08-04 11:35:25,768 - WARNING - \u26a0\ufe0f Error actualizando stats de ots: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'ots' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS ots WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,769 - WARNING - \u26a0\ufe0f Error actualizando stats de users: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'users' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS users WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,771 - INFO - \u2705 Estadísticas actualizadas para: locations
+2025-08-04 11:35:25,773 - INFO - \u2705 Estadísticas actualizadas para: institutions
+2025-08-04 11:35:25,774 - INFO - \u2705 Estadísticas actualizadas para: artworks
+2025-08-04 11:35:25,775 - WARNING - \u26a0\ufe0f Error actualizando stats de auth_tokens: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'auth_tokens' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS auth_tokens WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,775 - WARNING - \u26a0\ufe0f Error actualizando stats de activity_logs: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'activity_logs' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS activity_logs WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:35:25,775 - INFO - \U0001f50d Analizando consultas lentas...
+2025-08-04 11:35:25,793 - INFO - \u2705 No se encontraron consultas significativamente lentas
+2025-08-04 11:35:25,794 - INFO - \u2705 Optimizaciones SQL completadas
+2025-08-04 11:35:25,794 - INFO - \u2705 Health check registrado: database
+2025-08-04 11:35:25,794 - INFO - \u2705 Health check registrado: cache
+2025-08-04 11:35:25,794 - INFO - \u2705 Health check registrado: system_resources
+2025-08-04 11:35:25,794 - INFO - \u2705 Health check registrado: application_metrics
+2025-08-04 11:35:25,794 - INFO - \U0001f50d Health checks inicializados
+2025-08-04 11:35:25,794 - INFO - \U0001f4be Sistema de backup inicializado
+2025-08-04 11:35:25,794 - INFO - \U0001f515 Alerta omitida (dev): Sistema iniciado correctamente
+2025-08-04 11:35:25,794 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-08-04 11:35:25,794 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-08-04 11:35:25,794 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-08-04 11:35:25,794 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-08-04 11:35:25,795 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-08-04 11:35:25,795 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-08-04 11:35:25,795 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-08-04 11:35:25,795 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-08-04 11:35:25,795 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-08-04 11:35:25,795 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-08-04 11:35:25,795 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-08-04 11:35:25,796 - INFO - \u2705 \U0001f680 Sistema de cache inicializado
+2025-08-04 11:35:25,796 - INFO - \u2705 \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:35:25,796 - INFO - \u2705 \u26a1 Optimizaciones SQL aplicadas
+2025-08-04 11:35:25,796 - INFO - \u2705 \U0001f50d Health checks avanzados
+2025-08-04 11:35:25,796 - INFO - \u2705 \U0001f4be Sistema de backup configurado
+2025-08-04 11:35:25,796 - INFO - ======================================================
+
+2025-08-04 11:35:25,796 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-08-04 11:36:12,614 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-08-04 11:36:12,614 - INFO - \U0001f4be Limpieza de recursos completada
+2025-08-04 11:36:27,689 - INFO - \U0001f515 Sistema de notificaciones deshabilitado (desarrollo)
+2025-08-04 11:36:27,700 - INFO - \U0001f4be Sistema de backup deshabilitado (desarrollo)
+2025-08-04 11:36:27,731 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-08-04 11:36:27,731 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-08-04 11:36:27,733 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-08-04 11:36:27,971 - INFO - \U0001f514 Registrando router de mensajes...
+2025-08-04 11:36:27,977 - INFO - \u2705 Router de mensajes registrado con prefix: /api/mensajes
+2025-08-04 11:36:27,977 - INFO - \U0001f4cb 12 rutas de mensajes registradas
+2025-08-04 11:36:27,977 - INFO - \U0001f6e0\ufe0f Registrando router de administración de mensajes...
+2025-08-04 11:36:27,985 - INFO - \u2705 Router de administración de mensajes registrado con prefix: /admin/api/mensajes
+2025-08-04 11:36:27,985 - INFO - \U0001f4c1 Registrando router de archivos estáticos de mensajes...
+2025-08-04 11:36:27,986 - INFO - \u2705 Router de estáticos de mensajes registrado con prefix: /mensajes/static
+2025-08-04 11:36:27,986 - INFO - \U0001f4ac Registrando router de API de chat...
+2025-08-04 11:36:27,989 - INFO - \u2705 Router de API de chat registrado con prefix: /api/chat
+2025-08-04 11:36:27,989 - INFO - \U0001f50c Registrando router WebSocket de mensajes...
+2025-08-04 11:36:27,990 - INFO - \u2705 Router WebSocket de mensajes registrado con prefix: /ws
+2025-08-04 11:36:27,990 - INFO - \U0001f4ac Registrando router WebSocket de chat...
+2025-08-04 11:36:28,028 - INFO - \u2705 Router WebSocket de chat registrado con prefix: /chat
+2025-08-04 11:36:28,028 - INFO - \U0001f4ac Registrando router API REST del chat...
+2025-08-04 11:36:28,045 - INFO - \u2705 Router API REST del chat registrado
+2025-08-04 11:36:28,045 - INFO - \U0001f4c1 Registrando archivos estáticos del chat...
+2025-08-04 11:36:28,045 - INFO - \u2705 Archivos estáticos del chat registrados en /static/chat
+2025-08-04 11:36:28,045 - INFO - \U0001f9ea Registrando endpoint directo para página de pruebas de chat...
+2025-08-04 11:36:28,046 - INFO - \u2705 Endpoints /chat-test y /mensajes-admin-public registrados correctamente
+2025-08-04 11:36:28,046 - INFO - \U0001f9ea Registrando endpoints de testing para mensajes...
+2025-08-04 11:36:28,046 - INFO - \u2705 Endpoints de testing para mensajes registrados correctamente
+2025-08-04 11:36:28,047 - INFO - \U0001f9ea Registrando endpoints públicos para testing de mensajes...
+2025-08-04 11:36:28,047 - INFO - \u2705 Endpoints públicos de mensajes registrados correctamente
+2025-08-04 11:36:28,047 - INFO - \U0001f9e9 Registrando router de widgets...
+2025-08-04 11:36:28,048 - INFO - \u2705 Router de widgets registrado con prefix: /widgets
+2025-08-04 11:36:28,048 - INFO - \U0001f4c4 Registrando router de páginas de administración...
+2025-08-04 11:36:28,048 - INFO - \u2705 Router de páginas de administración registrado con prefix: /admin
+2025-08-04 11:36:28,048 - INFO - \U0001f513 Registrando router simple de administración...
+2025-08-04 11:36:28,049 - INFO - \u2705 Router simple de administración registrado con prefix: /administracion
+2025-08-04 11:36:32,798 - WARNING - \u26a0\ufe0f Redis no disponible: Error 10061 connecting to localhost:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+2025-08-04 11:36:32,798 - INFO - \U0001f504 Usando caché en memoria como fallback
+2025-08-04 11:36:32,798 - INFO - \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:36:32,798 - INFO - \U0001f4ca Métricas disponibles en /metrics (desarrollo)
+2025-08-04 11:36:32,799 - INFO - \U0001f680 Inicializando optimizaciones SQL...
+2025-08-04 11:36:32,799 - INFO - \U0001f527 Creando índices de rendimiento...
+2025-08-04 11:36:32,799 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_fecha_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_fecha_estado ON movements(fecha, estado) INCLUDE (cantidad, observaciones)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,799 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_ot_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_ot_id_fecha ON movements(ot_id, fecha) INCLUDE (cantidad, tipo_movimiento)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,800 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_location_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_location_id_fecha ON movements(location_id, fecha DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,800 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_estado_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_estado_fecha ON ots(estado, fecha_inicio) INCLUDE (titulo, descripcion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,800 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_institution_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_institution_id_estado ON ots(institution_id, estado)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,801 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_users_email_active'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_users_email_active ON users(email, is_active) INCLUDE (username, role)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,801 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_locations_institution_id'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_locations_institution_id ON locations(institution_id) INCLUDE (nombre, tipo)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,801 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_artworks_artist_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_artworks_artist_id_estado ON artworks(artist_id, estado) INCLUDE (titulo, fecha_creacion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,802 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_auth_tokens_user_expiry'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_auth_tokens_user_expiry ON auth_tokens(user_id, expires_at) WHERE is_revoked = 0]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,802 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_activity_logs_user_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_activity_logs_user_fecha ON activity_logs(user_id, timestamp DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,802 - INFO - \U0001f4ca Índices procesados: 0/10
+2025-08-04 11:36:32,802 - INFO - \U0001f680 Optimizando consultas comunes...
+2025-08-04 11:36:32,802 - INFO - \u2705 4 consultas optimizadas preparadas
+2025-08-04 11:36:32,803 - INFO - \u26a1 Configuraciones de conexión optimizadas
+2025-08-04 11:36:32,804 - INFO - \U0001f4c8 Actualizando estadísticas de tablas...
+2025-08-04 11:36:32,807 - INFO - \u2705 Estadísticas actualizadas para: movements
+2025-08-04 11:36:32,807 - WARNING - \u26a0\ufe0f Error actualizando stats de ots: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'ots' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS ots WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,808 - WARNING - \u26a0\ufe0f Error actualizando stats de users: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'users' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS users WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,810 - INFO - \u2705 Estadísticas actualizadas para: locations
+2025-08-04 11:36:32,811 - INFO - \u2705 Estadísticas actualizadas para: institutions
+2025-08-04 11:36:32,813 - INFO - \u2705 Estadísticas actualizadas para: artworks
+2025-08-04 11:36:32,814 - WARNING - \u26a0\ufe0f Error actualizando stats de auth_tokens: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'auth_tokens' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS auth_tokens WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,814 - WARNING - \u26a0\ufe0f Error actualizando stats de activity_logs: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'activity_logs' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS activity_logs WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:36:32,815 - INFO - \U0001f50d Analizando consultas lentas...
+2025-08-04 11:36:32,825 - INFO - \u2705 No se encontraron consultas significativamente lentas
+2025-08-04 11:36:32,827 - INFO - \u2705 Optimizaciones SQL completadas
+2025-08-04 11:36:32,827 - INFO - \u2705 Health check registrado: database
+2025-08-04 11:36:32,827 - INFO - \u2705 Health check registrado: cache
+2025-08-04 11:36:32,827 - INFO - \u2705 Health check registrado: system_resources
+2025-08-04 11:36:32,827 - INFO - \u2705 Health check registrado: application_metrics
+2025-08-04 11:36:32,827 - INFO - \U0001f50d Health checks inicializados
+2025-08-04 11:36:32,827 - INFO - \U0001f4be Sistema de backup inicializado
+2025-08-04 11:36:32,827 - INFO - \U0001f515 Alerta omitida (dev): Sistema iniciado correctamente
+2025-08-04 11:36:32,827 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-08-04 11:36:32,827 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-08-04 11:36:32,827 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-08-04 11:36:32,828 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-08-04 11:36:32,828 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-08-04 11:36:32,828 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-08-04 11:36:32,828 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-08-04 11:36:32,828 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-08-04 11:36:32,828 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-08-04 11:36:32,828 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-08-04 11:36:32,828 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-08-04 11:36:32,829 - INFO - \u2705 \U0001f680 Sistema de cache inicializado
+2025-08-04 11:36:32,829 - INFO - \u2705 \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:36:32,829 - INFO - \u2705 \u26a1 Optimizaciones SQL aplicadas
+2025-08-04 11:36:32,829 - INFO - \u2705 \U0001f50d Health checks avanzados
+2025-08-04 11:36:32,829 - INFO - \u2705 \U0001f4be Sistema de backup configurado
+2025-08-04 11:36:32,829 - INFO - ======================================================
+
+2025-08-04 11:36:32,829 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-08-04 11:37:22,952 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-08-04 11:37:22,952 - INFO - \U0001f4be Limpieza de recursos completada
+2025-08-04 11:37:26,542 - INFO - \U0001f515 Sistema de notificaciones deshabilitado (desarrollo)
+2025-08-04 11:37:26,545 - INFO - \U0001f4be Sistema de backup deshabilitado (desarrollo)
+2025-08-04 11:37:26,547 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-08-04 11:37:26,548 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-08-04 11:37:26,548 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-08-04 11:37:26,626 - INFO - \U0001f514 Registrando router de mensajes...
+2025-08-04 11:37:26,633 - INFO - \u2705 Router de mensajes registrado con prefix: /api/mensajes
+2025-08-04 11:37:26,634 - INFO - \U0001f4cb 12 rutas de mensajes registradas
+2025-08-04 11:37:26,634 - INFO - \U0001f6e0\ufe0f Registrando router de administración de mensajes...
+2025-08-04 11:37:26,641 - INFO - \u2705 Router de administración de mensajes registrado con prefix: /admin/api/mensajes
+2025-08-04 11:37:26,641 - INFO - \U0001f4c1 Registrando router de archivos estáticos de mensajes...
+2025-08-04 11:37:26,642 - INFO - \u2705 Router de estáticos de mensajes registrado con prefix: /mensajes/static
+2025-08-04 11:37:26,642 - INFO - \U0001f4ac Registrando router de API de chat...
+2025-08-04 11:37:26,646 - INFO - \u2705 Router de API de chat registrado con prefix: /api/chat
+2025-08-04 11:37:26,646 - INFO - \U0001f50c Registrando router WebSocket de mensajes...
+2025-08-04 11:37:26,647 - INFO - \u2705 Router WebSocket de mensajes registrado con prefix: /ws
+2025-08-04 11:37:26,647 - INFO - \U0001f4ac Registrando router WebSocket de chat...
+2025-08-04 11:37:26,660 - INFO - \u2705 Router WebSocket de chat registrado con prefix: /chat
+2025-08-04 11:37:26,661 - INFO - \U0001f4ac Registrando router API REST del chat...
+2025-08-04 11:37:26,666 - INFO - \u2705 Router API REST del chat registrado
+2025-08-04 11:37:26,667 - INFO - \U0001f4c1 Registrando archivos estáticos del chat...
+2025-08-04 11:37:26,667 - INFO - \u2705 Archivos estáticos del chat registrados en /static/chat
+2025-08-04 11:37:26,667 - INFO - \U0001f9ea Registrando endpoint directo para página de pruebas de chat...
+2025-08-04 11:37:26,668 - INFO - \u2705 Endpoints /chat-test y /mensajes-admin-public registrados correctamente
+2025-08-04 11:37:26,668 - INFO - \U0001f9ea Registrando endpoints de testing para mensajes...
+2025-08-04 11:37:26,668 - INFO - \u2705 Endpoints de testing para mensajes registrados correctamente
+2025-08-04 11:37:26,670 - INFO - \U0001f9ea Registrando endpoints públicos para testing de mensajes...
+2025-08-04 11:37:26,670 - INFO - \u2705 Endpoints públicos de mensajes registrados correctamente
+2025-08-04 11:37:26,670 - INFO - \U0001f9e9 Registrando router de widgets...
+2025-08-04 11:37:26,671 - INFO - \u2705 Router de widgets registrado con prefix: /widgets
+2025-08-04 11:37:26,671 - INFO - \U0001f4c4 Registrando router de páginas de administración...
+2025-08-04 11:37:26,671 - INFO - \u2705 Router de páginas de administración registrado con prefix: /admin
+2025-08-04 11:37:26,671 - INFO - \U0001f513 Registrando router simple de administración...
+2025-08-04 11:37:26,672 - INFO - \u2705 Router simple de administración registrado con prefix: /administracion
+2025-08-04 11:37:31,471 - WARNING - \u26a0\ufe0f Redis no disponible: Error 10061 connecting to localhost:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+2025-08-04 11:37:31,471 - INFO - \U0001f504 Usando caché en memoria como fallback
+2025-08-04 11:37:31,471 - INFO - \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:37:31,471 - INFO - \U0001f4ca Métricas disponibles en /metrics (desarrollo)
+2025-08-04 11:37:31,471 - INFO - \U0001f680 Inicializando optimizaciones SQL...
+2025-08-04 11:37:31,471 - INFO - \U0001f527 Creando índices de rendimiento...
+2025-08-04 11:37:31,472 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_fecha_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_fecha_estado ON movements(fecha, estado) INCLUDE (cantidad, observaciones)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,472 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_ot_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_ot_id_fecha ON movements(ot_id, fecha) INCLUDE (cantidad, tipo_movimiento)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,473 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_location_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_location_id_fecha ON movements(location_id, fecha DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,473 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_estado_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_estado_fecha ON ots(estado, fecha_inicio) INCLUDE (titulo, descripcion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,474 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_institution_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_institution_id_estado ON ots(institution_id, estado)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,474 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_users_email_active'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_users_email_active ON users(email, is_active) INCLUDE (username, role)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,475 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_locations_institution_id'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_locations_institution_id ON locations(institution_id) INCLUDE (nombre, tipo)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,475 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_artworks_artist_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_artworks_artist_id_estado ON artworks(artist_id, estado) INCLUDE (titulo, fecha_creacion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,475 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_auth_tokens_user_expiry'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_auth_tokens_user_expiry ON auth_tokens(user_id, expires_at) WHERE is_revoked = 0]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,476 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_activity_logs_user_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_activity_logs_user_fecha ON activity_logs(user_id, timestamp DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,476 - INFO - \U0001f4ca Índices procesados: 0/10
+2025-08-04 11:37:31,476 - INFO - \U0001f680 Optimizando consultas comunes...
+2025-08-04 11:37:31,476 - INFO - \u2705 4 consultas optimizadas preparadas
+2025-08-04 11:37:31,477 - INFO - \u26a1 Configuraciones de conexión optimizadas
+2025-08-04 11:37:31,477 - INFO - \U0001f4c8 Actualizando estadísticas de tablas...
+2025-08-04 11:37:31,490 - INFO - \u2705 Estadísticas actualizadas para: movements
+2025-08-04 11:37:31,490 - WARNING - \u26a0\ufe0f Error actualizando stats de ots: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'ots' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS ots WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,491 - WARNING - \u26a0\ufe0f Error actualizando stats de users: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'users' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS users WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,493 - INFO - \u2705 Estadísticas actualizadas para: locations
+2025-08-04 11:37:31,494 - INFO - \u2705 Estadísticas actualizadas para: institutions
+2025-08-04 11:37:31,496 - INFO - \u2705 Estadísticas actualizadas para: artworks
+2025-08-04 11:37:31,497 - WARNING - \u26a0\ufe0f Error actualizando stats de auth_tokens: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'auth_tokens' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS auth_tokens WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,497 - WARNING - \u26a0\ufe0f Error actualizando stats de activity_logs: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'activity_logs' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS activity_logs WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:31,497 - INFO - \U0001f50d Analizando consultas lentas...
+2025-08-04 11:37:31,507 - INFO - \u2705 No se encontraron consultas significativamente lentas
+2025-08-04 11:37:31,508 - INFO - \u2705 Optimizaciones SQL completadas
+2025-08-04 11:37:31,508 - INFO - \u2705 Health check registrado: database
+2025-08-04 11:37:31,508 - INFO - \u2705 Health check registrado: cache
+2025-08-04 11:37:31,508 - INFO - \u2705 Health check registrado: system_resources
+2025-08-04 11:37:31,508 - INFO - \u2705 Health check registrado: application_metrics
+2025-08-04 11:37:31,508 - INFO - \U0001f50d Health checks inicializados
+2025-08-04 11:37:31,508 - INFO - \U0001f4be Sistema de backup inicializado
+2025-08-04 11:37:31,508 - INFO - \U0001f515 Alerta omitida (dev): Sistema iniciado correctamente
+2025-08-04 11:37:31,508 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-08-04 11:37:31,508 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-08-04 11:37:31,510 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-08-04 11:37:31,510 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-08-04 11:37:31,510 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-08-04 11:37:31,510 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-08-04 11:37:31,510 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-08-04 11:37:31,510 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-08-04 11:37:31,510 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-08-04 11:37:31,510 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-08-04 11:37:31,510 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-08-04 11:37:31,510 - INFO - \u2705 \U0001f680 Sistema de cache inicializado
+2025-08-04 11:37:31,511 - INFO - \u2705 \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:37:31,511 - INFO - \u2705 \u26a1 Optimizaciones SQL aplicadas
+2025-08-04 11:37:31,511 - INFO - \u2705 \U0001f50d Health checks avanzados
+2025-08-04 11:37:31,511 - INFO - \u2705 \U0001f4be Sistema de backup configurado
+2025-08-04 11:37:31,511 - INFO - ======================================================
+
+2025-08-04 11:37:31,511 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-08-04 11:37:31,512 - INFO - \U0001f6d1 Cerrando aplicación FastAPI
+2025-08-04 11:37:31,513 - INFO - \U0001f4be Limpieza de recursos completada
+2025-08-04 11:37:35,324 - INFO - \U0001f515 Sistema de notificaciones deshabilitado (desarrollo)
+2025-08-04 11:37:35,327 - INFO - \U0001f4be Sistema de backup deshabilitado (desarrollo)
+2025-08-04 11:37:35,355 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.stock.model_stock_movimientos: No module named 'sql_app.Services.app_stock.stock.model_stock_movimientos'
+2025-08-04 11:37:35,355 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.categorias.model_categorias: No module named 'sql_app.Services.app_stock.categorias'
+2025-08-04 11:37:35,356 - WARNING - No se pudo importar el modelo sql_app.Services.app_stock.proveedores.model_proveedores: No module named 'sql_app.Services.app_stock.proveedores'
+2025-08-04 11:37:35,584 - INFO - \U0001f514 Registrando router de mensajes...
+2025-08-04 11:37:35,589 - INFO - \u2705 Router de mensajes registrado con prefix: /api/mensajes
+2025-08-04 11:37:35,589 - INFO - \U0001f4cb 12 rutas de mensajes registradas
+2025-08-04 11:37:35,590 - INFO - \U0001f6e0\ufe0f Registrando router de administración de mensajes...
+2025-08-04 11:37:35,596 - INFO - \u2705 Router de administración de mensajes registrado con prefix: /admin/api/mensajes
+2025-08-04 11:37:35,597 - INFO - \U0001f4c1 Registrando router de archivos estáticos de mensajes...
+2025-08-04 11:37:35,597 - INFO - \u2705 Router de estáticos de mensajes registrado con prefix: /mensajes/static
+2025-08-04 11:37:35,598 - INFO - \U0001f4ac Registrando router de API de chat...
+2025-08-04 11:37:35,600 - INFO - \u2705 Router de API de chat registrado con prefix: /api/chat
+2025-08-04 11:37:35,600 - INFO - \U0001f50c Registrando router WebSocket de mensajes...
+2025-08-04 11:37:35,601 - INFO - \u2705 Router WebSocket de mensajes registrado con prefix: /ws
+2025-08-04 11:37:35,601 - INFO - \U0001f4ac Registrando router WebSocket de chat...
+2025-08-04 11:37:35,614 - INFO - \u2705 Router WebSocket de chat registrado con prefix: /chat
+2025-08-04 11:37:35,614 - INFO - \U0001f4ac Registrando router API REST del chat...
+2025-08-04 11:37:35,619 - INFO - \u2705 Router API REST del chat registrado
+2025-08-04 11:37:35,619 - INFO - \U0001f4c1 Registrando archivos estáticos del chat...
+2025-08-04 11:37:35,620 - INFO - \u2705 Archivos estáticos del chat registrados en /static/chat
+2025-08-04 11:37:35,620 - INFO - \U0001f9ea Registrando endpoint directo para página de pruebas de chat...
+2025-08-04 11:37:35,621 - INFO - \u2705 Endpoints /chat-test y /mensajes-admin-public registrados correctamente
+2025-08-04 11:37:35,621 - INFO - \U0001f9ea Registrando endpoints de testing para mensajes...
+2025-08-04 11:37:35,621 - INFO - \u2705 Endpoints de testing para mensajes registrados correctamente
+2025-08-04 11:37:35,621 - INFO - \U0001f9ea Registrando endpoints públicos para testing de mensajes...
+2025-08-04 11:37:35,622 - INFO - \u2705 Endpoints públicos de mensajes registrados correctamente
+2025-08-04 11:37:35,622 - INFO - \U0001f9e9 Registrando router de widgets...
+2025-08-04 11:37:35,623 - INFO - \u2705 Router de widgets registrado con prefix: /widgets
+2025-08-04 11:37:35,623 - INFO - \U0001f4c4 Registrando router de páginas de administración...
+2025-08-04 11:37:35,623 - INFO - \u2705 Router de páginas de administración registrado con prefix: /admin
+2025-08-04 11:37:35,624 - INFO - \U0001f513 Registrando router simple de administración...
+2025-08-04 11:37:35,624 - INFO - \u2705 Router simple de administración registrado con prefix: /administracion
+2025-08-04 11:37:40,361 - WARNING - \u26a0\ufe0f Redis no disponible: Error 10061 connecting to localhost:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+2025-08-04 11:37:40,361 - INFO - \U0001f504 Usando caché en memoria como fallback
+2025-08-04 11:37:40,361 - INFO - \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:37:40,361 - INFO - \U0001f4ca Métricas disponibles en /metrics (desarrollo)
+2025-08-04 11:37:40,361 - INFO - \U0001f680 Inicializando optimizaciones SQL...
+2025-08-04 11:37:40,361 - INFO - \U0001f527 Creando índices de rendimiento...
+2025-08-04 11:37:40,362 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_fecha_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_fecha_estado ON movements(fecha, estado) INCLUDE (cantidad, observaciones)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,363 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_ot_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_ot_id_fecha ON movements(ot_id, fecha) INCLUDE (cantidad, tipo_movimiento)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,363 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_movements_location_id_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_movements_location_id_fecha ON movements(location_id, fecha DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,364 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_estado_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_estado_fecha ON ots(estado, fecha_inicio) INCLUDE (titulo, descripcion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,364 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_ots_institution_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_ots_institution_id_estado ON ots(institution_id, estado)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,364 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_users_email_active'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_users_email_active ON users(email, is_active) INCLUDE (username, role)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,365 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_locations_institution_id'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_locations_institution_id ON locations(institution_id) INCLUDE (nombre, tipo)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,365 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_artworks_artist_id_estado'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_artworks_artist_id_estado ON artworks(artist_id, estado) INCLUDE (titulo, fecha_creacion)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,365 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_auth_tokens_user_expiry'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_auth_tokens_user_expiry ON auth_tokens(user_id, expires_at) WHERE is_revoked = 0]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,366 - WARNING - \u26a0\ufe0f Error creando índice: (pyodbc.ProgrammingError) ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de la palabra clave 'IF'. (156) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Sintaxis incorrecta cerca de 'IX_activity_logs_user_fecha'. (102)")
+[SQL: CREATE NONCLUSTERED INDEX IF NOT EXISTS IX_activity_logs_user_fecha ON activity_logs(user_id, timestamp DESC)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,366 - INFO - \U0001f4ca Índices procesados: 0/10
+2025-08-04 11:37:40,366 - INFO - \U0001f680 Optimizando consultas comunes...
+2025-08-04 11:37:40,366 - INFO - \u2705 4 consultas optimizadas preparadas
+2025-08-04 11:37:40,367 - INFO - \u26a1 Configuraciones de conexión optimizadas
+2025-08-04 11:37:40,367 - INFO - \U0001f4c8 Actualizando estadísticas de tablas...
+2025-08-04 11:37:40,369 - INFO - \u2705 Estadísticas actualizadas para: movements
+2025-08-04 11:37:40,370 - WARNING - \u26a0\ufe0f Error actualizando stats de ots: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'ots' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS ots WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,371 - WARNING - \u26a0\ufe0f Error actualizando stats de users: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'users' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS users WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,372 - INFO - \u2705 Estadísticas actualizadas para: locations
+2025-08-04 11:37:40,374 - INFO - \u2705 Estadísticas actualizadas para: institutions
+2025-08-04 11:37:40,375 - INFO - \u2705 Estadísticas actualizadas para: artworks
+2025-08-04 11:37:40,376 - WARNING - \u26a0\ufe0f Error actualizando stats de auth_tokens: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'auth_tokens' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS auth_tokens WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,377 - WARNING - \u26a0\ufe0f Error actualizando stats de activity_logs: (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]La tabla 'activity_logs' no existe. (2706) (SQLExecDirectW)")
+[SQL: UPDATE STATISTICS activity_logs WITH FULLSCAN]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-08-04 11:37:40,377 - INFO - \U0001f50d Analizando consultas lentas...
+2025-08-04 11:37:40,388 - INFO - \u2705 No se encontraron consultas significativamente lentas
+2025-08-04 11:37:40,389 - INFO - \u2705 Optimizaciones SQL completadas
+2025-08-04 11:37:40,390 - INFO - \u2705 Health check registrado: database
+2025-08-04 11:37:40,390 - INFO - \u2705 Health check registrado: cache
+2025-08-04 11:37:40,390 - INFO - \u2705 Health check registrado: system_resources
+2025-08-04 11:37:40,390 - INFO - \u2705 Health check registrado: application_metrics
+2025-08-04 11:37:40,390 - INFO - \U0001f50d Health checks inicializados
+2025-08-04 11:37:40,390 - INFO - \U0001f4be Sistema de backup inicializado
+2025-08-04 11:37:40,390 - INFO - \U0001f515 Alerta omitida (dev): Sistema iniciado correctamente
+2025-08-04 11:37:40,390 - INFO - 
+================= CHECKLIST DE INICIO =================
+2025-08-04 11:37:40,390 - INFO - \u2705 \U0001f7e2 .env cargado correctamente
+2025-08-04 11:37:40,390 - INFO - \u2705 \U0001f7e2 Configuración de base de datos cargada
+2025-08-04 11:37:40,390 - INFO - \u2705 \U0001f7e2 Configuración de correo cargada correctamente
+2025-08-04 11:37:40,390 - INFO - \u2705 \U0001f7e2 Modelos importados
+2025-08-04 11:37:40,391 - INFO - \u2705 \U0001f7e2 Tablas creadas/verificadas
+2025-08-04 11:37:40,391 - INFO - \u2705 \U0001f7e2 Directorios verificados
+2025-08-04 11:37:40,391 - INFO - \u2705 \U0001f7e2 Sistema de stock configurado
+2025-08-04 11:37:40,391 - INFO - \u2705 \U0001f7e2 Middlewares y rutas registradas
+2025-08-04 11:37:40,391 - INFO - \u2705 \U0001f7e2 Logging inicializado
+2025-08-04 11:37:40,391 - INFO - \u2705 \U0001f7e2 Migraciones Alembic aplicadas
+2025-08-04 11:37:40,391 - INFO - \u2705 \U0001f680 Sistema de cache inicializado
+2025-08-04 11:37:40,392 - INFO - \u2705 \U0001f4ca Sistema de métricas inicializado
+2025-08-04 11:37:40,392 - INFO - \u2705 \u26a1 Optimizaciones SQL aplicadas
+2025-08-04 11:37:40,392 - INFO - \u2705 \U0001f50d Health checks avanzados
+2025-08-04 11:37:40,392 - INFO - \u2705 \U0001f4be Sistema de backup configurado
+2025-08-04 11:37:40,392 - INFO - ======================================================
+
+2025-08-04 11:37:40,392 - INFO - \U0001f680 Iniciando aplicación FastAPI
+2025-08-04 11:38:07,950 - INFO - Verificando ruta: /generar
+2025-08-04 11:38:07,950 - INFO - Ruta /generar no requiere protección
+2025-08-04 11:38:07,950 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/generar?id=8907b279-c675-4449-b969-8d2d212d67f1&vscodeBrowserReqId=1754318287929
+2025-08-04 11:38:07,952 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.102.3 Chrome/134.0.6998.205 Electron/35.6.0 Safari/537.36', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'navigate', 'sec-fetch-dest': 'iframe', 'sec-fetch-storage-access': 'active', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es'})
+2025-08-04 11:38:07,952 - DEBUG - \U0001f4cd Cookies: {}
+2025-08-04 11:38:07,952 - DEBUG - \u274c Encabezado Authorization no presente
+2025-08-04 11:38:07,952 - DEBUG - \u274c Cookie access_token no presente
+2025-08-04 11:38:07,957 - DEBUG - \U0001f4e4 Respuesta: 307 None
+2025-08-04 11:38:07,959 - INFO - Verificando ruta: /generar/
+2025-08-04 11:38:07,959 - INFO - Ruta /generar/ no requiere protección
+2025-08-04 11:38:07,959 - DEBUG - \U0001f50d Middleware procesando: GET http://127.0.0.1:8000/generar/?id=8907b279-c675-4449-b969-8d2d212d67f1&vscodeBrowserReqId=1754318287929
+2025-08-04 11:38:07,959 - DEBUG - \U0001f4cd Encabezados: Headers({'host': '127.0.0.1:8000', 'connection': 'keep-alive', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.102.3 Chrome/134.0.6998.205 Electron/35.6.0 Safari/537.36', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'navigate', 'sec-fetch-dest': 'iframe', 'sec-fetch-storage-access': 'active', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'es'})
+2025-08-04 11:38:07,959 - DEBUG - \U0001f4cd Cookies: {}
+2025-08-04 11:38:07,959 - DEBUG - \u274c Encabezado Authorization no presente
+2025-08-04 11:38:07,960 - DEBUG - \u274c Cookie access_token no presente
+2025-08-04 11:38:07,962 - INFO - Verificando autenticación para: /generar/
+2025-08-04 11:38:07,962 - WARNING - No se encontró token en la petición
+2025-08-04 11:38:07,964 - DEBUG - \U0001f4e4 Respuesta: 303 application/json
