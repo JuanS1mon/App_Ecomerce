@@ -1,0 +1,122 @@
+{
+  "service_name": "sistema_visual",
+  "description": "Sistema generado con Editor Visual",
+  "tables": [
+    {
+      "name": "usuarios",
+      "description": "Módulo usuarios generado desde Editor Visual",
+      "fields": [
+        {
+          "name": "nombre",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "email",
+          "field_type": "email",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "activo",
+          "field_type": "boolean",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "fecha_registro",
+          "field_type": "datetime",
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    {
+      "name": "productos",
+      "description": "Módulo productos generado desde Editor Visual",
+      "fields": [
+        {
+          "name": "nombre",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "precio",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "disponible",
+          "field_type": "boolean",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "categoria",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    {
+      "name": "pedidos",
+      "description": "Módulo pedidos generado desde Editor Visual",
+      "fields": [
+        {
+          "name": "usuario_id",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "producto_id",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "cantidad",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "fecha_pedido",
+          "field_type": "datetime",
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from_table": "usuarios",
+      "to_table": "pedidos",
+      "relationship_type": "many-to-many",
+      "from_field": "id",
+      "to_field": "usuario_id",
+      "relationship_name": "usuarios_to_pedidos",
+      "back_populates": null,
+      "cascade_delete": false,
+      "lazy_loading": "select"
+    },
+    {
+      "from_table": "pedidos",
+      "to_table": "productos",
+      "relationship_type": "many-to-many",
+      "from_field": "id",
+      "to_field": "producto_id",
+      "relationship_name": "pedidos_to_productos",
+      "back_populates": null,
+      "cascade_delete": false,
+      "lazy_loading": "select"
+    }
+  ],
+  "generate_crud_for_all": true,
+  "generate_relationship_endpoints": true
+}

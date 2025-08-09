@@ -93,6 +93,53 @@ async def test_widgets_page():
     from fastapi.responses import FileResponse
     return FileResponse("test_widgets.html")
 
+# Endpoint para el Editor Visual Avanzado - TEST DEBUG
+@app.get("/editor-visual-test-debug")
+async def editor_visual_test_debug():
+    """Test debug para editor visual"""
+    import os
+    from fastapi.responses import HTMLResponse
+    
+    current_dir = os.getcwd()
+    file_path = os.path.join(current_dir, "static", "html", "editor_visual.html")
+    file_exists = os.path.exists(file_path)
+    
+    return HTMLResponse(f"""
+    <html><body>
+    <h1>Debug Editor Visual</h1>
+    <p>Directorio actual: {current_dir}</p>
+    <p>Ruta del archivo: {file_path}</p>
+    <p>¿Archivo existe?: {file_exists}</p>
+    <p>Listado de static/html/:</p>
+    <ul>
+    """)
+
+# Endpoint para el Editor Visual Avanzado - NUEVO ENDPOINT SIN CONFLICTOS
+@app.get("/editor-visual-nuevo")
+async def editor_visual_nuevo():
+    """Editor Visual Avanzado - Diseñador de esquemas de base de datos"""
+    try:
+        with open("static/html/editor_visual.html", "r", encoding="utf-8") as f:
+            from fastapi.responses import HTMLResponse
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        from fastapi.responses import HTMLResponse
+        return HTMLResponse("""
+        <html><body>
+        <h1>Editor Visual No Disponible</h1>
+        <p>Archivo no encontrado: static/html/editor_visual.html</p>
+        </body></html>
+        """, status_code=404)
+
+# Endpoint para el Editor Visual Avanzado - COMENTADO porque está en router
+# @app.get("/editor-visual")
+# async def editor_visual_page():
+#     """Editor Visual Avanzado - Diseñador de esquemas de base de datos"""
+#     from fastapi.responses import FileResponse
+#     import os
+#     file_path = os.path.join(os.getcwd(), "static", "html", "editor_visual.html")
+#     return FileResponse(file_path)
+
 # Endpoint para listar rutas registradas
 @app.get("/debug/routes")
 async def debug_routes():
@@ -159,6 +206,7 @@ async def routes_info():
             "administracion_mensajes": "http://127.0.0.1:8000/mensajes-admin-public",
             "chat_test": "http://127.0.0.1:8000/chat-test",
             "widgets_demo": "http://127.0.0.1:8000/widgets-demo",
+            "editor_visual": "http://127.0.0.1:8000/editor-visual",
             "documentacion": "http://127.0.0.1:8000/docs",
             "home": "http://127.0.0.1:8000/"
         },

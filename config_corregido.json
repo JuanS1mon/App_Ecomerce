@@ -1,0 +1,133 @@
+{
+  "service_name": "sistema_visual_multiple",
+  "description": "Sistema multi-tabla generado desde Editor Visual",
+  "tables": [
+    {
+      "name": "usuarios12",
+      "description": "Módulo usuarios generado desde Editor Visual",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        {
+          "name": "nombre",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "email",
+          "field_type": "email",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "activo",
+          "field_type": "boolean",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "fecha_registro",
+          "field_type": "datetime",
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    {
+      "name": "productos123",
+      "description": "Módulo productos generado desde Editor Visual",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        {
+          "name": "nombre",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "precio",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "disponible",
+          "field_type": "boolean",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "categoria",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    {
+      "name": "pedidos123",
+      "description": "Módulo pedidos generado desde Editor Visual",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        {
+          "name": "usuario_id",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "producto_id",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "cantidad",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "fecha_pedido",
+          "field_type": "datetime",
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from_table": "pedidos123",
+      "from_field": "usuario_id",
+      "to_table": "usuarios12",
+      "to_field": "id",
+      "relationship_type": "many_to_one"
+    },
+    {
+      "from_table": "pedidos123",
+      "from_field": "producto_id",
+      "to_table": "productos123",
+      "to_field": "id",
+      "relationship_type": "many_to_one"
+    }
+  ],
+  "generate_crud_for_all": true,
+  "generated_by": "Editor Visual",
+  "timestamp": "2025-08-07T22:38:23.949Z"
+}

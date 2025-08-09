@@ -91,7 +91,7 @@ lxml==4.9.3
 # =============================
 # CLIENTE HTTP ADICIONAL
 # =============================
-urllib3==2.1.0
+# urllib3==2.1.0  # Comentado por conflicto con versión principal
 
 # =============================
 # UTILIDADES ASÍNCRONAS

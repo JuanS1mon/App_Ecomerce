@@ -64,6 +64,13 @@ const navigationItems = [
         icon: 'fa-code'
     },
     { 
+        path: '/editor-visual', 
+        title: 'Editor Visual', 
+        visible: true, 
+        parent: '/admin',
+        icon: 'fa-magic'
+    },
+    { 
         path: '/admin/perfil', 
         title: 'Perfil de Usuario', 
         visible: false,
@@ -629,6 +636,7 @@ function detectNavigationPath(currentPath) {
         '/configdb': 'Configuración DB',
         '/migraciones/admin_migraciones': 'Migraciones',
         '/generar': 'Generar API',
+        '/editor-visual': 'Editor Visual',
         '/admin/perfil': 'Perfil de Usuario',
         '/docs': 'Documentación API'
     };
@@ -639,6 +647,7 @@ function detectNavigationPath(currentPath) {
         '/configdb': '/admin',
         '/migraciones/admin_migraciones': '/admin',
         '/generar': '/admin',
+        '/editor-visual': '/admin',
         '/admin/perfil': '/admin'
     };
     
@@ -725,6 +734,8 @@ function detectNavigationPath(currentPath) {
                 pageTitle = "Migraciones";
             } else if (currentPath.includes('/generar')) {
                 pageTitle = "Generar API";
+            } else if (currentPath.includes('/editor-visual')) {
+                pageTitle = "Editor Visual";
             }
             
             navItems.push({
@@ -778,6 +789,7 @@ function getPageNavConfig() {
                 case 'Configuración DB': path = '/configdb'; break;
                 case 'Migraciones': path = '/migraciones/admin_migraciones'; break;
                 case 'Generar API': path = '/generar'; break;
+                case 'Editor Visual': path = '/editor-visual'; break;
                 default: path = '#'; break;
             }
             

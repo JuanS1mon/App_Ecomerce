@@ -1,0 +1,125 @@
+{
+  "service_name": "sistema_conciliacion_backoffice",
+  "description": "Sistema para conciliación de cuentas, control de pagos, facturas y rentabilidad",
+  "tables": [
+    {
+      "name": "facturas",
+      "description": "Registro de facturas emitidas",
+      "fields": [
+        { "name": "numero_factura", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "fecha", "field_type": "datetime", "primary_key": false, "auto_increment": false },
+        { "name": "sucursal", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "cliente", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "importe", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "tipo_cambio", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "moneda", "field_type": "string", "primary_key": false, "auto_increment": false }
+      ]
+    },
+    {
+      "name": "pagos",
+      "description": "Pagos realizados por clientes",
+      "fields": [
+        { "name": "numero_comprobante", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "fecha_pago", "field_type": "datetime", "primary_key": false, "auto_increment": false },
+        { "name": "cliente", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "importe", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "banco", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "dni_cuit_origen", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "moneda", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "metodo_pago", "field_type": "string", "primary_key": false, "auto_increment": false }
+      ]
+    },
+    {
+      "name": "deudas",
+      "description": "Deudas generadas por facturas no pagadas",
+      "fields": [
+        { "name": "factura_id", "field_type": "integer", "primary_key": false, "auto_increment": false },
+        { "name": "cliente", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "importe_deuda", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "fecha_deuda", "field_type": "datetime", "primary_key": false, "auto_increment": false },
+        { "name": "moneda", "field_type": "string", "primary_key": false, "auto_increment": false }
+      ]
+    },
+    {
+      "name": "cotizacion_dolar",
+      "description": "Historial de cotización del dólar",
+      "fields": [
+        { "name": "fecha", "field_type": "datetime", "primary_key": false, "auto_increment": false },
+        { "name": "valor_oficial", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "valor_blue", "field_type": "string", "primary_key": false, "auto_increment": false }
+      ]
+    },
+    {
+      "name": "rel_pagos_facturas",
+      "description": "Relación entre pagos y facturas (puede ser parcial o total)",
+      "fields": [
+        { "name": "pago_id", "field_type": "integer", "primary_key": false, "auto_increment": false },
+        { "name": "factura_id", "field_type": "integer", "primary_key": false, "auto_increment": false },
+        { "name": "monto_aplicado", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "pago_completo", "field_type": "boolean", "primary_key": false, "auto_increment": false }
+      ]
+    },
+    {
+      "name": "rentabilidad",
+      "description": "Informe de rentabilidad por factura o sucursal",
+      "fields": [
+        { "name": "factura_id", "field_type": "integer", "primary_key": false, "auto_increment": false },
+        { "name": "sucursal", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "facturado_loc", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "costo_loc", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "rentabilidad_loc", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "facturado_usd", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "costo_usd", "field_type": "string", "primary_key": false, "auto_increment": false },
+        { "name": "rentabilidad_usd", "field_type": "string", "primary_key": false, "auto_increment": false }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from_table": "pagos",
+      "to_table": "rel_pagos_facturas",
+      "relationship_type": "one-to-many",
+      "from_field": "id",
+      "to_field": "pago_id",
+      "relationship_name": "pagos_to_rel_pagos_facturas",
+      "back_populates": null,
+      "cascade_delete": false,
+      "lazy_loading": "select"
+    },
+    {
+      "from_table": "facturas",
+      "to_table": "rel_pagos_facturas",
+      "relationship_type": "one-to-many",
+      "from_field": "id",
+      "to_field": "factura_id",
+      "relationship_name": "facturas_to_rel_pagos_facturas",
+      "back_populates": null,
+      "cascade_delete": false,
+      "lazy_loading": "select"
+    },
+    {
+      "from_table": "facturas",
+      "to_table": "deudas",
+      "relationship_type": "one-to-one",
+      "from_field": "id",
+      "to_field": "factura_id",
+      "relationship_name": "facturas_to_deudas",
+      "back_populates": null,
+      "cascade_delete": false,
+      "lazy_loading": "select"
+    },
+    {
+      "from_table": "facturas",
+      "to_table": "rentabilidad",
+      "relationship_type": "one-to-one",
+      "from_field": "id",
+      "to_field": "factura_id",
+      "relationship_name": "facturas_to_rentabilidad",
+      "back_populates": null,
+      "cascade_delete": false,
+      "lazy_loading": "select"
+    }
+  ],
+  "generate_crud_for_all": true,
+  "generate_relationship_endpoints": true
+}

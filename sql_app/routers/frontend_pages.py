@@ -69,3 +69,36 @@ async def test_auth_complete():
         <p>La página de test completo no está disponible</p>
         </body></html>
         """, status_code=404)
+
+@router.get("/editor-visual", response_class=HTMLResponse)
+@router.get("/editor-visual.html", response_class=HTMLResponse)
+async def editor_visual():
+    """Editor Visual Avanzado - Fase 3"""
+    try:
+        import os
+        # Usar ruta absoluta completa
+        base_dir = r"C:\Users\PCJuan\Desktop\sql_app"
+        file_path = os.path.join(base_dir, "static", "html", "editor_visual.html")
+        
+        if not os.path.exists(file_path):
+            return HTMLResponse(f"""
+            <html><body>
+            <h1>Error: Archivo no encontrado</h1>
+            <p>Ruta buscada: {file_path}</p>
+            <p>Directorio actual: {os.getcwd()}</p>
+            <p>Archivo existe: {os.path.exists(file_path)}</p>
+            </body></html>
+            """, status_code=404)
+            
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            return HTMLResponse(content=content)
+            
+    except Exception as e:
+        return HTMLResponse(f"""
+        <html><body>
+        <h1>Error al cargar Editor Visual</h1>
+        <p>Error: {str(e)}</p>
+        <p>Directorio actual: {os.getcwd()}</p>
+        </body></html>
+        """, status_code=500)

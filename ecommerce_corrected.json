@@ -1,0 +1,80 @@
+{
+  "service_name": "ecommerce_app",
+  "description": "Sistema básico de e-commerce",
+  "tables": [
+    {
+      "name": "usuarios",
+      "description": "Tabla de usuarios registrados",
+      "fields": [
+        { "name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false },
+        { "name": "nombre", "field_type": "string", "max_length": 100, "nullable": false },
+        { "name": "email", "field_type": "string", "max_length": 150, "nullable": false, "unique": true },
+        { "name": "password", "field_type": "string", "max_length": 255, "nullable": false },
+        { "name": "fecha_registro", "field_type": "datetime", "nullable": false }
+      ]
+    },
+    {
+      "name": "productos",
+      "description": "Catálogo de productos disponibles",
+      "fields": [
+        { "name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false },
+        { "name": "nombre", "field_type": "string", "max_length": 200, "nullable": false },
+        { "name": "descripcion", "field_type": "text", "nullable": true },
+        { "name": "precio", "field_type": "decimal", "nullable": false },
+        { "name": "stock", "field_type": "integer", "nullable": false, "default_value": "0" }
+      ]
+    },
+    {
+      "name": "ordenes",
+      "description": "Órdenes realizadas por los usuarios",
+      "fields": [
+        { "name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false },
+        { "name": "usuario_id", "field_type": "integer", "nullable": false, "foreign_key": "usuarios.id" },
+        { "name": "fecha_orden", "field_type": "datetime", "nullable": false },
+        { "name": "total", "field_type": "decimal", "nullable": false }
+      ]
+    },
+    {
+      "name": "detalle_orden",
+      "description": "Detalle de productos en cada orden",
+      "fields": [
+        { "name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false },
+        { "name": "orden_id", "field_type": "integer", "nullable": false, "foreign_key": "ordenes.id" },
+        { "name": "producto_id", "field_type": "integer", "nullable": false, "foreign_key": "productos.id" },
+        { "name": "cantidad", "field_type": "integer", "nullable": false },
+        { "name": "precio_unitario", "field_type": "decimal", "nullable": false }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "relationship_type": "one_to_many",
+      "from_table": "usuarios",
+      "from_field": "id",
+      "to_table": "ordenes",
+      "to_field": "usuario_id",
+      "relationship_name": "ordenes",
+      "back_populates": "usuario"
+    },
+    {
+      "relationship_type": "one_to_many",
+      "from_table": "ordenes",
+      "from_field": "id",
+      "to_table": "detalle_orden",
+      "to_field": "orden_id",
+      "relationship_name": "detalles",
+      "back_populates": "orden"
+    },
+    {
+      "relationship_type": "one_to_many",
+      "from_table": "productos",
+      "from_field": "id",
+      "to_table": "detalle_orden",
+      "to_field": "producto_id",
+      "relationship_name": "detalles_producto",
+      "back_populates": "producto"
+    }
+  ],
+  "generate_crud_for_all": true,
+  "generate_relationship_endpoints": true
+}
