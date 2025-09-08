@@ -310,7 +310,7 @@
                 console.warn('Error al cargar usuario:', error);
             });
         } else {
-            fetch('/auth/me', {
+            fetch('/api/public/auth/me', {
                 credentials: 'include',
                 headers: {
                     'Accept': 'application/json'
@@ -431,7 +431,7 @@
     
     function actualizarContadorMensajes() {
         console.log('📊 Actualizando contador de mensajes...');
-        fetch('/api/mensajes/no-leidos/count', {
+        fetch('/api/public/mensajes/no-leidos/count', {
             credentials: 'include',
             headers: {
                 'Accept': 'application/json'

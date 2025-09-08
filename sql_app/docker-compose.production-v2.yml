@@ -1,0 +1,156 @@
+version: '3.8'
+
+services:
+  # =============================
+  # APLICACIÓN PRINCIPAL FASTAPI
+  # =============================
+  app:
+    build: .
+    container_name: sql_app_production_v2
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - PORT=8000
+      - WORKERS=4
+      - LOG_LEVEL=info
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - .env
+    volumes:
+      # Solo logs y uploads, no código fuente
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    networks:
+      - app_network
+    depends_on:
+      - db
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # =============================
+  # REDIS CACHE
+  # =============================
+  redis:
+    image: redis:7-alpine
+    container_name: sql_app_redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Base de datos (mantener configuración existente)
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_app_db
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    networks:
+      - app_network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "${SA_PASSWORD}" -Q "SELECT 1" || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: sql_app_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+    networks:
+      - app_network
+    depends_on:
+      - app
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # =============================
+  # PROMETHEUS MONITORING
+  # =============================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sql_app_prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - app_network
+
+  # =============================
+  # GRAFANA DASHBOARDS
+  # =============================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sql_app_grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - app_network
+
+# =============================
+# VOLÚMENES PERSISTENTES
+# =============================
+volumes:
+  mssql_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+# =============================
+# RED DEDICADA
+# =============================
+networks:
+  app_network:
+    driver: bridge

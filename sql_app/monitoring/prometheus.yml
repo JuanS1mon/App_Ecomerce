@@ -1,0 +1,63 @@
+# =============================
+# CONFIGURACIÓN DE PROMETHEUS
+# =============================
+# Archivo de configuración para el monitoreo de métricas
+
+global:
+  scrape_interval: 15s  # Interval entre recolecciones
+  evaluation_interval: 15s  # Interval para evaluar rules
+
+# Configuración de alertas (futuro)
+rule_files:
+  - "alert_rules.yml"
+
+# Configuración de targets para scraping
+scrape_configs:
+  # =============================
+  # MÉTRICAS DE LA APLICACIÓN
+  # =============================
+  - job_name: 'fastapi-app'
+    static_configs:
+      - targets: ['app:8000']  # En Docker
+        labels:
+          service: 'stock-management'
+          environment: 'production'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # =============================
+  # MÉTRICAS DE PROMETHEUS
+  # =============================
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # =============================
+  # MÉTRICAS DE REDIS
+  # =============================
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+        labels:
+          service: 'redis-cache'
+    # Nota: Requiere redis_exporter para métricas completas
+
+  # =============================
+  # MÉTRICAS DEL SISTEMA (NODE)
+  # =============================
+  # - job_name: 'node-exporter'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
+  #       labels:
+  #         service: 'system-metrics'
+
+# Configuración de almacenamiento
+storage:
+  tsdb:
+    retention: 30d  # Retener métricas por 30 días
+    
+# Configuración de logging
+log_level: info

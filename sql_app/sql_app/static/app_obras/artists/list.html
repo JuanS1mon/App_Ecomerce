@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directorio de Artistas - Sistema de Obras de Arte</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts - Elementos del Brooklyn Museum -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+        }
+        
+        .brooklyn-title {
+            font-family: 'Crimson Text', serif;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        
+        .artist-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .artist-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .artist-badge {
+            background-color: #f3f4f6;
+            color: #374151;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            letter-spacing: 0.025em;
+        }
+        
+        .table-minimal {
+            border: none;
+        }
+        
+        .table-minimal thead th {
+            border-bottom: 2px solid #e5e7eb;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #6b7280;
+            padding: 1rem 0;
+            background: none;
+        }
+        
+        .table-minimal tbody td {
+            border-bottom: 1px solid #f3f4f6;
+            padding: 1.5rem 0;
+            vertical-align: middle;
+        }
+        
+        .action-btn {
+            font-size: 0.75rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            letter-spacing: 0.025em;
+            transition: all 0.2s ease;
+        }
+        
+        .section-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #374151;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+   
+    <!-- Contenido principal estilo Brooklyn Museum -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">   
+        
+        <!-- Header principal estilo Brooklyn Museum -->
+        <div class="mb-12">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="brooklyn-title text-4xl md:text-5xl text-gray-900 mb-4">DIRECTORIO DE ARTISTAS</h1>
+                    <p class="text-gray-600 text-lg max-w-2xl">
+                        Catálogo completo de artistas y creadores en la colección
+                    </p>
+                </div>
+                <div>
+                    <a href="/app_obras/artists/html/create" class="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors rounded-lg">
+                        <i class="fas fa-plus mr-2"></i>
+                        Nuevo Artista
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 py-6 border-t border-b border-gray-200">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1">{{ artists|length }}</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Total Artistas</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1">85%</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Con Obras</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1">12</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">En Exhibición</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1">156</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Obras Totales</div>
+            </div>
+        </div>
+
+        <!-- Listado estilo minimalista -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="table-minimal w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left pl-6">ID</th>
+                            <th class="text-left">Artista</th>
+                            <th class="text-left">Estado</th>
+                            <th class="text-center pr-6">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for artist in artists %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="pl-6">
+                                <span class="artist-badge">#{{ artist.id }}</span>
+                            </td>
+                            <td>
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                                        <i class="fas fa-user text-gray-500"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900">{{ artist.full_name }}</div>
+                                        <div class="text-sm text-gray-500">Artista profesional</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-circle text-green-400 mr-1" style="font-size: 0.5rem;"></i>
+                                    Activo
+                                </span>
+                            </td>
+                            <td class="text-center pr-6">
+                                <div class="flex items-center justify-center space-x-2">
+                                    <a href="/app_obras/artists/html/edit/{{ artist.id }}" 
+                                       class="action-btn inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-md transition-colors">
+                                        <i class="fas fa-edit mr-1"></i>
+                                        Editar
+                                    </a>
+                                    <button onclick="deleteArtist('{{ artist.id }}')" 
+                                            class="action-btn inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-md transition-colors">
+                                        <i class="fas fa-trash mr-1"></i>
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer con estadísticas adicionales -->
+        <div class="mt-8 text-center text-gray-500 text-sm">
+            <p>Total: {{ artists|length }} artistas registrados en el sistema</p>
+        </div>
+
+    </main>
+    
+    <div id="footer-container"></div>
+
+    <script>
+        async function deleteArtist(id) {
+            // Crear modal de confirmación personalizado
+            const confirmed = confirm('¿Está seguro de que desea eliminar este artista?\n\nEsta acción no se puede deshacer y eliminará también todas las relaciones con obras de arte.');
+            
+            if (confirmed) {
+                try {
+                    const response = await fetch(`/app_obras/artists/id/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        // Mostrar mensaje de éxito y recargar
+                        alert('✅ Artista eliminado exitosamente');
+                        location.reload();
+                    } else {
+                        const error = await response.json();
+                        alert('❌ Error al eliminar el artista: ' + (error.detail || 'Error desconocido'));
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('❌ Error de conexión al eliminar el artista');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Listado de artistas cargado');
+            
+            // Cargar navbar si existe
+            const navbarContainer = document.getElementById('navbar-container');
+            if (navbarContainer) {
+                loadNavbar(navbarContainer);
+            }
+            
+            // Cargar footer si existe
+            const footerContainer = document.getElementById('footer-container');
+            if (footerContainer) {
+                loadFooter(footerContainer);
+            }
+            
+            // Agregar efecto hover mejorado a las filas
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(4px)';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

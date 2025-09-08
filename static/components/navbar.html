@@ -282,7 +282,7 @@
                 console.warn('Error al cargar usuario:', error);
             });
         } else {
-            fetch('/auth/me', {
+            fetch('/api/public/auth/me', {
                 credentials: 'include',
                 headers: {
                     'Accept': 'application/json'
@@ -292,14 +292,25 @@
                 if (response.ok) {
                     return response.json();
                 }
-                throw new Error('No autenticado');
+                // No lanzar error, simplemente retornar null
+                return null;
             })
             .then(function(data) {
-                updateUserElements(userInitial, userName, userEmail, data);
-                setupLogoutHandler();
+                if (data) {
+                    updateUserElements(userInitial, userName, userEmail, data);
+                    setupLogoutHandler();
+                } else {
+                    // Usuario no autenticado - valores por defecto silenciosos
+                    if (userInitial) userInitial.textContent = 'U';
+                    if (userName) userName.textContent = 'Usuario Invitado';
+                    if (userEmail) userEmail.textContent = 'Sin autenticar';
+                }
             })
             .catch(function(error) {
-                console.log('Usuario no autenticado:', error);
+                // Autenticación no disponible - usar valores por defecto sin mostrar errores
+                if (userInitial) userInitial.textContent = 'U';
+                if (userName) userName.textContent = 'Usuario Invitado';
+                if (userEmail) userEmail.textContent = 'Sin autenticar';
             });
         }
     }

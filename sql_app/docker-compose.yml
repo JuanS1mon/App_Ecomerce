@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # SERVICIO DE BASE DE DATOS MSSQL SERVER
+  # ==========================================
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_app_database
+    restart: unless-stopped
+    environment:
+      # Configuración de SQL Server
+      ACCEPT_EULA: Y
+      SA_PASSWORD: MyStrongPassword123!
+      MSSQL_PID: Express
+      # Configuración de memoria (importante para evitar problemas)
+      MSSQL_MEMORY_LIMIT_MB: 2048
+    ports:
+      - "1433:1433"
+    volumes:
+      # Persistencia de datos
+      - sql_data:/var/opt/mssql
+      # Scripts de inicialización (opcional)
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - sql_app_network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P MyStrongPassword123! -Q 'SELECT 1' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ==========================================
+  # SERVICIO DE APLICACIÓN FASTAPI
+  # ==========================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sql_app_fastapi
+    restart: unless-stopped
+    environment:
+      # Variables de entorno para la aplicación
+      DATABASE_URL: "mssql+pyodbc://sa:MyStrongPassword123!@database:1433/StockApp?driver=ODBC+Driver+17+for+SQL+Server&charset=utf8"
+      ENVIRONMENT: production
+      SECRET_KEY: "your-super-secret-key-change-this-in-production"
+      ALGORITHM: "HS256"
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      # Configuración de logs
+      LOG_LEVEL: INFO
+    ports:
+      - "8000:8000"
+    volumes:
+      # Logs persistentes (opcional)
+      - ./logs:/app/logs
+      # Archivos estáticos (si los hay)
+      - ./static:/app/static
+    networks:
+      - sql_app_network
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==========================================
+  # SERVICIO NGINX (OPCIONAL - PARA PRODUCCIÓN)
+  # ==========================================
+  nginx:
+    image: nginx:alpine
+    container_name: sql_app_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./static:/var/www/static:ro
+      # Para SSL (opcional)
+      # - ./ssl:/etc/ssl/certs:ro
+    networks:
+      - sql_app_network
+    depends_on:
+      - app
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# ==========================================
+# VOLÚMENES PERSISTENTES
+# ==========================================
+volumes:
+  sql_data:
+    driver: local
+    name: sql_app_data
+
+# ==========================================
+# REDES
+# ==========================================
+networks:
+  sql_app_network:
+    driver: bridge
+    name: sql_app_network

@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script> 
+       <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>    <!-- INTERCEPTOR DE AUTENTICACIÓN EMBEBIDO PARA ADMIN -->
+  
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    <!-- Sistema de widgets integrado -->
+    <script>
+        // Configuración específica para widgets en admin
+        window.adminWidgetsConfig = {
+            autoInit: true,
+            floatingControls: true,
+            position: 'bottom-right'
+        };
+    </script>
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Estilos para widgets de comunicación */
+        @keyframes notification-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .notification-count {
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        #communication-notification-badge {
+            animation: notification-pulse 2s infinite;
+        }
+        
+        .communication-widget-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .communication-widget-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .communication-widget-card:hover::before {
+            left: 100%;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+   
+    <!-- Contenido principal -->
+    <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">   
+        <!-- Header con información de la página -->
+        <div class="mb-8">
+            <div class="gradient-bg text-white rounded-lg shadow-lg p-6 sm:p-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Panel de Administración</h1>
+                        <p class="text-white text-opacity-90">
+                            Bienvenido, <span class="font-semibold">{{ user.nombre }}</span>. Gestiona aplicaciones, usuarios y más desde este panel.
+                        </p>
+                    </div>
+                    <div class="mt-4 md:mt-0 bg-white bg-opacity-20 p-3 rounded-lg">
+                        <div class="text-sm font-medium">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                <span id="currentDate">19 de marzo, 2025</span>
+                            </div>
+                            <div class="flex items-center mt-1">
+                                <i class="fas fa-clock mr-2"></i>
+                                <span id="currentTime">10:30 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas en tarjetas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Tarjeta de usuarios -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-blue-500 rounded-full p-3">
+                            <i class="fas fa-users text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Total Usuarios</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">{{ user_count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="/usuarios_admin/" class="text-sm text-blue-500 font-medium hover:text-blue-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tarjeta de migraciones -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-purple-500 rounded-full p-3">
+                            <i class="fas fa-database text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Migraciones</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">{{activity_count}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="/migraciones/admin_migraciones" class="text-sm text-purple-500 font-medium hover:text-purple-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tarjeta de aplicaciones -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-green-500 rounded-full p-3">
+                            <i class="fas fa-laptop-code text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Aplicaciones</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">4</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="#" class="text-sm text-green-500 font-medium hover:text-green-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tarjeta de rutas -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover border border-gray-100">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-indigo-500 rounded-full p-3">
+                            <i class="fas fa-route text-white text-xl"></i>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-sm font-medium text-gray-500 truncate">Rutas</p>
+                            <p class="mt-1 text-3xl font-semibold text-gray-900">4</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <a href="#" class="text-sm text-indigo-500 font-medium hover:text-indigo-700 flex items-center">
+                        Ver detalles 
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Accesos rápidos -->
+        <div class="bg-white rounded-xl shadow-md mb-8 overflow-hidden border border-gray-100">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-bolt mr-2 text-yellow-500"></i>
+                    Accesos rápidos
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dashboard de Obras de Arte -->
+                    <a href="/app_obras/dashboard" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Dashboard Obras de Arte</h4>
+                            <p class="mt-1 text-sm text-gray-500">Gestión integral de obras y exposiciones</p>
+                        </div>
+                    </a>
+
+                    <!-- Dashboard de Stock -->
+                    <a href="/stock_admin/dashboard" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-green-100 text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Dashboard Stock</h4>
+                            <p class="mt-1 text-sm text-gray-500">Control de inventario y almacén</p>
+                        </div>
+                    </a>
+                    <!-- Acceso rápido para el sistema de Tickets -->
+                    <a href="/tickets/admin" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-red-100 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Sistema de Tickets</h4>
+                            <p class="mt-1 text-sm text-gray-500">Gestiona solicitudes de soporte</p>
+                        </div>
+                    </a>
+
+
+                    <a href="/generar" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Generar App</h4>
+                            <p class="mt-1 text-sm text-gray-500">Crea nuevas APIs y aplicaciones</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/migraciones/admin_migraciones" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Migraciones</h4>
+                            <p class="mt-1 text-sm text-gray-500">Administra migraciones de base de datos</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/analisis/admin" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-green-100 text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Análisis de datos</h4>
+                            <p class="mt-1 text-sm text-gray-500">Herramientas estadísticas</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/scraping/admin" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-indigo-100 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-spider"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Scraping Web</h4>
+                            <p class="mt-1 text-sm text-gray-500">Extrae info de sitios web externos</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/create_blog" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-pink-100 text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Nueva Noticia</h4>
+                            <p class="mt-1 text-sm text-gray-500">Crea y publica entradas de blog</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/usuarios_admin/" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-yellow-100 text-yellow-600 group-hover:bg-yellow-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Gestionar Usuarios</h4>
+                            <p class="mt-1 text-sm text-gray-500">Administra cuentas y permisos</p>
+                        </div>
+                    </a>
+
+                    <a href="/servicios/" class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-teal-100 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-base font-medium text-gray-900">Gestor de Servicios</h4>
+                            <p class="mt-1 text-sm text-gray-500">Administra servicios y módulos</p>
+                        </div>
+                    </a>
+                    
+                    <!-- ACCESO DIRECTO: CHAT & MENSAJES -->
+                    <a href="/chat-testing" class="communication-widget-card flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 transition-all duration-300 group shadow-sm hover:shadow-md" 
+                       onmouseenter="showCommunicationTooltip(this)"
+                       onmouseleave="hideCommunicationTooltip()">
+                        <div class="inline-flex flex-shrink-0 items-center justify-center h-12 w-12 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white group-hover:scale-110 transition-transform duration-300 relative">
+                            <i class="fas fa-comments"></i>
+                            <!-- Indicador de notificaciones -->
+                            <span id="communication-notification-badge" class="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse hidden">
+                                <span class="notification-count">0</span>
+                            </span>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-base font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                                    Chat & Mensajes
+                                    <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                        En Línea
+                                    </span>
+                                </h4>
+                                <div class="text-xs text-gray-400 group-hover:text-blue-500 transition-colors">
+                                    <i class="fas fa-circle text-green-400 mr-1 status-indicator"></i>
+                                    Conectado
+                                </div>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500 group-hover:text-gray-700">
+                                Centro de comunicación • Chat en tiempo real • Mensajes directos
+                            </p>
+                            <div class="mt-2 flex items-center space-x-4 text-xs text-gray-400">
+                                <span class="flex items-center">
+                                    <i class="fas fa-envelope mr-1"></i>
+                                    <span id="unread-messages-count">0</span> Sin leer
+                                </span>
+                                <span class="flex items-center">
+                                    <i class="fas fa-user-friends mr-1"></i>
+                                    <span id="online-users-count">1</span> En línea
+                                </span>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex flex-col items-center">
+                            <i class="fas fa-external-link-alt text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300 mb-1"></i>
+                            <div class="text-xs text-gray-400 group-hover:text-blue-500 transition-colors">
+                                Abrir
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Últimas actividades y gráfico -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Últimas actividades -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        <i class="fas fa-history mr-2 text-blue-500"></i>
+                        Últimas actividades
+                    </h3>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="p-6 max-h-96 overflow-y-auto">
+                    <ul class="space-y-4">
+                        {% for activity in activities %}
+                        <li class="pb-3 border-b border-gray-100 last:border-0 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-medium">{{ activity.usuario.nombre }}</span> {{ activity.action }}
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    hace 2 horas
+                                </p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                        
+                        <!-- Actividades de ejemplo si no hay suficientes -->
+                        {% if activities|length < 3 %}
+                        <li class="pb-3 border-b border-gray-100 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-medium">Sistema</span> ha completado la actualización programada
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    hace 4 horas
+                                </p>
+                            </div>
+                        </li>
+                        <li class="pb-3 border-b border-gray-100 flex items-start">
+                            <div class="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-3 mt-0.5">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-medium">Migración</span> completada con éxito
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    hace 1 día
+                                </p>
+                            </div>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Gráfico de actividades -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        <i class="fas fa-chart-line mr-2 text-indigo-500"></i>
+                        Actividad del Sistema
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <canvas id="activityChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div id="footer-container"></div>
+
+    <script>
+        // Actualizar fecha y hora
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const currentDateElement = document.getElementById('currentDate');
+            const currentTimeElement = document.getElementById('currentTime');
+
+            if (currentDateElement) {
+                currentDateElement.textContent = now.toLocaleDateString('es-ES', options);
+            } else {
+                console.error("Elemento 'currentDate' no encontrado en el DOM.");
+            }
+
+            if (currentTimeElement) {
+                currentTimeElement.textContent = now.toLocaleTimeString('es-ES', { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                });
+            } else {
+                console.error("Elemento 'currentTime' no encontrado en el DOM.");
+            }
+        }
+
+        // Ejecutar al cargar y actualizar cada minuto
+        updateDateTime();
+        setInterval(updateDateTime, 60000);        // Código para el gráfico (se mantiene igual, solo añadimos algunas mejoras visuales)
+        document.addEventListener('DOMContentLoaded', function() {
+            // VERIFICAR AUTENTICACIÓN AL CARGAR LA PÁGINA
+            if (typeof window.checkInitialAuth === 'function') {
+                window.checkInitialAuth();
+            }
+            
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            
+            // Datos de ejemplo para el gráfico
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+                    datasets: [{
+                        label: 'Actividad',
+                        data: [12, 19, 8, 15, 10, 3, 7],
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1f2937',
+                            bodyColor: '#4b5563',
+                            borderColor: 'rgba(203, 213, 225, 1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false
+                        }
+                    }
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbarContainer = document.getElementById('navbar-container');
+            if (navbarContainer) {
+                loadNavbar(navbarContainer);
+            } else {
+                console.error("Elemento 'navbar-container' no encontrado en el DOM.");
+            }
+        });
+    </script>
+
+    <!-- BLOQUE: Captura de token tras acceso a /admin por redirección -->
+    <script>
+    // Captura el token de la URL tras acceder a /admin y lo guarda en localStorage
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        if (token) {
+            localStorage.setItem('access_token', token);
+            console.log('🔐 Token JWT guardado en localStorage tras acceso a /admin:', token.substring(0, 20) + '...');
+            // Limpiar el token de la URL para mayor seguridad
+            urlParams.delete('token');
+            const cleanUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+            window.history.replaceState({}, document.title, cleanUrl);
+        }
+    })();
+    // Documentación:
+    // - Si accedes a /admin?token=... el token se guarda y se limpia la URL.
+    // - El resto del frontend usará el token desde localStorage para autenticación.
+    </script>
+
+    <!-- SISTEMA DE WIDGETS PARA ADMIN -->
+    <script>
+        // Variables de estado para widgets
+        let communicationWidgetsVisible = false;
+        let messageWidgetLoaded = false;
+        let chatWidgetLoaded = false;
+        let notificationUpdateInterval = null;
+
+        // Función para actualizar contadores de comunicación
+        function updateCommunicationCounters() {
+            // Simular llamada a API para obtener contadores actuales
+            fetch('/api/chat/stats')
+                .then(response => response.json())
+                .then(data => {
+                    const unreadCount = data.unread_messages || 0;
+                    const onlineUsers = data.online_users || 1;
+                    
+                    // Actualizar contador de mensajes sin leer
+                    const unreadElement = document.getElementById('unread-messages-count');
+                    if (unreadElement) {
+                        unreadElement.textContent = unreadCount;
+                    }
+                    
+                    // Actualizar contador de usuarios en línea
+                    const onlineElement = document.getElementById('online-users-count');
+                    if (onlineElement) {
+                        onlineElement.textContent = onlineUsers;
+                    }
+                    
+                    // Mostrar/ocultar badge de notificación
+                    const badge = document.getElementById('communication-notification-badge');
+                    if (badge) {
+                        if (unreadCount > 0) {
+                            badge.classList.remove('hidden');
+                            badge.querySelector('.notification-count').textContent = unreadCount > 99 ? '99+' : unreadCount;
+                        } else {
+                            badge.classList.add('hidden');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.warn('No se pudieron obtener estadísticas de comunicación:', error);
+                    // Valores por defecto en caso de error
+                    const unreadElement = document.getElementById('unread-messages-count');
+                    const onlineElement = document.getElementById('online-users-count');
+                    if (unreadElement) unreadElement.textContent = '0';
+                    if (onlineElement) onlineElement.textContent = '1';
+                });
+        }
+
+        // Función para mostrar tooltip de estado rápido
+        function showCommunicationTooltip(element) {
+            // Crear tooltip si no existe
+            let tooltip = document.getElementById('communication-tooltip');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = 'communication-tooltip';
+                tooltip.className = 'absolute z-50 bg-gray-900 text-white p-3 rounded-lg shadow-lg text-sm max-w-xs opacity-0 transition-opacity duration-200 pointer-events-none';
+                document.body.appendChild(tooltip);
+            }
+            
+            // Obtener datos actuales
+            const unreadCount = document.getElementById('unread-messages-count')?.textContent || '0';
+            const onlineCount = document.getElementById('online-users-count')?.textContent || '1';
+            
+            // Contenido del tooltip
+            tooltip.innerHTML = `
+                <div class="font-semibold mb-2 flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Estado de Comunicación
+                </div>
+                <div class="space-y-1 text-xs">
+                    <div class="flex justify-between">
+                        <span>Mensajes sin leer:</span>
+                        <span class="font-bold text-yellow-300">${unreadCount}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Usuarios en línea:</span>
+                        <span class="font-bold text-green-300">${onlineCount}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Estado del chat:</span>
+                        <span class="font-bold text-green-300">
+                            <i class="fas fa-circle text-green-400 mr-1"></i>
+                            Conectado
+                        </span>
+                    </div>
+                </div>
+                <div class="mt-2 pt-2 border-t border-gray-700 text-xs text-gray-300">
+                    Clic para abrir el centro de comunicación
+                </div>
+            `;
+            
+            // Posicionar tooltip
+            const rect = element.getBoundingClientRect();
+            tooltip.style.left = `${rect.left + window.scrollX}px`;
+            tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 10}px`;
+            
+            // Mostrar tooltip
+            tooltip.classList.remove('opacity-0');
+            tooltip.classList.add('opacity-100');
+        }
+        
+        function hideCommunicationTooltip() {
+            const tooltip = document.getElementById('communication-tooltip');
+            if (tooltip) {
+                tooltip.classList.remove('opacity-100');
+                tooltip.classList.add('opacity-0');
+                setTimeout(() => {
+                    if (tooltip.parentNode) {
+                        tooltip.parentNode.removeChild(tooltip);
+                    }
+                }, 200);
+            }
+        }
+
+        // Función para alternar la sección de widgets de comunicación
+        function toggleCommunicationWidgets() {
+            const section = document.getElementById('communication-widgets-section');
+            
+            if (communicationWidgetsVisible) {
+                section.style.display = 'none';
+                communicationWidgetsVisible = false;
+            } else {
+                section.style.display = 'block';
+                communicationWidgetsVisible = true;
+                
+                // Inicializar el sistema de widgets si no está cargado
+                if (!window.widgetSystemLoaded) {
+                    loadWidgetSystemForAdmin();
+                }
+            }
+        }
+
+        // Cargar el sistema de widgets específicamente para admin
+        function loadWidgetSystemForAdmin() {
+            if (window.loadMessageWidget && window.loadChatWidget) {
+                window.widgetSystemLoaded = true;
+                return Promise.resolve();
+            }
+
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = '/widgets/loader.js';
+                script.onload = () => {
+                    console.log('✅ Sistema de widgets cargado en panel admin');
+                    window.widgetSystemLoaded = true;
+                    resolve();
+                };
+                script.onerror = () => {
+                    console.error('❌ Error al cargar widgets en panel admin');
+                    reject();
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        // Función para cargar widget de mensajes en el admin
+        function toggleMessageWidget() {
+            const container = document.getElementById('admin-message-widget-container');
+            
+            if (messageWidgetLoaded) {
+                // Limpiar y mostrar placeholder
+                container.innerHTML = `
+                    <div class="text-center text-gray-500">
+                        <i class="fas fa-envelope text-4xl mb-2"></i>
+                        <p>Haz clic en "Mensajes" para cargar el widget</p>
+                    </div>
+                `;
+                container.className = 'border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[300px] flex items-center justify-center text-gray-500';
+                messageWidgetLoaded = false;
+            } else {
+                // Cargar widget
+                loadWidgetSystemForAdmin().then(() => {
+                    if (window.loadMessageWidget) {
+                        // Preparar el contenedor
+                        container.innerHTML = '';
+                        container.className = 'border border-gray-300 rounded-lg overflow-hidden';
+                        
+                        // Cargar el widget
+                        window.loadMessageWidget('admin-message-widget-container', {
+                            position: 'inline',
+                            showHeader: true,
+                            maxHeight: '350px',
+                            adminMode: true
+                        });
+                        messageWidgetLoaded = true;
+                    } else {
+                        showWidgetError('mensajes');
+                    }
+                }).catch(() => {
+                    showWidgetError('mensajes');
+                });
+            }
+        }
+
+        // Función para cargar widget de chat en el admin
+        function toggleChatWidget() {
+            const container = document.getElementById('admin-chat-widget-container');
+            
+            if (chatWidgetLoaded) {
+                // Limpiar y mostrar placeholder
+                container.innerHTML = `
+                    <div class="text-center text-gray-500">
+                        <i class="fas fa-comments text-4xl mb-2"></i>
+                        <p>Haz clic en "Chat" para cargar el widget</p>
+                    </div>
+                `;
+                container.className = 'border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[300px] flex items-center justify-center text-gray-500';
+                chatWidgetLoaded = false;
+            } else {
+                // Cargar widget
+                loadWidgetSystemForAdmin().then(() => {
+                    if (window.loadChatWidget) {
+                        // Preparar el contenedor
+                        container.innerHTML = '';
+                        container.className = 'border border-gray-300 rounded-lg overflow-hidden';
+                        
+                        // Cargar el widget
+                        window.loadChatWidget('admin-chat-widget-container', {
+                            position: 'inline',
+                            showHeader: true,
+                            maxHeight: '350px',
+                            adminMode: true
+                        });
+                        chatWidgetLoaded = true;
+                    } else {
+                        showWidgetError('chat');
+                    }
+                }).catch(() => {
+                    showWidgetError('chat');
+                });
+            }
+        }
+
+        // Función para mostrar errores de widgets
+        function showWidgetError(type) {
+            const containerId = type === 'chat' ? 'admin-chat-widget-container' : 'admin-message-widget-container';
+            const container = document.getElementById(containerId);
+            const icon = type === 'chat' ? 'fa-comments' : 'fa-envelope';
+            
+            container.innerHTML = `
+                <div class="text-center text-red-500">
+                    <i class="fas ${icon} text-4xl mb-2"></i>
+                    <p>Error al cargar widget de ${type}</p>
+                    <button onclick="toggle${type === 'chat' ? 'Chat' : 'Message'}Widget()" class="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                        Reintentar
+                    </button>
+                </div>
+            `;
+        }
+
+        // Función para cargar un widget específico (API pública)
+        function loadAdminWidget(type, containerId, options = {}) {
+            return loadWidgetSystemForAdmin().then(() => {
+                const defaultOptions = {
+                    position: 'inline',
+                    showHeader: true,
+                    adminMode: true,
+                    ...options
+                };
+
+                if (type === 'message' && window.loadMessageWidget) {
+                    window.loadMessageWidget(containerId, defaultOptions);
+                    return true;
+                } else if (type === 'chat' && window.loadChatWidget) {
+                    window.loadChatWidget(containerId, defaultOptions);
+                    return true;
+                } else {
+                    throw new Error(`Widget tipo "${type}" no disponible`);
+                }
+            });
+        }
+
+        // Hacer funciones disponibles globalmente
+        window.toggleCommunicationWidgets = toggleCommunicationWidgets;
+        window.toggleMessageWidget = toggleMessageWidget;
+        window.toggleChatWidget = toggleChatWidget;
+        window.loadAdminWidget = loadAdminWidget;
+        window.updateCommunicationCounters = updateCommunicationCounters;
+        window.showCommunicationTooltip = showCommunicationTooltip;
+        window.hideCommunicationTooltip = hideCommunicationTooltip;
+
+        // Inicialización adicional cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Actualizar contadores inmediatamente
+            updateCommunicationCounters();
+            
+            // Configurar actualización automática de contadores cada 30 segundos
+            notificationUpdateInterval = setInterval(updateCommunicationCounters, 30000);
+            
+            // Precargar el sistema de widgets si estamos en admin
+            setTimeout(() => {
+                loadWidgetSystemForAdmin().catch(() => {
+                    console.warn('Sistema de widgets no disponible');
+                });
+            }, 2000);
+        });
+
+        // Limpiar interval al salir de la página
+        window.addEventListener('beforeunload', function() {
+            if (notificationUpdateInterval) {
+                clearInterval(notificationUpdateInterval);
+            }
+        });
+    </script>
+</body>
+</html>

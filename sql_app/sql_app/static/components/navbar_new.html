@@ -1,0 +1,400 @@
+<nav class="bg-gradient-to-r from-indigo-900 to-blue-900 p-3 sticky top-0 z-30 shadow-lg border-b border-blue-800">
+    <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <a class="flex items-center space-x-2 hover:opacity-90 transition-opacity" href="/index">
+                <div class="bg-white p-1 rounded-full shadow-sm">
+                    <img alt="Logo" class="h-7 w-auto" src="/static/img/logo_mapache.gif"/>
+                </div>
+                <span class="text-white font-bold text-lg hidden md:block">
+                    SQL App Studio
+                </span>
+            </a>
+            <div class="flex items-center space-x-1 bg-blue-800 bg-opacity-40 px-3 py-1.5 rounded-md border border-blue-700 border-opacity-50" id="breadcrumb-container">
+                <!-- Los elementos del breadcrumb se generarán dinámicamente tipo explorador de Windows -->
+            </div>
+        </div>
+        <div class="flex items-center space-x-3 relative">
+            <div class="relative group">
+                <a class="flex items-center text-white hover:bg-blue-800 px-3 py-1.5 rounded-md text-sm transition-colors" href="/admin">
+                    <i class="fas fa-cog mr-2"></i>
+                    <span class="hidden sm:inline">Admin</span>
+                </a>
+            </div>
+            
+            <div class="relative group">
+                <a class="flex items-center text-white hover:bg-blue-800 px-3 py-1.5 rounded-md text-sm transition-colors" href="/docs">
+                    <i class="fas fa-book mr-2"></i>
+                    <span class="hidden sm:inline">API</span>
+                </a>
+            </div>
+            
+            <div class="h-6 border-r border-blue-700 mx-1"></div>
+            
+            <span class="text-xs text-blue-200">
+                <i class="far fa-calendar-alt mr-1"></i>
+                <span id="current-date">29 Jun, 2025</span>
+            </span>
+            
+            <div class="relative">
+                <button id="perfil" class="flex items-center focus:outline-none hover:bg-blue-800 px-2.5 py-1.5 rounded-md transition-colors">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white shadow-md" id="user-initial">
+                        U
+                    </div>
+                    <svg class="ml-1 w-4 h-4 text-blue-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-xl z-50 border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                        <div class="text-sm font-medium text-gray-800" id="user-name">Usuario Actual</div>
+                        <div class="text-xs text-gray-500 mt-0.5" id="user-email">usuario@ejemplo.com</div>
+                    </div>
+                    <a href="/admin/perfil" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                        <i class="fas fa-user-circle text-blue-500 mr-3 w-4 text-center"></i>
+                        Perfil de usuario
+                    </a>
+                    <a href="/admin/configuracion" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                        <i class="fas fa-cogs text-blue-500 mr-3 w-4 text-center"></i>
+                        Configuración
+                    </a>
+                    <form id="logout-form" action="/logout" method="post" class="border-t border-gray-200">
+                        <button type="submit" class="w-full flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
+                            <i class="fas fa-sign-out-alt mr-3 w-4 text-center"></i>
+                            Cerrar sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function() {
+    'use strict';
+    
+    // Configuración de rutas para el breadcrumb
+    var routeConfig = {
+        '/': { title: 'Inicio', icon: 'fa-home', isRoot: true },
+        '/index': { title: 'Inicio', icon: 'fa-home', isRoot: true },
+        '/admin': { title: 'Administración', parent: '/', icon: 'fa-cog' },
+        '/admin/usuarios': { title: 'Usuarios', parent: '/admin', icon: 'fa-users' },
+        '/admin/usuarios/perfil': { title: 'Perfil', parent: '/admin/usuarios', icon: 'fa-user-circle' },
+        '/admin/usuarios/nuevo': { title: 'Nuevo Usuario', parent: '/admin/usuarios', icon: 'fa-user-plus' },
+        '/admin/usuarios/editar': { title: 'Editar Usuario', parent: '/admin/usuarios', icon: 'fa-user-edit' },
+        '/admin/perfil': { title: 'Mi Perfil', parent: '/admin', icon: 'fa-user-circle' },
+        '/admin/configuracion': { title: 'Configuración', parent: '/admin', icon: 'fa-cogs' },
+        '/configdb': { title: 'Configuración DB', parent: '/admin', icon: 'fa-database' },
+        '/migraciones': { title: 'Migraciones', parent: '/admin', icon: 'fa-exchange-alt' },
+        '/generar': { title: 'Generar API', parent: '/admin', icon: 'fa-code' },
+        '/app_stock': { title: 'Inventario', parent: '/', icon: 'fa-boxes' },
+        '/articulos': { title: 'Artículos', parent: '/app_stock', icon: 'fa-box' },
+        '/articulos/dashboard': { title: 'Dashboard', parent: '/articulos', icon: 'fa-tachometer-alt' },
+        '/categorias': { title: 'Categorías', parent: '/app_stock', icon: 'fa-tags' },
+        '/proveedores': { title: 'Proveedores', parent: '/app_stock', icon: 'fa-truck' },
+        '/facturacion': { title: 'Facturación', parent: '/', icon: 'fa-file-invoice' },
+        '/facturas': { title: 'Facturas', parent: '/facturacion', icon: 'fa-file-invoice-dollar' },
+        '/presupuestos': { title: 'Presupuestos', parent: '/facturacion', icon: 'fa-file-alt' }
+    };
+
+    // Función para normalizar rutas
+    function normalizePath(path) {
+        var normalizedPath = path.split('?')[0];
+        if (normalizedPath.length > 1 && normalizedPath.endsWith('/')) {
+            normalizedPath = normalizedPath.slice(0, -1);
+        }
+        if (normalizedPath === '' || normalizedPath === '/') {
+            normalizedPath = '/';
+        }
+        return normalizedPath;
+    }
+
+    // Función para generar ruta dinámicamente si no está configurada
+    function generateDynamicRoute(path) {
+        var segments = path.split('/').filter(function(s) { return s; });
+        if (segments.length === 0) {
+            return { title: 'Inicio', parent: null, icon: 'fa-home' };
+        }
+        
+        var lastSegment = segments[segments.length - 1];
+        var parentPath = '/' + segments.slice(0, -1).join('/');
+        var normalizedParent = parentPath === '/' ? '/' : parentPath;
+        
+        if (/^\d+$/.test(lastSegment)) {
+            return {
+                title: 'ID: ' + lastSegment,
+                parent: normalizedParent || '/',
+                icon: 'fa-hashtag'
+            };
+        }
+        
+        var actionIcons = {
+            'nuevo': 'fa-plus',
+            'nueva': 'fa-plus',
+            'editar': 'fa-edit',
+            'ver': 'fa-eye',
+            'eliminar': 'fa-trash',
+            'configurar': 'fa-cog',
+            'configuracion': 'fa-cogs',
+            'perfil': 'fa-user-circle',
+            'dashboard': 'fa-tachometer-alt'
+        };
+        
+        var icon = actionIcons[lastSegment.toLowerCase()] || 'fa-folder';
+        var title = lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1).replace(/_/g, ' ');
+        
+        return {
+            title: title,
+            parent: normalizedParent || '/',
+            icon: icon
+        };
+    }
+
+    // Función para construir la cadena de breadcrumb
+    function buildBreadcrumbChain(targetPath) {
+        var breadcrumbChain = [];
+        
+        function buildChain(path) {
+            if (!routeConfig[path]) {
+                var dynamicConfig = generateDynamicRoute(path);
+                if (dynamicConfig) {
+                    breadcrumbChain.unshift({
+                        title: dynamicConfig.title,
+                        path: path,
+                        icon: dynamicConfig.icon,
+                        active: path === targetPath
+                    });
+                    
+                    if (dynamicConfig.parent && dynamicConfig.parent !== path) {
+                        buildChain(dynamicConfig.parent);
+                    }
+                }
+                return;
+            }
+            
+            var config = routeConfig[path];
+            breadcrumbChain.unshift({
+                title: config.title,
+                path: path,
+                icon: config.icon || '',
+                active: path === targetPath
+            });
+            
+            if (config.parent && config.parent !== path && !config.isRoot) {
+                buildChain(config.parent);
+            }
+        }
+        
+        buildChain(targetPath);
+        
+        if (breadcrumbChain.length === 0 || breadcrumbChain[0].path !== '/') {
+            breadcrumbChain.unshift({
+                title: 'Inicio',
+                path: '/',
+                icon: 'fa-home',
+                active: targetPath === '/' || targetPath === '/index'
+            });
+        }
+        
+        return breadcrumbChain;
+    }
+
+    // Función para generar el breadcrumb HTML
+    function generateBreadcrumb() {
+        var currentPath = window.location.pathname;
+        var normalizedPath = normalizePath(currentPath);
+        var breadcrumbChain = buildBreadcrumbChain(normalizedPath);
+        return breadcrumbChain;
+    }
+
+    // Función para actualizar la navegación
+    function updateNavigation() {
+        var breadcrumbContainer = document.getElementById('breadcrumb-container');
+        if (!breadcrumbContainer) {
+            return;
+        }
+        
+        var breadcrumbElements = generateBreadcrumb();
+        breadcrumbContainer.innerHTML = '';
+        
+        for (var i = 0; i < breadcrumbElements.length; i++) {
+            var item = breadcrumbElements[i];
+            var itemContainer = document.createElement('div');
+            itemContainer.className = 'flex items-center';
+            
+            var element = document.createElement(item.active ? 'span' : 'a');
+            
+            if (item.icon) {
+                var icon = document.createElement('i');
+                icon.className = 'fas ' + item.icon + ' text-xs';
+                element.appendChild(icon);
+                
+                var space = document.createTextNode(' ');
+                element.appendChild(space);
+            }
+            
+            var textNode = document.createTextNode(item.title);
+            element.appendChild(textNode);
+            
+            if (item.active) {
+                element.className = 'text-blue-100 font-medium flex items-center px-2 py-1 bg-blue-700 bg-opacity-50 rounded text-sm';
+            } else {
+                element.href = item.path;
+                element.className = 'text-white hover:text-blue-200 hover:bg-blue-800 hover:bg-opacity-30 transition-all duration-200 flex items-center px-2 py-1 rounded text-sm';
+            }
+            
+            itemContainer.appendChild(element);
+            breadcrumbContainer.appendChild(itemContainer);
+            
+            if (i < breadcrumbElements.length - 1) {
+                var separator = document.createElement('span');
+                separator.className = 'text-blue-400 mx-1 text-xs';
+                separator.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                breadcrumbContainer.appendChild(separator);
+            }
+        }
+        
+        var activeElement = breadcrumbElements[breadcrumbElements.length - 1];
+        if (activeElement) {
+            document.title = activeElement.title + ' - SQL App Studio';
+        }
+
+        fetchCurrentUser();
+    }
+
+    // Función para obtener datos del usuario actual
+    function fetchCurrentUser() {
+        var userInitial = document.getElementById('user-initial');
+        var userName = document.getElementById('user-name');
+        var userEmail = document.getElementById('user-email');
+        
+        if (window.currentUser && window.currentUser.nombre) {
+            updateUserElements(userInitial, userName, userEmail, window.currentUser);
+            return;
+        }
+        
+        if (typeof window.loadCurrentUser === 'function') {
+            window.loadCurrentUser().then(function(data) {
+                updateUserElements(userInitial, userName, userEmail, data);
+            }).catch(function(error) {
+                console.warn('Error al cargar usuario:', error);
+            });
+        } else {
+            fetch('/auth/me', {
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('No autenticado');
+            })
+            .then(function(data) {
+                updateUserElements(userInitial, userName, userEmail, data);
+                setupLogoutHandler();
+            })
+            .catch(function(error) {
+                console.log('Usuario no autenticado:', error);
+            });
+        }
+    }
+
+    // Función para actualizar elementos de usuario en la UI
+    function updateUserElements(userInitial, userName, userEmail, data) {
+        if (userInitial && data.nombre) {
+            userInitial.textContent = data.nombre.charAt(0).toUpperCase();
+        }
+        if (userName && data.nombre) {
+            userName.textContent = data.nombre;
+        }
+        if (userEmail && data.email) {
+            userEmail.textContent = data.email;
+        }
+    }
+
+    // Función para configurar el manejador de logout
+    function setupLogoutHandler() {
+        var logoutForm = document.getElementById('logout-form');
+        if (logoutForm) {
+            logoutForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                fetch('/logout', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(function(response) {
+                    if (response.ok || response.redirected) {
+                        window.location.href = '/loginpage';
+                    } else {
+                        throw new Error('Error al cerrar sesión');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error en logout:', error);
+                    alert('Error al cerrar sesión. Por favor, inténtelo de nuevo.');
+                });
+            });
+        }
+    }
+
+    // Función principal de inicialización
+    function initializeNavbar() {
+        // Configurar fecha actual
+        var fechaActual = new Date();
+        var opciones = { day: 'numeric', month: 'short', year: 'numeric' };
+        var currentDateElement = document.getElementById('current-date');
+        if (currentDateElement) {
+            currentDateElement.textContent = fechaActual.toLocaleDateString('es-ES', opciones);
+        }
+
+        // Configurar menú de perfil
+        var perfilBtn = document.getElementById('perfil');
+        var perfilMenu = document.getElementById('menu-perfil');
+        
+        if (perfilBtn && perfilMenu) {
+            perfilBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                perfilMenu.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!perfilBtn.contains(event.target) && !perfilMenu.contains(event.target)) {
+                    perfilMenu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Actualizar navegación
+        updateNavigation();
+    }
+
+    // Exponer funciones globalmente
+    window.addEventListener('popstate', updateNavigation);
+    window.updateNavigation = updateNavigation;
+    window.generateBreadcrumb = generateBreadcrumb;
+    
+    window.refreshNavigation = function() {
+        updateNavigation();
+    };
+    
+    window.addRoute = function(path, config) {
+        routeConfig[path] = config;
+    };
+
+    // Inicializar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeNavbar);
+    } else {
+        setTimeout(initializeNavbar, 10);
+    }
+
+})();
+</script>

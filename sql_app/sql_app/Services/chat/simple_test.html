@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Test - Sistema de Pruebas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-center mb-8">
+                <i class="fas fa-comments text-blue-500"></i>
+                Sistema de Chat - Pruebas Básicas
+            </h1>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Testing Links -->
+                <div class="bg-blue-50 p-6 rounded-lg">
+                    <h2 class="text-xl font-bold mb-4">Enlaces de Prueba</h2>
+                    <div class="space-y-3">
+                        <a href="/chat/test" class="block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-center">
+                            <i class="fas fa-flask mr-2"></i>
+                            API Chat Test
+                        </a>
+                        <a href="/static/chat/test_chat_system.html" class="block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-center">
+                            <i class="fas fa-cogs mr-2"></i>
+                            Panel Completo de Pruebas
+                        </a>
+                        <a href="/admin/mensajes" class="block bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 text-center">
+                            <i class="fas fa-envelope mr-2"></i>
+                            Admin Mensajes
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- WebSocket Test -->
+                <div class="bg-green-50 p-6 rounded-lg">
+                    <h2 class="text-xl font-bold mb-4">WebSocket Test</h2>
+                    <div class="space-y-3">
+                        <button onclick="testWebSocket()" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                            <i class="fas fa-plug mr-2"></i>
+                            Probar WebSocket Chat
+                        </button>
+                        <button onclick="initGlobalChat()" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                            <i class="fas fa-comments mr-2"></i>
+                            Inicializar Chat Global
+                        </button>
+                        <div id="websocket-status" class="text-sm p-3 bg-gray-100 rounded">
+                            Estado: <span class="font-mono">Listo para probar</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Log de pruebas -->
+            <div class="mt-8 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-xl font-bold mb-4">Log de Pruebas</h2>
+                <div id="test-log" class="bg-black text-green-400 p-4 rounded font-mono text-sm h-40 overflow-y-auto">
+                    [INICIO] Sistema de pruebas cargado<br>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Include Chat Widget -->
+    <script src="/static/chat/global-chat-widget.js"></script>
+    
+    <script>
+        let ws = null;
+        
+        function log(message) {
+            const logDiv = document.getElementById('test-log');
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${time}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('websocket-status');
+            const colors = {
+                'info': 'text-blue-600',
+                'success': 'text-green-600',
+                'error': 'text-red-600',
+                'warning': 'text-yellow-600'
+            };
+            statusDiv.innerHTML = `Estado: <span class="font-mono ${colors[type]}">${message}</span>`;
+        }
+        
+        function testWebSocket() {
+            log('🔌 Iniciando prueba de WebSocket...');
+            updateStatus('Conectando...', 'info');
+            
+            try {
+                const wsUrl = 'ws://localhost:8000/chat/ws/room/1?user_id=999&user_name=Test%20User';
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function(event) {
+                    log('✅ WebSocket conectado exitosamente');
+                    updateStatus('Conectado', 'success');
+                    
+                    // Enviar mensaje de prueba
+                    setTimeout(() => {
+                        const testMessage = {
+                            type: 'send_message',
+                            data: { content: '¡Hola desde la prueba básica!' }
+                        };
+                        ws.send(JSON.stringify(testMessage));
+                        log('📤 Mensaje de prueba enviado');
+                    }, 1000);
+                };
+                
+                ws.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    log(`📨 Mensaje recibido: ${data.type}`);
+                    if (data.type === 'new_message') {
+                        log(`💬 "${data.data.content}" - ${data.data.user_name}`);
+                    }
+                };
+                
+                ws.onclose = function(event) {
+                    log('🔌 WebSocket cerrado');
+                    updateStatus('Desconectado', 'warning');
+                };
+                
+                ws.onerror = function(error) {
+                    log('❌ Error en WebSocket: ' + error);
+                    updateStatus('Error', 'error');
+                };
+                
+            } catch (error) {
+                log('❌ Error iniciando WebSocket: ' + error.message);
+                updateStatus('Error de conexión', 'error');
+            }
+        }
+        
+        function initGlobalChat() {
+            log('💬 Inicializando chat global...');
+            
+            try {
+                if (typeof GlobalChatWidget !== 'undefined') {
+                    window.globalChat = new GlobalChatWidget({
+                        userId: 998,
+                        userName: 'Usuario de Prueba',
+                        defaultRoomId: 1,
+                        autoConnect: true
+                    });
+                    log('✅ Chat global inicializado');
+                    updateStatus('Chat Global Activo', 'success');
+                } else {
+                    log('❌ GlobalChatWidget no disponible');
+                    updateStatus('Widget no cargado', 'error');
+                }
+            } catch (error) {
+                log('❌ Error inicializando chat global: ' + error.message);
+                updateStatus('Error en widget', 'error');
+            }
+        }
+        
+        // Auto-inicializar al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            log('📋 Página de pruebas cargada');
+            log('🔗 URLs disponibles:');
+            log('   - WebSocket: ws://localhost:8000/chat/ws/room/1');
+            log('   - API: http://localhost:8000/chat/test');
+            log('   - Panel: http://localhost:8000/static/chat/test_chat_system.html');
+            updateStatus('Sistema Listo', 'info');
+        });
+    </script>
+</body>
+</html>

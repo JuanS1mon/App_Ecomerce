@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Mensajes - SQL App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="/static/components/load-components.js"></script>
+    <script src="/mensajes/static/js/mensajes-admin.js"></script>
+    <style>
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        
+        .mensaje-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .mensaje-card {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navbar -->
+    <div id="navbar-placeholder"></div>
+    
+    <!-- Contenido Principal -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Header con título y botón nuevo mensaje -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                    <i class="fas fa-envelope mr-3 text-blue-600"></i>
+                    Administración de Mensajes
+                </h1>
+                <p class="text-gray-600 mt-2">Gestiona todos los mensajes del sistema</p>
+            </div>
+            <button onclick="abrirModalNuevoMensaje()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-colors">
+                <i class="fas fa-plus"></i>
+                <span>Nuevo Mensaje</span>
+            </button>
+        </div>
+        
+        <!-- Panel de Estadísticas -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Mensajes</p>
+                        <p class="text-2xl font-bold text-gray-900" id="stat-total">-</p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-lg">
+                        <i class="fas fa-envelope text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">No Leídos</p>
+                        <p class="text-2xl font-bold text-orange-600" id="stat-no-leidos">-</p>
+                    </div>
+                    <div class="bg-orange-100 p-3 rounded-lg">
+                        <i class="fas fa-bell text-orange-600"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Urgentes</p>
+                        <p class="text-2xl font-bold text-red-600" id="stat-urgentes">-</p>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-lg">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Hoy</p>
+                        <p class="text-2xl font-bold text-green-600" id="stat-hoy">-</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        <i class="fas fa-calendar-day text-green-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtros y Búsqueda -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+                    <input type="text" id="filtro-busqueda" placeholder="Buscar en título o contenido..." 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+                    <select id="filtro-tipo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Todos</option>
+                        <option value="sistema">Sistema</option>
+                        <option value="alerta">Alerta</option>
+                        <option value="notificacion">Notificación</option>
+                        <option value="usuario">Usuario</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Prioridad</label>
+                    <select id="filtro-prioridad" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Todas</option>
+                        <option value="urgente">Urgente</option>
+                        <option value="alta">Alta</option>
+                        <option value="normal">Normal</option>
+                        <option value="baja">Baja</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                    <select id="filtro-estado" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Todos</option>
+                        <option value="leido">Leídos</option>
+                        <option value="no-leido">No Leídos</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center mt-4">
+                <button onclick="aplicarFiltros()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+                    <i class="fas fa-search"></i>
+                    <span>Filtrar</span>
+                </button>
+                
+                <button onclick="limpiarFiltros()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+                    <i class="fas fa-times"></i>
+                    <span>Limpiar</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Lista de Mensajes -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-900">Lista de Mensajes</h2>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-500" id="total-mensajes">Cargando...</span>
+                        <div class="flex space-x-2">
+                            <button onclick="cambiarVista('tarjetas')" id="btn-vista-tarjetas" class="p-2 rounded-lg bg-blue-100 text-blue-600">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button onclick="cambiarVista('tabla')" id="btn-vista-tabla" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Vista de Tarjetas -->
+            <div id="vista-tarjetas" class="p-6">
+                <div id="lista-mensajes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Los mensajes se cargarán aquí -->
+                    <div class="flex items-center justify-center py-12 col-span-full">
+                        <div class="text-center">
+                            <i class="fas fa-spinner fa-spin text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-500">Cargando mensajes...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Vista de Tabla -->
+            <div id="vista-tabla" class="hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Título</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prioridad</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-mensajes" class="bg-white divide-y divide-gray-200">
+                            <!-- Los mensajes se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Paginación -->
+            <div class="p-6 border-t border-gray-200">
+                <div class="flex justify-between items-center">
+                    <div class="text-sm text-gray-500">
+                        Mostrando <span id="pag-inicio">1</span> a <span id="pag-fin">10</span> de <span id="pag-total">0</span> mensajes
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="paginaAnterior()" id="btn-anterior" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50" disabled>
+                            Anterior
+                        </button>
+                        <button onclick="paginaSiguiente()" id="btn-siguiente" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50" disabled>
+                            Siguiente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Modal Nuevo/Editar Mensaje -->
+    <div id="modal-mensaje" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-50" onclick="cerrarModalMensaje()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto slide-in">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h3 id="modal-titulo" class="text-xl font-semibold text-gray-900">Nuevo Mensaje</h3>
+                        <button onclick="cerrarModalMensaje()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <form id="form-mensaje" class="p-6 space-y-6">
+                    <input type="hidden" id="mensaje-id" value="">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Usuario Receptor *</label>
+                            <select id="usuario-receptor" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Seleccionar usuario...</option>
+                                <!-- Se cargarán dinámicamente -->
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo *</label>
+                            <select id="mensaje-tipo" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="sistema">Sistema</option>
+                                <option value="alerta">Alerta</option>
+                                <option value="notificacion" selected>Notificación</option>
+                                <option value="usuario">Usuario</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prioridad *</label>
+                            <select id="mensaje-prioridad" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="baja">Baja</option>
+                                <option value="normal" selected>Normal</option>
+                                <option value="alta">Alta</option>
+                                <option value="urgente">Urgente</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Título *</label>
+                        <input type="text" id="mensaje-titulo" required maxlength="200" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               placeholder="Título del mensaje...">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Contenido *</label>
+                        <textarea id="mensaje-contenido" required rows="4" 
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="Contenido del mensaje..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Metadatos (JSON)</label>
+                        <textarea id="mensaje-metadatos" rows="3" 
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder='{"clave": "valor", "origen": "admin"}'></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Formato JSON opcional para metadatos adicionales</p>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" onclick="cerrarModalMensaje()" 
+                                class="px-6 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
+                            Cancelar
+                        </button>
+                        <button type="submit" 
+                                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                            <span id="btn-guardar-texto">Guardar Mensaje</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Ver Mensaje -->
+    <div id="modal-ver-mensaje" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-50" onclick="cerrarModalVerMensaje()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto slide-in">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-semibold text-gray-900">Detalles del Mensaje</h3>
+                        <button onclick="cerrarModalVerMensaje()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="contenido-ver-mensaje" class="p-6">
+                    <!-- El contenido se cargará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+    <script>
+        // Variables globales
+        let paginaActual = 1;
+        let totalPaginas = 1;
+        let vistaActual = 'tarjetas';
+        let filtrosActuales = {};
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Esperar un poco para que se cargue mensajes-admin.js
+            setTimeout(function() {
+                if (typeof window.cargarEstadisticas === 'function') {
+                    window.cargarEstadisticas();
+                    window.cargarUsuarios();
+                    window.cargarMensajes();
+                } else {
+                    console.log('Funciones de mensajes-admin.js no disponibles, usando fallback');
+                    cargarDatosFallback();
+                }
+            }, 100);
+            
+            // Event listeners para filtros
+            document.getElementById('filtro-busqueda').addEventListener('input', debounce(aplicarFiltros, 500));
+            document.getElementById('filtro-tipo').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtro-prioridad').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtro-estado').addEventListener('change', aplicarFiltros);
+        });
+        
+        // Función debounce para búsqueda
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // TODO: Implementar todas las funciones JavaScript
+        // (En el siguiente paso implementaré todas las funciones)
+        
+        // Funciones implementadas en mensajes-admin.js
+        // Las funciones cargarEstadisticas, cargarUsuarios, cargarMensajes, aplicarFiltros
+        // están implementadas en /mensajes/static/js/mensajes-admin.js
+        
+        function cargarDatosFallback() {
+            console.log('🚀 Cargando datos usando endpoints públicos...');
+            
+            // Cargar estadísticas
+            fetch('/api/public/mensajes/estadisticas')
+                .then(response => {
+                    console.log('📊 Respuesta estadísticas status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('✅ Datos de estadísticas recibidos:', data);
+                    document.getElementById('stat-total').textContent = data.total_mensajes || 0;
+                    document.getElementById('stat-no-leidos').textContent = data.mensajes_no_leidos || 0;
+                    document.getElementById('stat-urgentes').textContent = data.mensajes_urgentes || 0;
+                    document.getElementById('stat-hoy').textContent = data.usuarios_activos || 0;
+                    console.log('✅ Estadísticas actualizadas en el DOM');
+                })
+                .catch(error => console.error('❌ Error cargando estadísticas:', error));
+            
+            // Cargar mensajes
+            fetch('/api/public/mensajes/navbar')
+                .then(response => {
+                    console.log('📨 Respuesta mensajes status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('✅ Datos de mensajes recibidos:', data);
+                    console.log(`📝 Cantidad de mensajes: ${data.mensajes ? data.mensajes.length : 'undefined'}`);
+                    
+                    const listaMensajes = document.getElementById('lista-mensajes');
+                    const totalMensajes = document.getElementById('total-mensajes');
+                    
+                    if (!listaMensajes) {
+                        console.error('❌ No se encontró elemento lista-mensajes');
+                        return;
+                    }
+                    
+                    if (data.mensajes && Array.isArray(data.mensajes) && data.mensajes.length > 0) {
+                        console.log(`🎯 Procesando ${data.mensajes.length} mensajes...`);
+                        listaMensajes.innerHTML = '';
+                        
+                        data.mensajes.forEach((mensaje, index) => {
+                            console.log(`📋 Procesando mensaje ${index + 1}:`, mensaje.titulo);
+                            try {
+                                const card = crearTarjetaMensaje(mensaje);
+                                if (card) {
+                                    listaMensajes.appendChild(card);
+                                    console.log(`✅ Mensaje ${index + 1} agregado al DOM`);
+                                } else {
+                                    console.error(`❌ No se pudo crear tarjeta para mensaje ${index + 1}`);
+                                }
+                            } catch (error) {
+                                console.error(`❌ Error creando tarjeta para mensaje ${index + 1}:`, error);
+                            }
+                        });
+                        
+                        if (totalMensajes) {
+                            totalMensajes.textContent = `${data.mensajes.length} mensajes encontrados`;
+                        }
+                        console.log('🎉 Todos los mensajes procesados correctamente');
+                        
+                    } else {
+                        console.log('⚠️ No hay mensajes o array vacío:', data);
+                        listaMensajes.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">No hay mensajes disponibles</div>';
+                        if (totalMensajes) {
+                            totalMensajes.textContent = '0 mensajes encontrados';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Error cargando mensajes:', error);
+                    const listaMensajes = document.getElementById('lista-mensajes');
+                    if (listaMensajes) {
+                        listaMensajes.innerHTML = '<div class="col-span-full text-center text-red-500 py-8">Error cargando mensajes</div>';
+                    }
+                });
+        }
+        
+        function crearTarjetaMensaje(mensaje) {
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-lg shadow-sm border border-gray-200 p-6 mensaje-card';
+            div.innerHTML = `
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-lg font-semibold text-gray-900 truncate">${mensaje.titulo || 'Sin título'}</h3>
+                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-${getPrioridadColor(mensaje.prioridad)}-100 text-${getPrioridadColor(mensaje.prioridad)}-800">
+                        ${mensaje.prioridad || 'normal'}
+                    </span>
+                </div>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-3">${mensaje.contenido || 'Sin contenido'}</p>
+                <div class="flex justify-between items-center text-xs text-gray-500">
+                    <span class="px-2 py-1 bg-gray-100 rounded">${mensaje.tipo || 'sistema'}</span>
+                    <span>${formatearFecha(mensaje.fecha_creacion)}</span>
+                </div>
+                ${!mensaje.leido ? '<div class="absolute top-2 right-2 w-3 h-3 bg-blue-500 rounded-full"></div>' : ''}
+            `;
+            return div;
+        }
+        
+        function getPrioridadColor(prioridad) {
+            switch(prioridad) {
+                case 'urgente': return 'red';
+                case 'alta': return 'orange';
+                case 'media': return 'yellow';
+                case 'baja': return 'green';
+                default: return 'gray';
+            }
+        }
+        
+        function formatearFecha(fecha) {
+            if (!fecha) return '';
+            return new Date(fecha).toLocaleDateString('es-ES');
+        }
+        
+        function aplicarFiltros() {
+            console.log('Aplicando filtros...');
+            // Esta función se puede implementar más tarde
+        }
+        
+        function abrirModalNuevoMensaje() {
+            document.getElementById('modal-mensaje').classList.remove('hidden');
+        }
+        
+        function cerrarModalMensaje() {
+            document.getElementById('modal-mensaje').classList.add('hidden');
+        }
+        
+        function cerrarModalVerMensaje() {
+            document.getElementById('modal-ver-mensaje').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

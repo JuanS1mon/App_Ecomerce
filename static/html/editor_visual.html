@@ -446,36 +446,28 @@
             debugLocalStorage() {
                 console.log('🔍 Debug localStorage:');
                 
-                const simpleConfig = localStorage.getItem('phase2_current_config');
-                const complexConfig = localStorage.getItem('phase2_complex_config');
+                const generatorConfig = localStorage.getItem('generator_config');
                 const exportData = localStorage.getItem('visual_editor_export');
                 
-                console.log('phase2_current_config:', simpleConfig);
-                console.log('phase2_complex_config:', complexConfig);
+                console.log('generator_config:', generatorConfig);
                 console.log('visual_editor_export:', exportData);
                 
                 // Mostrar información en alert también
                 let info = '🔍 DEBUG LOCALSTORAGE\n\n';
                 
-                if (simpleConfig) {
-                    info += '✅ Configuración Simple encontrada\n';
-                    info += `Tamaño: ${simpleConfig.length} caracteres\n\n`;
-                } else {
-                    info += '❌ No hay configuración simple\n\n';
-                }
-                
-                if (complexConfig) {
-                    info += '✅ Configuración Compleja encontrada\n';
-                    info += `Tamaño: ${complexConfig.length} caracteres\n\n`;
+                if (generatorConfig) {
+                    info += '✅ Configuración para Generador encontrada\n';
+                    info += `Tamaño: ${generatorConfig.length} caracteres\n\n`;
                     try {
-                        const parsed = JSON.parse(complexConfig);
+                        const parsed = JSON.parse(generatorConfig);
+                        info += `Servicio: ${parsed.service_name || 'Sin nombre'}\n`;
                         info += `Tablas: ${parsed.tables ? parsed.tables.length : 0}\n`;
                         info += `Relaciones: ${parsed.relationships ? parsed.relationships.length : 0}\n\n`;
                     } catch (e) {
-                        info += '❌ Error parseando configuración compleja\n\n';
+                        info += '❌ Error parseando configuración\n\n';
                     }
                 } else {
-                    info += '❌ No hay configuración compleja\n\n';
+                    info += '❌ No hay configuración para el generador\n\n';
                 }
                 
                 if (exportData) {
@@ -1734,6 +1726,11 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
             }
             
             sendToGenerator() {
+                console.log('🚀 [DEBUG] sendToGenerator iniciado');
+                console.log('🚀 [DEBUG] Número de tablas:', this.tables.size);
+                console.log('🚀 [DEBUG] Tablas disponibles:', Array.from(this.tables.keys()));
+                console.log('🚀 [DEBUG] Número de relaciones:', this.relationships.length);
+                
                 if (this.tables.size === 0) {
                     alert('No hay tablas para enviar. Crea al menos una tabla primero.');
                     return;
@@ -1741,24 +1738,25 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
                 
                 try {
                     // Limpiar configuraciones anteriores para evitar conflictos
-                    localStorage.removeItem('phase2_current_config');
-                    localStorage.removeItem('phase2_complex_config');
+                    localStorage.removeItem('generator_config');
                     localStorage.removeItem('visual_editor_export');
                     
                     console.log('🧹 localStorage limpiado antes de enviar nueva configuración');
                     
                     // Convertir todas las tablas a formato del Generador
                     const tables = Array.from(this.tables.values());
+                    console.log('🚀 [DEBUG] Tablas convertidas a array:', tables.length);
                     
                     if (tables.length === 1) {
+                        console.log('🚀 [DEBUG] Usando lógica de tabla única');
                         // Una sola tabla - formato simple
                         const table = tables[0];
                         const phase2Config = this.convertToPhase2Format(table);
                         
                         console.log('📤 Configuración simple a enviar:', phase2Config);
                         
-                        // Guardar en localStorage para el Generador
-                        localStorage.setItem('phase2_current_config', JSON.stringify(phase2Config));
+                        // Guardar en localStorage para el Generador con la clave correcta
+                        localStorage.setItem('generator_config', JSON.stringify(phase2Config));
                         localStorage.setItem('visual_editor_export', JSON.stringify({
                             timestamp: new Date().toISOString(),
                             table_name: table.name,
@@ -1769,11 +1767,14 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
                         alert(`✅ Tabla "${table.name}" enviada exitosamente al Generador.\n\nPuedes regresar al Generador y la configuración estará lista.`);
                         
                     } else {
+                        console.log('🚀 [DEBUG] Usando lógica de múltiples tablas');
                         // Múltiples tablas - crear configuración compleja
                         
                         // Obtener configuración del proyecto
                         const projectName = document.getElementById('project-name').value.trim() || 'sistema_visual_multiple';
                         const projectDescription = document.getElementById('project-description').value.trim() || 'Sistema multi-tabla generado desde Editor Visual';
+                        
+                        console.log('🚀 [DEBUG] Configuración del proyecto:', { projectName, projectDescription });
                         
                         // Validar nombre del proyecto (solo letras, números y guiones bajos)
                         const validProjectName = projectName.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
@@ -1785,6 +1786,7 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
                             service_name: validProjectName,
                             description: projectDescription,
                             tables: tables.map(table => {
+                                console.log('🚀 [DEBUG] Procesando tabla:', table.name, 'con', table.fields.length, 'campos');
                                 // Asegurar que cada tabla tenga un campo ID primario
                                 const fields = [];
                                 
@@ -1834,7 +1836,11 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
                             timestamp: new Date().toISOString()
                         };
                         
-                        localStorage.setItem('phase2_complex_config', JSON.stringify(complexConfig));
+                        console.log('🚀 [DEBUG] Configuración compleja creada:', complexConfig);
+                        console.log('🚀 [DEBUG] Número de tablas en configuración:', complexConfig.tables.length);
+                        console.log('🚀 [DEBUG] Número de relaciones en configuración:', complexConfig.relationships.length);
+                        
+                        localStorage.setItem('generator_config', JSON.stringify(complexConfig));
                         localStorage.setItem('visual_editor_export', JSON.stringify({
                             timestamp: new Date().toISOString(),
                             tables_count: tables.length,
@@ -2260,11 +2266,11 @@ EJEMPLO COMPLETO DE RELACIÓN CORRECTA:
 {
   "from_table": "usuarios",      // Tabla padre (sin FK)
   "to_table": "pedidos",         // Tabla hija (con FK)
-  "relationship_type": "one_to_many",
+  "relationship_type": "one-to-many",
   "from_field": "id",           // Campo en tabla padre
   "to_field": "id_usuario"      // Foreign key en tabla hija
 }
-✅ En relaciones one_to_many: from_field="id", to_field="id_tabla_padre"
+✅ En relaciones one-to-many: from_field="id", to_field="id_tabla_padre"
 ✅ Incluye posiciones para organizar visualmente las tablas
 
 EJEMPLOS DE APLICACIONES:
@@ -2280,26 +2286,43 @@ INSTRUCCIONES:
 3. Incluye posiciones organizadas para las tablas
 4. Asegúrate de que las relaciones tengan sentido lógico
 
-VALIDACIONES FINALES:
-🔍 Antes de enviar el JSON, verifica que:
-- Todas las tablas tienen campo "id" como primary_key con field_type="integer"
-- Los campos primary_key SIEMPRE deben ser field_type="integer" (no string)
-- Los foreign keys siguen el formato "id_tabla_padre" (ejemplo: id_usuario, id_producto)
-- Las foreign keys también deben ser field_type="integer"
-- Las posiciones están distribuidas sin solapamientos (mínimo 280px de separación)
-- Las relaciones one-to-many van de tabla padre (sin FK) a tabla hija (con FK)
-- Los campos obligatorios tienen nullable=false
-- Los primary_key tienen auto_increment=true
-- NO incluyas foreign keys como campos separados si ya están en las relaciones
+🚨🚨🚨 VALIDACIONES CRÍTICAS OBLIGATORIAS 🚨🚨🚨
+⚠️ El sistema rechazará tu JSON si NO cumple TODAS estas reglas:
 
-ERRORES COMUNES A EVITAR:
-❌ "field_type": "string" en campos id (debe ser "integer")
-❌ Relaciones que apuntan a campos inexistentes
-❌ Foreign keys duplicados en fields y relationships
-❌ Usar guiones bajos en relationship_type (usar guiones medios: "one-to-many")
+1. CAMPOS ID PRIMARIOS - FORMATO ÚNICO OBLIGATORIO:
+   ✅ "name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false
+   ❌ NUNCA usar "field_type": "string" en campos "id"
 
-FORMATO CORRECTO DE CAMPO ID:
-✅ {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false}
+2. FOREIGN KEYS - FORMATO ÚNICO OBLIGATORIO:
+   ✅ "field_type": "integer" (SIEMPRE)
+   ✅ Nombres: "id_usuario", "id_categoria", etc.
+   ❌ NUNCA usar "field_type": "string" en foreign keys
+
+3. RELATIONSHIP_TYPE - FORMATO ÚNICO OBLIGATORIO:
+   ✅ "one-to-many" (con guiones medios)
+   ✅ "many-to-one" (con guiones medios)
+   ❌ NUNCA usar "one_to_many" (con guiones bajos)
+
+🔍 CHECKLIST ANTES DE GENERAR:
+□ ¿Todos los campos "id" tienen "field_type": "integer"?
+□ ¿Todas las foreign keys tienen "field_type": "integer"?
+□ ¿Todos los relationship_type usan guiones medios (-)?
+□ ¿Los campos id tienen auto_increment=true?
+□ ¿Los campos id tienen primary_key=true?
+
+❌ ERRORES QUE CAUSAN RECHAZO AUTOMÁTICO:
+- "field_type": "string" en cualquier campo "id"
+- "field_type": "string" con "auto_increment": true
+- "relationship_type": "one_to_many" (usar "one-to-many")
+
+EJEMPLO PERFECTO DE CAMPO ID:
+{
+  "name": "id",
+  "field_type": "integer",
+  "primary_key": true,
+  "auto_increment": true,
+  "nullable": false
+}
 
 ¿Qué tipo de aplicación quieres que te ayude a crear?`;
 
@@ -2391,7 +2414,7 @@ FORMATO CORRECTO DE CAMPO ID:
             importFromPhase2() {
                 try {
                     // Intentar cargar desde localStorage del Generador
-                    const phase2Data = localStorage.getItem('phase2_current_config');
+                    const phase2Data = localStorage.getItem('generator_config');
                     
                     if (!phase2Data) {
                         alert('No se encontraron configuraciones guardadas en el Generador. Por favor, crea una configuración en el Generador primero.');

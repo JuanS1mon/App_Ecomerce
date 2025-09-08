@@ -10,8 +10,21 @@
 
 from sql_app.config import FRONTEND_URL, ORIGINS, STATIC_DIR, ENVIRONMENT
 from sql_app.logging_config import setup_logging
+import logging
 
+# Configurar logging al inicio y forzar reconfiguración de todos los loggers
 setup_logging()
+
+# Forzar que todos los loggers existentes usen también el file handler
+import logging.config
+from sql_app.logging_config import LOGGING_CONFIG
+
+# Reconfigurar todos los loggers para asegurar que usen el file handler
+logging.config.dictConfig(LOGGING_CONFIG)
+
+# Obtener logger principal para confirmar configuración
+main_logger = logging.getLogger("main")
+main_logger.info("🚀 Logging configurado - archivos se escribirán en logs/server.log")
 
 # =============================
 # IMPORTACIONES ESTÁNDAR Y FASTAPI

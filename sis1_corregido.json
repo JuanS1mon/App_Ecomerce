@@ -1,0 +1,239 @@
+{
+  "service_name": "sis1",
+  "description": "Sistema multi-tabla generado desde Editor Visual",
+  "tables": [
+    {
+      "name": "usuario_1092",
+      "description": "Módulo usuario_1092 generado desde Editor Visual",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        {
+          "name": "nombre",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "email",
+          "field_type": "email",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "telefono",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "activo",
+          "field_type": "boolean",
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    {
+      "name": "producto_1092",
+      "description": "Módulo producto_1092 generado desde Editor Visual",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        {
+          "name": "nombre",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "precio",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "stock",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "categoria",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    {
+      "name": "orden_1092",
+      "description": "Módulo orden_1092 generado desde Editor Visual",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        {
+          "name": "numero_orden",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "fecha_orden",
+          "field_type": "datetime",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "total",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "estado",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "usuario_id",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false,
+          "foreign_key": "usuario_1092.id"
+        }
+      ]
+    },
+    {
+      "name": "detalle_orden_1092",
+      "description": "Módulo detalle_orden_1092 generado desde Editor Visual",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        {
+          "name": "cantidad",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "precio_unitario",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "subtotal",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "descuento",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "orden_id",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false,
+          "foreign_key": "orden_1092.id"
+        },
+        {
+          "name": "producto_id",
+          "field_type": "integer",
+          "primary_key": false,
+          "auto_increment": false,
+          "foreign_key": "producto_1092.id"
+        }
+      ]
+    },
+    {
+      "name": "categoria_1092",
+      "description": "Módulo categoria_1092 generado desde Editor Visual",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        {
+          "name": "nombre",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "descripcion",
+          "field_type": "string",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "activa",
+          "field_type": "boolean",
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from_table": "orden_1092",
+      "to_table": "usuario_1092",
+      "relationship_type": "many-to-one",
+      "from_field": "usuario_id",
+      "to_field": "id",
+      "relationship_name": "orden_1092_to_usuario_1092",
+      "back_populates": null,
+      "cascade_delete": false,
+      "lazy_loading": "select"
+    },
+    {
+      "from_table": "detalle_orden_1092",
+      "to_table": "orden_1092",
+      "relationship_type": "many-to-one",
+      "from_field": "orden_id",
+      "to_field": "id",
+      "relationship_name": "detalle_orden_1092_to_orden_1092",
+      "back_populates": null,
+      "cascade_delete": false,
+      "lazy_loading": "select"
+    },
+    {
+      "from_table": "detalle_orden_1092",
+      "to_table": "producto_1092",
+      "relationship_type": "many-to-one",
+      "from_field": "producto_id",
+      "to_field": "id",
+      "relationship_name": "detalle_orden_1092_to_producto_1092",
+      "back_populates": null,
+      "cascade_delete": false,
+      "lazy_loading": "select"
+    }
+  ],
+  "generate_crud_for_all": true,
+  "generated_by": "Editor Visual",
+  "timestamp": "2025-08-16T18:28:32.193Z"
+}

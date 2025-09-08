@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instituciones - Sistema de Obras de Arte</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts - Elementos del Brooklyn Museum -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+        }
+        
+        .brooklyn-title {
+            font-family: 'Crimson Text', serif;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        
+        .institution-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .institution-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .institution-badge {
+            background-color: #f3f4f6;
+            color: #374151;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            letter-spacing: 0.025em;
+        }
+        
+        .table-minimal {
+            border: none;
+        }
+        
+        .table-minimal th {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 500;
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+            color: #374151;
+            padding: 1rem 1.5rem;
+        }
+        
+        .table-minimal td {
+            border: none;
+            border-bottom: 1px solid #f3f4f6;
+            padding: 1rem 1.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .action-btn {
+            font-size: 0.75rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            letter-spacing: 0.025em;
+            transition: all 0.2s ease;
+        }
+        
+        .section-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #374151;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+   
+    <!-- Contenido principal estilo Brooklyn Museum -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">   
+        
+        <!-- Header principal estilo Brooklyn Museum -->
+        <div class="mb-12">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="brooklyn-title text-4xl md:text-5xl text-gray-900 mb-4">INSTITUCIONES</h1>
+                    <p class="text-gray-600 text-lg max-w-2xl">
+                        Directorio completo de museos, galerías y centros culturales
+                    </p>
+                </div>
+                <div>
+                    <a href="/app_obras/institutions/html/create" class="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors rounded-lg">
+                        <i class="fas fa-plus mr-2"></i>
+                        Nueva Institución
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 py-6 border-t border-b border-gray-200">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1">{{ institutions|length }}</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Total Instituciones</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1" id="museums-count">0</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Museos</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1" id="galleries-count">0</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Galerías</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1" id="locations-count">0</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Ubicaciones</div>
+            </div>
+        </div>
+
+        <!-- Listado estilo minimalista -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="table-minimal w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Institución</th>
+                            <th class="text-left">Ubicación</th>
+                            <th class="text-left">Tipo</th>
+                            <th class="text-center">Exhibiciones</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for institution in institutions %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td>
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-building text-gray-600"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900">{{ institution.name }}</div>
+                                        <div class="text-sm text-gray-500">ID: {{ institution.id }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-gray-900">
+                                    {% if institution.location %}
+                                        {{ institution.location.city }}, {{ institution.location.country }}
+                                    {% else %}
+                                        <span class="text-gray-500">Sin ubicación</span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-sm text-gray-500">
+                                    {% if institution.location %}
+                                        {{ institution.location.address }}
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if 'museo' in institution.name.lower() %}
+                                    <span class="institution-badge bg-blue-100 text-blue-800">Museo</span>
+                                {% elif 'galería' in institution.name.lower() or 'galeria' in institution.name.lower() %}
+                                    <span class="institution-badge bg-green-100 text-green-800">Galería</span>
+                                {% elif 'centro' in institution.name.lower() %}
+                                    <span class="institution-badge bg-purple-100 text-purple-800">Centro Cultural</span>
+                                {% else %}
+                                    <span class="institution-badge bg-gray-100 text-gray-800">Institución</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <span class="text-gray-900 font-medium">
+                                    {% if institution.exhibitions %}
+                                        {{ institution.exhibitions|length }}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </span>
+                                <div class="text-xs text-gray-500">exhibiciones</div>
+                            </td>
+                            <td class="text-center">
+                                <div class="flex justify-center space-x-2">
+                                    <a href="/app_obras/institutions/html/edit/{{ institution.id }}" 
+                                       class="action-btn bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg">
+                                        <i class="fas fa-edit mr-1"></i>
+                                        Editar
+                                    </a>
+                                    <button onclick="deleteInstitution({{ institution.id }})" 
+                                            class="action-btn bg-red-100 text-red-700 hover:bg-red-200 rounded-lg">
+                                        <i class="fas fa-trash mr-1"></i>
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-12">
+                                <div class="text-gray-500">
+                                    <i class="fas fa-building text-4xl mb-4"></i>
+                                    <p class="text-lg font-medium">No hay instituciones registradas</p>
+                                    <p class="text-sm">Comienza agregando tu primera institución al sistema.</p>
+                                    <a href="/app_obras/institutions/html/create" class="inline-flex items-center mt-4 px-4 py-2 bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors rounded-lg">
+                                        <i class="fas fa-plus mr-2"></i>
+                                        Crear Primera Institución
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="section-title">Gestión de Instituciones</h3>
+                <div class="space-y-3 text-sm text-gray-600">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        Registro completo de museos y galerías
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        Ubicaciones geográficas detalladas
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        Seguimiento de exhibiciones por institución
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        Clasificación automática por tipo
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="section-title">Acciones Rápidas</h3>
+                <div class="space-y-3">
+                    <a href="/app_obras/institutions/html/create" class="flex items-center text-sm text-gray-700 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-plus w-4 mr-3 text-gray-500"></i>
+                        Agregar nueva institución
+                    </a>
+                    <a href="/app_obras/locations/html/" class="flex items-center text-sm text-gray-700 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-map-marker-alt w-4 mr-3 text-gray-500"></i>
+                        Gestionar ubicaciones
+                    </a>
+                    <a href="/app_obras/exhibitions/html/" class="flex items-center text-sm text-gray-700 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-calendar w-4 mr-3 text-gray-500"></i>
+                        Ver exhibiciones activas
+                    </a>
+                    <a href="/app_obras/dashboard/" class="flex items-center text-sm text-gray-700 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-chart-bar w-4 mr-3 text-gray-500"></i>
+                        Estadísticas del sistema
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-xl mr-3"></i>
+                    <h3 class="text-lg font-medium text-gray-900">Confirmar eliminación</h3>
+                </div>
+                <p class="text-gray-600 mb-6">
+                    ¿Estás seguro de que deseas eliminar esta institución? Esta acción no se puede deshacer.
+                </p>
+                <div class="flex justify-end space-x-3">
+                    <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+                        Cancelar
+                    </button>
+                    <button onclick="confirmDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let institutionToDelete = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar navbar
+            loadNavbar();
+            
+            // Calcular estadísticas
+            calculateStats();
+        });
+
+        function calculateStats() {
+            const institutions = [];
+            
+            // Contar tipos de instituciones
+            let museumsCount = 0;
+            let galleriesCount = 0;
+            let locationsCount = new Set();
+            
+            institutions.forEach(institution => {
+                const name = institution.name.toLowerCase();
+                if (name.includes('museo')) {
+                    museumsCount++;
+                } else if (name.includes('galería') || name.includes('galeria')) {
+                    galleriesCount++;
+                }
+                
+                if (institution.location_id) {
+                    locationsCount.add(institution.location_id);
+                }
+            });
+            
+            document.getElementById('museums-count').textContent = museumsCount;
+            document.getElementById('galleries-count').textContent = galleriesCount;
+            document.getElementById('locations-count').textContent = locationsCount.size;
+        }
+
+        function deleteInstitution(id) {
+            institutionToDelete = id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+            institutionToDelete = null;
+        }
+
+        async function confirmDelete() {
+            if (!institutionToDelete) return;
+            
+            try {
+                const response = await fetch(`/app_obras/institutions/id/${institutionToDelete}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // Recargar la página para mostrar los cambios
+                    window.location.reload();
+                } else {
+                    alert('Error al eliminar la institución');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar la institución');
+            }
+            
+            closeDeleteModal();
+        }
+    </script>
+</body>
+</html>

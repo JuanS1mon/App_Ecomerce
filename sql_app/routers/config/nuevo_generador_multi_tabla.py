@@ -17,12 +17,19 @@ def generar_estructura_completa_por_tabla(service_config: MultiTableServiceConfi
     generated_files = []
     
     try:
+        # Construir ruta base correcta para Services
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))  # sql_app/
+        services_path = os.path.join(base_dir, GENERATOR_CONFIG.paths.services)  # sql_app/Services/
+        
         # Para cada tabla, crear su carpeta individual
         for table in service_config.tables:
             
             # Crear directorio de la tabla
-            table_dir = os.path.join(GENERATOR_CONFIG.paths.services, service_config.service_name, table.name)
+            table_dir = os.path.join(services_path, service_config.service_name, table.name)
             Path(table_dir).mkdir(parents=True, exist_ok=True)
+            
+            print(f"🏗️ Creando directorio: {table_dir}")  # Debug para verificar
+            print(f"🏗️ Creando directorio: {table_dir}")  # Debug para verificar
             
             # 1. Generar model
             model_content = generar_modelo_tabla(table, service_config)
@@ -30,6 +37,7 @@ def generar_estructura_completa_por_tabla(service_config: MultiTableServiceConfi
             with open(model_file, 'w', encoding='utf-8') as f:
                 f.write(model_content)
             generated_files.append(model_file)
+            print(f"📄 Modelo creado: {model_file}")
             
             # 2. Generar schema
             schema_content = generar_schema_tabla(table, service_config)
@@ -37,6 +45,7 @@ def generar_estructura_completa_por_tabla(service_config: MultiTableServiceConfi
             with open(schema_file, 'w', encoding='utf-8') as f:
                 f.write(schema_content)
             generated_files.append(schema_file)
+            print(f"📄 Schema creado: {schema_file}")
             
             # 3. Generar service
             service_content = generar_service_tabla(table, service_config)
@@ -44,6 +53,7 @@ def generar_estructura_completa_por_tabla(service_config: MultiTableServiceConfi
             with open(service_file, 'w', encoding='utf-8') as f:
                 f.write(service_content)
             generated_files.append(service_file)
+            print(f"📄 Service creado: {service_file}")
             
             # 4. Generar router
             router_content = generar_router_tabla(table, service_config)
@@ -51,6 +61,7 @@ def generar_estructura_completa_por_tabla(service_config: MultiTableServiceConfi
             with open(router_file, 'w', encoding='utf-8') as f:
                 f.write(router_content)
             generated_files.append(router_file)
+            print(f"📄 Router creado: {router_file}")
             
             # 5. Generar __init__.py
             init_content = generar_init_tabla(table, service_config)
@@ -58,7 +69,17 @@ def generar_estructura_completa_por_tabla(service_config: MultiTableServiceConfi
             with open(init_file, 'w', encoding='utf-8') as f:
                 f.write(init_content)
             generated_files.append(init_file)
+            print(f"📄 Init creado: {init_file}")
         
+        # 6. Generar route_config para todo el servicio
+        route_config_content = generar_route_config_servicio(service_config)
+        route_config_file = os.path.join(services_path, service_config.service_name, f"route_config_{service_config.service_name}.py")
+        with open(route_config_file, 'w', encoding='utf-8') as f:
+            f.write(route_config_content)
+        generated_files.append(route_config_file)
+        print(f"📄 Route Config creado: {route_config_file}")
+        
+        print(f"🎯 Generación completada: {len(generated_files)} archivos creados")
         return {
             "success": True,
             "generated_files": generated_files,
@@ -422,6 +443,53 @@ __all__ = [
     "{table.name}_service",
     "router"
 ]
+'''
+    
+    return content
+
+def generar_route_config_servicio(service_config: MultiTableServiceConfig) -> str:
+    """Generar archivo route_config para todo el servicio"""
+    
+    # Generar imports de los routers
+    imports = []
+    router_includes = []
+    
+    for table in service_config.tables:
+        import_name = f"{table.name}_router"
+        imports.append(f"from sql_app.Services.{service_config.service_name}.{table.name}.route_{table.name} import router as {import_name}")
+        router_includes.append(f"    app.include_router({import_name}, prefix=\"/{service_config.service_name}\")")
+    
+    imports_text = "\n".join(imports)
+    includes_text = "\n".join(router_includes)
+    
+    content = f'''# ============================================================================
+# ROUTE CONFIG - {service_config.service_name.upper()}
+# ============================================================================
+"""
+Configurador de rutas para el servicio: {service_config.service_name}
+{service_config.description or "Servicio generado automáticamente"}
+
+Este archivo centraliza la configuración de todas las rutas del servicio.
+"""
+
+# Imports de terceros
+from fastapi import FastAPI
+
+# Imports del proyecto
+{imports_text}
+
+def configure_{service_config.service_name}_routes(app: FastAPI):
+    """
+    Configura todas las rutas relacionadas con el módulo de {service_config.service_name}
+    
+    Args:
+        app: Instancia de FastAPI donde se registrarán las rutas
+    """
+    
+    # Incluir todos los routers del servicio
+{includes_text}
+    
+    return app
 '''
     
     return content

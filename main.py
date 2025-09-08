@@ -8,8 +8,9 @@
 # CONFIGURACIÓN Y ENTORNO
 # =============================
 from sql_app.config import FRONTEND_URL, ORIGINS, STATIC_DIR, ENVIRONMENT
-from sql_app.logging_config import setup_logging
+from sql_app.logging_config_new import setup_logging
 
+# CONFIGURAR LOGGING ULTRA VERBOSO
 setup_logging()
 
 # =============================
@@ -167,6 +168,15 @@ app.include_router(aut_usuario.usuarios_router)
 app.include_router(auth_router.router)
 app.include_router(usuarios_admin.router)
 app.include_router(Generar.router)
+
+# ROUTER TEMPORAL PARA PROBAR GENERADOR OPTIMIZADO
+try:
+    from sql_app.routers.config.generador_test_optimizado import router as generador_optimizado_router
+    app.include_router(generador_optimizado_router)
+    print("✅ Router de generador optimizado agregado exitosamente")
+except Exception as e:
+    print(f"⚠️ No se pudo cargar el router optimizado: {e}")
+
 app.include_router(configDB.router)
 app.include_router(admin_router)
 app.include_router(frontend_pages.router)

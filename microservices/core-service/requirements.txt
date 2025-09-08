@@ -1,0 +1,34 @@
+# Core Service Requirements
+# Dependencias principales para el servicio core
+
+# Framework web
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Base de datos
+sqlalchemy==2.0.23
+pyodbc==5.0.1
+alembic==1.12.1
+
+# Autenticación y seguridad
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Comunicación HTTP
+httpx==0.25.2
+requests==2.31.0
+
+# Utilidades
+python-dotenv==1.0.0
+pydantic==2.5.0
+pydantic-settings==2.0.3
+
+# Email
+fastapi-mail==1.4.1
+
+# Logging y monitoreo
+structlog==23.2.0
+
+# Validación y serialización
+email-validator==2.1.0

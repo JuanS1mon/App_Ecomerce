@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exhibiciones - Test Simple</title>
+</head>
+<body>
+    <h1>EXHIBICIONES</h1>
+    <p>Total exhibiciones: {{ exhibitions|length }}</p>
+    
+    {% for exhibition in exhibitions %}
+    <div>
+        <p>ID: {{ exhibition.id }}</p>
+        <p>Nombre: {{ exhibition.name }}</p>
+        <p>Fecha inicio: {{ exhibition.start_date }}</p>
+        <p>Fecha fin: {{ exhibition.end_date }}</p>
+    </div>
+    {% endfor %}
+</body>
+</html>

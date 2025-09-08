@@ -1,0 +1,2854 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Gestión de Órdenes de Trabajo - ERP Professional | SQL App Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+    <style>
+        /* Estilos ERP Professional */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* KPI Cards */
+        .kpi-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+        
+        .kpi-card.kpi-total { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .kpi-card.kpi-proceso { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .kpi-card.kpi-finalizada { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .kpi-card.kpi-critica { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        
+        /* ERP Cards */
+        .erp-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .erp-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+        
+        /* Status Badges Mejorados */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        
+        .estado-planificando { background-color: #fef3c7; color: #92400e; }
+        .estado-ejecutando { background-color: #dbeafe; color: #1e40af; }
+        .estado-finalizada { background-color: #d1fae5; color: #065f46; }
+        
+        /* Priority System */
+        .priority-alta { 
+            border-left: 4px solid #ef4444; 
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.05) 0%, transparent 100%);
+        }
+        .priority-media { 
+            border-left: 4px solid #f59e0b;
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.05) 0%, transparent 100%);
+        }
+        .priority-baja { 
+            border-left: 4px solid #10b981;
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);
+        }
+        
+        .priority-badge-alta { background-color: #fee2e2; color: #991b1b; }
+        .priority-badge-media { background-color: #fef3c7; color: #92400e; }
+        .priority-badge-baja { background-color: #d1fae5; color: #065f46; }
+        
+        /* Advanced Filters */
+        .advanced-filter {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        /* Toolbar Mejorada */
+        .toolbar {
+            background: white;
+            border-bottom: 2px solid #e2e8f0;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        /* Action Buttons */
+        .action-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+        
+        .action-button:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+        }
+        
+        .action-button.success {
+            background: #10b981;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+        }
+        
+        .action-button.success:hover {
+            background: #059669;
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+        }
+        
+        .action-button.secondary {
+            background: #6b7280;
+            box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3);
+        }
+        
+        .action-button.secondary:hover {
+            background: #4b5563;
+            box-shadow: 0 4px 8px rgba(107, 114, 128, 0.4);
+        }
+        
+        /* Data Grid Mejorado */
+        .data-grid {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .grid-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 2px solid #e2e8f0;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Table Improvements */
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Toast mejorados */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            z-index: 9999;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .toast-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .toast-error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .toast-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+        
+        /* Input Fields Mejorados */
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        /* Progress Bar */
+        .progress-bar {
+            background: #e5e7eb;
+            border-radius: 9999px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .kpi-card {
+                padding: 1rem;
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .advanced-filter {
+                padding: 1rem;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Layout ERP */
+        body {
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #f6f9fc 0%, #f1f5f9 100%);
+        }
+        
+        main {
+            flex: 1 0 auto;
+        }
+        
+        footer {
+            flex-shrink: 0;
+        }
+    </style>
+    <script defer src="/static/app_stock/ot/ot_service.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar mejorado -->
+    <nav class="bg-gradient-to-r from-gray-800 to-gray-900 p-4 sticky top-0 z-30 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a class="flex items-center space-x-2" href="/index">
+                    <img alt="Logo" class="h-8 w-auto" src="/static/img/logo_mapache.gif"/>
+                    <span class="text-white font-bold text-lg hidden md:block">
+                        SQL App Studio
+                    </span>
+                </a>
+                <div class="flex items-center space-x-2" id="breadcrumb-container">
+                    <!-- Los elementos del breadcrumb se generarán dinámicamente -->
+                </div>
+            </div>
+            <div class="flex items-center space-x-4 relative">
+                <a class="text-white hover:bg-gray-700 px-3 py-1 rounded-md text-sm transition-colors" href="/docs">
+                    <i class="fas fa-book mr-1"></i>
+                    API
+                </a>
+                <button id="perfil" class="flex items-center focus:outline-none hover:bg-gray-700 px-3 py-1 rounded-md transition-colors">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white" id="user-initial">
+                        U
+                    </div>
+                    <svg class="ml-2 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div id="menu-perfil" class="hidden absolute right-0 mt-12 w-48 bg-white rounded-md shadow-lg z-50">
+                    <a href="/admin/perfil" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Perfil de usuario</a>
+                    <form action="/logout" method="post">
+                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Notificaciones Toast -->
+        <div id="toast-container"></div>
+        
+        <header class="bg-white shadow-sm mb-6">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+                            <i class="fas fa-clipboard-list text-blue-600 mr-3"></i>
+                            Gestión de Órdenes de Trabajo
+                        </h1>
+                        <p class="text-gray-600 mt-1">
+                            Administra, añade y edita las órdenes de trabajo del sistema
+                        </p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <button class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors flex items-center" id="help-btn" onclick="toggleDescription()">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Ayuda
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="hidden container mx-auto px-4 mb-6" id="description">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-lg shadow-sm slide-in">
+                <div class="flex justify-between items-start">
+                    <h2 class="text-lg font-semibold text-blue-700 mb-3">
+                        Cómo utilizar este módulo
+                    </h2>
+                    <button class="text-gray-400 hover:text-gray-600" onclick="toggleDescription()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="space-y-3 text-gray-700">
+                    <div class="flex items-start">
+                        <i class="fas fa-plus-circle text-green-600 mt-1 mr-3"></i>
+                        <p>Usa el formulario para crear nuevas órdenes de trabajo.</p>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-table text-blue-600 mt-1 mr-3"></i>
+                        <p>La tabla muestra todas las órdenes y permite filtrarlas usando la barra de búsqueda.</p>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-edit text-yellow-600 mt-1 mr-3"></i>
+                        <p>Puedes editar los detalles de cada orden de trabajo según sea necesario.</p>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-clipboard-check text-green-600 mt-1 mr-3"></i>
+                        <p>Actualiza el estado de las órdenes de trabajo a medida que avanzan en el proceso.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Formulario para crear/editar órdenes de trabajo -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-plus-circle text-green-600 mr-2"></i>
+                Nueva Orden de Trabajo
+            </h2>
+            <form class="mb-4" id="data-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="numero">
+                            Número OT
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" id="numero" placeholder="Número de orden" required type="text"/>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="fecha">
+                            Fecha
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" id="fecha" required type="date"/>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="cliente">
+                            Cliente
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" id="cliente" placeholder="Nombre del cliente" required type="text"/>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="tipo">
+                            Tipo de trabajo
+                        </label>
+                        <select class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" id="tipo">
+                            <option value="">Seleccionar tipo</option>
+                            <option value="instalacion">Instalación</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="reparacion">Reparación</option>
+                            <option value="revision">Revisión</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="estado">
+                            Estado
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <select class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" id="estado" required>
+                            <option value="planificando">Planificando</option>
+                            <option value="ejecutando">Ejecutando</option>
+                            <option value="finalizada">Finalizada</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="tecnico">
+                            Técnico asignado
+                        </label>
+                        <input class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" id="tecnico" placeholder="Nombre del técnico" type="text"/>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="prioridad">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            Prioridad
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <select class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" id="prioridad" required>
+                            <option value="Baja">Baja</option>
+                            <option value="Media" selected>Media</option>
+                            <option value="Alta">Alta</option>
+                            <option value="Crítica">Crítica</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="descripcion">
+                        Descripción del trabajo
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <textarea class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" id="descripcion" placeholder="Detalle del trabajo a realizar" required rows="3"></textarea>
+                </div>
+
+                <!-- Sección de Tareas -->
+                <div class="mt-6 border-t border-gray-200 pt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <i class="fas fa-tasks text-blue-600 mr-2"></i>
+                            Tareas de la Orden de Trabajo
+                        </h3>
+                        <button type="button" onclick="agregarTarea()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm flex items-center transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
+                            Agregar Tarea
+                        </button>
+                    </div>
+
+                    <div id="tareas-container" class="space-y-3">
+                        <!-- Las tareas se agregarán dinámicamente aquí -->
+                        <div class="text-center text-gray-500 py-4 border-2 border-dashed border-gray-300 rounded-lg" id="tareas-placeholder">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            No hay tareas definidas. Haz clic en "Agregar Tarea" para comenzar.
+                        </div>
+                    </div>
+
+                    <template id="tarea-template">
+                        <div class="tarea-item bg-gray-50 border border-gray-300 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                            <div class="flex-1 space-y-2">
+                                <input type="text" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" placeholder="Nombre de la tarea" required />
+                                <div class="grid grid-cols-2 gap-4">
+                                    <select class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" required>
+                                        <option value="planificando">Planificando</option>
+                                        <option value="ejecutando">Ejecutando</option>
+                                        <option value="finalizada">Finalizada</option>
+                                    </select>
+                                    <input type="number" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" placeholder="Horas" min="0" required />
+                                </div>
+                                <select class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" required>
+                                    <option value="Baja">Baja</option>
+                                    <option value="Media">Media</option>
+                                    <option value="Alta">Alta</option>
+                                    <option value="Crítica">Crítica</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm flex items-center transition-colors" onclick="eliminarTarea(this)">
+                                    <i class="fas fa-trash mr-2"></i>
+                                    Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                
+                <div class="mt-6">
+                    <button class="bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-2 rounded-md shadow-sm hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-all flex items-center" id="submit-btn" type="submit">
+                        <i class="fas fa-save mr-2"></i>
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Filtro de búsqueda -->
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <div class="flex flex-wrap items-center">
+                <div class="relative flex-grow">
+                    <input class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700" id="search-input" placeholder="Buscar por número, cliente o descripción..." type="text"/>
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="mt-2 sm:mt-0 sm:ml-4">
+                    <button class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center" id="reset-search">
+                        <i class="fas fa-redo-alt mr-2"></i>
+                        Restablecer
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabla de órdenes de trabajo -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <i class="fas fa-table text-blue-600 mr-2"></i>
+                    Órdenes de Trabajo
+                </h2>
+                <div class="text-sm text-gray-500" id="record-count">
+                    Cargando registros...
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Número</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Fecha</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Cliente</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Tipo</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                Prioridad
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Estado</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">
+                                <i class="fas fa-chart-line mr-1"></i>
+                                Progreso
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">
+                                <i class="fas fa-tasks mr-1"></i>
+                                Tareas
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Técnico</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Materiales</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="data-table-body">
+                        <tr id="loading-row">
+                            <td class="px-6 py-10 text-center text-sm text-gray-500" colspan="11">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>
+                                Cargando datos...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Dashboard de KPIs profesional -->
+        <section class="container mx-auto px-4 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <!-- KPI 1: Total OT -->
+                <div class="kpi-card bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Total OT</p>
+                                <p class="text-3xl font-bold text-gray-900 mt-2" id="kpi-total-ot">0</p>
+                                <div class="flex items-center mt-2">
+                                    <span class="text-sm font-medium text-green-600" id="kpi-total-trend">+0%</span>
+                                    <span class="text-sm text-gray-500 ml-1">este mes</span>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-blue-100 rounded-full">
+                                <i class="fas fa-clipboard-list text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI 2: OT Pendientes -->
+                <div class="kpi-card bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Pendientes</p>
+                                <p class="text-3xl font-bold text-orange-600 mt-2" id="kpi-pendientes">0</p>
+                                <div class="flex items-center mt-2">
+                                    <span class="text-sm font-medium text-orange-600" id="kpi-pendientes-trend">0%</span>
+                                    <span class="text-sm text-gray-500 ml-1">del total</span>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-orange-100 rounded-full">
+                                <i class="fas fa-clock text-orange-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI 3: OT En Proceso -->
+                <div class="kpi-card bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">En Proceso</p>
+                                <p class="text-3xl font-bold text-blue-600 mt-2" id="kpi-en-proceso">0</p>
+                                <div class="flex items-center mt-2">
+                                    <span class="text-sm font-medium text-blue-600" id="kpi-proceso-trend">0%</span>
+                                    <span class="text-sm text-gray-500 ml-1">del total</span>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-blue-100 rounded-full">
+                                <i class="fas fa-cogs text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI 4: OT Completadas -->
+                <div class="kpi-card bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Completadas</p>
+                                <p class="text-3xl font-bold text-green-600 mt-2" id="kpi-completadas">0</p>
+                                <div class="flex items-center mt-2">
+                                    <span class="text-sm font-medium text-green-600" id="kpi-completadas-trend">0%</span>
+                                    <span class="text-sm text-gray-500 ml-1">del total</span>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-green-100 rounded-full">
+                                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos adicionales -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Gráfico de distribución por estado -->
+                <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Distribución por Estado</h3>
+                        <i class="fas fa-chart-pie text-gray-400"></i>
+                    </div>
+                    <div class="relative h-64">
+                        <canvas id="chart-estados"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de tendencia mensual -->
+                <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Tendencia Mensual</h3>
+                        <i class="fas fa-chart-line text-gray-400"></i>
+                    </div>
+                    <div class="relative h-64">
+                        <canvas id="chart-tendencia"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filtros avanzados -->
+        <section class="container mx-auto px-4 mb-6">
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100">
+                <div class="grid-header">
+                    <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                        <i class="fas fa-filter text-blue-600 mr-2"></i>
+                        Filtros Avanzados
+                    </h2>
+                    <button id="toggle-filters" class="text-gray-500 hover:text-gray-700 transition-colors">
+                        <i class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                </div>
+                <div id="advanced-filters" class="advanced-filter hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                        <!-- Filtro por Estado -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                            <select id="filter-estado" class="filter-select w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Todos los estados</option>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="En Proceso">En Proceso</option>
+                                <option value="Completada">Completada</option>
+                                <option value="Cancelada">Cancelada</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Prioridad -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prioridad</label>
+                            <select id="filter-prioridad" class="filter-select w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Todas las prioridades</option>
+                                <option value="Baja">Baja</option>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                                <option value="Crítica">Crítica</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Fecha Desde -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Desde</label>
+                            <input type="date" id="filter-fecha-desde" class="filter-input w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Filtro por Fecha Hasta -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Hasta</label>
+                            <input type="date" id="filter-fecha-hasta" class="filter-input w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <!-- Filtro por Responsable -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Responsable</label>
+                            <input type="text" id="filter-responsable" placeholder="Buscar responsable..." class="filter-input w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Filtro por Tipo de OT -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de OT</label>
+                            <select id="filter-tipo" class="filter-select w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Todos los tipos</option>
+                                <option value="Correctivo">Correctivo</option>
+                                <option value="Preventivo">Preventivo</option>
+                                <option value="Predictivo">Predictivo</option>
+                                <option value="Mejora">Mejora</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Progreso -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Progreso Mínimo (%)</label>
+                            <input type="range" id="filter-progreso" min="0" max="100" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-sm text-gray-500 mt-1">
+                                <span>0%</span>
+                                <span id="progreso-value">0%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+                        <button id="apply-filters" class="btn-primary flex items-center">
+                            <i class="fas fa-search mr-2"></i>
+                            Aplicar Filtros
+                        </button>
+                        <button id="clear-filters" class="btn-secondary flex items-center">
+                            <i class="fas fa-times mr-2"></i>
+                            Limpiar Filtros
+                        </button>
+                        <button id="export-filtered" class="btn-secondary flex items-center">
+                            <i class="fas fa-download mr-2"></i>
+                            Exportar Resultados
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de edición -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" id="edit-modal">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 fade-in">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <i class="fas fa-edit text-blue-600 mr-2"></i>
+                    Editar Orden de Trabajo
+                </h3>
+                <button class="text-gray-400 hover:text-gray-500 focus:outline-none" onclick="closeEditModal()" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="edit-form">
+                <div class="p-6 space-y-4">
+                    <input id="edit-id" type="hidden"/>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="edit-numero">
+                            Número OT
+                        </label>
+                        <input class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500" id="edit-numero" type="text"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="edit-fecha">
+                            Fecha
+                        </label>
+                        <input class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500" id="edit-fecha" type="date"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="edit-cliente">
+                            Cliente
+                        </label>
+                        <input class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500" id="edit-cliente" type="text"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="edit-tipo">
+                            Tipo
+                        </label>
+                        <select class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500" id="edit-tipo">
+                            <option value="">Seleccionar tipo</option>
+                            <option value="instalacion">Instalación</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="reparacion">Reparación</option>
+                            <option value="revision">Revisión</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="edit-estado">
+                            Estado
+                        </label>
+                        <select class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500" id="edit-estado">
+                            <option value="pendiente">Pendiente</option>
+                            <option value="en_proceso">En proceso</option>
+                            <option value="finalizada">Finalizada</option>
+                            <option value="cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="edit-tecnico">
+                            Técnico asignado
+                        </label>
+                        <input class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500" id="edit-tecnico" type="text"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="edit-descripcion">
+                            Descripción
+                        </label>
+                        <textarea class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500" id="edit-descripcion" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors" onclick="closeEditModal()" type="button">
+                        Cancelar
+                    </button>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center" type="submit">
+                        <i class="fas fa-save mr-2"></i>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de eliminación -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" id="delete-modal">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 fade-in">
+            <div class="p-6">
+                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 text-center mb-2">
+                    Confirmar eliminación
+                </h3>
+                <p class="text-gray-500 text-center">
+                    ¿Está seguro de que desea eliminar esta orden de trabajo? Esta acción no se puede deshacer.
+                </p>
+                <div class="mt-6 flex justify-center space-x-4">
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors" id="cancel-delete" type="button">
+                        Cancelar
+                    </button>
+                    <button class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center" id="confirm-delete" type="button">
+                        <i class="fas fa-trash-alt mr-2"></i>
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar/editar tareas -->
+    <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" id="modal-tarea">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900" id="modal-tarea-titulo">
+                        <i class="fas fa-plus mr-2"></i>Agregar Nueva Tarea
+                    </h3>
+                    <button onclick="cerrarModalTarea()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="form-tarea" onsubmit="guardarTarea(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Descripción de la tarea
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <textarea 
+                            id="tarea-descripcion" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                            rows="3"
+                            required
+                            placeholder="Describe la tarea a realizar..."
+                        ></textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Responsable
+                        </label>
+                        <input 
+                            type="text" 
+                            id="tarea-responsable"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                            placeholder="Nombre del responsable (opcional)"
+                        >
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Tiempo estimado (horas)
+                            </label>
+                            <input 
+                                type="number" 
+                                step="0.5"
+                                min="0"
+                                id="tarea-tiempo"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                                placeholder="0"
+                            >
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Estado inicial
+                            </label>
+                            <select 
+                                id="tarea-estado"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                            >
+                                <option value="planificando">Planificando</option>
+                                <option value="ejecutando">Ejecutando</option>
+                                <option value="finalizada">Finalizada</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button 
+                            type="button" 
+                            onclick="cerrarModalTarea()"
+                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button 
+                            type="submit"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                            <i class="fas fa-save mr-2"></i>Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para lista de tareas -->
+    <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" id="modal-lista-tareas">
+        <div class="relative top-10 mx-auto p-5 border w-5/6 max-w-4xl shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900" id="modal-lista-titulo">
+                        <i class="fas fa-tasks mr-2"></i>Gestión de Tareas
+                    </h3>
+                    <button onclick="cerrarModalListaTareas()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-600">OT: <span id="modal-ot-numero" class="font-semibold"></span></span>
+                        <span class="text-sm text-gray-600">Cliente: <span id="modal-ot-cliente" class="font-semibold"></span></span>
+                    </div>
+                    <button 
+                        id="btn-agregar-tarea-modal"
+                        onclick="abrirModalTarea()"
+                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
+                    >
+                        <i class="fas fa-plus mr-2"></i>
+                        Agregar Tarea
+                    </button>
+                </div>
+                
+                <div id="contenido-lista-tareas" class="max-h-96 overflow-y-auto">
+                    <!-- Contenido dinámico de tareas -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer mejorado -->
+    <footer class="bg-gradient-to-r from-gray-800 to-gray-900 text-white py-6 mt-auto shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                    <img alt="Logo" class="h-8 w-auto" src="/static/img/logo_mapache.gif"/>
+                    <div>
+                        <h3 class="font-bold text-lg">SQL App Studio</h3>
+                        <p class="text-sm text-gray-300">&copy; 2025 Todos los derechos reservados.</p>
+                    </div>
+                </div>
+                
+                <div class="mt-3 md:mt-0 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex flex-col space-y-2">
+                        <h4 class="text-blue-300 font-medium mb-1 text-sm uppercase tracking-wider">Enlaces</h4>
+                        <a href="/index" class="text-sm text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-home mr-2 text-xs"></i> Inicio
+                        </a>
+                        <a href="/admin" class="text-sm text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-cog mr-2 text-xs"></i> Administración
+                        </a>
+                        <a href="/docs" class="text-sm text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-book mr-2 text-xs"></i> API Docs
+                        </a>
+                    </div>
+                    
+                    <div class="flex flex-col space-y-2">
+                        <h4 class="text-blue-300 font-medium mb-1 text-sm uppercase tracking-wider">Legal</h4>
+                        <a href="/privacidad" class="text-sm text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-shield-alt mr-2 text-xs"></i> Política de Privacidad
+                        </a>
+                        <a href="/terminos" class="text-sm text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-file-contract mr-2 text-xs"></i> Términos y Condiciones
+                        </a>
+                        <a href="/contacto" class="text-sm text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-envelope mr-2 text-xs"></i> Contacto
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="mt-6 md:mt-0 text-center md:text-right">
+                    <div class="bg-gray-700 bg-opacity-50 px-4 py-3 rounded-lg">
+                        <h4 class="text-blue-300 font-medium mb-2 text-sm uppercase tracking-wider">Versión</h4>
+                        <div class="flex items-center justify-center md:justify-end">
+                            <span class="bg-blue-900 text-blue-100 text-xs px-2 py-1 rounded mr-2 version-label">v1.2.5</span>
+                            <a href="/docs/changelog" class="text-xs text-blue-300 hover:text-blue-100 transition-colors">Ver novedades</a>
+                        </div>
+                        <div class="mt-2">
+                            <div class="flex items-center justify-center md:justify-end space-x-4">
+                                <!-- Social media icons con estados pendientes -->
+                                <a href="#" class="text-gray-400 hover:text-gray-200 transition-colors relative group">
+                                    <i class="fab fa-github"></i>
+                                    <span class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Próximamente</span>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-gray-200 transition-colors relative group">
+                                    <i class="fab fa-twitter"></i>
+                                    <span class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Próximamente</span>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-gray-200 transition-colors relative group">
+                                    <i class="fab fa-linkedin"></i>
+                                    <span class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Próximamente</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Función para actualizar el año de copyright automáticamente
+            function updateCopyrightYear() {
+                const currentYear = new Date().getFullYear();
+                const copyrightElement = document.querySelector('footer p');
+                if (copyrightElement) {
+                    copyrightElement.innerHTML = `&copy; ${currentYear} Todos los derechos reservados.`;
+                }
+            }
+
+            // Actualizar fecha al cargar el footer
+            updateCopyrightYear();
+        </script>
+    </footer>
+
+    <script>
+        // Configurar fecha actual por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('fecha').valueAsDate = new Date();
+            
+            // Configurar eventos del formulario
+            document.getElementById('data-form').addEventListener('submit', handleFormSubmit);
+            document.getElementById('search-input').addEventListener('input', handleSearch);
+            document.getElementById('reset-search').addEventListener('click', handleResetSearch);
+            
+            // Configurar eventos de filtros avanzados
+            setupAdvancedFilters();
+            
+            // Cargar datos iniciales
+            loadOrdersData();
+            updateNavigation();
+        });
+
+        function toggleDescription() {
+            const description = document.getElementById('description');
+            description.classList.toggle('hidden');
+        }
+
+        /**
+         * Muestra una notificación toast
+         */
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type} fade-in`;
+            toast.innerHTML = `
+                <div class="flex items-center">
+                    <i class="${type === 'success' ? 'fas fa-check-circle' : type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toastContainer.removeChild(toast);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Configuración central de rutas
+        const routeConfig = {
+            // Rutas principales
+            'index': { 
+                title: 'Inicio', 
+                isRoot: true,
+                icon: 'fa-home' 
+            },
+            'admin': { 
+                title: 'Admin', 
+                parent: 'index',
+                icon: 'fa-cog' 
+            },
+            
+            // Configuración
+            'configdb': { 
+                title: 'Configuración DB', 
+                parent: 'admin',
+                icon: 'fa-database' 
+            },
+            'migraciones': { 
+                title: 'Migraciones', 
+                parent: 'admin',
+                icon: 'fa-exchange-alt'
+            },
+            'generar': { 
+                title: 'Generar API', 
+                parent: 'admin',
+                icon: 'fa-code' 
+            },
+            'services': { 
+                title: 'Servicios', 
+                parent: 'admin',
+                icon: 'fa-cogs' 
+            },
+            
+            // App Stock
+            'app_stock': { 
+                title: 'Inventario', 
+                parent: 'index',
+                icon: 'fa-boxes' 
+            },
+            'dashboard': { 
+                title: 'Dashboard', 
+                parent: 'app_stock',
+                icon: 'fa-tachometer-alt' 
+            },
+            'articulos': { 
+                title: 'Artículos', 
+                parent: 'app_stock',
+                icon: 'fa-box' 
+            },
+            'stock': { 
+                title: 'Stock', 
+                parent: 'app_stock',
+                icon: 'fa-cubes' 
+            },
+            'stock_dashboard': { 
+                title: 'Panel de Stock', 
+                parent: 'stock',
+                icon: 'fa-tachometer-alt' 
+            },
+            'articulos_series': { 
+                title: 'Series', 
+                parent: 'articulos',
+                icon: 'fa-list-ol' 
+            },
+            'categorias': { 
+                title: 'Categorías', 
+                parent: 'app_stock',
+                icon: 'fa-tags' 
+            },
+            'proveedores': { 
+                title: 'Proveedores', 
+                parent: 'app_stock',
+                icon: 'fa-truck' 
+            },
+            'depositos': { 
+                title: 'Depósitos', 
+                parent: 'app_stock',
+                icon: 'fa-warehouse' 
+            },
+            'depositos_tipos': { 
+                title: 'Tipos de Depósitos', 
+                parent: 'depositos',
+                icon: 'fa-tags' 
+            },
+            'stock_historico': { 
+                title: 'Historial de Stock', 
+                parent: 'stock',
+                icon: 'fa-history' 
+            },
+            'ot': { 
+                title: 'Órdenes de trabajo', 
+                parent: 'app_stock',
+                icon: 'fa-clipboard-list' 
+            },
+        };
+
+        /**
+         * Genera el breadcrumb basado en la ruta actual
+         * Utiliza el objeto routeConfig para determinar la jerarquía
+         */
+        function generateBreadcrumb() {
+            const currentPath = window.location.pathname;
+            const pathSegments = currentPath.split('/').filter(segment => segment);
+            
+            // Elementos del breadcrumb
+            const breadcrumbElements = [];
+            
+            // Agregar inicio como primer elemento (raíz)
+            if (routeConfig['index']) {
+                breadcrumbElements.push({
+                    title: routeConfig['index'].title,
+                    path: '/index',
+                    icon: routeConfig['index'].icon || 'fa-home',
+                    active: currentPath === '/' || currentPath === '/index'
+                });
+            }
+            
+            // Si estamos en la página principal, no hay más que mostrar
+            if (currentPath === '/' || currentPath === '/index') {
+                return breadcrumbElements;
+            }
+            
+            // Construir la ruta completa basada en la configuración y jerarquía
+            let currentSegment = '';
+            let processedSegments = [];
+            
+            for (let i = 0; i < pathSegments.length; i++) {
+                const segment = pathSegments[i];
+                
+                // Saltear segmentos irrelevantes (como números de ID)
+                if (segment.match(/^\d+$/) || segment === 'pagina') {
+                    continue;
+                }
+                
+                currentSegment = segment;
+                processedSegments.push(currentSegment);
+                
+                // Determinar jerarquía y títulos
+                if (routeConfig[currentSegment]) {
+                    const config = routeConfig[currentSegment];
+                    const isActive = i === pathSegments.length - 1;
+                    
+                    breadcrumbElements.push({
+                        title: config.title,
+                        path: '/' + processedSegments.join('/'),
+                        icon: config.icon || '',
+                        active: isActive
+                    });
+                } else {
+                    // Si no hay configuración para este segmento, usamos el nombre del segmento capitalizado
+                    const title = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/_/g, ' ');
+                    const isActive = i === pathSegments.length - 1;
+                    
+                    breadcrumbElements.push({
+                        title: title,
+                        path: '/' + processedSegments.join('/'),
+                        icon: '',
+                        active: isActive
+                    });
+                }
+            }
+            
+            return breadcrumbElements;
+        }
+
+        /**
+         * Actualiza la navegación (breadcrumb) según la página actual
+         */
+        function updateNavigation() {
+            const breadcrumbContainer = document.getElementById('breadcrumb-container');
+            const breadcrumbElements = generateBreadcrumb();
+            
+            // Limpiar el contenedor actual
+            breadcrumbContainer.innerHTML = '';
+            
+            // Reconstruir el breadcrumb
+            breadcrumbElements.forEach((item, index) => {
+                // Añadir el elemento a la navegación
+                const element = document.createElement(item.active ? 'span' : 'a');
+                
+                // Construir el contenido con ícono si está disponible
+                let content = '';
+                if (item.icon) {
+                    content += `<i class="fas ${item.icon} ${index > 0 ? 'mx-1' : ''}"></i> `;
+                }
+                content += item.title;
+                element.innerHTML = content;
+                
+                if (item.active) {
+                    // Si es el elemento activo, se muestra como texto
+                    element.className = 'text-blue-200 font-medium';
+                } else {
+                    // Si no es el elemento activo, se muestra como enlace
+                    element.href = item.path;
+                    element.className = 'text-white hover:text-blue-200 transition-colors';
+                }
+                
+                breadcrumbContainer.appendChild(element);
+                
+                // Añadir el separador si no es el último elemento
+                if (index < breadcrumbElements.length - 1) {
+                    const separator = document.createElement('span');
+                    separator.className = 'text-gray-400';
+                    separator.textContent = ' / ';
+                    breadcrumbContainer.appendChild(separator);
+                }
+            });
+            
+            // Actualizar el título de la página
+            const activeElement = breadcrumbElements[breadcrumbElements.length - 1];
+            document.title = `${activeElement.title} - SQL App Studio`;
+
+            // Actualizar inicial del usuario si está disponible
+            const userInitial = document.getElementById('user-initial');
+            if (userInitial && window.currentUser && window.currentUser.nombre) {
+                userInitial.textContent = window.currentUser.nombre.charAt(0).toUpperCase();
+            }
+        }
+        
+        // Configuración del menú desplegable de perfil
+        document.getElementById('perfil').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('menu-perfil').classList.toggle('hidden');
+        });
+
+        // Cerrar menú cuando se hace clic fuera
+        document.addEventListener('click', function(event) {
+            const perfilBtn = document.getElementById('perfil');
+            const perfilMenu = document.getElementById('menu-perfil');
+            
+            if (perfilBtn && perfilMenu) {
+                if (!perfilBtn.contains(event.target) && !perfilMenu.contains(event.target)) {
+                    perfilMenu.classList.add('hidden');
+                }
+            }
+        });
+        
+        // Detectar cambios en la URL (para aplicaciones SPA)
+        window.addEventListener('popstate', updateNavigation);
+        
+        // Llamar a la función al cargar la página
+        document.addEventListener('DOMContentLoaded', updateNavigation);
+        updateNavigation();
+
+        /**
+         * Función para cargar y mostrar las órdenes de trabajo
+         */
+        async function loadOrdersData() {
+            try {
+                const response = await fetch('/app_stock/ot/', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const orders = await response.json();
+                renderOrdersTable(orders);
+                updateRecordCount(orders.length);
+                
+            } catch (error) {
+                console.error('Error al cargar órdenes:', error);
+                showToast('Error al cargar las órdenes de trabajo', 'error');
+            }
+        }
+
+        /**
+         * Renderiza la tabla de órdenes de trabajo
+         */
+        function renderOrdersTable(orders) {
+            const tbody = document.getElementById('data-table-body');
+            
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td class="px-6 py-4 text-center text-sm text-gray-500" colspan="11">
+                            No hay órdenes de trabajo disponibles
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = orders.map((order, index) => {
+                // Simular prioridad si no está presente
+                const prioridad = order.prioridad || ['Baja', 'Media', 'Alta', 'Crítica'][index % 4];
+                // Usar progreso calculado desde el backend
+                const progreso = order.progreso || 0;
+                
+                return `
+                <tr class="hover:bg-gray-50 transition-colors" data-order-id="${order.id}">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        ${order.numero || 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${formatDate(order.fecha) || 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${order.cliente || 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${formatTipoTrabajo(order.tipo) || 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="priority-badge ${getPrioridadClass(prioridad)}">
+                            <i class="fas fa-${getPrioridadIcon(prioridad)} mr-1"></i>
+                            ${prioridad}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getEstadoClass(order.estado)}">
+                            ${formatEstado(order.estado)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="w-full bg-gray-200 rounded-full h-2 mr-2">
+                                <div class="progress-fill h-2 rounded-full" style="width: ${progreso}%"></div>
+                            </div>
+                            <span class="text-xs font-medium text-gray-600 min-w-[35px]">${progreso}%</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button 
+                            onclick="abrirModalListaTareas(${order.id})" 
+                            class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-3 py-1 rounded-md text-xs font-medium transition-colors flex items-center"
+                            title="Ver/gestionar tareas de esta OT"
+                        >
+                            <i class="fas fa-tasks mr-1"></i>
+                            Tareas (${order.operaciones ? order.operaciones.length : 0})
+                        </button>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${order.tecnico || 'No asignado'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button 
+                            onclick="goToMateriales(${order.id})" 
+                            class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-md text-xs font-medium transition-colors flex items-center"
+                            title="Gestionar materiales de esta OT"
+                        >
+                            <i class="fas fa-boxes mr-1"></i>
+                            Materiales
+                        </button>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex justify-end space-x-2">
+                            <button 
+                                onclick="editOrder(${order.id})" 
+                                class="text-blue-600 hover:text-blue-900 transition-colors"
+                                title="Editar orden"
+                            >
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button 
+                                onclick="deleteOrder(${order.id})" 
+                                class="text-red-600 hover:text-red-900 transition-colors"
+                                title="Eliminar orden"
+                            >
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+                       }).join('');
+            
+            // Actualizar KPIs después de renderizar la tabla
+            updateKPIs(orders);
+        }
+
+        /**
+         * Navega a la página de gestión de materiales para una OT específica
+         */
+        function goToMateriales(otId) {
+            if (!otId) {
+                showToast('Error: ID de orden no válido', 'error');
+                return;
+            }
+            
+            // Redirigir a la página de materiales con el ID de la OT
+            window.location.href = `/ot/${otId}/materiales`;
+        }
+
+        /**
+         * Formatea la fecha para mostrarla en la tabla
+         */
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('es-ES');
+            } catch (error) {
+                return dateString;
+            }
+        }
+
+        /**
+         * Formatea el tipo de trabajo
+         */
+        function formatTipoTrabajo(tipo) {
+            const tipos = {
+                'instalacion': 'Instalación',
+                'mantenimiento': 'Mantenimiento',
+                'reparacion': 'Reparación',
+                'revision': 'Revisión',
+                'otro': 'Otro'
+            };
+            return tipos[tipo] || tipo || 'No especificado';
+        }
+
+        /**
+         * Formatea el estado
+         */
+        function formatEstado(estado) {
+            const estados = {
+                'planificando': 'Planificando',
+                'ejecutando': 'Ejecutando',
+                'finalizada': 'Finalizada'
+            };
+            return estados[estado] || estado || 'Desconocido';
+        }
+
+        /**
+         * Obtiene la clase CSS para el estado
+         */
+        function getEstadoClass(estado) {
+            switch (estado) {
+                case 'planificando':
+                    return 'estado-planificando';
+                case 'ejecutando':
+                    return 'estado-ejecutando';
+                case 'finalizada':
+                    return 'estado-finalizada';
+               
+               
+                default:
+                    return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        /**
+         * Actualiza el contador de registros
+         */
+        function updateRecordCount(count) {
+            const recordCount = document.getElementById('record-count');
+            if (recordCount) {
+                recordCount.textContent = `${count} registro${count !== 1 ? 's' : ''} encontrado${count !== 1 ? 's' : ''}`;
+            }
+        }
+
+        /**
+         * Funciones de placeholder para editar y eliminar
+         */
+        function editOrder(id) {
+            showToast('Función de edición en desarrollo', 'info');
+            // Aquí iría la lógica para abrir el modal de edición
+        }
+
+        function deleteOrder(id) {
+            showToast('Función de eliminación en desarrollo', 'info');
+            // Aquí iría la lógica para confirmar y eliminar
+        }
+
+        // Cargar datos al inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar datos después de un breve delay para asegurar que todo esté listo
+            setTimeout(loadOrdersData, 100);
+        });
+
+        /**
+         * Maneja el envío del formulario de nueva OT
+         */
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const formData = {
+                numero: document.getElementById('numero').value,
+                fecha: document.getElementById('fecha').value,
+                cliente: document.getElementById('cliente').value,
+                tipo: document.getElementById('tipo').value,
+                estado: document.getElementById('estado').value,
+                tecnico: document.getElementById('tecnico').value,
+                prioridad: document.getElementById('prioridad').value,
+                descripcion: document.getElementById('descripcion').value
+            };
+
+            try {
+                const response = await fetch('/app_stock/ot/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al crear la orden');
+                }
+
+                const newOrder = await response.json();
+                showToast('Orden de trabajo creada exitosamente', 'success');
+                
+                // Limpiar formulario
+                document.getElementById('data-form').reset();
+                document.getElementById('fecha').valueAsDate = new Date();
+                document.getElementById('prioridad').value = 'Media';
+                document.getElementById('progreso').value = '0';
+                
+                // Recargar datos
+                loadOrdersData();
+                
+            } catch (error) {
+                console.error('Error al crear orden:', error);
+                showToast(error.message, 'error');
+            }
+        }
+
+        /**
+         * Maneja la búsqueda en tiempo real
+         */
+        function handleSearch(event) {
+            const searchTerm = event.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#data-table-body tr');
+            
+            let visibleCount = 0;
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 1) { // Evitar la fila de "cargando" o "sin datos"
+                    const texto = Array.from(cells).slice(0, -2) // Excluir columnas de materiales y acciones
+                        .map(cell => cell.textContent.toLowerCase())
+                        .join(' ');
+                    
+                    if (texto.includes(searchTerm)) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+            
+            updateRecordCount(visibleCount);
+        }
+
+        /**
+         * Resetea la búsqueda
+         */
+        function handleResetSearch() {
+            document.getElementById('search-input').value = '';
+            const rows = document.querySelectorAll('#data-table-body tr');
+            let totalCount = 0;
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 1) {
+                    row.style.display = '';
+                    totalCount++;
+                }
+            });
+            
+            updateRecordCount(totalCount);
+        }
+
+        /**
+         * Configura los event listeners para filtros avanzados
+         */
+        function setupAdvancedFilters() {
+            // Toggle filtros avanzados
+            const toggleButton = document.getElementById('toggle-filters');
+            const filtersSection = document.getElementById('advanced-filters');
+            
+            if (toggleButton && filtersSection) {
+                toggleButton.addEventListener('click', function() {
+                    filtersSection.classList.toggle('hidden');
+                    const icon = toggleButton.querySelector('i');
+                    icon.classList.toggle('fa-chevron-down');
+                    icon.classList.toggle('fa-chevron-up');
+                });
+            }
+
+            // Filtro de progreso en tiempo real
+            const progresoRange = document.getElementById('filter-progreso');
+            const progresoValue = document.getElementById('progreso-value');
+            
+            if (progresoRange && progresoValue) {
+                progresoRange.addEventListener('input', function() {
+                    progresoValue.textContent = this.value + '%';
+                });
+            }
+
+            // Aplicar filtros
+            const applyButton = document.getElementById('apply-filters');
+            if (applyButton) {
+                applyButton.addEventListener('click', applyAdvancedFilters);
+            }
+
+            // Limpiar filtros
+            const clearButton = document.getElementById('clear-filters');
+            if (clearButton) {
+                clearButton.addEventListener('click', clearAdvancedFilters);
+            }
+
+            // Exportar resultados filtrados
+            const exportButton = document.getElementById('export-filtered');
+            if (exportButton) {
+                exportButton.addEventListener('click', exportFilteredResults);
+            }
+        }
+
+        /**
+         * Aplica los filtros avanzados
+         */
+        function applyAdvancedFilters() {
+            const rows = document.querySelectorAll('#data-table-body tr');
+            let visibleCount = 0;
+
+            // Obtener valores de filtros
+            const estado = document.getElementById('filter-estado').value.toLowerCase();
+            const prioridad = document.getElementById('filter-prioridad').value.toLowerCase();
+            const fechaDesde = document.getElementById('filter-fecha-desde').value;
+            const fechaHasta = document.getElementById('filter-fecha-hasta').value;
+            const responsable = document.getElementById('filter-responsable').value.toLowerCase();
+            const tipo = document.getElementById('filter-tipo').value.toLowerCase();
+            const progresoMin = parseInt(document.getElementById('filter-progreso').value);
+
+            rows.forEach(row => {
+                if (row.id === 'loading-row') return;
+                
+                let visible = true;
+                const cells = row.querySelectorAll('td');
+                
+                if (cells.length === 0) return;
+
+                // Extraer datos de la fila
+                const rowData = {
+                    fecha: cells[1]?.textContent.trim(),
+                    tipo: cells[3]?.textContent.trim().toLowerCase(),
+                    prioridad: cells[4]?.textContent.trim().toLowerCase(),
+                    estado: cells[5]?.textContent.trim().toLowerCase(),
+                    progreso: parseInt(cells[6]?.textContent.replace('%', '')) || 0,
+                    tecnico: cells[7]?.textContent.trim().toLowerCase()
+                };
+
+                // Aplicar filtros
+                if (estado && !rowData.estado.includes(estado)) visible = false;
+                if (prioridad && !rowData.prioridad.includes(prioridad)) visible = false;
+                if (responsable && !rowData.tecnico.includes(responsable)) visible = false;
+                if (tipo && !rowData.tipo.includes(tipo)) visible = false;
+                if (rowData.progreso < progresoMin) visible = false;
+
+                // Filtros de fecha
+                if (fechaDesde && rowData.fecha !== 'N/A') {
+                    const fechaRow = new Date(rowData.fecha.split('/').reverse().join('-'));
+                    const fechaDesdeObj = new Date(fechaDesde);
+                    if (fechaRow < fechaDesdeObj) visible = false;
+                }
+
+                if (fechaHasta && rowData.fecha !== 'N/A') {
+                    const fechaRow = new Date(rowData.fecha.split('/').reverse().join('-'));
+                    const fechaHastaObj = new Date(fechaHasta);
+                    if (fechaRow > fechaHastaObj) visible = false;
+                }
+
+                // Mostrar/ocultar fila
+                row.style.display = visible ? '' : 'none';
+                if (visible) visibleCount++;
+            });
+
+            // Actualizar contador
+            updateRecordCount(visibleCount);
+            
+            // Mostrar mensaje si no hay resultados
+            const tbody = document.getElementById('data-table-body');
+            if (visibleCount === 0) {
+                const noResultsRow = document.createElement('tr');
+                noResultsRow.innerHTML = `
+                    <td colspan="10" class="px-6 py-8 text-center text-gray-500">
+                        <i class="fas fa-search mr-2"></i>
+                        No se encontraron órdenes que coincidan con los filtros aplicados
+                    </td>
+                `;
+                tbody.appendChild(noResultsRow);
+            }
+
+            showToast(`Filtros aplicados. Mostrando ${visibleCount} resultados`, 'success');
+        }
+
+        /**
+         * Limpia todos los filtros avanzados
+         */
+        function clearAdvancedFilters() {
+            // Limpiar todos los campos de filtro
+            document.getElementById('filter-estado').value = '';
+            document.getElementById('filter-prioridad').value = '';
+            document.getElementById('filter-fecha-desde').value = '';
+            document.getElementById('filter-fecha-hasta').value = '';
+            document.getElementById('filter-responsable').value = '';
+            document.getElementById('filter-tipo').value = '';
+            document.getElementById('filter-progreso').value = '0';
+            document.getElementById('progreso-value').textContent = '0%';
+
+            // Mostrar todas las filas
+            const rows = document.querySelectorAll('#data-table-body tr');
+            rows.forEach(row => {
+                if (row.id !== 'loading-row') {
+                    row.style.display = '';
+                }
+            });
+
+            // Recargar datos para restaurar el estado original
+            loadOrdersData();
+            
+            showToast('Filtros limpiados', 'info');
+        }
+
+        /**
+         * Exporta los resultados filtrados
+         */
+        function exportFilteredResults() {
+            const visibleRows = Array.from(document.querySelectorAll('#data-table-body tr')).filter(
+                row => row.style.display !== 'none' && row.id !== 'loading-row'
+            );
+
+            if (visibleRows.length === 0) {
+                showToast('No hay datos para exportar', 'warning');
+                return;
+            }
+
+            // Crear CSV
+            const headers = ['Número', 'Fecha', 'Cliente', 'Tipo', 'Prioridad', 'Estado', 'Progreso', 'Técnico'];
+            let csvContent = headers.join(',') + '\n';
+
+            visibleRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 8) {
+                    const rowData = [
+                        cells[0].textContent.trim(),
+                        cells[1].textContent.trim(),
+                        cells[2].textContent.trim(),
+                        cells[3].textContent.trim(),
+                        cells[4].textContent.trim(),
+                        cells[5].textContent.trim(),
+                        cells[6].textContent.trim(),
+                        cells[7].textContent.trim()
+                    ];
+                    csvContent += rowData.map(cell => `"${cell}"`).join(',') + '\n';
+                }
+            });
+
+            // Descargar archivo
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `ordenes_trabajo_filtradas_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('Resultados exportados exitosamente', 'success');
+        }
+        
+        // ===== GESTIÓN DE TAREAS =====
+        
+        /**
+         * Toggle de visualización de tareas para una OT
+         */
+        async function toggleTareas(otId) {
+            const tareasRow = document.getElementById(`tareas-row-${otId}`);
+            const icon = document.getElementById(`icon-tareas-${otId}`);
+            
+            if (tareasRow.classList.contains('hidden')) {
+                // Mostrar tareas
+                tareasRow.classList.remove('hidden');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+                
+                // Cargar tareas si no están cargadas
+                await cargarTareas(otId);
+            } else {
+                // Ocultar tareas
+                tareasRow.classList.add('hidden');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        }
+        
+        /**
+         * Cargar tareas de una OT específica
+         */
+        async function cargarTareas(otId) {
+            const container = document.getElementById(`tareas-container-${otId}`);
+            
+            try {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-4">
+                        <i class="fas fa-spinner fa-spin mr-2"></i>
+                        Cargando tareas...
+                    </div>
+                `;
+                
+                // Simulamos una pequeña demora
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Datos simulados para prueba - luego usar la API real
+                const tareas = [
+                    {
+                        id: 1,
+                        nombre: "Revisión inicial del sistema",
+                        descripcion: "Verificar el estado general del sistema",
+                        estado: "planificando",
+                        orden: 1,
+                        duracion_estimada: 60,
+                        duracion_real: null,
+                        usuario_asignado: "Juan Pérez",
+                        fecha_inicio: null,
+                        fecha_fin: null,
+                        observaciones: ""
+                    },
+                    {
+                        id: 2,
+                        nombre: "Mantenimiento preventivo",
+                        descripcion: "Realizar limpieza y lubricación",
+                        estado: "ejecutando",
+                        orden: 2,
+                        duracion_estimada: 120,
+                        duracion_real: 90,
+                        usuario_asignado: "María García",
+                        fecha_inicio: "2025-06-30T08:00:00",
+                        fecha_fin: null,
+                        observaciones: "En progreso..."
+                    },
+                    {
+                        id: 3,
+                        nombre: "Pruebas finales",
+                        descripcion: "Verificar funcionamiento correcto",
+                        estado: "finalizada",
+                        orden: 3,
+                        duracion_estimada: 30,
+                        duracion_real: 25,
+                        usuario_asignado: "Carlos López",
+                        fecha_inicio: "2025-06-29T14:00:00",
+                        fecha_fin: "2025-06-29T14:25:00",
+                        observaciones: "Completado satisfactoriamente"
+                    }
+                ];
+                
+                // TODO: Descomentar cuando la API funcione
+                /*
+                const response = await fetch(`/app_stock/ot/id/${otId}/tareas`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const tareas = await response.json();
+                */
+                
+                renderTareas(otId, tareas);
+                
+            } catch (error) {
+                console.error('Error al cargar tareas:', error);
+                container.innerHTML = `
+                    <div class="text-center text-red-500 py-4">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Error al cargar las tareas
+                        <div class="text-xs text-gray-500 mt-1">Usando datos de prueba por ahora</div>
+                    </div>
+                `;
+            }
+        }
+        
+        /**
+         * Renderizar tabla de tareas
+         */
+        function renderTareas(otId, tareas) {
+            const container = document.getElementById(`tareas-container-${otId}`);
+            
+            if (!tareas || tareas.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-4">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay tareas definidas para esta OT
+                    </div>
+                `;
+                return;
+            }
+            
+            const tareasHtml = `
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Responsable</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tiempo Est.</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Orden</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${tareas.map(tarea => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 text-sm text-gray-900">${tarea.descripcion}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-600">${tarea.responsable || 'No asignado'}</td>
+                                    <td class="px-4 py-2">
+                                        <select 
+                                            class="text-xs border rounded px-2 py-1 ${getEstadoTareaClass(tarea.estado)}"
+                                            onchange="cambiarEstadoTarea(${tarea.id}, this.value, ${otId})"
+                                        >
+                                            <option value="planificando" ${tarea.estado === 'planificando' ? 'selected' : ''}>Planificando</option>
+                                            <option value="ejecutando" ${tarea.estado === 'ejecutando' ? 'selected' : ''}>Ejecutando</option>
+                                            <option value="finalizada" ${tarea.estado === 'finalizada' ? 'selected' : ''}>Finalizada</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm text-gray-600">${tarea.tiempo_estimado ? tarea.tiempo_estimado + 'h' : 'N/A'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-600">${tarea.orden}</td>
+                                    <td class="px-4 py-2 text-right">
+                                        <div class="flex justify-end space-x-1">
+                                            <button 
+                                                onclick="editarTarea(${tarea.id}, ${otId})"
+                                                class="text-blue-600 hover:text-blue-900 p-1"
+                                                title="Editar tarea"
+                                            >
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                            <button 
+                                                onclick="eliminarTarea(${tarea.id}, ${otId})"
+                                                class="text-red-600 hover:text-red-900 p-1"
+                                                title="Eliminar tarea"
+                                            >
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = tareasHtml;
+        }
+        
+        /**
+         * Cambiar estado de una tarea
+         */
+        async function cambiarEstadoTarea(tareaId, nuevoEstado, otId) {
+            // Verificar si la OT está finalizada
+            const ordenRow = document.querySelector(`tr[data-order-id="${otId}"]`);
+            if (ordenRow) {
+                const estadoCells = ordenRow.querySelectorAll('td');
+                const estadoTexto = estadoCells[5]?.textContent.trim().toLowerCase();
+                if (estadoTexto === 'finalizada') {
+                    showToast('No se pueden modificar tareas de una OT finalizada', 'error');
+                    // Recargar las tareas para revertir el cambio visual
+                    await cargarTareas(otId);
+                    return;
+                }
+            }
+            try {
+                const response = await fetch(`/app_stock/ot/tareas/${tareaId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        estado: nuevoEstado
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                showToast('Estado de tarea actualizado correctamente', 'success');
+                
+                // Recargar datos para actualizar progreso
+                await loadOrdersData();
+                
+                // Recargar tareas si están visibles
+                const tareasRow = document.getElementById(`tareas-row-${otId}`);
+                if (!tareasRow.classList.contains('hidden')) {
+                    await cargarTareas(otId);
+                }
+                
+            } catch (error) {
+                console.error('Error al cambiar estado de tarea:', error);
+                showToast('Error al actualizar el estado de la tarea', 'error');
+            }
+        }
+        
+        /**
+         * Agregar nueva tarea
+         */
+        async function agregarTarea(otId) {
+            // Verificar si la OT está finalizada
+            const ordenRow = document.querySelector(`tr[data-order-id="${otId}"]`);
+            if (ordenRow) {
+                const estadoCells = ordenRow.querySelectorAll('td');
+                const estadoTexto = estadoCells[5]?.textContent.trim().toLowerCase();
+                if (estadoTexto === 'finalizada') {
+                    showToast('No se pueden agregar tareas a una OT finalizada', 'error');
+                    return;
+                }
+            }
+            
+            const descripcion = prompt('Descripción de la nueva tarea:');
+            if (!descripcion) return;
+            
+            const responsable = prompt('Responsable (opcional):') || null;
+            const tiempoEstimado = prompt('Tiempo estimado en horas (opcional):');
+            
+            try {
+                const nuevaTarea = {
+                    ot_id: otId,
+                    descripcion: descripcion,
+                    responsable: responsable,
+                    tiempo_estimado: tiempoEstimado ? parseFloat(tiempoEstimado) : null,
+                    estado: 'planificando'
+                };
+                
+                const response = await fetch(`/app_stock/ot/id/${otId}/tareas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(nuevaTarea)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                showToast('Tarea agregada correctamente', 'success');
+                
+                // Recargar datos para actualizar progreso
+                await loadOrdersData();
+                
+                // Recargar tareas
+                await cargarTareas(otId);
+                
+            } catch (error) {
+                console.error('Error al agregar tarea:', error);
+                showToast('Error al agregar la tarea', 'error');
+            }
+        }
+        
+        /**
+         * Eliminar tarea
+         */
+        async function eliminarTarea(tareaId, otId) {
+            // Verificar si la OT está finalizada
+            const ordenRow = document.querySelector(`tr[data-order-id="${otId}"]`);
+            if (ordenRow) {
+                const estadoCells = ordenRow.querySelectorAll('td');
+                const estadoTexto = estadoCells[5]?.textContent.trim().toLowerCase();
+                if (estadoTexto === 'finalizada') {
+                    showToast('No se pueden eliminar tareas de una OT finalizada', 'error');
+                    return;
+                }
+            }
+            
+            if (!confirm('¿Está seguro de que desea eliminar esta tarea?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/app_stock/ot/tareas/${tareaId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                showToast('Tarea eliminada correctamente', 'success');
+                
+                // Recargar datos para actualizar progreso
+                await loadOrdersData();
+                
+                // Recargar tareas
+                await cargarTareas(otId);
+                
+            } catch (error) {
+                console.error('Error al eliminar tarea:', error);
+                showToast('Error al eliminar la tarea', 'error');
+            }
+        }
+        
+        /**
+         * Obtener clase CSS para estado de tarea
+         */
+        function getEstadoTareaClass(estado) {
+            switch (estado) {
+                case 'planificando':
+                    return 'text-yellow-700 bg-yellow-100 border-yellow-300';
+                case 'ejecutando':
+                    return 'text-blue-700 bg-blue-100 border-blue-300';
+                case 'finalizada':
+                    return 'text-green-700 bg-green-100 border-green-300';
+                default:
+                    return 'text-gray-700 bg-gray-100 border-gray-300';
+            }
+        }
+        // ===== FIN GESTIÓN DE TAREAS =====
+
+        // ===== GESTIÓN DE MODALES PARA TAREAS =====
+        
+        let modalTareaOtId = null;
+        let modalTareaEditId = null;
+        
+        /**
+         * Abrir modal para lista de tareas
+         */
+        async function abrirModalListaTareas(otId) {
+            modalTareaOtId = otId;
+            
+            // Obtener información de la OT
+            const ordenRow = document.querySelector(`tr[data-order-id="${otId}"]`);
+            if (ordenRow) {
+                const cells = ordenRow.querySelectorAll('td');
+                document.getElementById('modal-ot-numero').textContent = cells[0]?.textContent.trim() || 'N/A';
+                document.getElementById('modal-ot-cliente').textContent = cells[2]?.textContent.trim() || 'N/A';
+                
+                // Verificar si está finalizada para mostrar/ocultar botón de agregar
+                const estadoTexto = cells[5]?.textContent.trim().toLowerCase();
+                const btnAgregar = document.getElementById('btn-agregar-tarea-modal');
+                if (estadoTexto === 'finalizada') {
+                    btnAgregar.style.display = 'none';
+                } else {
+                    btnAgregar.style.display = 'flex';
+                }
+            }
+            
+            document.getElementById('modal-lista-tareas').classList.remove('hidden');
+            await cargarTareasEnModal(otId);
+        }
+        
+        /**
+         * Cerrar modal de lista de tareas
+         */
+        function cerrarModalListaTareas() {
+            document.getElementById('modal-lista-tareas').classList.add('hidden');
+            modalTareaOtId = null;
+        }
+        
+        /**
+         * Abrir modal para agregar/editar tarea
+         */
+        function abrirModalTarea(tareaId = null) {
+            modalTareaEditId = tareaId;
+            
+            if (tareaId) {
+                document.getElementById('modal-tarea-titulo').innerHTML = '<i class="fas fa-edit mr-2"></i>Editar Tarea';
+                // TODO: Cargar datos de la tarea para edición
+            } else {
+                document.getElementById('modal-tarea-titulo').innerHTML = '<i class="fas fa-plus mr-2"></i>Agregar Nueva Tarea';
+                document.getElementById('form-tarea').reset();
+                document.getElementById('tarea-estado').value = 'planificando';
+            }
+            
+            document.getElementById('modal-tarea').classList.remove('hidden');
+            document.getElementById('tarea-descripcion').focus();
+        }
+        
+        /**
+         * Cerrar modal de tarea
+         */
+        function cerrarModalTarea() {
+            document.getElementById('modal-tarea').classList.add('hidden');
+            modalTareaEditId = null;
+        }
+        
+        /**
+         * Guardar tarea (crear o editar)
+         */
+        async function guardarTarea(event) {
+            event.preventDefault();
+            
+            const descripcion = document.getElementById('tarea-descripcion').value.trim();
+            if (!descripcion) {
+                showToast('La descripción es obligatoria', 'error');
+                return;
+            }
+            
+            const responsable = document.getElementById('tarea-responsable').value.trim() || null;
+            const tiempoEstimado = document.getElementById('tarea-tiempo').value;
+            const estado = document.getElementById('tarea-estado').value;
+            
+            const tareaData = {
+                ot_id: modalTareaOtId,
+                descripcion: descripcion,
+                responsable: responsable,
+                tiempo_estimado: tiempoEstimado ? parseFloat(tiempoEstimado) : null,
+                estado: estado
+            };
+            
+            try {
+                let response;
+                if (modalTareaEditId) {
+                    // Editar tarea existente
+                    response = await fetch(`/app_stock/ot/tareas/${modalTareaEditId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(tareaData)
+                    });
+                } else {
+                    // Crear nueva tarea
+                    response = await fetch(`/app_stock/ot/id/${modalTareaOtId}/tareas`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(tareaData)
+                    });
+                }
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || `Error HTTP: ${response.status}`);
+                }
+                
+                showToast(modalTareaEditId ? 'Tarea actualizada correctamente' : 'Tarea creada correctamente', 'success');
+                cerrarModalTarea();
+                
+                // Recargar datos
+                await loadOrdersData();
+                await cargarTareasEnModal(modalTareaOtId);
+                
+            } catch (error) {
+                console.error('Error al guardar tarea:', error);
+                showToast(error.message || 'Error al guardar la tarea', 'error');
+            }
+        }
+        
+        /**
+         * Cargar tareas en el modal
+         */
+        async function cargarTareasEnModal(otId) {
+            const container = document.getElementById('contenido-lista-tareas');
+            
+            try {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-spinner fa-spin mr-2"></i>
+                        Cargando tareas...
+                    </div>
+                `;
+                
+                // Simulamos una pequeña demora
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Datos simulados para prueba - luego usar la API real
+                const tareas = [
+                    {
+                        id: 1,
+                        nombre: "Revisión inicial del sistema",
+                        descripcion: "Verificar el estado general del sistema",
+                        estado: "planificando",
+                        orden: 1,
+                        duracion_estimada: 60,
+                        duracion_real: null,
+                        responsable: "Juan Pérez",
+                        fecha_inicio: null,
+                        fecha_fin: null,
+                        observaciones: ""
+                    },
+                    {
+                        id: 2,
+                        nombre: "Mantenimiento preventivo",
+                        descripcion: "Realizar limpieza y lubricación",
+                        estado: "ejecutando",
+                        orden: 2,
+                        duracion_estimada: 120,
+                        duracion_real: 90,
+                        responsable: "María García",
+                        fecha_inicio: "2025-06-30T08:00:00",
+                        fecha_fin: null,
+                        observaciones: "En progreso..."
+                    },
+                    {
+                        id: 3,
+                        nombre: "Pruebas finales",
+                        descripcion: "Verificar funcionamiento correcto",
+                        estado: "finalizada",
+                        orden: 3,
+                        duracion_estimada: 30,
+                        duracion_real: 25,
+                        responsable: "Carlos López",
+                        fecha_inicio: "2025-06-29T14:00:00",
+                        fecha_fin: "2025-06-29T14:25:00",
+                        observaciones: "Completado satisfactoriamente"
+                    }
+                ];
+                
+                // TODO: Descomentar cuando la API funcione
+                /*
+                const response = await fetch(`/app_stock/ot/id/${otId}/tareas`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const tareas = await response.json();
+                */
+                renderTareasEnModal(otId, tareas);
+                
+            } catch (error) {
+                console.error('Error al cargar tareas en modal:', error);
+                container.innerHTML = `
+                    <div class="text-center text-red-500 py-8">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Error al cargar las tareas
+                    </div>
+                `;
+            }
+        }
+        
+        /**
+         * Renderizar tareas en modal
+         */
+        function renderTareasEnModal(otId, tareas) {
+            const container = document.getElementById('contenido-lista-tareas');
+            
+            if (!tareas || tareas.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay tareas definidas para esta OT
+                        <br>
+                        <button 
+                            onclick="abrirModalTarea()"
+                            class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
+                        >
+                            Crear primera tarea
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Verificar si la OT está finalizada
+            const ordenRow = document.querySelector(`tr[data-order-id="${otId}"]`);
+            const esFinalizada = ordenRow ? ordenRow.querySelectorAll('td')[5]?.textContent.trim().toLowerCase() === 'finalizada' : false;
+            
+            const tareasHtml = `
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsable</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiempo Est.</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orden</th>
+                                ${!esFinalizada ? '<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>' : ''}
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${tareas.map(tarea => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 text-sm text-gray-900">${tarea.descripcion}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">${tarea.responsable || 'No asignado'}</td>
+                                    <td class="px-6 py-4">
+                                        ${!esFinalizada ? `
+                                            <select 
+                                                class="text-xs border rounded px-2 py-1 ${getEstadoTareaClass(tarea.estado)}"
+                                                onchange="cambiarEstadoTareaEnModal(${tarea.id}, this.value, ${otId})"
+                                            >
+                                                <option value="planificando" ${tarea.estado === 'planificando' ? 'selected' : ''}>Planificando</option>
+                                                <option value="ejecutando" ${tarea.estado === 'ejecutando' ? 'selected' : ''}>Ejecutando</option>
+                                                <option value="finalizada" ${tarea.estado === 'finalizada' ? 'selected' : ''}>Finalizada</option>
+                                            </select>
+                                        ` : `
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getEstadoTareaClass(tarea.estado)}">
+                                                ${formatEstadoTarea(tarea.estado)}
+                                            </span>
+                                        `}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">${tarea.tiempo_estimado ? tarea.tiempo_estimado + 'h' : 'N/A'}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">${tarea.orden}</td>
+                                    ${!esFinalizada ? `
+                                        <td class="px-6 py-4 text-right">
+                                            <div class="flex justify-end space-x-2">
+                                                <button 
+                                                    onclick="abrirModalTarea(${tarea.id})"
+                                                    class="text-blue-600 hover:text-blue-900 p-2"
+                                                    title="Editar tarea"
+                                                >
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button 
+                                                    onclick="eliminarTareaEnModal(${tarea.id}, ${otId})"
+                                                    class="text-red-600 hover:text-red-900 p-2"
+                                                    title="Eliminar tarea"
+                                                >
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    ` : ''}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = tareasHtml;
+        }
+        
+        /**
+         * Cambiar estado de tarea desde modal
+         */
+        async function cambiarEstadoTareaEnModal(tareaId, nuevoEstado, otId) {
+            try {
+                const response = await fetch(`/app_stock/ot/tareas/${tareaId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        estado: nuevoEstado
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                showToast('Estado de tarea actualizado correctamente', 'success');
+                
+                // Recargar datos
+                await loadOrdersData();
+                await cargarTareasEnModal(otId);
+                
+            } catch (error) {
+                console.error('Error al cambiar estado de tarea:', error);
+                showToast('Error al actualizar el estado de la tarea', 'error');
+                await cargarTareasEnModal(otId); // Recargar para revertir cambio visual
+            }
+        }
+        
+        /**
+         * Eliminar tarea desde modal
+         */
+        async function eliminarTareaEnModal(tareaId, otId) {
+            if (!confirm('¿Está seguro de que desea eliminar esta tarea?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/app_stock/ot/tareas/${tareaId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                showToast('Tarea eliminada correctamente', 'success');
+                
+                // Recargar datos
+                await loadOrdersData();
+                await cargarTareasEnModal(otId);
+                
+            } catch (error) {
+                console.error('Error al eliminar tarea:', error);
+                showToast('Error al eliminar la tarea', 'error');
+            }
+        }
+        
+        /**
+         * Formatear estado de tarea para mostrar
+         */
+        function formatEstadoTarea(estado) {
+            const estados = {
+                'planificando': 'Planificando',
+                'ejecutando': 'Ejecutando',
+                'finalizada': 'Finalizada'
+            };
+            return estados[estado] || estado || 'Desconocido';
+        }
+        // ===== FIN GESTIÓN DE MODALES PARA TAREAS =====
+
+        // =============================================
+        // GESTIÓN DE TAREAS EN EL FORMULARIO DE OT
+        // =============================================
+        
+        let contadorTareas = 0;
+        let tareasFormulario = [];
+
+        /**
+         * Agregar una nueva tarea al formulario
+         */
+        function agregarTarea() {
+            contadorTareas++;
+            const container = document.getElementById('tareas-container');
+            const placeholder = document.getElementById('tareas-placeholder');
+            
+            // Ocultar placeholder si existe
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+            
+            const tareaId = `tarea-${contadorTareas}`;
+            const tareaHTML = `
+                <div class="tarea-item bg-gray-50 border border-gray-300 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                    <div class="flex-1 space-y-2">
+                        <input type="text" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" placeholder="Nombre de la tarea" required />
+                        <div class="grid grid-cols-2 gap-4">
+                            <select class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" required>
+                                <option value="planificando">Planificando</option>
+                                <option value="ejecutando">Ejecutando</option>
+                                <option value="finalizada">Finalizada</option>
+                            </select>
+                            <input type="number" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" placeholder="Horas" min="0" required />
+                        </div>
+                        <select class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 text-gray-700" required>
+                            <option value="Baja">Baja</option>
+                            <option value="Media">Media</option>
+                            <option value="Alta">Alta</option>
+                            <option value="Crítica">Crítica</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm flex items-center transition-colors" onclick="eliminarTarea(this)">
+                            <i class="fas fa-trash mr-2"></i>
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', tareaHTML);
+            
+            // Agregar tarea al array de seguimiento
+            tareasFormulario.push({
+                id: contadorTareas,
+                elemento: tareaId
+            });
+        }
+
+        /**
+         * Eliminar una tarea del formulario
+         */
+        function eliminarTarea(tareaId) {
+            const elemento = document.getElementById(tareaId);
+            if (elemento) {
+                elemento.remove();
+                
+                // Remover del array de seguimiento
+                tareasFormulario = tareasFormulario.filter(tarea => tarea.elemento !== tareaId);
+                
+                // Mostrar placeholder si no hay tareas
+                if (tareasFormulario.length === 0) {
+                    const placeholder = document.getElementById('tareas-placeholder');
+                    if (placeholder) {
+                        placeholder.style.display = 'block';
+                    }
+                }
+            }
+        }
+
+        /**
+         * Recopilar datos de todas las tareas del formulario
+         */
+        function recopilarTareas() {
+            const tareas = [];
+            
+            tareasFormulario.forEach(tarea => {
+                const elemento = document.getElementById(tarea.elemento);
+                if (elemento) {
+                    const id = tarea.id;
+                    
+                    const tareaDatos = {
+                        descripcion: elemento.querySelector(`[name="tarea_descripcion_${id}"]`).value,
+                        responsable: elemento.querySelector(`[name="tarea_responsable_${id}"]`).value,
+                        tiempo_estimado: parseInt(elemento.querySelector(`[name="tarea_tiempo_${id}"]`).value) || null,
+                        estado: elemento.querySelector(`[name="tarea_estado_${id}"]`).value,
+                        orden: parseInt(elemento.querySelector(`[name="tarea_orden_${id}"]`).value) || id,
+                        fecha_inicio: elemento.querySelector(`[name="tarea_inicio_${id}"]`).value || null,
+                        horas_trabajadas: parseFloat(elemento.querySelector(`[name="tarea_horas_${id}"]`).value) || 0,
+                        observaciones: elemento.querySelector(`[name="tarea_observaciones_${id}"]`).value
+                    };
+                    
+                    // Solo agregar si tiene descripción
+                    if (tareaDatos.descripcion.trim()) {
+                        tareas.push(tareaDatos);
+                    }
+                }
+            });
+            
+            return tareas;
+        }
+
+        /**
+         * Limpiar todas las tareas del formulario
+         */
+        function limpiarTareas() {
+            const container = document.getElementById('tareas-container');
+            container.innerHTML = `
+                <div class="text-center text-gray-500 py-4 border-2 border-dashed border-gray-300 rounded-lg" id="tareas-placeholder">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    No hay tareas definidas. Haz clic en "Agregar Tarea" para comenzar.
+                </div>
+            `;
+            
+            contadorTareas = 0;
+            tareasFormulario = [];
+        }
+    </script>
+</body>
+</html>

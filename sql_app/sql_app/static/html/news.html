@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticias y Actualizaciones</title>
+    
+    <!-- Estilos -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Animaciones */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        /* Filtro de categorías */
+        .category-filter {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .category-filter:hover {
+            transform: translateY(-2px);
+        }
+        
+        .category-filter.active {
+            color: #4f46e5;
+            border-color: #4f46e5;
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+        
+        /* Estilo de tarjetas */
+        .news-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .news-card .image-container {
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .news-card img {
+            transition: transform 0.5s ease;
+        }
+        
+        .news-card:hover img {
+            transform: scale(1.05);
+        }
+        
+        .news-card .badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 10;
+        }
+        
+        /* Shimmer effect para carga */
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+        
+        .loading-shimmer {
+            background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        
+        /* Estado vacío */
+        .empty-state {
+            border: 2px dashed #e5e7eb;
+            padding: 3rem;
+        }
+        
+        /* Paginación */
+        .pagination-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .pagination-btn:hover:not(.disabled) {
+            transform: translateY(-2px);
+        }
+        
+        .pagination-btn.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+    
+    <!-- Contenido principal -->
+    <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
+        <!-- Header con información de la página -->
+        <div class="mb-8">
+            <div class="gradient-bg text-white rounded-lg shadow-lg p-6 sm:p-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Noticias y Actualizaciones</h1>
+                        <p class="text-white text-opacity-90">
+                            Mantente al día con las últimas noticias, publicaciones y actualizaciones importantes.
+                        </p>
+                    </div>
+                    <div class="mt-4 md:mt-0 bg-white bg-opacity-20 p-3 rounded-lg">
+                        <div class="text-sm font-medium">
+                            <div class="flex items-center">
+                                <i class="fas fa-newspaper mr-2"></i>
+                                <span>Artículos disponibles: <span class="font-bold">{{ blog_posts|length|default(0) }}</span></span>
+                            </div>
+                            <div class="flex items-center mt-1">
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                <span id="currentDate">21 de marzo, 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtros y búsqueda -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-filter mr-2 text-indigo-500"></i>
+                    Filtros y Búsqueda
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <!-- Filtro por categorías -->
+                    <div class="flex flex-wrap gap-2">
+                        <button class="category-filter px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700 active">
+                            Todas
+                        </button>
+                        <button class="category-filter px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700">
+                            Actualizaciones
+                        </button>
+                        <button class="category-filter px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700">
+                            Eventos
+                        </button>
+                        <button class="category-filter px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700">
+                            Tutoriales
+                        </button>
+                        <button class="category-filter px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700">
+                            Comunicados
+                        </button>
+                    </div>
+                    
+                    <!-- Búsqueda -->
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            placeholder="Buscar noticia..." 
+                            class="w-full md:w-64 px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Grid de noticias -->
+        <div class="mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for post in blog_posts|sort(attribute='created_at', reverse=True)|default([]) %}
+                <!-- Alternativa usando clases predefinidas -->
+                <div class="news-card bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 animate-fadeIn delay-{{ loop.index0 }}">   
+                        <div class="image-container">
+                        {% if post.image_url %}
+                        <img src="{{ post.image_url }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
+                        {% else %}
+                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                            <i class="fas fa-newspaper text-4xl text-gray-400"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Categoría -->
+                        <span class="badge bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-md">
+                            {{ post.category|default('General') }}
+                        </span>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-500 flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                {{ post.created_at.strftime('%d/%m/%Y')|default('Sin fecha') }}
+                            </span>
+                            <span class="text-sm text-gray-500 flex items-center">
+                                <i class="far fa-eye mr-1"></i>
+                                {{ post.views|default('0') }} lecturas
+                            </span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold mb-2 text-gray-800 line-clamp-2">{{ post.title }}</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">{{ post.content | truncate(150) }}</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <a href="/news/{{ post.id }}" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center transition-colors">
+                                Leer más
+                                <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                            </a>
+                            
+                            <!-- Autor -->
+                            <div class="flex items-center">
+                                {% if post.author_avatar %}
+                                <img src="{{ post.author_avatar }}" alt="{{ post.author_name }}" class="w-6 h-6 rounded-full mr-2">
+                                {% else %}
+                                <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center mr-2">
+                                    <i class="fas fa-user text-xs text-gray-500"></i>
+                                </div>
+                                {% endif %}
+                                <span class="text-xs text-gray-500">{{ post.author_name|default('Admin') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Estado vacío -->
+                <div class="col-span-1 md:col-span-3 py-16 flex flex-col items-center justify-center empty-state rounded-xl bg-gray-50">
+                    <div class="text-gray-400 text-7xl mb-4">
+                        <i class="far fa-newspaper"></i>
+                    </div>
+                    <h3 class="text-xl font-medium text-gray-700 mb-2">No hay noticias disponibles</h3>
+                    <p class="text-gray-500 text-center max-w-md mb-6">
+                        Actualmente no hay noticias o publicaciones disponibles. Vuelve a revisar más tarde para ver las últimas actualizaciones.
+                    </p>
+                    <a href="/index" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center">
+                        <i class="fas fa-home mr-2"></i>
+                        Volver al inicio
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Paginación -->
+        {% if blog_posts|length > 9 %}
+        <div class="flex justify-center mt-8 mb-4">
+            <div class="inline-flex rounded-md shadow-sm">
+                <button class="pagination-btn disabled px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md">
+                    <i class="fas fa-chevron-left mr-1"></i>
+                    Anterior
+                </button>
+                <button class="pagination-btn active px-4 py-2 text-sm font-medium border border-gray-300">
+                    1
+                </button>
+                <button class="pagination-btn px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300">
+                    2
+                </button>
+                <button class="pagination-btn px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300">
+                    3
+                </button>
+                <button class="pagination-btn px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-r-md">
+                    <i class="fas fa-chevron-right mr-1"></i>
+                    Siguiente
+                </button>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Suscripción a noticias -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mt-8 animate-fadeIn" style="animation-delay: 0.3s">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-envelope mr-2 text-blue-500"></i>
+                    Suscríbete a nuestro Boletín
+                </h3>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-600 mb-6">
+                    Recibe las últimas noticias, actualizaciones y contenido exclusivo directamente en tu correo electrónico.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input 
+                        type="email" 
+                        placeholder="Tu correo electrónico" 
+                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                    <button class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Suscribirse
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-3">
+                    <i class="fas fa-shield-alt mr-1"></i>
+                    No compartiremos tu correo electrónico. Puedes darte de baja en cualquier momento.
+                </p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer - Se cargará dinámicamente -->
+    <div id="footer-container"></div>
+    
+    <script>
+        // Actualizar fecha en el header
+        function updateDateTime() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('es-ES', options);
+        }
+        updateDateTime();
+        
+        // Filtros de categoría
+        document.querySelectorAll('.category-filter').forEach(button => {
+            button.addEventListener('click', function() {
+                // Eliminar la clase activa de todos los botones
+                document.querySelectorAll('.category-filter').forEach(btn => btn.classList.remove('active'));
+                // Añadir la clase activa al botón clicado
+                this.classList.add('active');
+                
+                // Aquí iría la lógica para filtrar por categoría
+                const category = this.textContent.trim();
+                console.log('Filtrando por categoría:', category);
+                
+                // Simulación de filtrado para demostración
+                if (category === 'Todas') {
+                    document.querySelectorAll('.news-card').forEach(card => card.style.display = 'block');
+                } else {
+                    document.querySelectorAll('.news-card').forEach(card => {
+                        // Esto es solo una demostración, necesitarías lógica real de filtrado
+                        const cardCategory = card.querySelector('.badge').textContent.trim();
+                        card.style.display = cardCategory === category ? 'block' : 'none';
+                    });
+                }
+            });
+        });
+        
+        // Búsqueda de noticias
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            // Búsqueda simple por título
+            document.querySelectorAll('.news-card').forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const content = card.querySelector('p').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || content.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Efecto lazy loading simulado para las imágenes (demo)
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('.news-card img');
+            
+            // Crear un observador de intersección para cargar imágenes cuando son visibles
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        const src = img.getAttribute('data-src');
+                        
+                        if (src) {
+                            img.setAttribute('src', src);
+                        }
+                        
+                        observer.unobserve(img);
+                    }
+                });
+            });
+            
+            images.forEach(img => {
+                observer.observe(img);
+            });
+        });
+    </script>
+</body>
+</html>

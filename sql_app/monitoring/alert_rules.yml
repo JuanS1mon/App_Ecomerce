@@ -1,0 +1,198 @@
+# =============================
+# ALERTAS DE PROMETHEUS
+# =============================
+# Reglas de alertas para el sistema de gestión de stock
+
+groups:
+  # =============================
+  # ALERTAS DE APLICACIÓN
+  # =============================
+  - name: stock_app_alerts
+    rules:
+      # Alta tasa de errores
+      - alert: HighErrorRate
+        expr: |
+          (
+            rate(error_responses_total[5m]) / 
+            rate(http_requests_total[5m])
+          ) * 100 > 5
+        for: 2m
+        labels:
+          severity: warning
+          service: stock-management
+        annotations:
+          summary: "Alta tasa de errores en la aplicación"
+          description: "La tasa de errores es {{ $value }}% en los últimos 5 minutos"
+
+      # Tiempo de respuesta alto
+      - alert: HighResponseTime
+        expr: |
+          histogram_quantile(0.95, 
+            rate(http_request_duration_seconds_bucket[5m])
+          ) > 2
+        for: 3m
+        labels:
+          severity: warning
+          service: stock-management
+        annotations:
+          summary: "Tiempo de respuesta alto"
+          description: "95% de las requests tardan más de {{ $value }}s"
+
+      # Aplicación caída
+      - alert: ApplicationDown
+        expr: up{job="fastapi-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: stock-management
+        annotations:
+          summary: "Aplicación no responde"
+          description: "La aplicación FastAPI no está respondiendo"
+
+      # Muchas conexiones activas
+      - alert: TooManyActiveConnections
+        expr: http_requests_in_progress > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: stock-management
+        annotations:
+          summary: "Demasiadas conexiones activas"
+          description: "{{ $value }} conexiones HTTP activas"
+
+  # =============================
+  # ALERTAS DE BASE DE DATOS
+  # =============================
+  - name: database_alerts
+    rules:
+      # Muchas conexiones de BD
+      - alert: HighDatabaseConnections
+        expr: db_connections_active > 15
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "Alto número de conexiones de BD"
+          description: "{{ $value }} conexiones activas a la base de datos"
+
+      # Queries lentas
+      - alert: SlowDatabaseQueries
+        expr: |
+          histogram_quantile(0.95, 
+            rate(db_query_duration_seconds_bucket[5m])
+          ) > 5
+        for: 3m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "Queries de base de datos lentas"
+          description: "95% de las queries tardan más de {{ $value }}s"
+
+  # =============================
+  # ALERTAS DE CACHE
+  # =============================
+  - name: cache_alerts
+    rules:
+      # Baja tasa de hit de cache
+      - alert: LowCacheHitRate
+        expr: |
+          (
+            rate(cache_operations_total{result="hit"}[10m]) /
+            rate(cache_operations_total[10m])
+          ) * 100 < 70
+        for: 5m
+        labels:
+          severity: warning
+          service: cache
+        annotations:
+          summary: "Baja tasa de hit del cache"
+          description: "Tasa de hit del cache: {{ $value }}%"
+
+      # Redis desconectado
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          service: cache
+        annotations:
+          summary: "Redis no disponible"
+          description: "Redis cache no está respondiendo, usando fallback"
+
+  # =============================
+  # ALERTAS DE SISTEMA
+  # =============================
+  - name: system_alerts
+    rules:
+      # Rate limiting excesivo
+      - alert: HighRateLimitHits
+        expr: rate(rate_limit_hits_total[5m]) > 10
+        for: 3m
+        labels:
+          severity: warning
+          service: rate-limiting
+        annotations:
+          summary: "Alto número de rate limits"
+          description: "{{ $value }} rate limits por segundo"
+
+      # Muchos intentos de autenticación fallidos
+      - alert: HighFailedAuthAttempts
+        expr: rate(auth_attempts_total{result="failed"}[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+          service: authentication
+        annotations:
+          summary: "Muchos intentos de auth fallidos"
+          description: "{{ $value }} intentos fallidos por segundo"
+
+      # Sistema con mucho uptime (necesita restart)
+      - alert: LongUptime
+        expr: system_uptime_seconds > 604800  # 7 días
+        for: 0m
+        labels:
+          severity: info
+          service: system
+        annotations:
+          summary: "Sistema con mucho uptime"
+          description: "Sistema corriendo por {{ $value | humanizeDuration }}"
+
+  # =============================
+  # ALERTAS CRÍTICAS
+  # =============================
+  - name: critical_alerts
+    rules:
+      # Tasa de errores crítica
+      - alert: CriticalErrorRate
+        expr: |
+          (
+            rate(error_responses_total{error_type="server_error"}[5m]) / 
+            rate(http_requests_total[5m])
+          ) * 100 > 10
+        for: 1m
+        labels:
+          severity: critical
+          service: stock-management
+        annotations:
+          summary: "🚨 CRÍTICO: Tasa de errores muy alta"
+          description: "{{ $value }}% de errores de servidor en los últimos 5 minutos"
+
+      # Sistema sobrecargado
+      - alert: SystemOverloaded
+        expr: |
+          (
+            rate(http_requests_total[1m]) > 100
+          ) and (
+            histogram_quantile(0.95, 
+              rate(http_request_duration_seconds_bucket[5m])
+            ) > 5
+          )
+        for: 2m
+        labels:
+          severity: critical
+          service: stock-management
+        annotations:
+          summary: "🚨 CRÍTICO: Sistema sobrecargado"
+          description: "Alto tráfico ({{ $value }} req/s) con tiempos lentos"

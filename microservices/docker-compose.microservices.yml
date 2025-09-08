@@ -1,0 +1,208 @@
+version: '3.8'
+
+# ============================================================================
+# DOCKER COMPOSE PARA ARQUITECTURA DE MICROSERVICIOS
+# ============================================================================
+# Este archivo configura todos los servicios de la aplicación separados en
+# microservicios independientes con sus propias responsabilidades
+
+services:
+  # ==========================================
+  # BASE DE DATOS CENTRALIZADA (SHARED)
+  # ==========================================
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_app_database
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: MyStrongPassword123!
+      MSSQL_PID: Express
+      MSSQL_MEMORY_LIMIT_MB: 2048
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - microservices_network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P MyStrongPassword123! -Q 'SELECT 1' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ==========================================
+  # CORE SERVICE (SERVICIOS PRINCIPALES)
+  # ==========================================
+  core-service:
+    build:
+      context: ./microservices/core-service
+      dockerfile: Dockerfile
+    container_name: core_service
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=mssql+pyodbc://sa:MyStrongPassword123!@database:1433/CoreDB?driver=ODBC+Driver+17+for+SQL+Server&charset=utf8
+      - ENVIRONMENT=production
+      - SECRET_KEY=your-super-secret-key-change-this
+      - SERVICE_NAME=core-service
+      - SERVICE_PORT=8001
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./logs/core:/app/logs
+      - ./static/core:/app/static
+    networks:
+      - microservices_network
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/core/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==========================================
+  # STOCK SERVICE (GESTIÓN DE INVENTARIO)
+  # ==========================================
+  stock-service:
+    build:
+      context: ./microservices/stock-service
+      dockerfile: Dockerfile
+    container_name: stock_service
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=mssql+pyodbc://sa:MyStrongPassword123!@database:1433/StockDB?driver=ODBC+Driver+17+for+SQL+Server&charset=utf8
+      - CORE_SERVICE_URL=http://core-service:8001
+      - SERVICE_NAME=stock-service
+      - SERVICE_PORT=8002
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./logs/stock:/app/logs
+      - ./static/stock:/app/static
+    networks:
+      - microservices_network
+    depends_on:
+      - database
+      - core-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/stock/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==========================================
+  # OBRAS SERVICE (GESTIÓN DE OBRAS)
+  # ==========================================
+  obras-service:
+    build:
+      context: ./microservices/obras-service
+      dockerfile: Dockerfile
+    container_name: obras_service
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=mssql+pyodbc://sa:MyStrongPassword123!@database:1433/ObrasDB?driver=ODBC+Driver+17+for+SQL+Server&charset=utf8
+      - CORE_SERVICE_URL=http://core-service:8001
+      - SERVICE_NAME=obras-service
+      - SERVICE_PORT=8003
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./logs/obras:/app/logs
+      - ./static/obras:/app/static
+    networks:
+      - microservices_network
+    depends_on:
+      - database
+      - core-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/obras/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==========================================
+  # API GATEWAY (NGINX COMO PROXY REVERSO)
+  # ==========================================
+  api-gateway:
+    image: nginx:alpine
+    container_name: api_gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/microservices.conf:/etc/nginx/nginx.conf:ro
+      - ./static:/var/www/static:ro
+      - ./logs/nginx:/var/log/nginx
+    networks:
+      - microservices_network
+    depends_on:
+      - core-service
+      - stock-service
+      - obras-service
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==========================================
+  # MONITORING Y OBSERVABILIDAD (OPCIONAL)
+  # ==========================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - microservices_network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - microservices_network
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+
+# ==========================================
+# VOLÚMENES PERSISTENTES
+# ==========================================
+volumes:
+  sql_data:
+    driver: local
+    name: microservices_sql_data
+  prometheus_data:
+    driver: local
+    name: microservices_prometheus_data
+  grafana_data:
+    driver: local
+    name: microservices_grafana_data
+
+# ==========================================
+# REDES
+# ==========================================
+networks:
+  microservices_network:
+    driver: bridge
+    name: microservices_network

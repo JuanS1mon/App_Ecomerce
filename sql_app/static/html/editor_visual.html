@@ -173,6 +173,9 @@
             <button id="close-editor" class="bg-gray-500 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>Volver al Generador
             </button>
+            <button id="preview-json" class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded-lg transition-colors">
+                <i class="fas fa-eye mr-2"></i>Vista Previa
+            </button>
         </div>
     </div>
 
@@ -534,6 +537,16 @@
                 // Event listener para el selector de tipo de relación
                 document.getElementById('relationship-type').addEventListener('change', (e) => {
                     console.log('🔄 Tipo de relación cambiado a:', e.target.value);
+                });
+                
+                // Botón de vista previa JSON
+                document.getElementById('preview-json').addEventListener('click', () => {
+                    const jsonConfig = localStorage.getItem('generator_config');
+                    if (jsonConfig) {
+                        window.location.href = 'generar.html';
+                    } else {
+                        alert('No hay configuración JSON para previsualizar. Por favor, genera o carga un JSON primero.');
+                    }
                 });
             }
             
@@ -1336,16 +1349,30 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
                         // Agregar el resto de campos originales
                         fields.push(...table.fields
                             .filter(field => !field.primary || field.name === 'id') // Incluir ID si existe
-                            .map(field => ({
-                                name: field.name,
-                                field_type: field.type === 'integer' ? 'integer' : 
-                                           field.type === 'boolean' ? 'boolean' :
-                                           field.type === 'datetime' ? 'datetime' :
-                                           field.type === 'email' ? 'email' : 'string',
-                                primary_key: field.primary || field.name === 'id',
-                                auto_increment: field.primary || field.name === 'id',
-                                nullable: field.name === 'id' ? false : true
-                            })));
+                            .map(field => {
+                                // Para campos ID, siempre usar integer con auto_increment
+                                if (field.name === 'id' || field.primary) {
+                                    return {
+                                        name: field.name,
+                                        field_type: "integer",
+                                        primary_key: true,
+                                        auto_increment: true,
+                                        nullable: false
+                                    };
+                                }
+                                
+                                // Para otros campos, mapear tipos correctamente
+                                return {
+                                    name: field.name,
+                                    field_type: field.type === 'integer' ? 'integer' : 
+                                               field.type === 'boolean' ? 'boolean' :
+                                               field.type === 'datetime' ? 'datetime' :
+                                               field.type === 'email' ? 'email' : 'string',
+                                    primary_key: false,
+                                    auto_increment: false,
+                                    nullable: field.name === 'id' ? false : true
+                                };
+                            }));
                         
                         // PASO 2: Agregar foreign keys automáticamente
                         if (foreignKeys.has(table.name)) {
@@ -1488,601 +1515,39 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
                 });
             }
             
-            // Utilidades
-            toPascalCase(str) {
-                return str.replace(/(^\w|_\w)/g, match => match.replace('_', '').toUpperCase());
-            }
-            
-            getSQLAlchemyType(type) {
-                const types = {
-                    'string': 'String',
-                    'integer': 'Integer',
-                    'boolean': 'Boolean',
-                    'datetime': 'DateTime',
-                    'email': 'String',
-                    'url': 'String'
-                };
-                return types[type] || 'String';
-            }
-            
-            getPydanticType(type) {
-                const types = {
-                    'string': 'str',
-                    'integer': 'int',
-                    'boolean': 'bool',
-                    'datetime': 'datetime',
-                    'email': 'str',
-                    'url': 'str'
-                };
-                return types[type] || 'str';
-            }
-            
-            saveProject() {
-                console.log('📊 Guardando proyecto. Tablas actuales:', this.tables.size);
-                console.log('📋 Contenido de tablas:', Array.from(this.tables.values()));
-                
-                // Formatear tablas para compatibilidad
-                const formattedTables = Array.from(this.tables.values()).map(table => ({
-                    id: table.id,
-                    name: table.name,
-                    fields: table.fields,
-                    x: table.position?.x || table.x || 50,
-                    y: table.position?.y || table.y || 50,
-                    position: table.position || { x: table.x || 50, y: table.y || 50 }
-                }));
-                
-                const projectData = {
-                    tables: formattedTables,
-                    relationships: this.relationships,
-                    metadata: {
-                        name: 'Mi Proyecto Visual',
-                        created: new Date().toISOString(),
-                        version: '1.0'
-                    }
-                };
-                
-                console.log('💾 Datos del proyecto a guardar:', projectData);
-                
-                const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'proyecto-visual.json';
-                a.click();
-                URL.revokeObjectURL(url);
-                
-                console.log('💾 Proyecto guardado');
-            }
-            
-            loadProject() {
-                document.getElementById('file-input').click();
-            }
-            
-            handleFileLoad(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const projectData = JSON.parse(e.target.result);
-                        this.loadProjectFromData(projectData);
-                    } catch (error) {
-                        console.error('Error al cargar el archivo:', error);
-                        alert('Error al cargar el archivo. Verifique que sea un archivo JSON válido.');
-                    }
-                };
-                reader.readAsText(file);
-            }
-            
-            // Función para normalizar relaciones del formato ChatGPT al formato interno
-            normalizeRelationships(relationships) {
-                return relationships.map(rel => {
-                    // Detectar si es formato ChatGPT (simple) o formato interno (complejo)
-                    if (rel.from_table && rel.to_table && !rel.from) {
-                        console.log('🔧 Normalizando relación de formato ChatGPT:', rel);
-                        
-                        // Convertir tipo de relación: one_to_many -> one-to-many
-                        const normalizedType = rel.relationship_type.replace(/_/g, '-');
-                        
-                        return {
-                            id: `rel_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                            type: normalizedType,
-                            from: {
-                                tableId: this.findTableIdByName(rel.from_table),
-                                tableName: rel.from_table,
-                                side: 'right'  // lado por defecto
-                            },
-                            to: {
-                                tableId: this.findTableIdByName(rel.to_table),
-                                tableName: rel.to_table,
-                                side: 'left'   // lado por defecto
-                            }
-                        };
-                    } else {
-                        // Ya está en formato interno
-                        return rel;
-                    }
-                });
-            }
-            
-            // Función auxiliar para encontrar ID de tabla por nombre
-            findTableIdByName(tableName) {
-                for (let [tableId, tableData] of this.tables) {
-                    if (tableData.name === tableName) {
-                        return tableId;
-                    }
-                }
-                // Si no se encuentra, generar un ID temporal
-                return `table_${tableName}`;
-            }
-            
-            loadProjectFromData(projectData) {
-                try {
-                    console.log('🔍 Datos recibidos para cargar:', projectData);
-                    console.log('🔍 Cantidad de tablas en el archivo:', projectData.tables?.length);
-                    
-                    // Validar estructura del proyecto
-                    if (!projectData.tables || !Array.isArray(projectData.tables)) {
-                        throw new Error('Estructura de proyecto inválida');
-                    }
-                    
-                    // Limpiar canvas actual
-                    const canvas = document.getElementById('design-canvas');
-                    const existingTables = canvas.querySelectorAll('.table-component');
-                    existingTables.forEach(table => table.remove());
-                    
-                    this.tables.clear();
-                    
-                    // Guardar relaciones sin procesar para después
-                    const rawRelationships = projectData.relationships || [];
-                    this.relationships = [];
-                    this.tableCounter = 0;
-                    
-                    console.log('📋 Iniciando carga de tablas...');
-                    
-                    // Recrear tablas
-                    projectData.tables.forEach((tableData, index) => {
-                        console.log(`📊 Cargando tabla ${index + 1}:`, tableData.name);
-                        this.createTableFromData(tableData);
-                    });
-                    
-                    console.log('✅ Tablas cargadas. Total en memoria:', this.tables.size);
-                    
-                    // Ahora normalizar relaciones después de que las tablas estén creadas
-                    this.relationships = this.normalizeRelationships(rawRelationships);
-                    
-                    // Recrear relaciones si existen
-                    this.redrawRelationships();
-                    
-                    // Ocultar mensaje de bienvenida
-                    document.getElementById('welcome-message').style.display = 'none';
-                    
-                    console.log('✅ Proyecto cargado exitosamente');
-                    alert(`✅ Proyecto cargado exitosamente!\n\n📊 ${projectData.tables.length} tablas importadas\n🔗 ${this.relationships.length} relaciones restauradas`);
-                    
-                } catch (error) {
-                    console.error('Error al cargar proyecto:', error);
-                    alert('Error al cargar el proyecto. El archivo no tiene el formato correcto.');
-                }
-            }
-            
-            createTableFromData(tableData) {
-                // Usar el ID original o generar uno nuevo si no existe
-                const tableId = tableData.id || `table-${++this.tableCounter}`;
-                
-                // Crear elemento tabla con todos los estilos originales
-                const tableElement = document.createElement('div');
-                tableElement.className = 'table-component';
-                tableElement.id = tableId;
-                
-                // Usar coordenadas correctas del JSON (x, y directamente)
-                const posX = tableData.x || tableData.position?.x || 50;
-                const posY = tableData.y || tableData.position?.y || 50;
-                tableElement.style.left = posX + 'px';
-                tableElement.style.top = posY + 'px';
-                
-                // USAR LA MISMA FUNCIÓN generateTableHTML() para mantener el estilo consistente
-                tableElement.innerHTML = this.generateTableHTML(tableData);
-                
-                // Agregar al canvas
-                document.getElementById('design-canvas').appendChild(tableElement);
-                
-                // Guardar en el map de tablas con la estructura correcta
-                this.tables.set(tableId, {
-                    id: tableId,
-                    name: tableData.name,
-                    fields: tableData.fields,
-                    x: posX,
-                    y: posY,
-                    position: { x: posX, y: posY }
-                });
-                
-                // IMPORTANTE: Configurar todos los eventos para que sea editable
-                this.setupTableEvents(tableElement, {
-                    id: tableId,
-                    name: tableData.name,
-                    fields: tableData.fields
-                });
-                
-                console.log(`✅ Tabla "${tableData.name}" recreada con ${tableData.fields.length} campos`);
-            }
-            
-            redrawRelationships() {
-                // Limpiar líneas existentes
-                const existingLines = document.querySelectorAll('.relationship-line');
-                existingLines.forEach(line => line.remove());
-                
-                // Redibujar todas las relaciones
-                this.relationships.forEach(relationship => {
-                    this.drawRelationshipLine(relationship);
-                });
-            }
-            
-            exportJSON() {
-                const config = this.generateConfigJSON(Array.from(this.tables.values()));
-                
-                const blob = new Blob([config], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'configuracion-generador.json';
-                a.click();
-                URL.revokeObjectURL(url);
-                
-                console.log('📄 JSON exportado');
-            }
-            
+            // Enviar JSON al generador
             sendToGenerator() {
-                if (this.tables.size === 0) {
-                    alert('No hay tablas para enviar. Crea al menos una tabla primero.');
+                const projectName = document.getElementById('project-name').value.trim();
+                const projectDescription = document.getElementById('project-description').value.trim();
+
+                if (!projectName || !projectDescription) {
+                    alert('Por favor, completa el nombre y la descripción del proyecto antes de enviarlo.');
                     return;
                 }
                 
+                // Verificar que hay tablas para enviar
+                if (this.tables.size === 0) {
+                    alert('No hay tablas para enviar. Por favor, crea al menos una tabla primero.');
+                    return;
+                }
+
                 try {
-                    // Limpiar configuraciones anteriores para evitar conflictos
-                    localStorage.removeItem('phase2_current_config');
-                    localStorage.removeItem('phase2_complex_config');
-                    localStorage.removeItem('visual_editor_export');
-                    
-                    console.log('🧹 localStorage limpiado antes de enviar nueva configuración');
-                    
-                    // Convertir todas las tablas a formato del Generador
+                    // Generar la configuración usando la función existente generateConfigJSON
                     const tables = Array.from(this.tables.values());
+                    const jsonConfig = this.generateConfigJSON(tables);
+                    const config = JSON.parse(jsonConfig);
                     
-                    if (tables.length === 1) {
-                        // Una sola tabla - formato simple
-                        const table = tables[0];
-                        const phase2Config = this.convertToPhase2Format(table);
-                        
-                        console.log('📤 Configuración simple a enviar:', phase2Config);
-                        
-                        // Guardar en localStorage para el Generador
-                        localStorage.setItem('phase2_current_config', JSON.stringify(phase2Config));
-                        localStorage.setItem('visual_editor_export', JSON.stringify({
-                            timestamp: new Date().toISOString(),
-                            table_name: table.name,
-                            fields_count: table.fields.length,
-                            mode: 'single'
-                        }));
-                        
-                        alert(`✅ Tabla "${table.name}" enviada exitosamente al Generador.\n\nPuedes regresar al Generador y la configuración estará lista.`);
-                        
-                    } else {
-                        // Múltiples tablas - crear configuración compleja
-                        
-                        // Obtener configuración del proyecto
-                        const projectName = document.getElementById('project-name').value.trim() || 'sistema_visual_multiple';
-                        const projectDescription = document.getElementById('project-description').value.trim() || 'Sistema multi-tabla generado desde Editor Visual';
-                        
-                        // Validar nombre del proyecto (solo letras, números y guiones bajos)
-                        const validProjectName = projectName.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
-                        if (validProjectName !== projectName.toLowerCase()) {
-                            console.warn('Nombre del proyecto ajustado para cumplir con las reglas de nomenclatura');
-                        }
-                        
-                        const complexConfig = {
-                            service_name: validProjectName,
-                            description: projectDescription,
-                            tables: tables.map(table => {
-                                // Asegurar que cada tabla tenga un campo ID primario
-                                const fields = [];
-                                
-                                // Agregar ID automáticamente si no existe
-                                const hasId = table.fields.some(field => field.name === 'id' || field.primary);
-                                if (!hasId) {
-                                    fields.push({
-                                        name: "id",
-                                        field_type: "integer",
-                                        primary_key: true,
-                                        auto_increment: true
-                                    });
-                                }
-                                
-                                // Agregar el resto de campos
-                                fields.push(...table.fields
-                                    .filter(field => !field.primary || field.name === 'id')
-                                    .map(field => ({
-                                        name: field.name,
-                                        field_type: field.type === 'integer' ? 'integer' : 
-                                                   field.type === 'boolean' ? 'boolean' :
-                                                   field.type === 'datetime' ? 'datetime' :
-                                                   field.type === 'email' ? 'email' : 'string',
-                                        primary_key: field.primary || field.name === 'id',
-                                        auto_increment: field.primary || field.name === 'id'
-                                    })));
-                                
-                                return {
-                                    name: table.name,
-                                    description: `Módulo ${table.name} generado desde Editor Visual`,
-                                    fields: fields
-                                };
-                            }),
-                            relationships: this.relationships.map(rel => ({
-                                from_table: rel.from.tableName,
-                                to_table: rel.to.tableName,
-                                relationship_type: rel.type,
-                                from_field: `${rel.to.tableName}_id`,
-                                to_field: "id",
-                                relationship_name: `${rel.from.tableName}_to_${rel.to.tableName}`,
-                                back_populates: null,
-                                cascade_delete: false,
-                                lazy_loading: "select"
-                            })),
-                            generate_crud_for_all: true,
-                            generated_by: "Editor Visual",
-                            timestamp: new Date().toISOString()
-                        };
-                        
-                        localStorage.setItem('phase2_complex_config', JSON.stringify(complexConfig));
-                        localStorage.setItem('visual_editor_export', JSON.stringify({
-                            timestamp: new Date().toISOString(),
-                            tables_count: tables.length,
-                            mode: 'multiple'
-                        }));
-                        
-                        console.log('📤 Configuración compleja enviada:', complexConfig);
-                        alert(`✅ ${tables.length} tablas enviadas exitosamente al Generador.\n\nConfiguración compleja guardada para importación.`);
-                    }
+                    console.log('🔍 [Editor Visual → Generador] Enviando configuración:', config);
+                    localStorage.setItem('generator_config', JSON.stringify(config));
+                    console.log('✅ Configuración guardada en localStorage correctamente');
                     
-                    console.log('📤 Configuración enviada al Generador');
-                    this.showSendSuccess();
+                    // Redirigir al generador
+                    window.location.href = '/generar/';
                     
                 } catch (error) {
-                    console.error('Error al enviar al Generador:', error);
-                    alert('Error al enviar la configuración al Generador.');
+                    console.error('❌ Error al enviar la configuración al generador:', error);
+                    alert('❌ Error al enviar la configuración al generador: ' + error.message);
                 }
-            }
-            
-            convertToPhase2Format(tableData) {
-                // Mapear tipos de Editor Visual a tipos del Generador
-                const typeMapping = {
-                    'string': 'str',
-                    'integer': 'int',
-                    'boolean': 'bool',
-                    'datetime': 'datetime',
-                    'email': 'email',
-                    'url': 'url'
-                };
-                
-                // Filtrar campos (excluir ID primario)
-                const fields = tableData.fields
-                    .filter(field => !field.primary)
-                    .map(field => ({
-                        name: field.name,
-                        type: typeMapping[field.type] || 'str'
-                    }));
-                
-                return {
-                    module_name: tableData.name,
-                    description: `Módulo ${tableData.name} generado desde Editor Visual`,
-                    fields: fields,
-                    generate_crud: true,
-                    generate_schema: true,
-                    generate_route: true,
-                    generated_by: "Editor Visual",
-                    timestamp: new Date().toISOString()
-                };
-            }
-            
-            showSendSuccess() {
-                const notification = document.createElement('div');
-                notification.className = 'fixed top-20 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50';
-                notification.innerHTML = `
-                    <div class="flex flex-col items-center">
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-check-circle mr-2"></i>
-                            <span>¡Configuración enviada al Generador!</span>
-                        </div>
-                        <button onclick="window.open('/generar/', '_blank')" 
-                                class="bg-white text-green-600 px-4 py-2 rounded text-sm font-semibold hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-external-link-alt mr-1"></i>
-                            Abrir Generador
-                        </button>
-                    </div>
-                `;
-                
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    notification.remove();
-                }, 5000);
-            }
-            
-            createDemo() {
-                // Limpiar canvas
-                const canvas = document.getElementById('design-canvas');
-                const existingTables = canvas.querySelectorAll('.table-component');
-                existingTables.forEach(table => table.remove());
-                
-                this.tables.clear();
-                this.tableCounter = 0;
-                this.relationships = []; // Limpiar relaciones también
-                
-                // 🎯 SISTEMA INDEXADO: Generar timestamp para hacer nombres únicos
-                const timestamp = Date.now().toString().slice(-4); // Últimos 4 dígitos del timestamp
-                
-                // 📊 CREAR TABLAS CON NOMBRES INDEXADOS
-                // Tabla 1: Usuarios (tabla principal)
-                this.createDemoTable(`usuario_${timestamp}`, [
-                    { name: 'id', type: 'integer', primary: true },
-                    { name: 'nombre', type: 'string' },
-                    { name: 'email', type: 'email' },
-                    { name: 'telefono', type: 'string' },
-                    { name: 'activo', type: 'boolean' }
-                ], 200, 100);
-                
-                // Tabla 2: Productos (tabla principal)
-                this.createDemoTable(`producto_${timestamp}`, [
-                    { name: 'id', type: 'integer', primary: true },
-                    { name: 'nombre', type: 'string' },
-                    { name: 'precio', type: 'integer' },
-                    { name: 'stock', type: 'integer' },
-                    { name: 'categoria', type: 'string' }
-                ], 550, 100);
-                
-                // Tabla 3: Órdenes (relacionada con usuario)
-                this.createDemoTable(`orden_${timestamp}`, [
-                    { name: 'id', type: 'integer', primary: true },
-                    { name: 'numero_orden', type: 'string' },
-                    { name: 'fecha_orden', type: 'datetime' },
-                    { name: 'total', type: 'integer' },
-                    { name: 'estado', type: 'string' }
-                ], 100, 300);
-                
-                // Tabla 4: Detalles de Orden (relacionada con orden y producto)
-                this.createDemoTable(`detalle_orden_${timestamp}`, [
-                    { name: 'id', type: 'integer', primary: true },
-                    { name: 'cantidad', type: 'integer' },
-                    { name: 'precio_unitario', type: 'integer' },
-                    { name: 'subtotal', type: 'integer' },
-                    { name: 'descuento', type: 'integer' }
-                ], 400, 300);
-                
-                // Tabla 5: Categorías (independiente)
-                this.createDemoTable(`categoria_${timestamp}`, [
-                    { name: 'id', type: 'integer', primary: true },
-                    { name: 'nombre', type: 'string' },
-                    { name: 'descripcion', type: 'string' },
-                    { name: 'activa', type: 'boolean' }
-                ], 700, 300);
-                
-                // 🔗 CREAR RELACIONES AUTOMÁTICAS PARA PRUEBAS
-                setTimeout(() => {
-                    const tablesArray = Array.from(this.tables.values());
-                    if (tablesArray.length >= 4) {
-                        // Relación: Usuario → Orden (one-to-many)
-                        this.createDemoRelation(tablesArray[0], tablesArray[2], 'one-to-many');
-                        // Relación: Orden → Detalle Orden (one-to-many)  
-                        this.createDemoRelation(tablesArray[2], tablesArray[3], 'one-to-many');
-                        // Relación: Producto → Detalle Orden (one-to-many)
-                        this.createDemoRelation(tablesArray[1], tablesArray[3], 'one-to-many');
-                    }
-                }, 500); // Esperar a que las tablas se rendericen
-                
-                // Ocultar mensaje de bienvenida
-                document.getElementById('welcome-message').style.display = 'none';
-                
-                // Mostrar notificación mejorada
-                this.showDemoNotification(timestamp);
-                
-                console.log(`🎭 [DEMO v2.1.0] Creado con timestamp: ${timestamp}`);
-                console.log(`📊 5 tablas indexadas generadas automáticamente`);
-                console.log(`🔗 3 relaciones configuradas para pruebas`);
-            }
-            
-            createDemoTable(tableName, fields, x, y) {
-                this.tableCounter++;
-                const tableId = `table_${this.tableCounter}`;
-                
-                const tableElement = document.createElement('div');
-                tableElement.className = 'table-component';
-                tableElement.id = tableId;
-                tableElement.style.left = `${x}px`;
-                tableElement.style.top = `${y}px`;
-                
-                const tableData = {
-                    id: tableId,
-                    name: tableName,
-                    fields: fields,
-                    x: x,
-                    y: y
-                };
-                
-                tableElement.innerHTML = this.generateTableHTML(tableData);
-                this.setupTableEvents(tableElement, tableData);
-                
-                document.getElementById('design-canvas').appendChild(tableElement);
-                this.tables.set(tableId, tableData);
-                this.updateCounts();
-                
-                // Animación de entrada
-                tableElement.style.opacity = '0';
-                tableElement.style.transform = 'scale(0.8)';
-                
-                setTimeout(() => {
-                    tableElement.style.transition = 'all 0.5s ease';
-                    tableElement.style.opacity = '1';
-                    tableElement.style.transform = 'scale(1)';
-                }, this.tableCounter * 200);
-            }
-            
-            createDemoRelation(fromTable, toTable, relationType) {
-                // 🔗 Crear relación visual automática para el demo
-                try {
-                    const relationship = {
-                        id: `rel_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-                        from: {
-                            tableId: fromTable.id,
-                            tableName: fromTable.name,
-                            field: 'id' // Siempre usar id como campo origen
-                        },
-                        to: {
-                            tableId: toTable.id,
-                            tableName: toTable.name,
-                            field: `id_${fromTable.name}` // Campo FK auto-generado
-                        },
-                        type: relationType,
-                        color: relationType === 'one-to-many' ? '#3B82F6' : '#10B981'
-                    };
-                    
-                    this.relationships.push(relationship);
-                    console.log(`🔗 [DEMO] Relación creada: ${fromTable.name} → ${toTable.name} (${relationType})`);
-                    
-                    // Redibujar las relaciones visualmente
-                    this.redrawRelationships();
-                } catch (error) {
-                    console.error('❌ Error creando relación demo:', error);
-                }
-            }
-            
-            showDemoNotification(timestamp = '') {
-                const notification = document.createElement('div');
-                notification.className = 'fixed top-20 right-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 transform transition-all duration-300';
-                notification.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-magic mr-3 text-yellow-300"></i>
-                        <div>
-                            <div class="font-bold text-lg">¡Demo Indexado Creado! 🎯</div>
-                            <div class="text-sm opacity-90">5 tablas con timestamp: ${timestamp}</div>
-                            <div class="text-xs opacity-75 mt-1">✅ Relaciones automáticas • ⚡ Listo para pruebas</div>
-                        </div>
-                    </div>
-                `;
-                
-                document.body.appendChild(notification);
-                
-                // Animación de entrada
-                setTimeout(() => {
-                    notification.style.transform = 'translateX(0) scale(1.05)';
-                }, 100);
-                
-                // Quitar la notificación
-                setTimeout(() => {
-                    notification.style.transform = 'translateX(100%) scale(0.8)';
-                    notification.style.opacity = '0';
-                    setTimeout(() => notification.remove(), 300);
-                }, 5000);
             }
             
             generateAIPrompt() {
@@ -2260,7 +1725,7 @@ EJEMPLO COMPLETO DE RELACIÓN CORRECTA:
 {
   "from_table": "usuarios",      // Tabla padre (sin FK)
   "to_table": "pedidos",         // Tabla hija (con FK)
-  "relationship_type": "one_to_many",
+  "relationship_type": "one-to-many",
   "from_field": "id",           // Campo en tabla padre
   "to_field": "id_usuario"      // Foreign key en tabla hija
 }
@@ -2300,6 +1765,46 @@ ERRORES COMUNES A EVITAR:
 
 FORMATO CORRECTO DE CAMPO ID:
 ✅ {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false}
+
+🚨🚨🚨 REGLAS CRÍTICAS - OBLIGATORIO LEER 🚨🚨🚨
+
+PARA TODOS LOS CAMPOS ID PRIMARIOS:
+- SIEMPRE usar: "field_type": "integer" (NUNCA "string")
+- SIEMPRE incluir: "auto_increment": true
+- SIEMPRE incluir: "primary_key": true
+- SIEMPRE incluir: "nullable": false
+
+EJEMPLO OBLIGATORIO PARA CAMPO ID:
+{
+  "name": "id",
+  "field_type": "integer",
+  "primary_key": true,
+  "auto_increment": true,
+  "nullable": false
+}
+
+PARA FOREIGN KEYS:
+- SIEMPRE usar: "field_type": "integer" 
+- Nombres como: "id_usuario", "id_categoria", etc.
+
+PARA RELATIONSHIP_TYPE:
+- SIEMPRE usar guiones medios: "one-to-many"
+- NUNCA usar guiones bajos: "one_to_many"
+
+⚠️ ERRORES COMUNES A EVITAR ABSOLUTAMENTE:
+❌ "field_type": "string" en campo "id"
+❌ "field_type": "string" con "auto_increment": true
+❌ "relationship_type": "one_to_many" (usar "one-to-many")
+
+✅ FORMATOS CORRECTOS ÚNICOS:
+✅ {"name": "id", "field_type": "integer", "auto_increment": true}
+✅ "relationship_type": "one-to-many"
+✅ "relationship_type": "many-to-one"
+
+🔍 VERIFICACIÓN ANTES DE GENERAR:
+1. ¿Todos los campos "id" tienen "field_type": "integer"?
+2. ¿Todas las foreign keys tienen "field_type": "integer"?
+3. ¿Todos los relationship_type usan guiones medios (-)?
 
 ¿Qué tipo de aplicación quieres que te ayude a crear?`;
 

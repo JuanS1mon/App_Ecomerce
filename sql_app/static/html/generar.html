@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,147 +9,57 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <!-- Sistema de componentes y navegación -->
     <script src="/static/js/components.js"></script>
-    <style>
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .gradient-bg {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-        }
-        .field-container {
-            transition: all 0.2s ease;
-        }
-        .field-container:hover {
-            border-color: #4f46e5;
-        }
-        
-        /* ============ ESTILOS PARA MEJORAS FASE 2 ============ */
-        
-        /* Validación en tiempo real */
-        .json-editor-valid {
-            border-color: #10b981 !important;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
-            background-color: #f0fdf4 !important;
-        }
-        
-        .json-editor-invalid {
-            border-color: #ef4444 !important;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-            background-color: #fef2f2 !important;
-        }
-        
-        .json-editor-warning {
-            border-color: #f59e0b !important;
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1) !important;
-            background-color: #fffbeb !important;
-        }
-        
-        /* Animaciones suaves */
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Estados de carga mejorados */
-        .loading-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        
-        .step-item {
-            transition: all 0.3s ease;
-        }
-        
-        /* Estilos para Editor Visual (Próximamente) */
-        .coming-soon-overlay {
-            backdrop-filter: blur(2px);
-            transition: all 0.3s ease;
-        }
-        
-        .coming-soon-overlay:hover {
-            backdrop-filter: blur(1px);
-        }
-        
-        .preview-board {
-            background-image: 
-                radial-gradient(circle at 20px 20px, #e5e7eb 2px, transparent 2px),
-                radial-gradient(circle at 80px 80px, #e5e7eb 2px, transparent 2px);
-            background-size: 100px 100px;
-            background-position: 0 0, 50px 50px;
-        }
-        
-        .visual-editor-card {
-            transition: all 0.3s ease;
-        }
-        
-        .visual-editor-card:hover {
-            transform: translateY(-2px);
-        }
-        
-        /* Animación para el icono de "próximamente" */
-        .rocket-animation {
-            animation: bounce 2s infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-10px);
-            }
-            60% {
-                transform: translateY(-5px);
-            }
-        }
-        
-        /* Mejoras responsivas para móvil */
-        @media (max-width: 640px) {
-            .card-hover {
-                margin-bottom: 1rem;
-            }
-            
-            .grid-responsive {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            /* En móvil, cambiar grid a 1 columna */
-            .lg\\:grid-cols-3 {
-                grid-template-columns: 1fr !important;
-            }
-            
-            #progress-steps {
-                font-size: 0.6rem;
-            }
-        }
-        
-        /* Estilos para favoritos */
-        .favorite-star {
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        
-        .favorite-star:hover {
-            transform: scale(1.2);
-        }
-        
-        .favorite-star.active {
-            color: #fbbf24;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/generar.css">
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navbar - Se cargará dinámicamente -->
     <div id="navbar-container"></div>
-   
+
+    <!-- Overlay de carga -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Generando tu aplicación...</div>
+        <div class="loading-subtitle">¡Este proceso puede tomar unos momentos!</div>
+    </div>
+
+    <!-- Modal de celebración -->
+    <div id="celebration-modal" class="celebration-modal">
+        <div class="celebration-content">
+            <!-- Estrellas de fondo -->
+            <div class="star"><i class="fas fa-star"></i></div>
+            <div class="star"><i class="fas fa-star"></i></div>
+            <div class="star"><i class="fas fa-star"></i></div>
+            <div class="star"><i class="fas fa-star"></i></div>
+            <div class="star"><i class="fas fa-star"></i></div>
+            <div class="star"><i class="fas fa-star"></i></div>
+            
+            <!-- Confeti -->
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            
+            <!-- Contenido del modal -->
+            <div class="celebration-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h2 class="celebration-title">¡Felicitaciones!</h2>
+            <p class="celebration-message">
+                ¡Has generado exitosamente tu aplicación! 🎉<br>
+                Tu sistema está listo y funcionando perfectamente.
+            </p>
+            <button class="celebration-button" onclick="closeCelebration()">
+                <i class="fas fa-rocket mr-2"></i>
+                ¡Explorar mi aplicación!
+            </button>
+        </div>
+    </div>
+
     <!-- Contenido principal -->
     <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto"> 
         <!-- Header con información de la página -->
@@ -182,12 +91,14 @@
           <!-- Modificar la sección de navegación para habilitar las pestañas -->
         <div class="border-b border-gray-200">
             <nav class="flex flex-wrap">
-                <button id="tab-nueva-app" class="tab-button px-6 py-4 text-gray-700 font-medium border-b-2 border-indigo-500 focus:outline-none active">
+                <!-- Tab Sistema Simple - OCULTO (obsoleto) -->
+                <button id="tab-nueva-app" class="tab-button px-6 py-4 text-gray-700 font-medium border-b-2 border-transparent focus:outline-none hidden">
                     <i class="fas fa-plus-circle mr-2 text-indigo-500"></i>
-                    Aplicación Simple
+                    Aplicación Simple (Obsoleto)
                 </button>
-                <button id="tab-multi-tabla" class="tab-button px-6 py-4 text-gray-500 hover:text-gray-700 font-medium border-b-2 border-transparent hover:border-gray-300 focus:outline-none">
-                    <i class="fas fa-project-diagram mr-2"></i>
+                <!-- Tab Multi-Tabla - ACTIVO POR DEFECTO -->
+                <button id="tab-multi-tabla" class="tab-button px-6 py-4 text-gray-700 font-medium border-b-2 border-indigo-500 focus:outline-none active">
+                    <i class="fas fa-project-diagram mr-2 text-indigo-500"></i>
                     Sistema Multi-Tabla
                 </button>
                 <button id="tab-plantillas" class="tab-button px-6 py-4 text-gray-500 hover:text-gray-700 font-medium border-b-2 border-transparent hover:border-gray-300 focus:outline-none">
@@ -201,141 +112,134 @@
             </nav>
         </div>
         
-                <div class="p-6">
-            <!-- Tab de Nueva Aplicación - Contenido existente -->
-            <div id="content-nueva-app" class="tab-content block">
-                <form id="generador" action="/generar/generate" method="post" class="space-y-6">
-                    <!-- Información del Módulo -->
-                    <div class="bg-white rounded-lg p-6 border border-gray-200">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                                <i class="fas fa-cube text-indigo-600"></i>
-                            </div>
-                            <h2 class="text-xl font-bold text-gray-800">Información del Módulo</h2>
+        <div class="p-6">
+        <!-- Contenido Sistema Simple - OCULTO por defecto -->
+        <div id="content-nueva-app" class="tab-content hidden">
+            <form id="generador" action="/generar/generate" method="post" class="space-y-6">
+                <!-- Información del Módulo -->
+                <div class="bg-white rounded-lg p-6 border border-gray-200">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <i class="fas fa-cube text-indigo-600"></i>
                         </div>
-                        
-                        <div class="grid grid-cols-1 gap-4">
-                            <div>
-                                <label for="module_name" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Nombre del Módulo/Tabla
-                                </label>
-                                <input type="text" 
-                                       id="module_name" 
-                                       name="module_name" 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                       placeholder="Ejemplo: usuarios, productos, ventas"
-                                       required>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    Este será el nombre de tu tabla en la base de datos y el módulo generado
-                                </p>
-                            </div>
-                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Información del Módulo</h2>
                     </div>
-        
-                    <!-- Campos del módulo -->
-                    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                                <i class="fas fa-table text-green-600"></i>
-                            </div>
-                            <h2 class="text-xl font-bold text-gray-800">Campos del Modelo</h2>
-                        </div>
-                        
+
+                    <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-gray-700 font-medium">Definición de campos:</label>
-                                <span class="text-sm text-gray-500 italic">El campo1 es obligatorio para realizar búsquedas</span>
-                            </div>
-                            
-                            <div id="fields" class="space-y-3 mb-4">
-                                <!-- Los campos dinámicos se generarán aquí -->
-                            </div>
-                            
-                            <button type="button" id="add_field" class="flex items-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md shadow transition-colors">
-                                <i class="fas fa-plus mr-2"></i>
-                                Agregar Campo
-                            </button>
+                            <label for="module_name" class="block text-sm font-medium text-gray-700 mb-1">
+                                Nombre del Módulo/Tabla
+                            </label>
+                            <input type="text" 
+                                   id="module_name" 
+                                   name="module_name" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                   placeholder="Ejemplo: usuarios, productos, ventas"
+                                   required>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Este será el nombre de tu tabla en la base de datos y el módulo generado
+                            </p>
                         </div>
                     </div>
-        
-                    <!-- Opciones de generación -->
-                    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                <i class="fas fa-cogs text-blue-600"></i>
-                            </div>
-                            <h2 class="text-xl font-bold text-gray-800">Opciones de Generación</h2>
+                </div>
+
+                <!-- Campos del módulo -->
+                <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                            <i class="fas fa-table text-green-600"></i>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
-                                <input type="checkbox" id="generate_crud" name="generate_crud" value="true" 
-                                    class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
-                                <div>
-                                    <label class="text-gray-800 font-medium block" for="generate_crud">Generar CRUD</label>
-                                    <span class="text-xs text-gray-500">Endpoints básicos: Crear, Leer, Actualizar, Eliminar</span>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
-                                <input type="checkbox" id="generate_schema" name="generate_schema" value="true" 
-                                    class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
-                                <div>
-                                    <label class="text-gray-800 font-medium block" for="generate_schema">Generar Esquema</label>
-                                    <span class="text-xs text-gray-500">Validación de datos con modelos Pydantic</span>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
-                                <input type="checkbox" id="generate_route" name="generate_route" value="true" 
-                                    class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
-                                <div>
-                                    <label class="text-gray-800 font-medium block" for="generate_route">Generar Ruta</label>
-                                    <span class="text-xs text-gray-500">Configuración automática de endpoints</span>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
-                                <input type="checkbox" id="generate_html_form" name="generate_html_form" value="true" 
-                                    class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
-                                <div>
-                                    <label class="text-gray-800 font-medium block" for="generate_html_form">Formulario HTML</label>
-                                    <span class="text-xs text-gray-500">Interfaz de usuario para manipular datos</span>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
-                                <input type="checkbox" id="generate_tests" name="generate_tests" value="true" 
-                                    class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
-                                <div>
-                                    <label class="text-gray-800 font-medium block" for="generate_tests">Pruebas</label>
-                                    <span class="text-xs text-gray-500">Tests automatizados para endpoints</span>
-                                </div>
-                            </div>
-        
-                            <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
-                                <input type="checkbox" id="generate_service" name="generate_service" value="true" 
-                                    class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
-                                <div>
-                                    <label class="text-gray-800 font-medium block" for="generate_service">Generar Servicio</label>
-                                    <span class="text-xs text-gray-500">Capa de servicio para lógica de negocio</span>
-                                </div>
-                            </div>
-                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Campos del Modelo</h2>
                     </div>
-        
-                    <!-- Botón de generación -->
-                    <div class="flex justify-end">
-                        <button type="submit" class="flex items-center px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition-colors text-lg">
-                            <i class="fas fa-magic mr-2"></i>
-                            Generar Aplicación
+
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-gray-700 font-medium">Definición de campos:</label>
+                            <span class="text-sm text-gray-500 italic">El campo1 es obligatorio para realizar búsquedas</span>
+                        </div>
+
+                        <div id="fields" class="space-y-3 mb-4">
+                            <!-- Los campos dinámicos se generarán aquí -->
+                        </div>
+
+                        <button type="button" id="add_field" class="flex items-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md shadow transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
+                            Agregar Campo
                         </button>
                     </div>
-                </form>
+                </div>
+
+                <!-- Opciones de generación -->
+                <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <i class="fas fa-cogs text-blue-600"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Opciones de Generación</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
+                            <input type="checkbox" id="generate_crud" name="generate_crud" value="true" 
+                                class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
+                            <div>
+                                <label class="text-gray-800 font-medium block" for="generate_crud">Generar CRUD</label>
+                                <span class="text-xs text-gray-500">Endpoints básicos: Crear, Leer, Actualizar, Eliminar</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
+                            <input type="checkbox" id="generate_schema" name="generate_schema" value="true" 
+                                class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
+                            <div>
+                                <label class="text-gray-800 font-medium block" for="generate_schema">Generar Esquema</label>
+                                <span class="text-xs text-gray-500">Validación de datos con modelos Pydantic</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
+                            <input type="checkbox" id="generate_route" name="generate_route" value="true" 
+                                class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
+                            <div>
+                                <label class="text-gray-800 font-medium block" for="generate_route">Generar Ruta</label>
+                                <span class="text-xs text-gray-500">Configuración automática de endpoints</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
+                            <input type="checkbox" id="generate_html_form" name="generate_html_form" value="true" 
+                                class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
+                            <div>
+                                <label class="text-gray-800 font-medium block" for="generate_html_form">Formulario HTML</label>
+                                <span class="text-xs text-gray-500">Interfaz de usuario para manipular datos</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
+                            <input type="checkbox" id="generate_tests" name="generate_tests" value="true" 
+                                class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
+                            <div>
+                                <label class="text-gray-800 font-medium block" for="generate_tests">Pruebas</label>
+                                <span class="text-xs text-gray-500">Tests automatizados para endpoints</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-white transition-colors">
+                            <input type="checkbox" id="generate_service" name="generate_service" value="true" 
+                                class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
+                            <div>
+                                <label class="text-gray-800 font-medium block" for="generate_service">Generar Servicio</label>
+                                <span class="text-xs text-gray-500">Capa de servicio para lógica de negocio</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Tab de Sistema Multi-Tabla (NUEVO) -->
-            <div id="content-multi-tabla" class="tab-content hidden">
+            <!-- Tab Sistema Multi-Tabla - VISIBLE POR DEFECTO -->
+            <div id="content-multi-tabla" class="tab-content block">
                 <div class="space-y-6">
                     <!-- Header de Multi-Tabla -->
                     <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg p-6">
@@ -383,7 +287,7 @@
                                     Validación automática
                                 </div>
                             </div>
-                            <button id="btn-editor-visual" onclick="window.location.href='/editor-visual'" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-md transition-colors font-medium">
+                            <button id="btn-editor-visual-multitable" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-md transition-colors font-medium">
                                 <i class="fas fa-play mr-2"></i>
                                 Abrir Editor Visual
                             </button>
@@ -476,10 +380,6 @@
                             <!-- Botones de acción -->
                             <div class="flex justify-between items-center">
                                 <div class="flex space-x-2">
-                                    <button id="btn-preview-system" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors text-sm">
-                                        <i class="fas fa-eye mr-1"></i>
-                                        Vista Previa
-                                    </button>
                                     <button id="btn-export-json" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors text-sm">
                                         <i class="fas fa-download mr-1"></i>
                                         Exportar JSON
@@ -682,1626 +582,7 @@
     
     <div id="footer-container"></div>
 
-    <!-- Scripts para funcionalidad de pestañas y formularios -->
-       <script>
-        // Funcionalidad de pestañas
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            function switchTab(tabId) {
-                // Ocultar todos los contenidos
-                tabContents.forEach(content => {
-                    content.classList.add('hidden');
-                    content.classList.remove('block');
-                });
-                
-                // Mostrar el contenido seleccionado
-                const targetContent = document.getElementById('content-' + tabId);
-                if (targetContent) {
-                    targetContent.classList.remove('hidden');
-                    targetContent.classList.add('block');
-                }
-                
-                // Actualizar estilos de los botones
-                tabButtons.forEach(btn => {
-                    btn.classList.remove('border-indigo-500', 'text-gray-700', 'active');
-                    btn.classList.add('border-transparent', 'text-gray-500');
-                });
-                
-                const activeButton = document.getElementById('tab-' + tabId);
-                if (activeButton) {
-                    activeButton.classList.remove('border-transparent', 'text-gray-500');
-                    activeButton.classList.add('border-indigo-500', 'text-gray-700', 'active');
-                }
-            }
-            
-            // Asignar eventos de clic a los botones de pestañas
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const tabId = this.id.replace('tab-', '');
-                    switchTab(tabId);
-                });
-            });
-            
-            // Inicializar en la primera pestaña
-            switchTab('nueva-app');
-            
-            // Agregar el primer campo automáticamente
-            if (document.getElementById('add_field')) {
-                document.getElementById('add_field').click();
-            }
-            
-            // Funcionalidad para los botones de usar plantilla
-            document.querySelectorAll('#content-plantillas button').forEach(btn => {
-                if (btn.textContent.includes('Usar plantilla')) {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const templateTitle = this.closest('.card-hover').querySelector('h3').textContent;
-                        
-                        // Cargar datos de la plantilla según el tipo
-                        loadTemplate(templateTitle);
-                        
-                        // Cambiar a la pestaña de nueva aplicación
-                        switchTab('nueva-app');
-                    });
-                }
-            });
-        });
-
-        // Función para cargar plantillas
-        function loadTemplate(templateName) {
-            const moduleNameInput = document.getElementById('module_name');
-            const fieldsContainer = document.getElementById('fields');
-            
-            // Limpiar campos existentes
-            fieldsContainer.innerHTML = '';
-            
-            switch(templateName) {
-                case 'API REST Básica':
-                    moduleNameInput.value = 'api_module';
-                    addTemplateField('nombre', 'str');
-                    addTemplateField('descripcion', 'str');
-                    addTemplateField('activo', 'bool');
-                    // Marcar opciones recomendadas
-                    document.getElementById('generate_crud').checked = true;
-                    document.getElementById('generate_schema').checked = true;
-                    document.getElementById('generate_route').checked = true;
-                    break;
-                    
-                case 'Microservicio':
-                    moduleNameInput.value = 'microservice';
-                    addTemplateField('servicio_id', 'str');
-                    addTemplateField('estado', 'str');
-                    addTemplateField('configuracion', 'str');
-                    document.getElementById('generate_service').checked = true;
-                    break;
-                    
-                case 'Panel Admin':
-                    moduleNameInput.value = 'admin_entity';
-                    addTemplateField('titulo', 'str');
-                    addTemplateField('orden', 'int');
-                    addTemplateField('visible', 'bool');
-                    document.getElementById('generate_html_form').checked = true;
-                    document.getElementById('generate_crud').checked = true;
-                    break;
-                    
-                default:
-                    alert('Plantilla cargada: ' + templateName);
-            }
-        }
-
-        // Función auxiliar para agregar campos de plantilla
-        function addTemplateField(name, type) {
-            document.getElementById('add_field').click();
-            const lastField = document.querySelector('#fields > div:last-child');
-            if (lastField) {
-                const nameInput = lastField.querySelector('input[name="field_names[]"]');
-                const typeSelect = lastField.querySelector('select[name="field_types[]"]');
-                if (nameInput) nameInput.value = name;
-                if (typeSelect) typeSelect.value = type;
-            }
-        }
-        
-        // Funcionalidad para agregar campos dinámicamente
-        document.getElementById('add_field').addEventListener('click', function() {
-            const fieldsCount = document.querySelectorAll('#fields > div').length;
-            const fieldNumber = fieldsCount + 1;
-            
-            const div = document.createElement('div');
-            div.className = 'field-container flex items-center space-x-3 p-3 border border-gray-200 rounded-lg bg-white';
-            
-            // Icono del campo
-            const iconDiv = document.createElement('div');
-            iconDiv.className = 'flex-shrink-0 h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600';
-            iconDiv.innerHTML = '<i class="fas fa-database"></i>';
-            div.appendChild(iconDiv);
-            
-            // Contenedor para inputs
-            const inputsContainer = document.createElement('div');
-            inputsContainer.className = 'flex-grow grid grid-cols-1 sm:grid-cols-2 gap-3';
-            
-            // Input para nombre
-            const nameContainer = document.createElement('div');
-            
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.name = 'field_names[]';
-            input.placeholder = fieldNumber === 1 ? 'Campo principal (obligatorio)' : 'Nombre del campo';
-            input.className = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500';
-            if (fieldNumber === 1) {
-                input.classList.add('border-yellow-500');
-            }
-            
-            nameContainer.appendChild(input);
-            inputsContainer.appendChild(nameContainer);
-            
-            // Select para tipo
-            const typeContainer = document.createElement('div');
-            
-            const select = document.createElement('select');
-            select.name = 'field_types[]';
-            select.className = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500';
-            
-            const opcionTipos = ['str', 'int', 'float', 'bool'];
-            opcionTipos.forEach(function(tipo) {
-                const option = document.createElement('option');
-                option.value = tipo;
-                option.text = tipo;
-                select.appendChild(option);
-            });
-            
-            typeContainer.appendChild(select);
-            inputsContainer.appendChild(typeContainer);
-            div.appendChild(inputsContainer);
-            
-            // Botón para eliminar
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'flex-shrink-0 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full focus:outline-none transition-colors';
-            button.innerHTML = '<i class="fas fa-trash"></i>';
-            button.title = 'Quitar campo';
-            div.appendChild(button);
-            
-            document.getElementById('fields').appendChild(div);
-            input.focus();
-            
-            // Marcar el primer campo como especial
-            if (fieldNumber === 1) {
-                div.classList.add('border-yellow-300', 'bg-yellow-50');
-            }
-        });
-
-        // Eliminar campos
-        document.addEventListener('click', function(e) {
-            if (e.target && e.target.closest('button') && e.target.closest('button').innerHTML.includes('fa-trash')) {
-                e.target.closest('.field-container').remove();
-            }
-        });
-
-        // Validación del formulario
-        document.getElementById('generador').addEventListener('submit', function(event) {
-            // Validar nombre del módulo
-            const moduleName = document.getElementById('module_name').value.trim();
-            if (!moduleName) {
-                event.preventDefault();
-                alert('Por favor, ingrese un nombre para el módulo.');
-                document.getElementById('module_name').focus();
-                return;
-            }
-        
-            // Validar campos
-            const fields = document.querySelectorAll('#fields > div');
-            if (fields.length < 1) {
-                event.preventDefault();
-                alert('Por favor, añada al menos un campo.');
-                return;
-            }
-        
-            // Validar nombres de campos
-            const inputs = document.querySelectorAll('input[name="field_names[]"]');
-            for (let input of inputs) {
-                if (!input.value.trim()) {
-                    event.preventDefault();
-                    alert('Por favor, complete todos los nombres de los campos.');
-                    input.focus();
-                    return;
-                }
-            }
-            
-            // Validar que al menos una opción esté seleccionada
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-            if (!anyChecked) {
-                event.preventDefault();
-                alert('Por favor, seleccione al menos una opción de generación.');
-                return;
-            }
-        });
-
-        // ================================================================
-        // FUNCIONALIDAD MULTI-TABLA
-        // ================================================================
-
-        // Manejar pestaña multi-tabla
-        document.addEventListener('click', function(e) {
-            // Botón para mostrar configuración JSON
-            if (e.target.id === 'btn-config-json') {
-                const jsonSection = document.getElementById('json-config-section');
-                jsonSection.classList.remove('hidden');
-                document.getElementById('json-config').focus();
-            }
-
-            // Botón para cargar ejemplo
-            if (e.target.id === 'btn-load-example') {
-                loadMultiTableExample();
-            }
-
-            // Botón para validar JSON
-            if (e.target.id === 'btn-validate-json') {
-                validateJsonConfig();
-            }
-
-            // Botón para generar sistema multi-tabla
-            if (e.target.id === 'btn-generate-multi-table') {
-                generateMultiTableSystem();
-            }
-
-            // Botones de ejemplos predefinidos
-            if (e.target.classList.contains('example-btn') || e.target.closest('.example-btn')) {
-                const btn = e.target.classList.contains('example-btn') ? e.target : e.target.closest('.example-btn');
-                const exampleType = btn.dataset.example;
-                loadPredefinedExample(exampleType);
-            }
-        });
-
-        // Función para cargar ejemplo desde el servidor
-        async function loadMultiTableExample() {
-            try {
-                showLoading('Cargando ejemplo...');
-                const response = await fetch('/generar/multi-table-example');
-                const data = await response.json();
-                
-                if (data.success) {
-                    const jsonTextarea = document.getElementById('json-config');
-                    jsonTextarea.value = JSON.stringify(data.example, null, 2);
-                    
-                    // Mostrar sección de configuración si está oculta
-                    const jsonSection = document.getElementById('json-config-section');
-                    jsonSection.classList.remove('hidden');
-                    
-                    showNotification('Ejemplo cargado exitosamente', 'success');
-                } else {
-                    showNotification('Error cargando ejemplo', 'error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showNotification('Error de conexión', 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-
-        // Función para validar configuración JSON
-        function validateJsonConfig() {
-            const jsonTextarea = document.getElementById('json-config');
-            const resultDiv = document.getElementById('json-validation-result');
-            
-            try {
-                const jsonData = JSON.parse(jsonTextarea.value);
-                
-                // Validación básica
-                const requiredFields = ['service_name', 'description', 'tables'];
-                const missingFields = requiredFields.filter(field => !jsonData[field]);
-                
-                if (missingFields.length > 0) {
-                    showValidationResult(`Campos requeridos faltantes: ${missingFields.join(', ')}`, 'error');
-                    return false;
-                }
-
-                if (!Array.isArray(jsonData.tables) || jsonData.tables.length === 0) {
-                    showValidationResult('Debe definir al menos una tabla', 'error');
-                    return false;
-                }
-
-                showValidationResult('✅ JSON válido - Listo para generar', 'success');
-                return true;
-            } catch (error) {
-                showValidationResult(`Error de sintaxis JSON: ${error.message}`, 'error');
-                return false;
-            }
-        }
-
-        // Función para generar sistema multi-tabla
-        async function generateMultiTableSystem() {
-            const jsonTextarea = document.getElementById('json-config');
-            
-            // Validar JSON antes de enviar
-            if (!validateJsonConfig()) {
-                return;
-            }
-
-            try {
-                showLoading('Generando sistema multi-tabla...');
-                
-                const jsonData = JSON.parse(jsonTextarea.value);
-                
-                const response = await fetch('/generar/generate-multi-table', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(jsonData)
-                });
-
-                const result = await response.json();
-                
-                // Mostrar resultados
-                displayGenerationResults(result);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showNotification('Error en la generación', 'error');
-                displayGenerationResults({
-                    success: false,
-                    message: `Error de conexión: ${error.message}`
-                });
-            } finally {
-                hideLoading();
-            }
-        }
-
-        // Función para cargar ejemplos predefinidos
-        function loadPredefinedExample(exampleType) {
-            const jsonTextarea = document.getElementById('json-config');
-            let exampleJson = {};
-
-            switch(exampleType) {
-                case 'biblioteca':
-                    exampleJson = {
-                        "service_name": "biblioteca_sistema",
-                        "description": "Sistema de gestión de biblioteca",
-                        "tables": [
-                            {
-                                "name": "autores",
-                                "description": "Información de autores",
-                                "fields": [
-                                    {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false},
-                                    {"name": "nombre", "field_type": "string", "max_length": 100, "nullable": false},
-                                    {"name": "email", "field_type": "string", "max_length": 150, "unique": true},
-                                    {"name": "fecha_creacion", "field_type": "datetime", "default_value": "now()"}
-                                ]
-                            },
-                            {
-                                "name": "libros",
-                                "description": "Catálogo de libros",
-                                "fields": [
-                                    {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false},
-                                    {"name": "titulo", "field_type": "string", "max_length": 200, "nullable": false},
-                                    {"name": "isbn", "field_type": "string", "max_length": 20, "unique": true},
-                                    {"name": "autor_id", "field_type": "integer", "foreign_key": "autores.id", "nullable": false},
-                                    {"name": "fecha_publicacion", "field_type": "date"},
-                                    {"name": "precio", "field_type": "decimal"}
-                                ]
-                            }
-                        ],
-                        "relationships": [
-                            {
-                                "relationship_type": "one_to_many",
-                                "from_table": "autores",
-                                "from_field": "id",
-                                "to_table": "libros",
-                                "to_field": "autor_id",
-                                "relationship_name": "libros",
-                                "back_populates": "autor"
-                            }
-                        ],
-                        "generate_crud_for_all": true,
-                        "generate_relationship_endpoints": true
-                    };
-                    break;
-
-                case 'ecommerce':
-                    exampleJson = {
-                        "service_name": "ecommerce_basico",
-                        "description": "Sistema básico de e-commerce",
-                        "tables": [
-                            {
-                                "name": "usuarios",
-                                "fields": [
-                                    {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true},
-                                    {"name": "username", "field_type": "string", "max_length": 50, "unique": true, "nullable": false},
-                                    {"name": "email", "field_type": "string", "max_length": 100, "unique": true}
-                                ]
-                            },
-                            {
-                                "name": "productos",
-                                "fields": [
-                                    {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true},
-                                    {"name": "nombre", "field_type": "string", "max_length": 100, "nullable": false},
-                                    {"name": "precio", "field_type": "decimal"},
-                                    {"name": "usuario_id", "field_type": "integer", "foreign_key": "usuarios.id"}
-                                ]
-                            },
-                            {
-                                "name": "ordenes",
-                                "fields": [
-                                    {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true},
-                                    {"name": "usuario_id", "field_type": "integer", "foreign_key": "usuarios.id"},
-                                    {"name": "producto_id", "field_type": "integer", "foreign_key": "productos.id"},
-                                    {"name": "cantidad", "field_type": "integer"},
-                                    {"name": "total", "field_type": "decimal"}
-                                ]
-                            }
-                        ],
-                        "relationships": [
-                            {
-                                "relationship_type": "one_to_many",
-                                "from_table": "usuarios",
-                                "from_field": "id",
-                                "to_table": "productos",
-                                "to_field": "usuario_id",
-                                "relationship_name": "productos",
-                                "back_populates": "usuario"
-                            },
-                            {
-                                "relationship_type": "one_to_many",
-                                "from_table": "usuarios",
-                                "from_field": "id",
-                                "to_table": "ordenes",
-                                "to_field": "usuario_id",
-                                "relationship_name": "ordenes",
-                                "back_populates": "usuario"
-                            }
-                        ],
-                        "generate_crud_for_all": true
-                    };
-                    break;
-
-                default:
-                    showNotification('Ejemplo no disponible aún', 'warning');
-                    return;
-            }
-
-            jsonTextarea.value = JSON.stringify(exampleJson, null, 2);
-            
-            // Mostrar sección de configuración
-            const jsonSection = document.getElementById('json-config-section');
-            jsonSection.classList.remove('hidden');
-            
-            showNotification(`Ejemplo "${exampleType}" cargado`, 'success');
-        }
-
-        // Función para mostrar resultados de validación
-        function showValidationResult(message, type) {
-            const resultDiv = document.getElementById('json-validation-result');
-            resultDiv.classList.remove('hidden');
-            
-            // Limpiar clases anteriores
-            resultDiv.className = 'mb-4 p-3 rounded-md';
-            
-            if (type === 'success') {
-                resultDiv.classList.add('bg-green-100', 'text-green-700', 'border', 'border-green-300');
-            } else if (type === 'error') {
-                resultDiv.classList.add('bg-red-100', 'text-red-700', 'border', 'border-red-300');
-            } else if (type === 'warning') {
-                resultDiv.classList.add('bg-yellow-100', 'text-yellow-700', 'border', 'border-yellow-300');
-            }
-            
-            resultDiv.innerHTML = message;
-        }
-
-        // Función para mostrar resultados de generación
-        function displayGenerationResults(result) {
-            const resultsDiv = document.getElementById('multi-table-results');
-            const outputDiv = document.getElementById('generation-output');
-            
-            resultsDiv.classList.remove('hidden');
-            
-            let html = '';
-            
-            if (result.success) {
-                html += `
-                    <div class="bg-green-100 border border-green-300 text-green-700 px-4 py-3 rounded mb-4">
-                        <div class="flex items-center">
-                            <i class="fas fa-check-circle mr-2"></i>
-                            <strong>¡Generación Exitosa!</strong>
-                        </div>
-                        <p class="mt-1">${result.message}</p>
-                    </div>
-                `;
-                
-                if (result.generated_files && result.generated_files.length > 0) {
-                    html += `
-                        <div class="bg-blue-50 border border-blue-200 rounded p-4 mb-4">
-                            <h4 class="text-blue-800 font-medium mb-2">
-                                <i class="fas fa-files-o mr-2"></i>
-                                Archivos Generados (${result.generated_files.length})
-                            </h4>
-                            <ul class="space-y-1">
-                    `;
-                    
-                    result.generated_files.forEach(file => {
-                        html += `<li class="text-sm text-blue-700"><i class="fas fa-file mr-1"></i> ${file}</li>`;
-                    });
-                    
-                    html += '</ul></div>';
-                }
-                
-                if (result.service_config) {
-                    html += `
-                        <div class="bg-gray-50 border border-gray-200 rounded p-4">
-                            <h4 class="text-gray-800 font-medium mb-2">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                Información del Servicio
-                            </h4>
-                            <div class="grid grid-cols-3 gap-4 text-sm">
-                                <div>
-                                    <span class="text-gray-600">Servicio:</span>
-                                    <span class="font-medium">${result.service_config.name}</span>
-                                </div>
-                                <div>
-                                    <span class="text-gray-600">Tablas:</span>
-                                    <span class="font-medium">${result.service_config.tables_count}</span>
-                                </div>
-                                <div>
-                                    <span class="text-gray-600">Relaciones:</span>
-                                    <span class="font-medium">${result.service_config.relationships_count}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            } else {
-                html += `
-                    <div class="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4">
-                        <div class="flex items-center">
-                            <i class="fas fa-exclamation-circle mr-2"></i>
-                            <strong>Error en la Generación</strong>
-                        </div>
-                        <p class="mt-1">${result.message}</p>
-                    </div>
-                `;
-                
-                if (result.errors && result.errors.length > 0) {
-                    html += `
-                        <div class="bg-red-50 border border-red-200 rounded p-4">
-                            <h4 class="text-red-800 font-medium mb-2">Errores Encontrados:</h4>
-                            <ul class="space-y-1">
-                    `;
-                    
-                    result.errors.forEach(error => {
-                        html += `<li class="text-sm text-red-700"><i class="fas fa-times mr-1"></i> ${error}</li>`;
-                    });
-                    
-                    html += '</ul></div>';
-                }
-            }
-            
-            outputDiv.innerHTML = html;
-            
-            // Scroll to results
-            resultsDiv.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Funciones auxiliares para UI
-        function showLoading(message) {
-            const loadingDiv = document.createElement('div');
-            loadingDiv.id = 'loading-indicator';
-            loadingDiv.className = 'fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50';
-            loadingDiv.innerHTML = `
-                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl">
-                    <div class="text-center">
-                        <i class="fas fa-cog fa-spin text-4xl text-blue-600 mb-4"></i>
-                        <h3 class="text-lg font-semibold text-gray-800">${message}</h3>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(loadingDiv);
-        }
-
-        function hideLoading() {
-            const loadingDiv = document.getElementById('loading-indicator');
-            if (loadingDiv) {
-                loadingDiv.remove();
-            }
-        }
-
-        function showNotification(message, type = 'info') {
-            const colors = {
-                success: 'bg-green-500',
-                error: 'bg-red-500',
-                warning: 'bg-yellow-500',
-                info: 'bg-blue-500'
-            };
-            
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
-            notification.innerHTML = `
-                <div class="flex items-center">
-                    <span>${message}</span>
-                    <button class="ml-3 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Remover automáticamente después de 5 segundos
-            setTimeout(() => {
-                if (document.body.contains(notification)) {
-                    notification.remove();
-                }
-            }, 5000);
-        }
-    </script>
-</body>
-</html>
-
-        // ============ SISTEMA DE PERSISTENCIA LOCAL ============
-        const Phase2LocalStorage = {
-            storageKey: 'phase2_user_data',
-            
-            // Estructura de datos
-            defaultData: {
-                templates: [],
-                selectedTemplate: null,
-                generationHistory: [],
-                lastConfig: null,
-                favorites: [],
-                userPreferences: {
-                    autoSave: true,
-                    showTips: true,
-                    defaultServiceName: 'mi_sistema'
-                }
-            },
-            
-            // Cargar datos del localStorage
-            load() {
-                try {
-                    const saved = localStorage.getItem(this.storageKey);
-                    if (saved) {
-                        const data = JSON.parse(saved);
-                        return { ...this.defaultData, ...data };
-                    }
-                } catch (error) {
-                    console.warn('Error cargando datos locales:', error);
-                }
-                return { ...this.defaultData };
-            },
-            
-            // Guardar datos en localStorage
-            save(data) {
-                try {
-                    localStorage.setItem(this.storageKey, JSON.stringify(data));
-                    return true;
-                } catch (error) {
-                    console.error('Error guardando datos locales:', error);
-                    return false;
-                }
-            },
-            
-            // Actualizar template seleccionado
-            setSelectedTemplate(template) {
-                const data = this.load();
-                data.selectedTemplate = template;
-                data.lastUsed = new Date().toISOString();
-                this.save(data);
-            },
-            
-            // Agregar generación al historial
-            addGeneration(result) {
-                const data = this.load();
-                const generation = {
-                    id: Date.now(),
-                    timestamp: new Date().toISOString(),
-                    template: result.template_name || 'custom',
-                    serviceName: result.service_name || 'unknown',
-                    statistics: result.statistics,
-                    success: result.success
-                };
-                
-                data.generationHistory.unshift(generation);
-                // Mantener solo los últimos 10 registros
-                if (data.generationHistory.length > 10) {
-                    data.generationHistory = data.generationHistory.slice(0, 10);
-                }
-                
-                this.save(data);
-                return generation;
-            },
-            
-            // Guardar configuración JSON
-            saveConfig(config, name = null) {
-                const data = this.load();
-                data.lastConfig = {
-                    config: config,
-                    name: name || `Configuración ${new Date().toLocaleDateString()}`,
-                    timestamp: new Date().toISOString()
-                };
-                this.save(data);
-            },
-            
-            // Cargar última configuración
-            getLastConfig() {
-                const data = this.load();
-                return data.lastConfig;
-            },
-            
-            // Obtener historial de generaciones
-            getGenerationHistory() {
-                const data = this.load();
-                return data.generationHistory || [];
-            },
-            
-            // Agregar/quitar template de favoritos
-            toggleFavorite(templateName) {
-                const data = this.load();
-                const favorites = data.favorites || [];
-                const index = favorites.indexOf(templateName);
-                
-                if (index > -1) {
-                    favorites.splice(index, 1);
-                } else {
-                    favorites.push(templateName);
-                }
-                
-                data.favorites = favorites;
-                this.save(data);
-                return favorites;
-            },
-            
-            // Verificar si template es favorito
-            isFavorite(templateName) {
-                const data = this.load();
-                return (data.favorites || []).includes(templateName);
-            }
-        };
-
-        // Variables globales para Fase 2
-        let availableTemplates = {};
-        let currentTemplate = null;
-
-        // Cargar templates al inicializar
-        async function loadTemplates() {
-            try {
-                const response = await fetch('/generar/templates');
-                const data = await response.json();
-                
-                if (data.success) {
-                    availableTemplates = data.templates;
-                    populateTemplateSelector(data.templates, data.templates_info);
-                } else {
-                    console.error('Error cargando templates:', data.error);
-                }
-            } catch (error) {
-                console.error('Error cargando templates:', error);
-            }
-        }
-
-        // Poblar selector de templates
-        function populateTemplateSelector(templates, templatesInfo) {
-            const selector = document.getElementById('template-selector');
-            selector.innerHTML = '<option value="">Selecciona un template...</option>';
-            
-            Object.keys(templates).forEach(templateName => {
-                const option = document.createElement('option');
-                option.value = templateName;
-                option.textContent = `${templateName.charAt(0).toUpperCase() + templateName.slice(1)} - ${templatesInfo[templateName]}`;
-                selector.appendChild(option);
-            });
-        }
-
-        // Manejar selección de template
-        function handleTemplateSelection(templateName) {
-            if (!templateName || !availableTemplates[templateName]) {
-                document.getElementById('template-info').classList.add('hidden');
-                document.getElementById('generate-from-template-btn').disabled = true;
-                currentTemplate = null;
-                return;
-            }
-
-            currentTemplate = availableTemplates[templateName];
-            
-            // Mostrar información del template
-            const infoDiv = document.getElementById('template-info');
-            const descriptionDiv = document.getElementById('template-description');
-            const tablesSpan = document.getElementById('template-tables');
-            const relationshipsSpan = document.getElementById('template-relationships');
-            
-            descriptionDiv.textContent = currentTemplate.description;
-            tablesSpan.textContent = currentTemplate.tables.length;
-            relationshipsSpan.textContent = currentTemplate.relationships.length;
-            
-            // Prellenar campos
-            document.getElementById('template-service-name').value = currentTemplate.service_name;
-            document.getElementById('template-description-custom').value = currentTemplate.description;
-            
-            infoDiv.classList.remove('hidden');
-            document.getElementById('generate-from-template-btn').disabled = false;
-        }
-
-        // Generar desde template - MEJORADO CON PROGRESO Y PERSISTENCIA
-        async function generateFromTemplate() {
-            const templateName = document.getElementById('template-selector').value;
-            const serviceName = document.getElementById('template-service-name').value.trim();
-            const description = document.getElementById('template-description-custom').value.trim();
-            
-            if (!templateName || !currentTemplate) {
-                showNotification('Selecciona un template válido', 'error');
-                return;
-            }
-
-            const customizations = {};
-            if (serviceName) customizations.service_name = serviceName;
-            if (description) customizations.description = description;
-
-            try {
-                // Progreso mejorado con pasos
-                showProgressLoading('Preparando generación desde template...', 0);
-                
-                // Simular pasos del proceso
-                updateProgress(10, '🔍 Validando template...', '3-5 segundos');
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                updateProgress(25, '📋 Preparando configuración...', '2-3 segundos');
-                await new Promise(resolve => setTimeout(resolve, 300));
-                
-                updateProgress(40, '⚙️ Generando archivos...', '1-2 segundos');
-                
-                const response = await fetch('/generar/generate-from-template', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        template_name: templateName,
-                        customizations: customizations
-                    })
-                });
-
-                updateProgress(75, '📝 Procesando resultados...', 'Casi listo');
-                
-                const result = await response.json();
-                
-                updateProgress(90, '💾 Guardando configuración...', 'Finalizando');
-                
-                // Guardar en persistencia local
-                Phase2LocalStorage.setSelectedTemplate({
-                    name: templateName,
-                    customizations: customizations
-                });
-                
-                if (result.success) {
-                    Phase2LocalStorage.addGeneration({
-                        ...result,
-                        template_name: templateName,
-                        service_name: serviceName
-                    });
-                }
-                
-                updateProgress(100, '✅ Completado', 'Listo');
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                hideLoading();
-                displayPhase2Results(result);
-                
-            } catch (error) {
-                hideLoading();
-                console.error('Error generando desde template:', error);
-                showNotification('Error en la generación desde template', 'error');
-            }
-        }
-
-        // Cargar ejemplo de Fase 2
-        async function loadPhase2Example() {
-            try {
-                const response = await fetch('/generar/phase2-example');
-                const data = await response.json();
-                
-                if (data.example) {
-                    document.getElementById('phase2-json-config').value = JSON.stringify(data.example, null, 2);
-                } else {
-                    showNotification('Error cargando ejemplo de Fase 2', 'error');
-                }
-            } catch (error) {
-                console.error('Error cargando ejemplo Fase 2:', error);
-                showNotification('Error cargando ejemplo', 'error');
-            }
-        }
-
-        // ============ VALIDACIÓN EN TIEMPO REAL ============
-        
-        // Validar configuración Phase 2 en tiempo real
-        function validatePhase2Config(config) {
-            const errors = [];
-            const warnings = [];
-            
-            try {
-                // Validar estructura básica
-                if (!config.service_name) {
-                    errors.push('service_name es requerido');
-                } else if (config.service_name.length < 3) {
-                    warnings.push('service_name debería tener al menos 3 caracteres');
-                }
-                
-                if (!config.tables || !Array.isArray(config.tables)) {
-                    errors.push('tables debe ser un array');
-                } else if (config.tables.length === 0) {
-                    warnings.push('No se han definido tablas');
-                }
-                
-                // Validar tablas
-                if (config.tables) {
-                    config.tables.forEach((table, index) => {
-                        if (!table.name) {
-                            errors.push(`Tabla ${index + 1}: nombre es requerido`);
-                        }
-                        
-                        if (!table.fields || !Array.isArray(table.fields) || table.fields.length === 0) {
-                            errors.push(`Tabla ${index + 1} (${table.name || 'sin nombre'}): debe tener al menos un campo`);
-                        }
-                        
-                        // Validar campos
-                        if (table.fields) {
-                            table.fields.forEach((field, fieldIndex) => {
-                                if (!field.name) {
-                                    errors.push(`Tabla ${table.name}: Campo ${fieldIndex + 1} sin nombre`);
-                                }
-                                if (!field.type) {
-                                    errors.push(`Tabla ${table.name}: Campo ${field.name || fieldIndex + 1} sin tipo`);
-                                }
-                            });
-                        }
-                    });
-                }
-                
-                // Validar relaciones
-                if (config.relationships) {
-                    config.relationships.forEach((rel, index) => {
-                        if (!rel.from_table || !rel.to_table) {
-                            errors.push(`Relación ${index + 1}: from_table y to_table son requeridos`);
-                        }
-                        
-                        if (rel.type === 'many_to_many' && !rel.junction_table) {
-                            warnings.push(`Relación ${index + 1}: junction_table se generará automáticamente`);
-                        }
-                    });
-                }
-                
-            } catch (error) {
-                errors.push(`Error de validación: ${error.message}`);
-            }
-            
-            return { errors, warnings, isValid: errors.length === 0 };
-        }
-
-        // Validar JSON en tiempo real
-        function validateJSONRealTime() {
-            const textarea = document.getElementById('phase2-json-config');
-            const jsonText = textarea.value.trim();
-            
-            // Remover clases de validación anteriores
-            textarea.classList.remove('json-editor-valid', 'json-editor-invalid', 'json-editor-warning');
-            
-            // Remover mensajes de validación anteriores
-            const existingFeedback = document.getElementById('json-validation-feedback');
-            if (existingFeedback) {
-                existingFeedback.remove();
-            }
-            
-            if (!jsonText) {
-                return;
-            }
-            
-            let config;
-            let syntaxValid = true;
-            
-            // Validar sintaxis JSON
-            try {
-                config = JSON.parse(jsonText);
-            } catch (error) {
-                syntaxValid = false;
-                textarea.classList.add('json-editor-invalid');
-                showJSONFeedback('error', `Error de sintaxis JSON: ${error.message}`);
-                return;
-            }
-            
-            // Validar estructura Phase 2
-            const validation = validatePhase2Config(config);
-            
-            // Crear elemento de feedback
-            const feedbackDiv = document.createElement('div');
-            feedbackDiv.id = 'json-validation-feedback';
-            feedbackDiv.className = 'mt-2 text-sm';
-            
-            if (validation.errors.length > 0) {
-                textarea.classList.add('json-editor-invalid');
-                feedbackDiv.innerHTML = `
-                    <div class="bg-red-50 border border-red-200 rounded p-2">
-                        <div class="flex items-center text-red-800 font-medium mb-1">
-                            <i class="fas fa-exclamation-circle mr-2"></i>
-                            Errores encontrados:
-                        </div>
-                        <ul class="list-disc list-inside text-red-700 space-y-1">
-                            ${validation.errors.map(error => `<li>${error}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            } else if (validation.warnings.length > 0) {
-                textarea.classList.add('json-editor-warning');
-                feedbackDiv.innerHTML = `
-                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2">
-                        <div class="flex items-center text-yellow-800 font-medium mb-1">
-                            <i class="fas fa-exclamation-triangle mr-2"></i>
-                            Advertencias:
-                        </div>
-                        <ul class="list-disc list-inside text-yellow-700 space-y-1">
-                            ${validation.warnings.map(warning => `<li>${warning}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            } else {
-                textarea.classList.add('json-editor-valid');
-                feedbackDiv.innerHTML = `
-                    <div class="bg-green-50 border border-green-200 rounded p-2">
-                        <div class="flex items-center text-green-800 font-medium">
-                            <i class="fas fa-check-circle mr-2"></i>
-                            Configuración válida
-                            <span class="ml-2 text-xs text-green-600">
-                                (${config.tables?.length ||  0} tablas, ${config.relationships?.length || 0} relaciones)
-                            </span>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            textarea.parentNode.appendChild(feedbackDiv);
-            
-            // Auto-guardar si está habilitado
-            const userData = Phase2LocalStorage.load();
-            if (userData.userPreferences.autoSave && validation.isValid) {
-                Phase2LocalStorage.saveConfig(config);
-            }
-        }
-
-        function showJSONFeedback(type, message) {
-            const textarea = document.getElementById('phase2-json-config');
-            const feedbackDiv = document.createElement('div');
-            feedbackDiv.id = 'json-validation-feedback';
-            feedbackDiv.className = 'mt-2 text-sm';
-            
-            const colorClasses = {
-                error: 'bg-red-50 border-red-200 text-red-800',
-                warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-                success: 'bg-green-50 border-green-200 text-green-800'
-            };
-            
-            feedbackDiv.innerHTML = `
-                <div class="${colorClasses[type]} border rounded p-2">
-                    <div class="flex items-center font-medium">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        ${message}
-                    </div>
-                </div>
-            `;
-            
-            textarea.parentNode.appendChild(feedbackDiv);
-        }
-
-        // Generar sistema Fase 2 - MEJORADO CON VALIDACIÓN Y PROGRESO
-        async function generatePhase2System() {
-            const jsonConfig = document.getElementById('phase2-json-config').value.trim();
-            
-            if (!jsonConfig) {
-                showNotification('Ingresa una configuración JSON válida', 'error');
-                return;
-            }
-
-            try {
-                // Validación previa
-                const config = JSON.parse(jsonConfig);
-                const validation = validatePhase2Config(config);
-                
-                if (!validation.isValid) {
-                    showNotification(`Configuración inválida: ${validation.errors.join(', ')}`, 'error');
-                    return;
-                }
-                
-                // Progreso mejorado
-                showProgressLoading('Iniciando generación de sistema Fase 2...', 0);
-                
-                updateProgress(15, '🔍 Validando configuración...', '5-8 segundos');
-                await new Promise(resolve => setTimeout(resolve, 800));
-                
-                updateProgress(30, '📋 Procesando tablas...', '4-6 segundos');
-                await new Promise(resolve => setTimeout(resolve, 600));
-                
-                updateProgress(50, '🔗 Configurando relaciones...', '3-5 segundos');
-                await new Promise(resolve => setTimeout(resolve, 400));
-                
-                updateProgress(65, '⚙️ Generando código...', '2-4 segundos');
-                
-                const response = await fetch('/generar/generate-phase2', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(config)
-                });
-
-                updateProgress(85, '📝 Procesando resultados...', '1-2 segundos');
-                
-                const result = await response.json();
-                
-                updateProgress(95, '💾 Guardando configuración...', 'Finalizando');
-                
-                // Guardar en persistencia local
-                Phase2LocalStorage.saveConfig(config, `Sistema ${config.service_name || 'Personalizado'}`);
-                
-                if (result.success) {
-                    Phase2LocalStorage.addGeneration({
-                        ...result,
-                        template_name: 'custom',
-                        service_name: config.service_name
-                    });
-                }
-                
-                updateProgress(100, '✅ Sistema generado', 'Completado');
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                hideLoading();
-                displayPhase2Results(result);
-                
-            } catch (error) {
-                hideLoading();
-                if (error instanceof SyntaxError) {
-                    showNotification('JSON inválido. Verifica la sintaxis.', 'error');
-                } else {
-                    console.error('Error generando sistema Fase 2:', error);
-                    showNotification('Error en la generación Fase 2', 'error');
-                }
-            }
-        }
-
-        // Mostrar resultados de Fase 2
-        function displayPhase2Results(result) {
-            const resultsDiv = document.getElementById('phase2-results');
-            const outputDiv = document.getElementById('phase2-output');
-            
-            let html = '';
-            
-            if (result.success) {
-                html += `
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
-                            <strong class="text-green-800">Sistema Fase 2 Generado Exitosamente</strong>
-                        </div>
-                        <p class="text-green-700">${result.message}</p>
-                    </div>
-                `;
-                
-                // Estadísticas avanzadas
-                if (result.statistics) {
-                    html += `
-                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
-                            <h4 class="text-purple-800 font-semibold mb-3">
-                                <i class="fas fa-chart-bar mr-2"></i>
-                                Estadísticas del Sistema
-                            </h4>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                <div class="bg-white p-3 rounded text-center">
-                                    <div class="text-2xl font-bold text-purple-600">${result.statistics.tables_count}</div>
-                                    <div class="text-gray-600">Tablas</div>
-                                </div>
-                                <div class="bg-white p-3 rounded text-center">
-                                    <div class="text-2xl font-bold text-blue-600">${result.statistics.relationships_count}</div>
-                                    <div class="text-gray-600">Relaciones</div>
-                                </div>
-                                <div class="bg-white p-3 rounded text-center">
-                                    <div class="text-2xl font-bold text-pink-600">${result.statistics.many_to_many_count || 0}</div>
-                                    <div class="text-gray-600">Many-to-Many</div>
-                                </div>
-                                <div class="bg-white p-3 rounded text-center">
-                                    <div class="text-2xl font-bold text-indigo-600">${result.statistics.estimated_endpoints || 0}</div>
-                                    <div class="text-gray-600">Endpoints</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // Archivos generados
-                if (result.generated_files && result.generated_files.length > 0) {
-                    html += `
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                            <h4 class="text-blue-800 font-medium mb-2">
-                                <i class="fas fa-file-code mr-2"></i>
-                                Archivos Generados (${result.generated_files.length})
-                            </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                    `;
-                    
-                    result.generated_files.forEach(file => {
-                        const fileName = file.split(/[/\\]/).pop();
-                        html += `
-                            <div class="bg-white p-2 rounded flex items-center">
-                                <i class="fas fa-file-alt text-blue-500 mr-2"></i>
-                                <span class="font-mono text-gray-700">${fileName}</span>
-                            </div>
-                        `;
-                    });
-                    
-                    html += '</div></div>';
-                }
-                
-                // Tablas de unión (específico de Fase 2)
-                if (result.junction_tables && result.junction_tables.length > 0) {
-                    html += `
-                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                            <h4 class="text-yellow-800 font-semibold mb-3">
-                                <i class="fas fa-link mr-2"></i>
-                                Tablas de Unión Generadas (${result.junction_tables.length})
-                            </h4>
-                            <div class="space-y-2 text-sm">
-                    `;
-                    
-                    result.junction_tables.forEach(table => {
-                        html += `
-                            <div class="bg-white p-2 rounded">
-                                <i class="fas fa-table text-yellow-500 mr-2"></i>
-                                <span class="font-mono">${table}</span>
-                            </div>
-                        `;
-                    });
-                    
-                    html += '</div></div>';
-                }
-                
-                // Funcionalidades habilitadas
-                if (result.statistics && result.statistics.features_enabled) {
-                    const features = result.statistics.features_enabled;
-                    html += `
-                        <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-                            <h4 class="text-indigo-800 font-semibold mb-3">
-                                <i class="fas fa-cogs mr-2"></i>
-                                Funcionalidades Habilitadas
-                            </h4>
-                            <div class="grid grid-cols-2 gap-2 text-sm">
-                    `;
-                    
-                    Object.entries(features).forEach(([feature, enabled]) => {
-                        const icon = enabled ? 'fas fa-check text-green-500' : 'fas fa-times text-red-500';
-                        const featureName = feature.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                        html += `
-                            <div class="flex items-center">
-                                <i class="${icon} mr-2"></i>
-                                <span>${featureName}</span>
-                            </div>
-                        `;
-                    });
-                    
-                    html += '</div></div>';
-                }
-                
-            } else {
-                html += `
-                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-exclamation-circle text-red-600 mr-2"></i>
-                            <strong class="text-red-800">Error en la Generación Fase 2</strong>
-                        </div>
-                        <p class="text-red-700">${result.error || result.message}</p>
-                    </div>
-                `;
-                
-                if (result.validation_errors && result.validation_errors.length > 0) {
-                    html += `
-                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
-                            <h4 class="text-red-800 font-medium mb-2">Errores de Validación:</h4>
-                            <ul class="space-y-1">
-                    `;
-                    
-                    result.validation_errors.forEach(error => {
-                        html += `<li class="text-sm text-red-700"><i class="fas fa-times mr-1"></i> ${error}</li>`;
-                    });
-                    
-                    html += '</ul></div>';
-                }
-            }
-            
-            outputDiv.innerHTML = html;
-            resultsDiv.classList.remove('hidden');
-            
-            // Scroll to results
-            resultsDiv.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Event Listeners para Fase 2
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cargar datos persistentes
-            const userData = Phase2LocalStorage.load();
-            
-            // Cargar templates al inicializar
-            loadTemplates();
-            
-            // Restaurar última configuración si existe
-            const lastConfig = Phase2LocalStorage.getLastConfig();
-            if (lastConfig && userData.userPreferences.autoSave) {
-                const textarea = document.getElementById('phase2-json-config');
-                textarea.value = JSON.stringify(lastConfig.config, null, 2);
-                // Validar configuración restaurada
-                setTimeout(() => validateJSONRealTime(), 100);
-            }
-            
-            // Selector de template
-            document.getElementById('template-selector').addEventListener('change', function() {
-                handleTemplateSelection(this.value);
-            });
-            
-            // Botón generar desde template
-            document.getElementById('generate-from-template-btn').addEventListener('click', generateFromTemplate);
-            
-            // Botón cargar ejemplo Fase 2
-            document.getElementById('load-phase2-example-btn').addEventListener('click', loadPhase2Example);
-            
-            // Botón generar sistema Fase 2
-            document.getElementById('generate-phase2-btn').addEventListener('click', generatePhase2System);
-            
-            // ============ VALIDACIÓN EN TIEMPO REAL ============
-            const jsonTextarea = document.getElementById('phase2-json-config');
-            
-            // Validación mientras escribe (con debounce)
-            let validationTimeout;
-            jsonTextarea.addEventListener('input', function() {
-                clearTimeout(validationTimeout);
-                validationTimeout = setTimeout(() => {
-                    validateJSONRealTime();
-                }, 500); // Esperar 500ms después de que pare de escribir
-            });
-            
-            // Validación inmediata al hacer foco fuera
-            jsonTextarea.addEventListener('blur', function() {
-                clearTimeout(validationTimeout);
-                validateJSONRealTime();
-            });
-            
-            // Auto-formatear JSON con Ctrl+Shift+F
-            jsonTextarea.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.shiftKey && e.key === 'F') {
-                    e.preventDefault();
-                    try {
-                        const config = JSON.parse(this.value);
-                        this.value = JSON.stringify(config, null, 2);
-                        validateJSONRealTime();
-                        showNotification('JSON formateado correctamente', 'success');
-                    } catch (error) {
-                        showNotification('No se puede formatear: JSON inválido', 'error');
-                    }
-                }
-            });
-            
-            // ============ PERSISTENCIA AUTOMÁTICA ============
-            
-            // Auto-guardar configuraciones válidas cada 30 segundos
-            if (userData.userPreferences.autoSave) {
-                setInterval(() => {
-                    const jsonText = jsonTextarea.value.trim();
-                    if (jsonText) {
-                        try {
-                            const config = JSON.parse(jsonText);
-                            const validation = validatePhase2Config(config);
-                            if (validation.isValid) {
-                                Phase2LocalStorage.saveConfig(config);
-                            }
-                        } catch (error) {
-                            // Silently ignore invalid JSON during auto-save
-                        }
-                    }
-                }, 30000);
-            }
-            
-            // ============ INICIALIZACIÓN DE TOOLTIPS ============
-            
-            // Agregar tooltips informativos
-            const tooltipElements = document.querySelectorAll('[data-tooltip]');
-            tooltipElements.forEach(element => {
-                element.addEventListener('mouseenter', function() {
-                    // Implementar tooltips si se desea
-                });
-            });
-            
-            console.log('🚀 Sistema Fase 2 mejorado cargado correctamente');
-            console.log('📊 Datos del usuario:', userData);
-            
-            // ============ FUNCIONALIDAD EDITOR VISUAL (PRÓXIMAMENTE) ============
-            
-            // Agregar evento click al overlay del Editor Visual
-            const visualEditorOverlay = document.querySelector('.coming-soon-overlay');
-            if (visualEditorOverlay) {
-                visualEditorOverlay.addEventListener('click', function() {
-                    showVisualEditorInfo();
-                });
-            }
-        });
-        
-        // Función para mostrar información del Editor Visual
-        function showVisualEditorInfo() {
-            const modalHtml = ``;
-            
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-        }
-        
-        function closeVisualEditorModal() {
-            const modal = document.getElementById('visual-editor-modal');
-            if (modal) {
-                modal.style.opacity = '0';
-                setTimeout(() => modal.remove(), 300);
-            }
-        }
-        
-        function joinWaitlist() {
-            // Simular unirse a lista de espera
-            closeVisualEditorModal();
-            showNotification('¡Te hemos agregado a la lista de espera! Te notificaremos cuando esté disponible.', 'success');
-            
-            // Guardar en localStorage que el usuario se unió a la lista
-            Phase2LocalStorage.load().userPreferences.waitlistVisualEditor = true;
-            Phase2LocalStorage.save(Phase2LocalStorage.load());
-        }
-        
-        // ============ INTEGRACIÓN CON EDITOR VISUAL ============
-        
-        // Función para detectar importaciones del Editor Visual
-        function checkVisualEditorImports() {
-            try {
-                const exportData = localStorage.getItem('visual_editor_export');
-                if (exportData) {
-                    const data = JSON.parse(exportData);
-                    const timeDiff = Date.now() - new Date(data.timestamp).getTime();
-                    
-                    // Si la exportación es reciente (menos de 1 hora)
-                    if (timeDiff < 3600000) {
-                        showVisualEditorImportNotification(data);
-                    }
-                }
-                
-                // Verificar configuración simple (una tabla)
-                const simpleConfig = localStorage.getItem('phase2_current_config');
-                if (simpleConfig) {
-                    try {
-                        const config = JSON.parse(simpleConfig);
-                        if (config.generated_by === "Editor Visual") {
-                            loadVisualEditorConfig(config);
-                        }
-                    } catch (e) {
-                        console.log('Error parsing simple config:', e);
-                    }
-                }
-                
-                // Verificar configuración compleja (múltiples tablas)
-                const complexConfig = localStorage.getItem('phase2_complex_config');
-                if (complexConfig) {
-                    try {
-                        const config = JSON.parse(complexConfig);
-                        if (config.generated_by === "Editor Visual") {
-                            loadComplexVisualEditorConfig(config);
-                        }
-                    } catch (e) {
-                        console.log('Error parsing complex config:', e);
-                    }
-                }
-                
-            } catch (error) {
-                console.log('Error checking visual editor imports:', error);
-            }
-        }
-        
-        function showVisualEditorImportNotification(data) {
-            let message = '🎨 Configuración importada desde Editor Visual!\n\n';
-            
-            if (data.mode === 'multiple') {
-                message += `✅ ${data.tables_count} tablas disponibles para importar`;
-            } else {
-                message += `✅ Tabla "${data.table_name}" con ${data.fields_count} campos`;
-            }
-            
-            message += '\n\nLa configuración ha sido cargada automáticamente.';
-            
-            showNotification(message, 'success', 5000);
-            
-            // Limpiar la notificación para evitar mostrarla repetidamente
-            localStorage.removeItem('visual_editor_export');
-        }
-        
-        function loadVisualEditorConfig(config) {
-            try {
-                // Cargar configuración en el formulario
-                if (config.module_name) {
-                    document.getElementById('module_name').value = config.module_name;
-                }
-                
-                // Cargar campos
-                if (config.fields && Array.isArray(config.fields)) {
-                    // Limpiar campos existentes
-                    document.getElementById('fields_container').innerHTML = '';
-                    
-                    // Agregar cada campo
-                    config.fields.forEach(field => {
-                        addField();
-                        const fieldContainers = document.querySelectorAll('.field-container');
-                        const lastContainer = fieldContainers[fieldContainers.length - 1];
-                        
-                        const nameInput = lastContainer.querySelector('input[name^="field_names"]');
-                        const typeSelect = lastContainer.querySelector('select[name^="field_types"]');
-                        
-                        if (nameInput) nameInput.value = field.name;
-                        if (typeSelect) typeSelect.value = field.type;
-                    });
-                }
-                
-                // Marcar opciones si están definidas
-                if (config.generate_crud) document.getElementById('generate_crud').checked = true;
-                if (config.generate_schema) document.getElementById('generate_schema').checked = true;
-                if (config.generate_route) document.getElementById('generate_route').checked = true;
-                
-                console.log('✅ Configuración del Editor Visual cargada');
-                
-            } catch (error) {
-                console.error('Error loading visual editor config:', error);
-            }
-        }
-        
-        function loadComplexVisualEditorConfig(config) {
-            try {
-                console.log('🔄 Cargando configuración compleja del Editor Visual:', config);
-                
-                // Cambiar al tab de multi-tabla si no está activo
-                const multiTablaTab = document.getElementById('tab-multi-tabla');
-                if (multiTablaTab) {
-                    multiTablaTab.click();
-                }
-                
-                // Mostrar la sección de configuración JSON
-                const jsonConfigSection = document.getElementById('json-config-section');
-                if (jsonConfigSection) {
-                    jsonConfigSection.classList.remove('hidden');
-                }
-                
-                // Cargar la configuración en el textarea JSON
-                const jsonTextarea = document.getElementById('json-config');
-                if (jsonTextarea) {
-                    jsonTextarea.value = JSON.stringify(config, null, 2);
-                    
-                    // Validar el JSON automáticamente
-                    const validateBtn = document.getElementById('btn-validate-json');
-                    if (validateBtn) {
-                        validateBtn.click();
-                    }
-                }
-                
-                // Mostrar notificación específica para configuración compleja
-                let message = `🎨 Configuración multi-tabla importada desde Editor Visual!\n\n`;
-                message += `✅ ${config.tables ? config.tables.length : 0} tablas importadas\n`;
-                message += `✅ Configuración JSON cargada automáticamente\n\n`;
-                message += `Puedes revisar y modificar la configuración antes de generar.`;
-                
-                showNotification(message, 'success', 5000);
-                
-                console.log('✅ Configuración compleja del Editor Visual cargada');
-                
-            } catch (error) {
-                console.error('Error loading complex visual editor config:', error);
-            }
-        }
-        
-        // Inicializar detección al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
-            // Esperar un poco para que se cargue todo
-            setTimeout(checkVisualEditorImports, 1000);
-        });
-    </script>
+    <!-- Scripts para funcionalidad de pestañas y formularios (externos) -->
+    <script src="/static/js/generar.js"></script>
 </body>
 </html>

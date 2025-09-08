@@ -1,0 +1,11 @@
+# Este archivo se usa para autogenerar migraciones con Alembic
+from alembic import op
+import sqlalchemy as sa
+
+# Reemplaza este archivo con los scripts generados por Alembic
+
+def upgrade():
+    pass
+
+def downgrade():
+    pass
