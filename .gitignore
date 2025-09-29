@@ -133,6 +133,11 @@ uploads/
 logs/
 **/logs/
 
+# Archivos de log específicos
+migraciones.log
+**/migraciones.log
+logs/migraciones.log
+
 # Entornos virtuales
 env/
 venv/
@@ -156,7 +161,31 @@ __pycache__/
 *.pdf
 *.docx
 *.xlsx
+*.xls
 *.pptx
+*.ppt
+
+# Archivos de datos temporales y de prueba
+*.csv
+!**/templates/**/*.csv
+!**/examples/**/*.csv
+*.xls
+*.xlsx
+!**/templates/**/*.xlsx
+!**/examples/**/*.xlsx
+*.json.backup
+*.json.bak
+test_*.csv
+temp_*.csv
+*_temp.*
+*_temporal.*
+
+# Archivos temporales específicos del proyecto
+!TMPCSV!
+%TMPCSV%
+test_small.csv
+*.tmp.csv
+*.backup.csv
 
 # Videos y archivos multimedia grandes
 *.mp4
@@ -207,3 +236,24 @@ sample_data/
 mock_data/
 dump/
 dumps/
+
+# Scripts de prueba y debugging específicos
+test_*.py
+debug_*.py
+debug_*.js
+crear_usuario_test.py
+test_editar_roles.py
+test_get_user.py
+test_juan_*.py
+test_migration_*.py
+test_password.py
+test_roles_api.py
+verify_*.py
+check_*.py
+diagnose_*.py
+
+# Archivos generados por herramientas de desarrollo
+*_test_generator.py
+quick_test_generator.py
+excel_test_generator.py
+generate_test_file.py
