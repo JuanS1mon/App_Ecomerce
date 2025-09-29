@@ -1,917 +1,502 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL App Studio</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        }
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .gradient-text {
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .feature-card {
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: all 0.3s ease;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .back-to-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #2563eb;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.3s, transform 0.3s;
-            z-index: 1000;
-        }
-        
-        .back-to-top.visible {
-            opacity: 1;
-        }
-        
-        .back-to-top:hover {
-            transform: translateY(-5px);
-        }
-        
-        .sending-message {
-            display: none;
-            align-items: center;
-            font-size: 16px;
-            color: #1a202c;
-            margin-left: 10px;
-            animation: fly 2s infinite;
-        }
-
-        @keyframes fly {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(10px); }
-            100% { transform: translateX(0); }
-        }
-
-        .hero-bg {
-            background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%232563eb" fill-opacity="0.08" d="M0,224L48,208C96,192,192,160,288,160C384,160,480,192,576,197.3C672,203,768,181,864,181.3C960,181,1056,203,1152,192C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"%3E%3C/path%3E%3C/svg%3E');
-            background-size: cover;
-            background-position: center bottom;
-            background-repeat: no-repeat;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SQL App Studio</title>
+  <meta name="description" content="SQL App Studio - Plataforma profesional para generación de APIs, migración de datos y analítica con IA." />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --color-bg-deep: #0f172a; /* slate-900 */
+      --color-bg-alt: #111c30;
+      --color-accent: #1d4ed8; /* blue-700 */
+      --color-accent-alt: #0ea5e9; /* cyan-500 */
+      --color-border: #1e293b; /* slate-800 */
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #334155;
+      --color-surface: #ffffff;
+      --color-surface-alt: #f1f5f9; /* slate-100 */
+      --gradient-hero: radial-gradient(circle at 30% 40%, rgba(56,189,248,0.25), transparent 60%), radial-gradient(circle at 70% 60%, rgba(29,78,216,0.35), transparent 65%), linear-gradient(120deg,#f8fafc 0%,#e2e8f0 70%);
+    }
+    /* Dark theme (default) */
+    :root.dark {
+      --color-bg-deep: #0f172a;
+      --color-bg-alt: #111c30;
+      --color-accent: #1d4ed8;
+      --color-accent-alt: #0ea5e9;
+      --color-border: #1e293b;
+      --color-text-primary: #f1f5f9;
+      --color-text-secondary: #94a3b8;
+      --color-surface: #0b1320;
+      --color-surface-alt: #0d1625;
+      --gradient-hero: radial-gradient(circle at 30% 40%, rgba(56,189,248,0.15), transparent 60%), radial-gradient(circle at 70% 60%, rgba(29,78,216,0.25), transparent 65%), linear-gradient(120deg,#0f172a 0%,#0b1324 70%);
+    }
+    /* Light theme */
+    :root.light {
+      --color-bg-deep: #f1f5f9;
+      --color-bg-alt: #e2e8f0;
+      --color-accent: #1d4ed8;
+      --color-accent-alt: #0369a1;
+      --color-border: #cbd5e1;
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #475569;
+      --color-surface: #ffffff;
+      --color-surface-alt: #f8fafc;
+      --gradient-hero: var(--gradient-hero);
+    }
+    body { font-feature-settings: "liga" on, "tnum" on; }
+    body, header, section, footer { transition: background-color .4s ease, color .4s ease, border-color .4s ease; }
+    /* Navbar */
+    .navbar-blur { backdrop-filter: blur(10px); background: rgba(15,23,42,0.82); }
+    .light .navbar-blur { background: rgba(255,255,255,0.7); }
+    .nav-solid { background: var(--color-bg-deep); }
+    /* Parallax */
+    .parallax-layer { position:absolute; inset:0; background-size:cover; background-position:center; will-change: transform; }
+    .grain { position:absolute; inset:0; pointer-events:none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cdefs%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/defs%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E"); mix-blend-mode: overlay; }
+    /* Hero gradient layers */
+    .hero-gradient-base { background: var(--gradient-hero); }
+    /* Utilities */
+  .text-gradient { background: linear-gradient(90deg,#60a5fa,#0ea5e9); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .section-divider { height:1px; background: linear-gradient(90deg, transparent, var(--color-border), transparent); }
+  .card-border { background: linear-gradient(var(--color-bg-alt),var(--color-bg-alt)) padding-box, linear-gradient(135deg,#1d4ed8,#0ea5e9) border-box; border:1px solid transparent; }
+  /* News cards clamp (fallback without line-clamp plugin) */
+  .clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-clamp:2; }
+  .clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; line-clamp:3; }
+    .focus-outline:focus { outline:2px solid var(--color-accent-alt); outline-offset:2px; }
+    /* Smooth fade */
+    .fade-in { opacity:0; transform: translateY(12px); transition: opacity .7s ease, transform .7s ease; }
+    .fade-in.visible { opacity:1; transform: translateY(0); }
+    /* Themed surface helper */
+    .themed-surface { background-color: var(--color-surface-alt); border:1px solid var(--color-border); }
+    :root.dark .themed-surface { background-color: rgba(15,23,42,0.55); }
+    .theme-toggle-icon { transition: transform .4s ease; }
+    .theme-switching .theme-toggle-icon { transform: rotate(180deg); }
+  </style>
 </head>
-
-<body class="bg-gray-50 min-h-screen">
-    <!-- Barra de navegación -->
-    <nav class="bg-gray-800 p-4 w-full z-10">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-4">
-                <a href="">
-                    <img src="static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
-                </a>
-                <span class="text-gray-400">/</span>
-                <a href="/index" class="text-white hover:text-gray-300">Inicio</a>
-                <span class="text-gray-400">/</span>
-                <a href="/news" class="text-white hover:text-gray-300">Noticias</a>
-                <span class="text-gray-400">/</span>
-                <a href="/index#contact" class="text-white hover:text-gray-300">Contacto</a>
-            </div>
-            <div class="flex items-center space-x-4">
-                <a href="/loginpage" class="text-white hover:text-gray-300">Iniciar Sesión</a>
-            </div>
-        </div>
+<body class="min-h-screen antialiased bg-[var(--color-surface)] text-[var(--color-text-primary)] dark:text-slate-200">
+  <!-- NAVBAR -->
+  <header id="site-nav" class="fixed top-0 left-0 right-0 z-40 navbar-blur border-b border-slate-800 transition-colors">
+    <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-6">
+        <a href="/" class="flex items-center gap-2 font-semibold tracking-wide text-slate-100" aria-label="Inicio">
+          <!-- Logo SVG inline -->
+          <svg width="26" height="26" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
+            <defs>
+              <linearGradient id="lg" x1="6" y1="6" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#1d4ed8" />
+                <stop offset="1" stop-color="#0ea5e9" />
+              </linearGradient>
+            </defs>
+            <rect x="4" y="4" width="40" height="40" rx="10" stroke="url(#lg)" stroke-width="2.4" fill="none" />
+            <path d="M15 18C15 15.2386 19.0294 13 24 13C28.9706 13 33 15.2386 33 18C33 20.7614 28.9706 23 24 23C19.0294 23 15 20.7614 15 18Z" stroke="url(#lg)" stroke-width="2.2" />
+            <path d="M15 24.5C15 27.2614 19.0294 29.5 24 29.5C28.9706 29.5 33 27.2614 33 24.5" stroke="url(#lg)" stroke-width="2.2" stroke-linecap="round" />
+            <path d="M15 30.5C15 33.2614 19.0294 35.5 24 35.5C28.9706 35.5 33 33.2614 33 30.5" stroke="url(#lg)" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+          <span class="hidden sm:inline">SQL App Studio</span>
+        </a>
+        <ul class="hidden md:flex items-center gap-6 text-sm">
+          <li><a href="#inicio" class="nav-link text-slate-300 hover:text-white transition">Inicio</a></li>
+          <li><a href="#capacidades" class="nav-link text-slate-300 hover:text-white transition">Capacidades</a></li>
+          <li><a href="#arquitectura" class="nav-link text-slate-300 hover:text-white transition">Arquitectura</a></li>
+          <li><a href="#news" class="nav-link text-slate-300 hover:text-white transition">Noticias</a></li>
+          <li><a href="#contacto" class="nav-link text-slate-300 hover:text-white transition">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="flex items-center gap-4">
+        <button id="theme-toggle" aria-label="Cambiar tema" aria-pressed="false" class="relative inline-flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-slate-600/60 hover:border-slate-500 transition focus-outline group">
+          <span class="w-4 h-4 relative block">
+            <svg class="absolute inset-0 theme-toggle-icon sun opacity-0 group-[.light]:opacity-100 transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.35 17.65l1.42-1.41M16.24 7.76l1.41-1.41"/></svg>
+            <svg class="absolute inset-0 theme-toggle-icon moon opacity-100 group-[.light]:opacity-0 transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 0111.21 3 7 7 0 0021 12.79z"/></svg>
+          </span>
+          <span class="hidden sm:inline text-xs font-medium">Tema</span>
+        </button>
+        <a href="/loginpage" class="text-sm px-4 py-2 rounded-md bg-slate-700/60 hover:bg-slate-600 text-slate-100 transition focus-outline">Iniciar Sesión</a>
+      </div>
     </nav>
+  </header>
 
-    <!-- Hero Section -->
-    <section class="relative bg-white hero-bg">
-        <div class="container mx-auto px-6 py-16 md:py-24 lg:py-32">
-            <div class="flex flex-col md:flex-row items-center justify-between">
-                <div class="md:w-1/2 mb-10 md:mb-0">
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4">
-                        <span class="block">SQL App</span>
-                        <span class="block gradient-text">Studio</span>
-                    </h1>
-                    <p class="text-lg md:text-xl text-gray-600 mb-8">
-                        Herramienta avanzada para desarrolladores y administradores de bases de datos. Simplifica y automatiza la creación de APIs, migración de datos y análisis con inteligencia artificial.
-                    </p>
-                    <div class="flex flex-wrap gap-4">
-                        <a href="#features" class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
-                            <i class="fas fa-info-circle mr-2"></i>Conocer más
-                        </a>
-                        <a href="#contact" class="inline-block px-6 py-3 bg-white text-blue-600 font-medium rounded-lg shadow-md border border-blue-600 hover:bg-blue-50 transition duration-300">
-                            <i class="fas fa-envelope mr-2"></i>Contactar
-                        </a>
-                    </div>
-                </div>
-                                <div class="md:w-1/2 flex justify-center">
-                    <div class="relative">
-                        <!-- Círculo decorativo de fondo -->
-                        <div class="absolute inset-0 bg-blue-100 rounded-full transform scale-95"></div>
-                        
-                        <!-- Imagen circular con borde -->
-                        <img src="/static/img/th.jpg" alt="SQL App Studio Dashboard" 
-                             class="relative z-10 h-64 w-64 md:h-80 md:w-80 object-cover rounded-full border-4 border-white shadow-xl">
-                        
-                        <!-- Elemento decorativo -->
-                        <div class="absolute -bottom-4 -right-4 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full h-20 w-20 flex items-center justify-center text-white shadow-lg">
-                            <i class="fas fa-database text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="py-16 bg-gray-100">
-        <div class="container mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold mb-4">Características Principales</h2>
-                <p class="text-gray-600 max-w-3xl mx-auto">
-                    Descubre todas las herramientas avanzadas que te ofrece SQL App Studio para optimizar tu trabajo con bases de datos.
-                </p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-server text-blue-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Backend Robusto</h3>
-                    <p class="text-gray-600">
-                        Construido con FastAPI, soporta SQL Server y PostgreSQL (próximamente MySQL). Totalmente dockerizado para despliegue rápido y escalable.
-                    </p>
-                </div>
-                
-                <!-- Feature 2 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-cogs text-purple-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Automatización Total</h3>
-                    <p class="text-gray-600">
-                        Genera rutas, modelos, esquemas, pruebas y archivos HTML con JavaScript para una gestión eficiente y rápida.
-                    </p>
-                </div>
-                
-                <!-- Feature 3 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-exchange-alt text-green-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Migración de Datos</h3>
-                    <p class="text-gray-600">
-                        Importa datos desde Excel (.xls y .xlsx) hacia bases de datos SQL con validaciones que garantizan su calidad.
-                    </p>
-                </div>
-                
-                <!-- Feature 4 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-brain text-red-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Análisis con IA</h3>
-                    <p class="text-gray-600">
-                        Integra modelos de inteligencia artificial para análisis avanzado de datos, ofreciendo insights clave para la toma de decisiones.
-                    </p>
-                </div>
-                
-                <!-- Feature 5 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-desktop text-yellow-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Interfaz Intuitiva</h3>
-                    <p class="text-gray-600">
-                        Entorno web basado en Jinja2, Bootstrap y SQLAlchemy para configuraciones rápidas y experiencia responsiva.
-                    </p>
-                </div>
-                
-                <!-- Feature 6 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-lock text-indigo-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Seguridad Avanzada</h3>
-                    <p class="text-gray-600">
-                        Implementa prácticas seguras para gestión de datos y autenticación, protegiendo tu información sensible en todo momento.
-                    </p>
-                </div>
-            </div>
+  <!-- HERO -->
+  <section id="inicio" class="relative h-[92vh] min-h-[640px] flex items-center overflow-hidden">
+    <div class="absolute inset-0 hero-gradient-base"></div>
+    <!-- Parallax layers -->
+    <div class="parallax-layer" data-speed="0.08" style="background-image:linear-gradient(120deg,rgba(14,165,233,0.05),rgba(29,78,216,0.05)); mix-blend-mode: screen;"></div>
+    <div class="parallax-layer" data-speed="0.16" style="background-image:radial-gradient(circle at 80% 20%,rgba(14,165,233,0.18),transparent 55%);"></div>
+    <div class="parallax-layer" data-speed="0.24" style="background-image:radial-gradient(circle at 15% 70%,rgba(29,78,216,0.22),transparent 60%);"></div>
+    <div class="grain"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-6 w-full">
+      <div class="max-w-3xl fade-in" data-observe>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 leading-tight">
+          Plataforma Profesional para Datos, APIs e Inteligencia
+        </h1>
+        <p class="text-lg md:text-xl text-slate-300 max-w-2xl mb-8 leading-relaxed">
+          Estandariza la generación de APIs, acelera migraciones y habilita analítica avanzada sobre tus fuentes SQL. Un núcleo sólido para escalar sin fricción.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="#capacidades" class="px-6 py-3 rounded-md bg-gradient-to-r from-blue-700 to-cyan-600 text-white text-sm font-medium shadow hover:from-blue-600 hover:to-cyan-500 transition focus-outline">Explorar Capacidades</a>
+          <a href="#contacto" class="px-6 py-3 rounded-md border border-slate-600 text-slate-200 hover:bg-slate-800 text-sm font-medium transition focus-outline">Hablar con Nosotros</a>
         </div>
-    </section>
-
-    <!-- Diagrama Section -->
-    <section class="py-16 bg-white">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row items-center gap-12">
-                <div class="md:w-1/2">
-                    <h2 class="text-3xl font-bold mb-6">Cómo Funciona</h2>
-                    <p class="text-gray-600 mb-4">
-                        SQL App Studio simplifica el flujo de trabajo desde la configuración de la base de datos hasta la implementación de APIs. Nuestro enfoque modular permite una integración perfecta con sistemas existentes.
-                    </p>
-                    <p class="text-gray-600 mb-6">
-                        La plataforma automatiza tareas repetitivas y proporciona herramientas avanzadas para la manipulación y análisis de datos, ahorrando tiempo valioso en el desarrollo.
-                    </p>
-                    <ul class="space-y-2">
-                        <li class="flex items-start">
-                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                            <span>Configuración de conexiones a diversas fuentes de datos</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                            <span>Generación automática de código y endpoints API</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                            <span>Procesos de ETL para transformación de datos</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                            <span>Análisis predictivo mediante modelos pre-entrenados</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="md:w-1/2">
-                    <img src="/static/img/diagrama_app.jpg" alt="Diagrama de Arquitectura" class="rounded-lg shadow-lg">
-                </div>
-            </div>
-        </div>
-    </section>
-<!-- News Section -->
-<section id="news" class="py-16 bg-gray-100">
-    <div class="container mx-auto px-6">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold mb-4">
-                <span class="relative inline-block">
-                    <span class="absolute bottom-0 left-0 w-full h-1 bg-indigo-600 opacity-30 rounded"></span>
-                    Últimas Noticias
-                </span>
-            </h2>
-            <p class="text-gray-600 max-w-3xl mx-auto">
-                Mantente actualizado con las últimas novedades y mejoras en nuestra plataforma.
-            </p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {% for post in blog_posts %}
-            <div class="news-card bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 animate-fadeIn">
-                <div class="image-container relative">
-                    {% if post.image_url %}
-                    <img src="{{ post.image_url }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
-                    {% else %}
-                    <div class="w-full h-48 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-center">
-                        <i class="fas fa-newspaper text-4xl text-indigo-300"></i>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Categoría -->
-                    <span class="badge absolute top-3 left-3 bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-md">
-                        {{ post.category|default('Noticias') }}
-                    </span>
-                </div>
-                
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm text-gray-500 flex items-center">
-                            <i class="far fa-calendar-alt mr-1"></i>
-                            {{ post.created_at.strftime('%d/%m/%Y') }}
-                        </span>
-                        <span class="text-sm text-gray-500 flex items-center">
-                            <i class="far fa-eye mr-1"></i>
-                            {{ post.views|default('0') }} lecturas
-                        </span>
-                    </div>
-                    
-                    <h3 class="text-xl font-bold text-gray-800 mb-2 line-clamp-2 hover:text-indigo-600 transition-colors">{{ post.title }}</h3>
-                    <p class="text-gray-600 mb-4 line-clamp-3">{{ post.content | truncate(120) }}</p>
-                    
-                    <div class="flex justify-between items-center pt-2 border-t border-gray-100">
-                        <div class="flex items-center">
-                            {% if post.author_avatar %}
-                            <img src="{{ post.author_avatar }}" alt="{{ post.author_name }}" class="w-6 h-6 rounded-full mr-2">
-                            {% else %}
-                            <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center mr-2">
-                                <i class="fas fa-user text-xs text-gray-500"></i>
-                            </div>
-                            {% endif %}
-                            <span class="text-xs text-gray-500">{{ post.author_name|default('Admin') }}</span>
-                        </div>
-                        
-                        <a href="/news/{{ post.id }}" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center transition-colors text-sm">
-                            Leer más
-                            <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% else %}
-            <div class="col-span-1 md:col-span-3 py-12 flex flex-col items-center justify-center">
-                <div class="text-gray-400 text-6xl mb-4">
-                    <i class="far fa-newspaper"></i>
-                </div>
-                <h3 class="text-xl font-medium text-gray-700 mb-2">No hay noticias disponibles</h3>
-                <p class="text-gray-500 text-center max-w-md">
-                    Actualmente no hay noticias o publicaciones disponibles. Vuelve a revisar más tarde para ver las últimas actualizaciones.
-                </p>
-            </div>
-            {% endfor %}
-        </div>
-        
-        <div class="mt-12 text-center">
-            <a href="/news" class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-md transition duration-300">
-                <i class="fas fa-newspaper mr-2"></i>
-                Ver todas las noticias
-                <i class="fas fa-chevron-right ml-2 text-xs"></i>
-            </a>
-        </div>
+      </div>
     </div>
-</section>
+  </section>
 
-    <!-- Testimonials Section -->
-    <section id="testimonials" class="py-16 bg-white">
-        <div class="container mx-auto px-6">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold mb-4">Lo Que Dicen Nuestros Usuarios</h2>
-                <p class="text-gray-600 max-w-3xl mx-auto">
-                    Descubre cómo SQL App Studio ha transformado los flujos de trabajo de nuestros clientes.
-                </p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Testimonial 1 -->
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
-                    <div class="flex items-center mb-4">
-                        <div class="text-yellow-400 flex">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 italic mb-4">
-                        "Esta herramienta ha reducido nuestro tiempo de desarrollo en un 60%. La capacidad de generar APIs automáticamente nos ha permitido centrarnos en la lógica de negocio."
-                    </p>
-                    <div class="flex items-center">
-                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                            <i class="fas fa-user text-gray-600"></i>
-                        </div>
-                        <div class="ml-3">
-                            <h4 class="font-medium">Carlos Martínez</h4>
-                            <p class="text-sm text-gray-500">CTO, TechSolutions</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Testimonial 2 -->
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
-                    <div class="flex items-center mb-4">
-                        <div class="text-yellow-400 flex">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 italic mb-4">
-                        "La migración de datos nunca había sido tan sencilla. Ahora podemos transferir información entre sistemas heterogéneos con total confianza en la integridad de los datos."
-                    </p>
-                    <div class="flex items-center">
-                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                            <i class="fas fa-user text-gray-600"></i>
-                        </div>
-                        <div class="ml-3">
-                            <h4 class="font-medium">Laura Gómez</h4>
-                            <p class="text-sm text-gray-500">Data Analyst, Fintech Inc.</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Testimonial 3 -->
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
-                    <div class="flex items-center mb-4">
-                        <div class="text-yellow-400 flex">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 italic mb-4">
-                        "Los insights generados por la IA han sido cruciales para nuestras decisiones estratégicas. La interfaz intuitiva permite que incluso los no técnicos puedan aprovecharlo."
-                    </p>
-                    <div class="flex items-center">
-                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                            <i class="fas fa-user text-gray-600"></i>
-                        </div>
-                        <div class="ml-3">
-                            <h4 class="font-medium">Alejandro Torres</h4>
-                            <p class="text-sm text-gray-500">CEO, DataDriven Co.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- CAPACIDADES / FEATURES (compacto) -->
+  <section id="capacidades" class="relative py-20 bg-[var(--color-surface-alt)] dark:bg-[#0d1625] border-t border-b border-slate-800">
+    <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+      <div class="parallax-layer" data-speed="0.06" style="background-image:linear-gradient(rgba(255,255,255,0.02),rgba(255,255,255,0));"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+      <div class="mb-14 max-w-3xl">
+        <h2 class="text-3xl md:text-4xl font-semibold mb-4">Capacidades Clave</h2>
+        <p class="text-slate-400 leading-relaxed">Diseñado para equipos que requieren rigor técnico, reproducibilidad y velocidad de entrega, manteniendo estándares de seguridad y observabilidad.</p>
+      </div>
+      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+  <div class="card-border rounded-xl p-6 flex flex-col gap-4 fade-in themed-surface" data-observe>
+          <div class="text-blue-400"><i class="fas fa-server text-xl"></i></div>
+          <h3 class="text-lg font-medium">Motor Backend Unificado</h3>
+          <p class="text-sm text-slate-400">FastAPI optimizado. Integración con SQL Server y PostgreSQL. Preparado para extender a otros motores.</p>
         </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden">
-        <!-- Decorative elements -->
-        <div class="absolute top-0 left-0 w-full h-full overflow-hidden">
-            <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+  <div class="card-border rounded-xl p-6 flex flex-col gap-4 fade-in themed-surface" data-observe>
+          <div class="text-cyan-400"><i class="fas fa-bolt text-xl"></i></div>
+          <h3 class="text-lg font-medium">Generación Sistemática</h3>
+          <p class="text-sm text-slate-400">Rutas, modelos, esquemas y pruebas consistentes. Minimiza divergencias y errores manuales.</p>
         </div>
-        
-        <div class="container mx-auto px-6 relative z-10">
-            <!-- Header -->
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-extrabold mb-4">
-                    <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                        Conectemos
-                    </span>
-                </h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    ¿Tienes una idea? ¿Necesitas ayuda? Estamos aquí para hacer realidad tus proyectos con bases de datos.
-                </p>
+  <div class="card-border rounded-xl p-6 flex flex-col gap-4 fade-in themed-surface" data-observe>
+          <div class="text-indigo-400"><i class="fas fa-exchange-alt text-xl"></i></div>
+          <h3 class="text-lg font-medium">Migración Validada</h3>
+          <p class="text-sm text-slate-400">Ingesta desde Excel con validaciones estructurales y semánticas para integridad continua.</p>
+        </div>
+  <div class="card-border rounded-xl p-6 flex flex-col gap-4 fade-in themed-surface" data-observe>
+          <div class="text-rose-400"><i class="fas fa-brain text-xl"></i></div>
+          <h3 class="text-lg font-medium">Analítica con IA</h3>
+          <p class="text-sm text-slate-400">Modelos aplicados a series y métricas. Enriquecimiento contextual y soporte a decisión.</p>
+        </div>
+  <div class="card-border rounded-xl p-6 flex flex-col gap-4 fade-in themed-surface" data-observe>
+          <div class="text-amber-400"><i class="fas fa-layer-group text-xl"></i></div>
+          <h3 class="text-lg font-medium">Arquitectura Modular</h3>
+          <p class="text-sm text-slate-400">Componentes desacoplados: generación, ingesta, exposición API, análisis.</p>
+        </div>
+  <div class="card-border rounded-xl p-6 flex flex-col gap-4 fade-in themed-surface" data-observe>
+          <div class="text-emerald-400"><i class="fas fa-shield-alt text-xl"></i></div>
+          <h3 class="text-lg font-medium">Seguridad y Control</h3>
+          <p class="text-sm text-slate-400">Prácticas seguras en autenticación y manejo de datos. Base para compliance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARQUITECTURA / FLOW -->
+  <section id="arquitectura" class="relative py-24 bg-[#0b1320]">
+    <div class="absolute inset-0 parallax-layer" data-speed="0.04" style="background-image:linear-gradient(160deg,rgba(29,78,216,0.12),transparent 70%);"></div>
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+      <div class="grid md:grid-cols-2 gap-14 items-start">
+        <div class="space-y-6 fade-in" data-observe>
+          <h2 class="text-3xl md:text-4xl font-semibold">Flujo Operativo</h2>
+          <p class="text-slate-400 leading-relaxed">El núcleo orquesta desde la ingesta y modelado, hasta la exposición de endpoints y análisis aumentado. Cada etapa es auditable y reproducible.</p>
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex gap-3"><span class="text-cyan-400 mt-0.5"><i class="fas fa-check"></i></span> Definición de conexiones y fuentes estructuradas.</li>
+            <li class="flex gap-3"><span class="text-cyan-400 mt-0.5"><i class="fas fa-check"></i></span> Generación consistente de endpoints y esquemas.</li>
+            <li class="flex gap-3"><span class="text-cyan-400 mt-0.5"><i class="fas fa-check"></i></span> Validación y transformación (ETL controlado).</li>
+            <li class="flex gap-3"><span class="text-cyan-400 mt-0.5"><i class="fas fa-check"></i></span> Enriquecimiento analítico y métricas derivadas.</li>
+          </ul>
+        </div>
+        <div class="fade-in" data-observe>
+          <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-6 shadow-inner themed-surface">
+            <div class="grid gap-4 text-xs md:text-sm font-mono tracking-tight text-slate-300">
+              <div class="flex items-center justify-between bg-slate-800/50 rounded px-3 py-2">
+                <span class="text-cyan-400">[1] Ingesta</span>
+                <span class="text-slate-400">Excel / SQL</span>
+              </div>
+              <div class="flex items-center justify-between bg-slate-800/50 rounded px-3 py-2">
+                <span class="text-blue-400">[2] Modelado</span>
+                <span class="text-slate-400">ORM / Schemas</span>
+              </div>
+              <div class="flex items-center justify-between bg-slate-800/50 rounded px-3 py-2">
+                <span class="text-indigo-400">[3] Exposición</span>
+                <span class="text-slate-400">API / Tests</span>
+              </div>
+              <div class="flex items-center justify-between bg-slate-800/50 rounded px-3 py-2">
+                <span class="text-rose-400">[4] Análisis</span>
+                <span class="text-slate-400">IA / Métricas</span>
+              </div>
+              <div class="flex items-center justify-between bg-slate-800/50 rounded px-3 py-2">
+                <span class="text-emerald-400">[5] Observabilidad</span>
+                <span class="text-slate-400">Logs / Validación</span>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-            <div class="max-w-6xl mx-auto">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-                    <!-- Left side - Contact Info -->
-                    <div class="space-y-8">
-                        <!-- Main CTA Card -->
-                        <div class="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
-                            <div class="flex items-center mb-6">
-                                <div class="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
-                                    <i class="fas fa-rocket text-white text-xl"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <h3 class="text-2xl font-bold text-gray-800">¡Empecemos!</h3>
-                                    <p class="text-gray-600">Tu próximo gran proyecto nos espera</p>
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-6 leading-relaxed">
-                                Cuéntanos sobre tu proyecto y descubre cómo SQL App Studio puede acelerar tu desarrollo y optimizar tus datos.
-                            </p>
-                            <div class="flex flex-wrap gap-3">
-                                <span class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                                    <i class="fas fa-clock mr-1"></i>Respuesta en 24h
-                                </span>
-                                <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                                    <i class="fas fa-shield-alt mr-1"></i>100% Confidencial
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Contact Methods -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <!-- Email Card -->
-                            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-                                <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fas fa-envelope text-white"></i>
-                                </div>
-                                <h4 class="font-bold text-gray-800 mb-2">Email</h4>
-                                <p class="text-gray-600 text-sm mb-3">Escríbenos directamente</p>
-                                <a href="mailto:info@sqlappstudio.com" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                                    info@sqlappstudio.com
-                                </a>
-                            </div>
-
-                            <!-- Chat Card -->
-                            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-                                <div class="w-12 h-12 bg-gradient-to-r from-green-400 to-green-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fas fa-comments text-white"></i>
-                                </div>
-                                <h4 class="font-bold text-gray-800 mb-2">Chat en vivo</h4>
-                                <p class="text-gray-600 text-sm mb-3">Respuesta inmediata</p>
-                                <button class="text-green-600 hover:text-green-800 font-medium text-sm">
-                                    Iniciar chat
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Social Links -->
-                        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                            <h4 class="font-bold text-gray-800 mb-4">Síguenos</h4>
-                            <div class="flex space-x-4">
-                                <a href="#" class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white hover:bg-blue-700 transition-colors duration-300">
-                                    <i class="fab fa-linkedin"></i>
-                                </a>
-                                <a href="#" class="w-12 h-12 bg-gray-800 rounded-xl flex items-center justify-center text-white hover:bg-gray-900 transition-colors duration-300">
-                                    <i class="fab fa-github"></i>
-                                </a>
-                                <a href="#" class="w-12 h-12 bg-blue-400 rounded-xl flex items-center justify-center text-white hover:bg-blue-500 transition-colors duration-300">
-                                    <i class="fab fa-twitter"></i>
-                                </a>
-                                <a href="#" class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center text-white hover:bg-red-700 transition-colors duration-300">
-                                    <i class="fab fa-youtube"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right side - Contact Form -->
-                    <div class="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
-                        <div class="mb-8">
-                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Cuéntanos tu proyecto</h3>
-                            <p class="text-gray-600">Completa el formulario y nos pondremos en contacto contigo</p>
-                        </div>
-
-                        <form id="contact-form" class="space-y-6">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <label for="nombre" class="text-sm font-medium text-gray-700">Nombre *</label>
-                                    <input type="text" id="nombre" name="nombre" required 
-                                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none"
-                                           placeholder="Tu nombre">
-                                </div>
-                                <div class="space-y-2">
-                                    <label for="email" class="text-sm font-medium text-gray-700">Email *</label>
-                                    <input type="email" id="email" name="email" required 
-                                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none"
-                                           placeholder="tu@email.com">
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <label for="empresa" class="text-sm font-medium text-gray-700">Empresa</label>
-                                <input type="text" id="empresa" name="empresa"
-                                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none"
-                                       placeholder="Nombre de tu empresa">
-                            </div>
-
-                            <div class="space-y-2">
-                                <label for="proyecto" class="text-sm font-medium text-gray-700">Tipo de proyecto</label>
-                                <select id="proyecto" name="proyecto" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none bg-white">
-                                    <option value="">Selecciona una opción</option>
-                                    <option value="api">Desarrollo de API</option>
-                                    <option value="migration">Migración de datos</option>
-                                    <option value="analysis">Análisis con IA</option>
-                                    <option value="consulting">Consultoría</option>
-                                    <option value="other">Otro</option>
-                                </select>
-                            </div>
-
-                            <div class="space-y-2">
-                                <label for="mensaje" class="text-sm font-medium text-gray-700">Mensaje *</label>
-                                <textarea id="mensaje" name="mensaje" rows="4" required
-                                          class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none resize-none"
-                                          placeholder="Cuéntanos más sobre tu proyecto, necesidades y objetivos..."></textarea>
-                            </div>
-
-                            <button type="submit" 
-                                    class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
-                                <span class="flex items-center justify-center">
-                                    <i class="fas fa-paper-plane mr-2"></i>
-                                    Enviar mensaje
-                                </span>
-                            </button>
-
-                            <div id="sending-message" class="sending-message">
-                                <i class="fa fa-paper-plane mr-2" aria-hidden="true"></i>
-                                <span>Enviando...</span>
-                            </div>
-
-                            <div class="text-center">
-                                <p class="text-xs text-gray-500">
-                                    Al enviar este formulario, aceptas nuestros términos de privacidad
-                                </p>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+  <!-- NOTICIAS -->
+  <section id="news" class="relative py-24 bg-[var(--color-surface-alt)] dark:bg-[#0d1625] border-t border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="mb-14 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+        <div>
+          <h2 class="text-3xl font-semibold mb-3">Noticias</h2>
+          <p class="text-slate-400 text-sm max-w-xl">Actualizaciones técnicas, mejoras internas y nuevas capacidades incorporadas a la plataforma.</p>
+        </div>
+        <a href="/news" class="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md border border-slate-600 hover:bg-slate-700/40 transition focus-outline">
+          Ver todas <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {% for post in blog_posts %}
+  <article class="group relative rounded-xl border border-slate-700/70 bg-slate-900/40 hover:border-slate-500 transition p-5 flex flex-col fade-in themed-surface" data-observe>
+          <div class="mb-4 aspect-video rounded-md overflow-hidden bg-slate-800/60 flex items-center justify-center">
+            {% if post.image_url %}
+              <img src="{{ post.image_url }}" alt="{{ post.title }}" class="w-full h-full object-cover group-hover:scale-105 transition" />
+            {% else %}
+              <i class="fas fa-newspaper text-slate-600 text-3xl"></i>
+            {% endif %}
+          </div>
+          <div class="flex items-center justify-between text-[11px] uppercase tracking-wide text-slate-400 mb-3">
+            <span>{{ post.category|default('Noticias') }}</span>
+            <span class="font-mono">{{ post.created_at.strftime('%d/%m/%Y') }}</span>
+          </div>
+          <h3 class="text-base font-medium mb-2 text-slate-100 clamp-2 group-hover:text-sky-400 transition">{{ post.title }}</h3>
+          <p class="text-sm text-slate-400 clamp-3 mb-4">{{ post.content | truncate(140) }}</p>
+          <div class="mt-auto flex items-center justify-between pt-3 border-t border-slate-700/60 text-xs text-slate-400">
+            <div class="flex items-center gap-2">
+              {% if post.author_avatar %}
+              <img src="{{ post.author_avatar }}" alt="{{ post.author_name }}" class="w-6 h-6 rounded-full object-cover" />
+              {% else %}
+              <div class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center"><i class="fas fa-user text-[10px] text-slate-400"></i></div>
+              {% endif %}
+              <span>{{ post.author_name|default('Admin') }}</span>
             </div>
+            <a href="/news/{{ post.id }}" class="text-sky-400 hover:text-sky-300 inline-flex items-center gap-1">Leer <i class="fas fa-chevron-right text-[10px]"></i></a>
+          </div>
+        </article>
+        {% else %}
+        <div class="md:col-span-3 text-center py-16 text-slate-500 fade-in" data-observe>
+          <p class="mb-2 text-lg">No hay noticias disponibles</p>
+          <p class="text-sm text-slate-500">Vuelve más tarde para conocer las últimas actualizaciones.</p>
         </div>
-    </section>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
 
-    <!-- Footer -->
-    <div id="footer-container"></div>
-
-           <!-- Back to top button -->
-        <div id="back-to-top" class="back-to-top">
-            <i class="fas fa-arrow-up"></i>
+  <!-- CONTACTO -->
+  <section id="contacto" class="relative py-28 bg-[#0b1320]">
+    <div class="absolute inset-0 parallax-layer" data-speed="0.05" style="background-image:linear-gradient(220deg,rgba(14,165,233,0.12),transparent 60%);"></div>
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
+      <div class="max-w-2xl mb-14">
+        <h2 class="text-3xl md:text-4xl font-semibold mb-4">Conversemos</h2>
+        <p class="text-slate-400 text-sm leading-relaxed">Describe brevemente tu contexto y objetivos. Respondemos habitualmente en menos de 24 horas laborales.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-12">
+        <div class="space-y-8 fade-in" data-observe>
+          <div>
+            <h3 class="text-lg font-medium mb-3">Canales</h3>
+            <ul class="space-y-3 text-sm text-slate-300">
+              <li class="flex gap-3"><i class="fas fa-envelope text-sky-400 mt-0.5"></i><span>info@sqlappstudio.com</span></li>
+              <li class="flex gap-3"><i class="fas fa-shield-alt text-sky-400 mt-0.5"></i><span>Confidencialidad y acuerdos a demanda.</span></li>
+              <li class="flex gap-3"><i class="fas fa-clock text-sky-400 mt-0.5"></i><span>Respuesta estimada: 24h</span></li>
+            </ul>
+          </div>
+          <div class="section-divider"></div>
+          <p class="text-xs text-slate-500 leading-relaxed">La información enviada se gestiona de forma segura y se utiliza únicamente para responder a tu consulta.</p>
         </div>
-    
-        <!-- Scripts -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script>
-            // TEMPORALMENTE DESHABILITADO para evitar conflictos de autenticación
-            // <script src="/static/js/components.js"></script>
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Cargar componentes
-                loadNavbar();
-                loadFooter();
-                setupScrollToTop();
-                setupContactForm();
-                setupSmoothScroll();
-                
-                // Inicializar animaciones
-                initAnimations();
-            });
-    
-            // Cargar el navbar
-            function loadNavbar() {
-                fetch('/static/html/navbar.html')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Error al cargar el navbar');
-                        }
-                        return response.text();
-                    })
-                    .then(html => {
-                        document.getElementById('navbar-container').innerHTML = html;
-                        
-                        // Activar el ítem de inicio en el navbar
-                        const navItems = document.querySelectorAll('#navbar-container .nav-link');
-                        navItems.forEach(item => {
-                            if (item.getAttribute('href') === '/' || item.getAttribute('href') === '/index.html') {
-                                item.classList.add('active', 'text-blue-600');
-                                item.classList.remove('text-gray-600');
-                            }
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        document.getElementById('navbar-container').innerHTML = `
-                            <div class="bg-red-100 text-red-700 p-4">Error al cargar el navbar</div>
-                        `;
-                    });
-            }
-    
-            // Cargar el footer
-            function loadFooter() {
-                fetch('/static/html/footer.html')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Error al cargar el footer');
-                        }
-                        return response.text();
-                    })
-                    .then(html => {
-                        document.getElementById('footer-container').innerHTML = html;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        document.getElementById('footer-container').innerHTML = `
-                            <div class="bg-red-100 text-red-700 p-4">Error al cargar el footer</div>
-                        `;
-                    });
-            }
-    
-            // Configurar el botón de volver arriba
-            function setupScrollToTop() {
-                const backToTopButton = document.getElementById('back-to-top');
-                
-                // Mostrar/ocultar el botón según el scroll
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 300) {
-                        backToTopButton.classList.add('visible');
-                    } else {
-                        backToTopButton.classList.remove('visible');
-                    }
-                });
-                
-                // Acción de volver arriba al hacer clic
-                backToTopButton.addEventListener('click', () => {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                });
-            }
-    
-            // Configurar el formulario de contacto
-            function setupContactForm() {
-                const contactForm = document.getElementById('contact-form');
-                const sendingMessage = document.getElementById('sending-message');
-                
-                if (contactForm) {
-                    contactForm.addEventListener('submit', async function(event) {
-                        event.preventDefault();
-                        
-                        // Mostrar indicador de envío
-                        sendingMessage.style.display = 'flex';
-                        
-                        // Obtener los datos del formulario
-                        const nombre = document.getElementById('nombre').value;
-                        const email = document.getElementById('email').value;
-                        const empresa = document.getElementById('empresa').value;
-                        const proyecto = document.getElementById('proyecto').value;
-                        const mensaje = document.getElementById('mensaje').value;
-                        
-                        // Construir el mensaje completo con toda la información
-                        let mensajeCompleto = `Nuevo mensaje de contacto:\n\n`;
-                        mensajeCompleto += `Nombre: ${nombre}\n`;
-                        mensajeCompleto += `Email: ${email}\n`;
-                        if (empresa) mensajeCompleto += `Empresa: ${empresa}\n`;
-                        if (proyecto) mensajeCompleto += `Tipo de proyecto: ${proyecto}\n`;
-                        mensajeCompleto += `\nMensaje:\n${mensaje}`;
-                        
-                        // Preparar los datos para enviar al backend
-                        const emailData = {
-                            destinatario: "fjuansimon@gmail.com", // Email de destino
-                            asunto: `Nuevo contacto desde web - ${nombre}`,
-                            mensaje: mensajeCompleto
-                        };
-                        
-                        try {
-                            // Enviar datos al endpoint real
-                            const response = await fetch('/envios/enviar_correo', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(emailData)
-                            });
-                            
-                            if (response.ok) {
-                                const result = await response.json();
-                                
-                                // Limpiar formulario
-                                contactForm.reset();
-                                
-                                // Ocultar indicador de envío
-                                sendingMessage.style.display = 'none';
-                                
-                                // Mostrar mensaje de éxito
-                                showToast('¡Mensaje enviado correctamente! Nos pondremos en contacto pronto.', 'success');
-                            } else {
-                                throw new Error(`Error del servidor: ${response.status}`);
-                            }
-                        } catch (error) {
-                            console.error('Error al enviar el formulario:', error);
-                            sendingMessage.style.display = 'none';
-                            showToast('Hubo un error al enviar el mensaje. Por favor, inténtalo nuevamente.', 'error');
-                        }
-                    });
-                }
-            }
-    
-            // Configurar scroll suave para los enlaces internos
-            function setupSmoothScroll() {
-                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                    anchor.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        
-                        const targetId = this.getAttribute('href');
-                        if (targetId === '#') return;
-                        
-                        const targetElement = document.querySelector(targetId);
-                        if (targetElement) {
-                            targetElement.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start'
-                            });
-                        }
-                    });
-                });
-            }
-    
-            // Inicializar animaciones de entrada
-            function initAnimations() {
-                // Animación para las tarjetas de características
-                const featureCards = document.querySelectorAll('.feature-card');
-                animateElementsOnScroll(featureCards, 'transform: translateY(20px); opacity: 0', 'transform: translateY(0); opacity: 1', 100);
-                
-                // Animación para los testimonios
-                const testimonials = document.querySelectorAll('#testimonials .bg-gray-50');
-                animateElementsOnScroll(testimonials, 'transform: scale(0.9); opacity: 0', 'transform: scale(1); opacity: 1', 150);
-            }
-    
-            // Función para animar elementos al hacer scroll
-            function animateElementsOnScroll(elements, initialStyle, finalStyle, delay = 0) {
-                if (!elements || elements.length === 0) return;
-                
-                // Configurar estilos iniciales
-                elements.forEach((el, index) => {
-                    el.style.transition = 'all 0.6s ease-out';
-                    el.style.transitionDelay = `${delay * index}ms`;
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateY(20px)';
-                });
-                
-                // Función para verificar si un elemento está en el viewport
-                function isElementInViewport(el) {
-                    const rect = el.getBoundingClientRect();
-                    return (
-                        rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.85 &&
-                        rect.bottom >= 0
-                    );
-                }
-                
-                // Función para mostrar elementos visibles
-                function showVisibleElements() {
-                    elements.forEach(el => {
-                        if (isElementInViewport(el) && el.style.opacity === '0') {
-                            el.style.opacity = '1';
-                            el.style.transform = 'translateY(0)';
-                        }
-                    });
-                }
-                
-                // Verificar elementos visibles al cargar y en scroll
-                showVisibleElements();
-                window.addEventListener('scroll', showVisibleElements);
-            }
-    
-            // Mostrar un mensaje toast
-            function showToast(message, type = 'info') {
-                // Crear el toast si no existe
-                let toast = document.getElementById('toast');
-                
-                if (!toast) {
-                    toast = document.createElement('div');
-                    toast.id = 'toast';
-                    toast.style.position = 'fixed';
-                    toast.style.bottom = '20px';
-                    toast.style.left = '50%';
-                    toast.style.transform = 'translateX(-50%)';
-                    toast.style.padding = '12px 24px';
-                    toast.style.borderRadius = '8px';
-                    toast.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-                    toast.style.zIndex = '1000';
-                    toast.style.transition = 'all 0.3s ease-in-out';
-                    toast.style.opacity = '0';
-                    document.body.appendChild(toast);
-                }
-                
-                // Establecer estilos según el tipo
-                switch (type) {
-                    case 'success':
-                        toast.style.backgroundColor = '#10B981';
-                        toast.style.color = 'white';
-                        break;
-                    case 'error':
-                        toast.style.backgroundColor = '#EF4444';
-                        toast.style.color = 'white';
-                        break;
-                    case 'warning':
-                        toast.style.backgroundColor = '#F59E0B';
-                        toast.style.color = 'white';
-                        break;
-                    default:
-                        toast.style.backgroundColor = '#3B82F6';
-                        toast.style.color = 'white';
-                }
-                
-                // Establecer el mensaje
-                toast.textContent = message;
-                
-                // Mostrar el toast
-                toast.style.opacity = '1';
-                
-                // Ocultar después de 5 segundos
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    
-                    // Eliminar el elemento después de la transición
-                    setTimeout(() => {
-                        if (document.body.contains(toast)) {
-                            document.body.removeChild(toast);
-                        }
-                    }, 300);
-                }, 5000);
-            }
-            
-            // Opción para precargar imágenes
-            function preloadImages(images) {
-                for (const src of images) {
-                    const img = new Image();
-                    img.src = src;
-                }
-            }
-            
-            // Precargar imágenes importantes
-            preloadImages([
-                '/static/img/dashboard_illustration.svg',
-                '/static/img/diagrama_app.jpg'
-            ]);
-        </script>
-    </body>
-    </html>
+  <form id="contact-form" class="space-y-6 fade-in themed-surface rounded-xl p-6 bg-slate-900/40 border border-slate-700/70" data-observe>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="flex flex-col gap-2">
+              <label for="nombre" class="text-sm font-medium">Nombre *</label>
+              <input id="nombre" name="nombre" required class="bg-slate-900/50 border border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500" placeholder="Tu nombre" />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="email" class="text-sm font-medium">Email *</label>
+              <input id="email" type="email" name="email" required class="bg-slate-900/50 border border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500" placeholder="tu@email" />
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="empresa" class="text-sm font-medium">Empresa</label>
+            <input id="empresa" name="empresa" class="bg-slate-900/50 border border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500" placeholder="Opcional" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="proyecto" class="text-sm font-medium">Tipo de proyecto</label>
+            <select id="proyecto" name="proyecto" class="bg-slate-900/50 border border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+              <option value="">Selecciona</option>
+              <option value="api">Desarrollo de API</option>
+              <option value="migration">Migración de datos</option>
+              <option value="analysis">Análisis con IA</option>
+              <option value="consulting">Consultoría</option>
+              <option value="other">Otro</option>
+            </select>
+          </div>
+            <div class="flex flex-col gap-2">
+              <label for="mensaje" class="text-sm font-medium">Mensaje *</label>
+              <textarea id="mensaje" name="mensaje" rows="5" required class="bg-slate-900/50 border border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 resize-none" placeholder="Contexto, objetivos, plazos aproximados..."></textarea>
+            </div>
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-700 to-cyan-600 hover:from-blue-600 hover:to-cyan-500 text-white text-sm font-medium rounded-md px-5 py-3 transition focus-outline">
+              <i class="fas fa-paper-plane"></i> Enviar
+            </button>
+            <div id="sending-message" class="hidden text-xs text-slate-400 flex items-center gap-2">
+              <i class="fas fa-spinner fa-spin"></i> Enviando...
+            </div>
+            <p class="text-[11px] text-slate-500">Al enviar aceptas el tratamiento de datos para fines de respuesta.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-[#0a121e] border-t border-slate-800 py-10 text-sm">
+    <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-10">
+      <div class="space-y-3">
+        <h4 class="font-medium text-slate-100">SQL App Studio</h4>
+        <p class="text-slate-500 text-xs leading-relaxed">Ecosistema para gestión estructurada y analítica inteligente sobre plataformas SQL.</p>
+      </div>
+      <div>
+        <h5 class="font-medium mb-3 text-slate-200">Secciones</h5>
+        <ul class="space-y-2 text-slate-400 text-xs">
+          <li><a href="#inicio" class="hover:text-slate-200">Inicio</a></li>
+          <li><a href="#capacidades" class="hover:text-slate-200">Capacidades</a></li>
+          <li><a href="#arquitectura" class="hover:text-slate-200">Arquitectura</a></li>
+          <li><a href="#news" class="hover:text-slate-200">Noticias</a></li>
+          <li><a href="#contacto" class="hover:text-slate-200">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="flex flex-col gap-3">
+        <h5 class="font-medium text-slate-200 mb-1">Estado</h5>
+        <span class="inline-flex items-center gap-2 text-xs text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Operativo</span>
+        <div class="flex gap-3 pt-2">
+          <a href="#" class="w-8 h-8 rounded bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 text-xs"><i class="fab fa-github"></i></a>
+          <a href="#" class="w-8 h-8 rounded bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 text-xs"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="mt-8 text-center text-[11px] text-slate-600">&copy; {{ (2025) }} SQL App Studio. Todos los derechos reservados.</div>
+  </footer>
+
+  <!-- Back to top -->
+  <button id="back-to-top" aria-label="Volver arriba" class="fixed bottom-5 right-5 w-10 h-10 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition flex items-center justify-center opacity-0 pointer-events-none">
+    <i class="fas fa-arrow-up text-xs"></i>
+  </button>
+
+  <!-- Scripts -->
+  <script>
+    // Theme initialization (before content flashes)
+    (function(){
+      const stored = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const root = document.documentElement;
+      const theme = stored || (prefersDark ? 'dark' : 'light');
+      root.classList.remove('light','dark');
+      root.classList.add(theme);
+    })();
+
+    // Theme toggle logic
+    (function(){
+      const btn = document.getElementById('theme-toggle');
+      if(!btn) return;
+      function current(){ return document.documentElement.classList.contains('light') ? 'light' : 'dark'; }
+      function setTheme(t){
+        document.documentElement.classList.remove('light','dark');
+        document.documentElement.classList.add(t);
+        localStorage.setItem('theme', t);
+        btn.setAttribute('aria-pressed', t==='dark');
+        // Update button group state class for icon swap using :has() fallback pattern via class on button
+        if(t==='light'){ btn.classList.add('light'); } else { btn.classList.remove('light'); }
+      }
+      setTheme(current());
+      btn.addEventListener('click', ()=>{
+        const next = current()==='dark' ? 'light' : 'dark';
+        document.body.classList.add('theme-switching');
+        setTheme(next);
+        setTimeout(()=>document.body.classList.remove('theme-switching'),450);
+      });
+    })();
+
+    // Parallax & Intersection Observer
+    (function(){
+      const layers = Array.from(document.querySelectorAll('.parallax-layer'));
+      let lastY = window.scrollY;
+      function raf(){
+        const y = window.scrollY;
+        const dh = document.documentElement.clientHeight;
+        if(Math.abs(y - lastY) > 0.5){
+          layers.forEach(layer => {
+            const speed = parseFloat(layer.dataset.speed || '0.1');
+            layer.style.transform = `translate3d(0, ${y * speed * -1}px, 0)`;
+          });
+          lastY = y;
+        }
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+    })();
+
+    // Fade-in on scroll
+    (function(){
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target);} });
+      }, { threshold: 0.15 });
+      document.querySelectorAll('[data-observe]').forEach(el => obs.observe(el));
+    })();
+
+    // Navbar solid on scroll & back-to-top
+    (function(){
+      const nav = document.getElementById('site-nav');
+      const back = document.getElementById('back-to-top');
+      function onScroll(){
+        if(window.scrollY > 40){ nav.classList.add('nav-solid'); } else { nav.classList.remove('nav-solid'); }
+        if(window.scrollY > 400){ back.style.opacity='1'; back.style.pointerEvents='auto'; } else { back.style.opacity='0'; back.style.pointerEvents='none'; }
+      }
+      window.addEventListener('scroll', onScroll, { passive:true });
+      back.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smooth' }));
+      onScroll();
+    })();
+
+    // Contact form submission (reutiliza endpoint existente)
+    (function(){
+      const form = document.getElementById('contact-form');
+      if(!form) return;
+      const sending = document.getElementById('sending-message');
+      form.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        sending.classList.remove('hidden');
+        const nombre = form.nombre.value.trim();
+        const email = form.email.value.trim();
+        const empresa = form.empresa.value.trim();
+        const proyecto = form.proyecto.value;
+        const mensaje = form.mensaje.value.trim();
+        let cuerpo = `Nuevo mensaje de contacto:\n\nNombre: ${nombre}\nEmail: ${email}\n`;
+        if(empresa) cuerpo += `Empresa: ${empresa}\n`;
+        if(proyecto) cuerpo += `Tipo de proyecto: ${proyecto}\n`;
+        cuerpo += `\nMensaje:\n${mensaje}`;
+        const payload = { destinatario: 'fjuansimon@gmail.com', asunto: `Nuevo contacto - ${nombre}`, mensaje: cuerpo };
+        try {
+          const res = await fetch('/envios/enviar_correo',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+          if(!res.ok) throw new Error('Server error');
+          toast('Mensaje enviado correctamente','success');
+          form.reset();
+        } catch(err){
+          console.error(err); toast('Error al enviar. Intenta nuevamente.','error');
+        } finally { sending.classList.add('hidden'); }
+      });
+    })();
+
+    // Minimal toast
+    function toast(msg,type='info'){
+      let t = document.getElementById('toast');
+      if(!t){
+        t = document.createElement('div');
+        t.id='toast';
+        t.style.position='fixed'; t.style.bottom='20px'; t.style.left='50%'; t.style.transform='translateX(-50%)';
+        t.style.padding='10px 18px'; t.style.borderRadius='6px'; t.style.fontSize='13px'; t.style.fontWeight='500';
+        t.style.zIndex='1000'; t.style.transition='opacity .3s'; t.style.opacity='0';
+        document.body.appendChild(t);
+      }
+      const colors={ success:'#059669', error:'#dc2626', info:'#334155' };
+      t.style.background=colors[type]||colors.info; t.style.color='#fff';
+      t.textContent=msg; t.style.opacity='1';
+      clearTimeout(t._h); t._h=setTimeout(()=>{ t.style.opacity='0'; },4000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL App Studio - Enterprise Data Solutions</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Tipografía profesional */
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        }
+        
+        body {
+            background: #fafbfc;
+            color: #1a202c;
+            font-feature-settings: "liga" on, "tnum" on;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Paleta profesional */
+        :root {
+            --primary-50: #eff6ff;
+            --primary-100: #dbeafe;
+            --primary-600: #2563eb;
+            --primary-700: #1d4ed8;
+            --primary-900: #1e3a8a;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-900) 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            border: 1px solid var(--gray-200);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: var(--primary-100);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-900));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+        .feature-card {
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #2563eb;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 1000;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px);
+        }
+        
+        .sending-message {
+            display: none;
+            align-items: center;
+            font-size: 16px;
+            color: #1a202c;
+            margin-left: 10px;
+            animation: fly 2s infinite;
+        }
+
+        @keyframes fly {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+
+        .hero-bg {
+            background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%232563eb" fill-opacity="0.08" d="M0,224L48,208C96,192,192,160,288,160C384,160,480,192,576,197.3C672,203,768,181,864,181.3C960,181,1056,203,1152,192C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"%3E%3C/path%3E%3C/svg%3E');
+            background-size: cover;
+            background-position: center bottom;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar Profesional -->
+    <nav class="bg-white/95 backdrop-blur-md border-b border-gray-200/60 sticky top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-8">
+                    <a href="/" class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-database text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900">SQL App Studio</span>
+                    </a>
+                    <div class="hidden md:flex items-center space-x-6">
+                        <a href="/index" class="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
+                            Inicio
+                        </a>
+                        <a href="/news" class="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
+                            Noticias
+                        </a>
+                        <a href="/index#contact" class="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
+                            Contacto
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/loginpage" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md">
+                        Iniciar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section Profesional -->
+    <section class="relative bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+        <!-- Elementos decorativos sutiles -->
+        <div class="absolute inset-0">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-blue-50 rounded-full opacity-60 -translate-y-20 translate-x-20"></div>
+            <div class="absolute bottom-0 left-0 w-80 h-80 bg-indigo-50 rounded-full opacity-40 translate-y-16 -translate-x-16"></div>
+        </div>
+        
+        <div class="relative container mx-auto px-6 py-20 lg:py-28">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <div class="space-y-4">
+                        <div class="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                            <i class="fas fa-bolt mr-2"></i>
+                            Enterprise Ready
+                        </div>
+                        <h1 class="text-4xl lg:text-6xl font-bold leading-tight">
+                            <span class="text-gray-900">SQL App</span>
+                            <span class="block gradient-text">Studio</span>
+                        </h1>
+                        <p class="text-xl text-gray-600 leading-relaxed max-w-lg">
+                            Plataforma empresarial para automatización de bases de datos, desarrollo de APIs y análisis inteligente de datos.
+                        </p>
+                    </div>
+                    
+                    <!-- Estadísticas profesionales -->
+                    <div class="grid grid-cols-3 gap-6 py-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-900">99.9%</div>
+                            <div class="text-sm text-gray-600">Uptime</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">10x</div>
+                            <div class="text-sm text-gray-600">Más rápido</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-900">24/7</div>
+                            <div class="text-sm text-gray-600">Soporte</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#features" class="inline-flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+                            <i class="fas fa-rocket mr-2"></i>
+                            Empezar ahora
+                        </a>
+                        <a href="#contact" class="inline-flex items-center justify-center px-8 py-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-all duration-200">
+                            <i class="fas fa-calendar mr-2"></i>
+                            Agendar demo
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="relative lg:pl-12">
+                    <div class="relative">
+                        <!-- Dashboard mockup más profesional -->
+                        <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+                            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                                    <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                                    <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                                    <div class="ml-4 text-sm text-gray-600 font-medium">SQL App Studio</div>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <img src="/static/img/th.jpg" alt="SQL App Studio Dashboard" 
+                                     class="w-full h-64 object-cover rounded-lg">
+                            </div>
+                        </div>
+                        
+                        <!-- Elementos flotantes profesionales -->
+                        <div class="absolute -top-4 -right-4 bg-green-100 text-green-800 p-3 rounded-xl shadow-lg">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                        <div class="absolute -bottom-4 -left-4 bg-blue-100 text-blue-800 p-3 rounded-xl shadow-lg">
+                            <i class="fas fa-chart-line text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </section>
+
+    <!-- Features Section Profesional -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium mb-4">
+                    <i class="fas fa-star mr-2"></i>
+                    Características Enterprise
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-6">
+                    Tecnología que impulsa 
+                    <span class="gradient-text">tu crecimiento</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Herramientas profesionales diseñadas para equipos que buscan eficiencia, escalabilidad y resultados excepcionales.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-server text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Arquitectura Enterprise</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        FastAPI de alto rendimiento con soporte nativo para SQL Server y PostgreSQL. Arquitectura de microservicios totalmente containerizada.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Auto-scaling automático
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Load balancing integrado
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-magic text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Automatización Inteligente</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        Generación automática de APIs, modelos de datos, documentación y tests. Reducción del 80% en tiempo de desarrollo.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Code generation
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Testing automático
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-database text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Migración de Datos</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        Importación masiva desde Excel con validaciones avanzadas, transformaciones y mapeo inteligente de esquemas.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Validación de datos
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Rollback automático
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-red-500 to-pink-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-brain text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Inteligencia Artificial</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        Análisis predictivo, detección de anomalías y optimización automática con modelos de machine learning.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            ML integrado
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Análisis predictivo
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-shield-alt text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Seguridad Enterprise</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        Cifrado end-to-end, autenticación multi-factor, auditoría completa y cumplimiento con estándares SOC 2.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            SOC 2 compliant
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Cifrado AES-256
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-chart-line text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Analytics Avanzado</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        Dashboards en tiempo real, reportes automatizados y métricas de performance con visualizaciones interactivas.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Real-time dashboards
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Custom reports
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Call to action dentro de features -->
+            <div class="text-center mt-16">
+                <div class="inline-flex items-center px-6 py-3 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium">
+                    <i class="fas fa-rocket mr-2"></i>
+                    ¿Listo para comenzar? Agenda una demo personalizada
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Diagrama Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <h2 class="text-3xl font-bold mb-6">Cómo Funciona</h2>
+                    <p class="text-gray-600 mb-4">
+                        SQL App Studio simplifica el flujo de trabajo desde la configuración de la base de datos hasta la implementación de APIs. Nuestro enfoque modular permite una integración perfecta con sistemas existentes.
+                    </p>
+                    <p class="text-gray-600 mb-6">
+                        La plataforma automatiza tareas repetitivas y proporciona herramientas avanzadas para la manipulación y análisis de datos, ahorrando tiempo valioso en el desarrollo.
+                    </p>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Configuración de conexiones a diversas fuentes de datos</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Generación automática de código y endpoints API</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Procesos de ETL para transformación de datos</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Análisis predictivo mediante modelos pre-entrenados</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="/static/img/diagrama_app.jpg" alt="Diagrama de Arquitectura" class="rounded-lg shadow-lg">
+                </div>
+            </div>
+        </div>
+    </section>
+<!-- News Section -->
+<section id="news" class="py-16 bg-gray-100">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">
+                <span class="relative inline-block">
+                    <span class="absolute bottom-0 left-0 w-full h-1 bg-indigo-600 opacity-30 rounded"></span>
+                    Últimas Noticias
+                </span>
+            </h2>
+            <p class="text-gray-600 max-w-3xl mx-auto">
+                Mantente actualizado con las últimas novedades y mejoras en nuestra plataforma.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for post in blog_posts %}
+            <div class="news-card bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 animate-fadeIn">
+                <div class="image-container relative">
+                    {% if post.image_url %}
+                    <img src="{{ post.image_url }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
+                    {% else %}
+                    <div class="w-full h-48 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-center">
+                        <i class="fas fa-newspaper text-4xl text-indigo-300"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Categoría -->
+                    <span class="badge absolute top-3 left-3 bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-md">
+                        {{ post.category|default('Noticias') }}
+                    </span>
+                </div>
+                
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm text-gray-500 flex items-center">
+                            <i class="far fa-calendar-alt mr-1"></i>
+                            {{ post.created_at.strftime('%d/%m/%Y') }}
+                        </span>
+                        <span class="text-sm text-gray-500 flex items-center">
+                            <i class="far fa-eye mr-1"></i>
+                            {{ post.views|default('0') }} lecturas
+                        </span>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-gray-800 mb-2 line-clamp-2 hover:text-indigo-600 transition-colors">{{ post.title }}</h3>
+                    <p class="text-gray-600 mb-4 line-clamp-3">{{ post.content | truncate(120) }}</p>
+                    
+                    <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+                        <div class="flex items-center">
+                            {% if post.author_avatar %}
+                            <img src="{{ post.author_avatar }}" alt="{{ post.author_name }}" class="w-6 h-6 rounded-full mr-2">
+                            {% else %}
+                            <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center mr-2">
+                                <i class="fas fa-user text-xs text-gray-500"></i>
+                            </div>
+                            {% endif %}
+                            <span class="text-xs text-gray-500">{{ post.author_name|default('Admin') }}</span>
+                        </div>
+                        
+                        <a href="/news/{{ post.id }}" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center transition-colors text-sm">
+                            Leer más
+                            <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-span-1 md:col-span-3 py-12 flex flex-col items-center justify-center">
+                <div class="text-gray-400 text-6xl mb-4">
+                    <i class="far fa-newspaper"></i>
+                </div>
+                <h3 class="text-xl font-medium text-gray-700 mb-2">No hay noticias disponibles</h3>
+                <p class="text-gray-500 text-center max-w-md">
+                    Actualmente no hay noticias o publicaciones disponibles. Vuelve a revisar más tarde para ver las últimas actualizaciones.
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="mt-12 text-center">
+            <a href="/news" class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-md transition duration-300">
+                <i class="fas fa-newspaper mr-2"></i>
+                Ver todas las noticias
+                <i class="fas fa-chevron-right ml-2 text-xs"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Lo Que Dicen Nuestros Usuarios</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    Descubre cómo SQL App Studio ha transformado los flujos de trabajo de nuestros clientes.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 flex">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic mb-4">
+                        "Esta herramienta ha reducido nuestro tiempo de desarrollo en un 60%. La capacidad de generar APIs automáticamente nos ha permitido centrarnos en la lógica de negocio."
+                    </p>
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            <i class="fas fa-user text-gray-600"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-medium">Carlos Martínez</h4>
+                            <p class="text-sm text-gray-500">CTO, TechSolutions</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 flex">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic mb-4">
+                        "La migración de datos nunca había sido tan sencilla. Ahora podemos transferir información entre sistemas heterogéneos con total confianza en la integridad de los datos."
+                    </p>
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            <i class="fas fa-user text-gray-600"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-medium">Laura Gómez</h4>
+                            <p class="text-sm text-gray-500">Data Analyst, Fintech Inc.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 flex">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic mb-4">
+                        "Los insights generados por la IA han sido cruciales para nuestras decisiones estratégicas. La interfaz intuitiva permite que incluso los no técnicos puedan aprovecharlo."
+                    </p>
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            <i class="fas fa-user text-gray-600"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-medium">Alejandro Torres</h4>
+                            <p class="text-sm text-gray-500">CEO, DataDriven Co.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden">
+        <!-- Decorative elements -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+        </div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Header -->
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-extrabold mb-4">
+                    <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        Conectemos
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    ¿Tienes una idea? ¿Necesitas ayuda? Estamos aquí para hacer realidad tus proyectos con bases de datos.
+                </p>
+            </div>
+
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                    <!-- Left side - Contact Info -->
+                    <div class="space-y-8">
+                        <!-- Main CTA Card -->
+                        <div class="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+                            <div class="flex items-center mb-6">
+                                <div class="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                                    <i class="fas fa-rocket text-white text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-2xl font-bold text-gray-800">¡Empecemos!</h3>
+                                    <p class="text-gray-600">Tu próximo gran proyecto nos espera</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 mb-6 leading-relaxed">
+                                Cuéntanos sobre tu proyecto y descubre cómo SQL App Studio puede acelerar tu desarrollo y optimizar tus datos.
+                            </p>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                                    <i class="fas fa-clock mr-1"></i>Respuesta en 24h
+                                </span>
+                                <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                                    <i class="fas fa-shield-alt mr-1"></i>100% Confidencial
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Contact Methods -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <!-- Email Card -->
+                            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+                                <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="fas fa-envelope text-white"></i>
+                                </div>
+                                <h4 class="font-bold text-gray-800 mb-2">Email</h4>
+                                <p class="text-gray-600 text-sm mb-3">Escríbenos directamente</p>
+                                <a href="mailto:info@sqlappstudio.com" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                                    info@sqlappstudio.com
+                                </a>
+                            </div>
+
+                            <!-- Chat Card -->
+                            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+                                <div class="w-12 h-12 bg-gradient-to-r from-green-400 to-green-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="fas fa-comments text-white"></i>
+                                </div>
+                                <h4 class="font-bold text-gray-800 mb-2">Chat en vivo</h4>
+                                <p class="text-gray-600 text-sm mb-3">Respuesta inmediata</p>
+                                <button class="text-green-600 hover:text-green-800 font-medium text-sm">
+                                    Iniciar chat
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Social Links -->
+                        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                            <h4 class="font-bold text-gray-800 mb-4">Síguenos</h4>
+                            <div class="flex space-x-4">
+                                <a href="#" class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white hover:bg-blue-700 transition-colors duration-300">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a href="#" class="w-12 h-12 bg-gray-800 rounded-xl flex items-center justify-center text-white hover:bg-gray-900 transition-colors duration-300">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="#" class="w-12 h-12 bg-blue-400 rounded-xl flex items-center justify-center text-white hover:bg-blue-500 transition-colors duration-300">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center text-white hover:bg-red-700 transition-colors duration-300">
+                                    <i class="fab fa-youtube"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right side - Contact Form -->
+                    <div class="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Cuéntanos tu proyecto</h3>
+                            <p class="text-gray-600">Completa el formulario y nos pondremos en contacto contigo</p>
+                        </div>
+
+                        <form id="contact-form" class="space-y-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label for="nombre" class="text-sm font-medium text-gray-700">Nombre *</label>
+                                    <input type="text" id="nombre" name="nombre" required 
+                                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none"
+                                           placeholder="Tu nombre">
+                                </div>
+                                <div class="space-y-2">
+                                    <label for="email" class="text-sm font-medium text-gray-700">Email *</label>
+                                    <input type="email" id="email" name="email" required 
+                                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none"
+                                           placeholder="tu@email.com">
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="empresa" class="text-sm font-medium text-gray-700">Empresa</label>
+                                <input type="text" id="empresa" name="empresa"
+                                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none"
+                                       placeholder="Nombre de tu empresa">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="proyecto" class="text-sm font-medium text-gray-700">Tipo de proyecto</label>
+                                <select id="proyecto" name="proyecto" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none bg-white">
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="api">Desarrollo de API</option>
+                                    <option value="migration">Migración de datos</option>
+                                    <option value="analysis">Análisis con IA</option>
+                                    <option value="consulting">Consultoría</option>
+                                    <option value="other">Otro</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="mensaje" class="text-sm font-medium text-gray-700">Mensaje *</label>
+                                <textarea id="mensaje" name="mensaje" rows="4" required
+                                          class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none resize-none"
+                                          placeholder="Cuéntanos más sobre tu proyecto, necesidades y objetivos..."></textarea>
+                            </div>
+
+                            <button type="submit" 
+                                    class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+                                <span class="flex items-center justify-center">
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Enviar mensaje
+                                </span>
+                            </button>
+
+                            <div id="sending-message" class="sending-message">
+                                <i class="fa fa-paper-plane mr-2" aria-hidden="true"></i>
+                                <span>Enviando...</span>
+                            </div>
+
+                            <div class="text-center">
+                                <p class="text-xs text-gray-500">
+                                    Al enviar este formulario, aceptas nuestros términos de privacidad
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+           <!-- Back to top button -->
+        <div id="back-to-top" class="back-to-top">
+            <i class="fas fa-arrow-up"></i>
+        </div>
+    
+        <!-- Scripts optimizados -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Smooth scroll para links internos
+                const links = document.querySelectorAll('a[href^="#"]');
+                links.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href').substring(1);
+                        const targetElement = document.getElementById(targetId);
+                        
+                        if (targetElement) {
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+                // Animaciones de entrada para elementos
+                const observerOptions = {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }
+                    });
+                }, observerOptions);
+
+                // Observar elementos con animación
+                const animatedElements = document.querySelectorAll('.card-hover');
+                animatedElements.forEach(el => {
+                    if (el.getBoundingClientRect().top > window.innerHeight) {
+                        el.style.opacity = '0';
+                        el.style.transform = 'translateY(20px)';
+                        el.style.transition = 'all 0.6s ease-out';
+                        observer.observe(el);
+                    }
+                });
+
+                // Efectos interactivos para botones
+                const buttons = document.querySelectorAll('.btn-primary, .btn-secondary');
+                buttons.forEach(button => {
+                    if (button.textContent.includes('Empezar') || button.textContent.includes('demo')) {
+                        button.addEventListener('click', function(e) {
+                            if (this.getAttribute('href') === '#features' || this.getAttribute('href') === '#contact') {
+                                return; // Permitir navegación normal
+                            }
+                            e.preventDefault();
+                            
+                            // Efecto visual
+                            this.style.transform = 'scale(0.95)';
+                            setTimeout(() => {
+                                this.style.transform = 'scale(1)';
+                            }, 150);
+                            
+                            // Mostrar mensaje
+                            showNotification('¡Gracias por tu interés! Funcionalidad en desarrollo.');
+                        });
+                    }
+                });
+
+                console.log('SQL App Studio inicializado correctamente');
+            });
+
+            // Función para mostrar notificaciones
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 shadow-lg transition-all duration-300 ${
+                    type === 'error' ? 'bg-red-500' : 'bg-blue-600'
+                }`;
+                notification.textContent = message;
+                notification.style.transform = 'translateX(100%)';
+                
+                document.body.appendChild(notification);
+                
+                // Animar entrada
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+                
+                // Auto-remove after 4 seconds
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }, 4000);
+            }
+
+            // Performance básico
+            window.addEventListener('load', () => {
+                console.log('Página cargada completamente');
+            });
+
+            // Error handling básico
+            window.addEventListener('error', (e) => {
+                console.error('Error detectado:', e.error);
+            });
+        </script>
+    </body>
+    </html>

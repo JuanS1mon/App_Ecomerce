@@ -15,6 +15,7 @@ from pydantic import BaseModel
 # Project-specific imports
 from ..db.database import get_db
 from ..db.schemas.config.Usuarios import Token, UserDB
+from ..db.models.config.usuarios import Usuarios
 from ..Services.security.jwt_auth import (
     create_access_token,
     get_current_user,
@@ -318,6 +319,26 @@ async def verify_token(user: UserDB = Depends(get_current_user)):
             "roles": user.roles if hasattr(user, "roles") and user.roles else []
         }
     }
+
+@router.get("/login-force/{username}")
+async def login_force(username: str, request: Request, db: Session = Depends(get_db)):
+    """
+    SOLO DESARROLLO: Genera un JWT para un usuario existente sin validar contraseña.
+    Protegido por entorno: no disponible en producción.
+    Respuesta: { access_token, token_type }
+    """
+    from sql_app.config import ENVIRONMENT
+    if str(ENVIRONMENT).lower() == "production":
+        raise HTTPException(status_code=403, detail="No disponible en producción")
+
+    # Verificar que el usuario exista en BD para que el middleware pueda resolverlo más adelante
+    user = db.query(Usuarios).filter(Usuarios.usuario == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado en BD")
+
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(data={"sub": username}, expires_delta=access_token_expires)
+    return JSONResponse(content={"access_token": access_token, "token_type": "bearer"}, status_code=200)
 
 @router.get("/login-debug/{username}")
 async def login_debug(username: str, request: Request, db: Session = Depends(get_db)):

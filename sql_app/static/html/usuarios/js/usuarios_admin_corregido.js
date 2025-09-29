@@ -165,6 +165,9 @@ function renderizarUsuarios() {
                     <button class="text-yellow-600 hover:text-yellow-900 transition-colors duration-200 btn-editar" data-user-id="${usuario.id}" title="Editar">
                         <i class="fas fa-edit"></i>
                     </button>
+                    <button class="text-indigo-600 hover:text-indigo-900 transition-colors duration-200 btn-editar-roles" data-user-id="${usuario.id}" data-user-name="${usuario.usuario}" title="Editar roles">
+                        <i class="fas fa-user-tag"></i>
+                    </button>
                     <button class="text-purple-600 hover:text-purple-900 transition-colors duration-200 btn-resetear-password" data-user-id="${usuario.id}" title="Resetear contraseña">
                         <i class="fas fa-key"></i>
                     </button>
@@ -197,6 +200,25 @@ function configurarEventosTabla() {
         btn.addEventListener('click', (e) => {
             const userId = e.currentTarget.getAttribute('data-user-id');
             editarUsuario(parseInt(userId));
+        });
+    });
+
+    // Botones de editar roles
+    document.querySelectorAll('.btn-editar-roles').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const userId = e.currentTarget.getAttribute('data-user-id');  
+            const userName = e.currentTarget.getAttribute('data-user-name');
+            
+            console.log('🖱️ Clic en editar roles:', { userId, userName, button: e.currentTarget });
+            
+            if (!userId || !userName) {
+                console.error('❌ Faltan atributos en el botón:', { userId, userName });
+                mostrarNotificacion('Error: Datos del usuario no encontrados', 'error');
+                return;
+            }
+            
+            editarRolesUsuario(parseInt(userId), userName);
         });
     });
 
@@ -318,6 +340,152 @@ async function toggleUsuarioStatus(userId) {
     } catch (error) {
         console.error('Error al cambiar estado del usuario:', error);
         mostrarNotificacion('Error al cambiar estado del usuario', 'error');
+    }
+}
+
+async function editarRolesUsuario(userId, userName) {
+    try {
+        console.log('🏷️ Editando roles del usuario:', { userId, userName });
+        
+        // Obtener los roles actuales del usuario
+        const usuario = usuarios.find(u => u.id === userId);
+        if (!usuario) {
+            mostrarNotificacion('Usuario no encontrado', 'error');
+            return;
+        }
+        
+        const rolesActuales = usuario.roles || [];
+        console.log('Roles actuales:', rolesActuales);
+        
+        // Mostrar modal de carga temporal
+        const modalCarga = crearModal(`Cargando Roles - ${userName}`, `
+            <div class="flex items-center justify-center py-8">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                <span class="text-gray-600">Cargando roles disponibles...</span>
+            </div>
+        `, []);
+        
+        // Cargar roles disponibles desde el servidor
+        console.log('📥 Cargando roles disponibles...');
+        const url = buildAuthUrl('/usuarios_admin/roles/');
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            cerrarModal(); // Cerrar modal de carga
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const rolesDisponibles = await response.json();
+        console.log('✅ Roles disponibles cargados:', rolesDisponibles);
+        
+        // Cerrar modal de carga
+        cerrarModal();
+        
+        if (!rolesDisponibles || rolesDisponibles.length === 0) {
+            mostrarNotificacion('No hay roles disponibles', 'error');
+            return;
+        }
+        
+        // Crear checkboxes para todos los roles disponibles
+        const rolesOptions = rolesDisponibles.map(rol => {
+            const checked = rolesActuales.includes(rol.nombre) ? 'checked' : '';
+            return `
+                <label class="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                    <input type="checkbox" value="${rol.nombre}" ${checked} 
+                           class="rounded border-gray-300 text-blue-600 role-checkbox">
+                    <div class="flex-1">
+                        <span class="font-medium text-gray-900">${rol.nombre}</span>
+                        <p class="text-sm text-gray-500">${rol.descripcion}</p>
+                    </div>
+                </label>
+            `;
+        }).join('');
+        
+        const modal = crearModal(`Editar Roles - ${userName}`, `
+            <div class="space-y-4">
+                <p class="text-sm text-gray-600">
+                    Selecciona los roles que quieres asignar al usuario <strong>${userName}</strong>:
+                </p>
+                <div class="max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-2">
+                    ${rolesOptions}
+                </div>
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-400"></i>
+                        </div>
+                        <div class="ml-3 text-sm text-blue-700">
+                            Los cambios se aplicarán inmediatamente y reemplazarán todos los roles actuales.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `, [
+            { text: 'Guardar Cambios', class: 'bg-blue-600 hover:bg-blue-700 text-white', action: 'save-roles' },
+            { text: 'Cancelar', class: 'bg-gray-300 hover:bg-gray-400 text-gray-700', action: 'close' }
+        ]);
+        
+        // Configurar event listeners del modal
+        modal.querySelector('.btn-cerrar-modal').addEventListener('click', cerrarModal);
+        
+        modal.querySelectorAll('.btn-modal-action').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const action = e.target.getAttribute('data-action');
+                
+                if (action === 'save-roles') {
+                    await guardarRolesUsuario(userId, userName);
+                } else if (action === 'close') {
+                    cerrarModal();
+                }
+            });
+        });
+        
+    } catch (error) {
+        console.error('❌ Error editando roles del usuario:', error);
+        mostrarNotificacion('Error al cargar roles del usuario', 'error');
+    }
+}
+
+async function guardarRolesUsuario(userId, userName) {
+    try {
+        // Obtener roles seleccionados
+        const rolesSeleccionados = [];
+        document.querySelectorAll('.role-checkbox:checked').forEach(checkbox => {
+            rolesSeleccionados.push(checkbox.value);
+        });
+        
+        console.log('🔄 Guardando roles para usuario:', { userId, userName, roles: rolesSeleccionados });
+        
+        const url = buildAuthUrl(`/usuarios_admin/usuarios/${userId}/roles`);
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                roles: rolesSeleccionados
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const resultado = await response.json();
+        console.log('✅ Roles actualizados:', resultado);
+        
+        if (resultado.success) {
+            mostrarNotificacion(resultado.message || 'Roles actualizados exitosamente', 'success');
+            cerrarModal();
+            cargarUsuarios(); // Recargar la lista de usuarios para mostrar los cambios
+        } else {
+            mostrarNotificacion(resultado.message || 'Error al actualizar roles', 'error');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error guardando roles:', error);
+        mostrarNotificacion('Error al guardar roles: ' + error.message, 'error');
     }
 }
 
@@ -720,22 +888,46 @@ function eliminarRol(rolId) {
 
 async function guardarNuevoRol() {
     try {
-        const nombre = document.getElementById('new_rol_nombre').value;
-        const descripcion = document.getElementById('new_rol_descripcion').value;
+        const nombre = document.getElementById('new_rol_nombre').value.trim();
+        const descripcion = document.getElementById('new_rol_descripcion').value.trim();
         
         if (!nombre) {
             mostrarNotificacion('El nombre del rol es obligatorio', 'error');
             return;
         }
         
-        // Simular creación de rol
-        mostrarNotificacion('Rol creado exitosamente', 'success');
-        cerrarModal();
-        cargarRoles();
+        console.log('🏷️ Creando nuevo rol:', { nombre, descripcion });
+        
+        // Crear FormData para enviar los datos
+        const formData = new FormData();
+        formData.append('nombre', nombre);
+        formData.append('descripcion', descripcion);
+        
+        const url = buildAuthUrl('/usuarios_admin/roles/');
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const resultado = await response.json();
+        console.log('✅ Rol creado:', resultado);
+        
+        if (resultado.success) {
+            mostrarNotificacion(resultado.message || 'Rol creado exitosamente', 'success');
+            cerrarModal();
+            cargarRoles(); // Recargar la lista de roles
+        } else {
+            mostrarNotificacion(resultado.message || 'Error al crear el rol', 'error');
+        }
         
     } catch (error) {
-        console.error('Error al crear rol:', error);
-        mostrarNotificacion('Error al crear rol', 'error');
+        console.error('❌ Error al crear rol:', error);
+        mostrarNotificacion('Error al crear rol: ' + error.message, 'error');
     }
 }
 

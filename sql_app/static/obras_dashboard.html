@@ -7,10 +7,13 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    
     <!-- Google Fonts - Elementos del Brooklyn Museum -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
     <!-- Sistema de componentes y navegación -->
     <script src="/static/js/components.js"></script>
+    
     <!-- Scripts locales -->
     <script src="/static/js/obras_dashboard.js" defer></script>
     <style>
@@ -113,25 +116,6 @@
             </div>
         </div>
 
-        <!-- Nueva fila de estadísticas adicionales -->
-        <div class="stats-minimal grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-16 py-8">
-            <div class="text-center">
-                <div class="text-3xl font-bold text-gray-900 mb-1" id="total-movimientos">47</div>
-                <div class="text-sm text-gray-600 uppercase tracking-wider">Movimientos Activos</div>
-                <a href="/app_obras/movements/html" class="text-xs text-gray-500 hover:text-gray-700 mt-1 inline-block">Ver movimientos</a>
-            </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-gray-900 mb-1" id="total-prestamos">23</div>
-                <div class="text-sm text-gray-600 uppercase tracking-wider">Préstamos</div>
-                <a href="/app_obras/movements/html?type=prestamo" class="text-xs text-gray-500 hover:text-gray-700 mt-1 inline-block">Ver préstamos</a>
-            </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-gray-900 mb-1" id="total-traslados">12</div>
-                <div class="text-sm text-gray-600 uppercase tracking-wider">Traslados</div>
-                <a href="/app_obras/movements/html/traslado" class="text-xs text-gray-500 hover:text-gray-700 mt-1 inline-block">Crear traslado</a>
-            </div>
-        </div>
-
         <!-- Gestión Principal estilo museo -->
         <section class="mb-16">
             <h2 class="section-title mb-8">Gestión Principal</h2>
@@ -197,64 +181,6 @@
                         <p class="text-sm text-gray-500 mb-4">Transacciones y pagos</p>
                         <a href="/app_obras/sales/html/" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
                             Ver ventas
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Segunda fila de gestión principal con movimientos -->
-        <section class="mb-16">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Movimientos de Obras -->
-                <div class="museum-card bg-white rounded-lg overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400&h=200&fit=crop" 
-                         alt="Movimientos de Obras" 
-                         class="w-full h-32 object-cover">
-                    <div class="p-6">
-                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
-                            Movimientos de Obras
-                        </h3>
-                        <p class="text-sm text-gray-500 mb-4">Préstamos, traslados y seguimiento</p>
-                        <div class="space-y-2">
-                            <a href="/app_obras/movements/html" class="block text-gray-900 font-medium hover:text-gray-600 transition-colors">
-                                Ver todos los movimientos
-                            </a>
-                            <a href="/app_obras/movements/html/traslado" class="block text-sm text-gray-600 hover:text-gray-800 transition-colors">
-                                Crear nuevo traslado
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gestión de Contactos -->
-                <div class="museum-card bg-white rounded-lg overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1556761175-4b46a572b786?w=400&h=200&fit=crop" 
-                         alt="Gestión de Contactos" 
-                         class="w-full h-32 object-cover">
-                    <div class="p-6">
-                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
-                            Gestión de Contactos
-                        </h3>
-                        <p class="text-sm text-gray-500 mb-4">Directorio de contactos para movimientos</p>
-                        <a href="/app_obras/contacts/html/" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
-                            Ver contactos
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Historia de Movimientos -->
-                <div class="museum-card bg-white rounded-lg overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=200&fit=crop" 
-                         alt="Historia de Movimientos" 
-                         class="w-full h-32 object-cover">
-                    <div class="p-6">
-                        <h3 class="brooklyn-title text-xl text-gray-900 mb-3">
-                            Historia de Movimientos
-                        </h3>
-                        <p class="text-sm text-gray-500 mb-4">Historial completo de movimientos</p>
-                        <a href="/app_obras/movements/html" class="text-gray-900 font-medium hover:text-gray-600 transition-colors">
-                            Ver historial
                         </a>
                     </div>
                 </div>
@@ -625,29 +551,10 @@
                     document.getElementById('total-ventas').textContent = stats.total_ventas || '€2.4M';
                     document.getElementById('total-instituciones').textContent = stats.total_instituciones || '15';
                     document.getElementById('total-documentos').textContent = stats.total_documentos || '156';
-                    
-                    // Actualizar estadísticas de movimientos
-                    document.getElementById('total-movimientos').textContent = stats.total_movimientos || '47';
-                    document.getElementById('total-prestamos').textContent = stats.total_prestamos || '23';
-                    document.getElementById('total-traslados').textContent = stats.total_traslados || '12';
                 }
             } catch (error) {
                 console.log('Error cargando estadísticas:', error);
                 // Las estadísticas por defecto ya están en el HTML
-            }
-
-            // También cargar estadísticas específicas de movimientos
-            try {
-                const movementsResponse = await fetch('/app_obras/movements/stats');
-                if (movementsResponse.ok) {
-                    const movementStats = await movementsResponse.json();
-                    document.getElementById('total-movimientos').textContent = movementStats.total_movements || '47';
-                    document.getElementById('total-prestamos').textContent = movementStats.prestamos || '23';
-                    document.getElementById('total-traslados').textContent = movementStats.traslados || '12';
-                }
-            } catch (error) {
-                console.log('Error cargando estadísticas de movimientos:', error);
-                // Usar valores por defecto
             }
         }
 

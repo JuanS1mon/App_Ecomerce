@@ -139,6 +139,49 @@ document.addEventListener('DOMContentLoaded', function() {
     // 4. FUNCIONALIDAD BOTONES
     // ============================
     
+    // Botón "Configurar JSON" - Expandir/contraer sección
+    const btnConfigJson = document.getElementById('btn-config-json');
+    if (btnConfigJson) {
+        btnConfigJson.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const jsonConfigSection = document.getElementById('json-config-section');
+            if (!jsonConfigSection) {
+                console.error('❌ Sección de configuración JSON no encontrada');
+                return;
+            }
+            
+            // Alternar visibilidad de la sección
+            if (jsonConfigSection.classList.contains('hidden')) {
+                // Expandir la sección
+                jsonConfigSection.classList.remove('hidden');
+                jsonConfigSection.classList.add('block');
+                
+                // Actualizar texto del botón
+                this.innerHTML = '<i class="fas fa-eye-slash mr-2"></i>Ocultar Configuración JSON';
+                
+                // Hacer scroll suave hacia la sección
+                setTimeout(() => {
+                    jsonConfigSection.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }, 100);
+                
+                console.log('✅ Sección JSON Config expandida');
+            } else {
+                // Contraer la sección
+                jsonConfigSection.classList.add('hidden');
+                jsonConfigSection.classList.remove('block');
+                
+                // Restaurar texto del botón
+                this.innerHTML = '<i class="fas fa-play mr-2"></i>Configurar con JSON';
+                
+                console.log('✅ Sección JSON Config contraída');
+            }
+        });
+    }
+    
     // Botón "Cargar Ejemplo"
     const btnCargarEjemplo = document.getElementById('btn-cargar-ejemplo');
     if (btnCargarEjemplo) {
@@ -412,6 +455,26 @@ if (!btnGenerateSystem) {
     // Agregar funcionalidad específica al botón multi-tabla
     btnGenerateSystem.addEventListener('click', function(event) {
         event.preventDefault();
+        
+        // Validar que hay JSON antes de proceder
+        const jsonTextarea = document.getElementById('json-config');
+        if (!jsonTextarea || !jsonTextarea.value.trim()) {
+            // Mostrar mensaje informativo y expandir la sección de configuración JSON
+            alert('❌ No hay configuración JSON cargada.\n\nPara generar un sistema multi-tabla necesitas:\n\n1. Usar el Editor Visual para crear la configuración, O\n2. Hacer clic en "Configurar con JSON" y cargar/crear tu configuración\n\nLuego podrás generar el sistema.');
+            
+            // Expandir automáticamente la sección de configurar JSON para guiar al usuario
+            const jsonConfigSection = document.getElementById('json-config-section');
+            const btnConfigJson = document.getElementById('btn-config-json');
+            
+            if (jsonConfigSection && jsonConfigSection.classList.contains('hidden')) {
+                if (btnConfigJson) {
+                    btnConfigJson.click(); // Simular clic para expandir
+                }
+            }
+            
+            return;
+        }
+        
         sendMultiTableJSON();
     });
 }
@@ -746,12 +809,30 @@ function closeCelebration() {
 // Función para enviar JSON multi-tabla
 function sendMultiTableJSON() {
     const jsonTextarea = document.getElementById('json-config');
+    
+    // Verificar que el textarea existe y tiene contenido
+    if (!jsonTextarea || !jsonTextarea.value.trim()) {
+        alert('❌ Error: No hay configuración JSON para generar.\n\nPara usar el sistema multi-tabla:\n1. Primero usa el Editor Visual para crear tu configuración\n2. O haz clic en "Configurar con JSON" y carga/crea tu configuración\n3. Luego podrás generar el sistema');
+        return;
+    }
+    
     let jsonData;
 
     try {
-        jsonData = JSON.parse(jsonTextarea.value);
+        jsonData = JSON.parse(jsonTextarea.value.trim());
     } catch (error) {
-        alert(`❌ Error de sintaxis JSON: ${error.message}`);
+        alert(`❌ Error de sintaxis JSON: ${error.message}\n\nRevisa tu configuración JSON antes de generar.`);
+        return;
+    }
+    
+    // Validaciones básicas del contenido JSON
+    if (!jsonData.service_name || !jsonData.service_name.trim()) {
+        alert('❌ Error: La configuración JSON debe tener un "service_name" válido.');
+        return;
+    }
+    
+    if (!jsonData.tables || !Array.isArray(jsonData.tables) || jsonData.tables.length === 0) {
+        alert('❌ Error: La configuración JSON debe tener al menos una tabla definida en el array "tables".');
         return;
     }
 

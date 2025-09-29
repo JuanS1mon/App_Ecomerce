@@ -1,9 +1,9 @@
 from starlette.middleware.base import BaseHTTPMiddleware
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, HTMLResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, HTMLResponse, Response
 import logging
 import os
 import httpx
-from sql_app.config import ENVIRONMENT
+from sql_app.config import ENVIRONMENT, STATIC_DIR
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
@@ -73,26 +73,53 @@ class FrontendRedirectMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
 class CustomErrorMiddleware(BaseHTTPMiddleware):
+    """Sirve páginas de error HTML desde el STATIC_DIR configurado.
+
+    Se adapta al movimiento de carpetas evitando rutas rotas (antes dependía de ..\static relativo al archivo).
+    Si la página no existe devuelve un fallback Response simple para no disparar un 500 adicional.
+    Excluye rutas de documentación y API para no interferir con respuestas JSON.
+    """
+
+    ERROR_PAGES = {
+        401: '401.html',
+        403: '403.html',
+        404: '404.html',
+        405: '405.html',
+        500: '500.html',
+        503: '503.html',
+        505: '505.html'
+    }
+
+    def _resolve_static_dir(self):
+        # STATIC_DIR puede venir relativo (p.e. 'sql_app/static'); normalizamos a absoluto.
+        if os.path.isabs(STATIC_DIR):
+            base = STATIC_DIR
+        else:
+            base = os.path.abspath(os.path.join(os.getcwd(), STATIC_DIR))
+        return base
+
+    def _error_file_response(self, status_code: int):
+        static_dir = self._resolve_static_dir()
+        filename = self.ERROR_PAGES.get(status_code)
+        if not filename:
+            return Response(status_code=status_code)
+        path = os.path.join(static_dir, filename)
+        if os.path.exists(path):
+            try:
+                return FileResponse(path, status_code=status_code)
+            except Exception:  # fallback final si hubiese un problema de lectura
+                pass
+        # Fallback mínimo HTML para no romper cadena de errores
+        return HTMLResponse(f"<html><body><h1>{status_code}</h1><p>Error</p></body></html>", status_code=status_code)
+
     async def dispatch(self, request, call_next):
         response = await call_next(request)
-        excluded_paths = ["/docs", "/redoc", "/openapi.json", "/api"]
-        if any(request.url.path.startswith(path) for path in excluded_paths):
+        # Rutas excluidas (doc, api) y favicon (evitar transformar un 404 de favicon en HTML ruidoso)
+        excluded_prefixes = ("/docs", "/redoc", "/openapi.json", "/api")
+        if request.url.path.startswith(excluded_prefixes) or request.url.path == "/favicon.ico":
             return response
-        static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
-        if response.status_code == 404:
-            return FileResponse(os.path.join(static_dir, '404.html'), status_code=404)
-        elif response.status_code == 401:
-            return FileResponse(os.path.join(static_dir, '401.html'), status_code=401)
-        elif response.status_code == 403:
-            return FileResponse(os.path.join(static_dir, '403.html'), status_code=403)
-        elif response.status_code == 405:
-            return FileResponse(os.path.join(static_dir, '405.html'), status_code=405)
-        elif response.status_code == 500:
-            return FileResponse(os.path.join(static_dir, '500.html'), status_code=500)
-        elif response.status_code == 503:
-            return FileResponse(os.path.join(static_dir, '503.html'), status_code=503)
-        elif response.status_code == 505:
-            return FileResponse(os.path.join(static_dir, '505.html'), status_code=505)
+        if response.status_code in self.ERROR_PAGES:
+            return self._error_file_response(response.status_code)
         return response
 
 class UserTemplateMiddleware(BaseHTTPMiddleware):

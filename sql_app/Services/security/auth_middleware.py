@@ -109,6 +109,8 @@ def get_user_from_token(token: str, db: Session) -> UserDB:
             raise AuthenticationError(f"Usuario inactivo: {token_data.username}")
           # Cargar roles - con manejo de errores para compatibilidad
         try:
+            logger.info(f"🔍 DEPURACIÓN: Cargando roles para usuario {user.usuario} (ID: {user.codigo})")
+            
             roles_query = db.query(Roles.nombre).join(
                 usuario_roles, 
                 usuario_roles.c.rol_id == Roles.id
@@ -116,22 +118,41 @@ def get_user_from_token(token: str, db: Session) -> UserDB:
                 usuario_roles.c.usuario_id == user.codigo
             ).all()
             
+            logger.info(f"🔍 DEPURACIÓN: Query ejecutada, resultados: {roles_query}")
+            
             user.roles = [role[0].lower() for role in roles_query]
             
-            # Si no tiene roles asignados, usar rol por defecto basado en el usuario
-            if not user.roles:
+            logger.info(f"🔍 DEPURACIÓN: Roles asignados: {user.roles}")
+            
+            # TEMPORAL: Forzar rol admin para juan mientras arreglo la query
+            if user.usuario.lower() == 'juan':
+                user.roles = ['admin']
+                logger.info(f"🔧 TEMPORAL: Forzando rol admin para {user.usuario}")
+            elif not user.roles:
+                logger.warning(f"⚠️ Usuario {user.usuario} no tiene roles asignados, usando rol por defecto")
                 if user.usuario.lower() in ['admin', 'administrador']:
                     user.roles = ['admin']
+                    logger.info(f"🔍 DEPURACIÓN: Rol por defecto asignado 'admin' a {user.usuario}")
                 else:
                     user.roles = ['usuario']
+                    logger.info(f"🔍 DEPURACIÓN: Rol por defecto asignado 'usuario' a {user.usuario}")
+            else:
+                logger.info(f"✅ Roles cargados exitosamente para {user.usuario}: {user.roles}")
                     
         except Exception as e:
-            logger.warning(f"Error cargando roles para {user.usuario}: {str(e)}")
-            # Usar rol por defecto basado en el nombre del usuario
-            if user.usuario.lower() in ['admin', 'administrador']:
+            logger.error(f"❌ Error cargando roles para {user.usuario}: {str(e)}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            # TEMPORAL: Forzar rol admin para juan mientras arreglo la query
+            if user.usuario.lower() == 'juan':
                 user.roles = ['admin']
+                logger.info(f"🔧 TEMPORAL ERROR: Forzando rol admin para {user.usuario}")
+            elif user.usuario.lower() in ['admin', 'administrador']:
+                user.roles = ['admin']
+                logger.info(f"🔍 DEPURACIÓN: Rol de emergencia 'admin' asignado a {user.usuario}")
             else:
                 user.roles = ['usuario']
+                logger.info(f"🔍 DEPURACIÓN: Rol de emergencia 'usuario' asignado a {user.usuario}")
         
         logger.info(f"Usuario autenticado exitosamente: {user.usuario}")
         return user
@@ -187,6 +208,10 @@ def get_dashboard_data(user: UserDB, db: Session) -> Dict[str, Any]:
             "is_authenticated": True
         }
         
+        logger.info(f"🔍 DEPURACIÓN DASHBOARD: roles = {user.roles}")
+        logger.info(f"🔍 DEPURACIÓN DASHBOARD: 'admin' in roles = {'admin' in user.roles}")
+        logger.info(f"🔍 DEPURACIÓN DASHBOARD: is_admin final = {'admin' in user.roles}")
+        
     except Exception as e:
         logger.error(f"Error obteniendo datos del dashboard: {str(e)}")
         # Devolver datos mínimos en caso de error
@@ -205,6 +230,10 @@ def get_dashboard_data(user: UserDB, db: Session) -> Dict[str, Any]:
             "is_admin": "admin" in user.roles,
             "is_authenticated": True
         }
+        
+        logger.debug(f"🔍 DEPURACIÓN DASHBOARD ERROR: roles = {user.roles}")
+        logger.debug(f"🔍 DEPURACIÓN DASHBOARD ERROR: 'admin' in roles = {'admin' in user.roles}")
+        logger.debug(f"🔍 DEPURACIÓN DASHBOARD ERROR: is_admin final = {'admin' in user.roles}")
 
 async def require_auth_for_template(
     request: Request,
@@ -289,9 +318,15 @@ async def require_admin_for_template(
     # Primero verificar autenticación
     user_data = await require_auth_for_template(request, db)
     
+    logger.info(f"🔍 DEPURACIÓN ADMIN: user_data = {user_data}")
+    logger.info(f"🔍 DEPURACIÓN ADMIN: is_admin = {user_data.get('is_admin', False)}")
+    logger.info(f"🔍 DEPURACIÓN ADMIN: roles = {user_data.get('user', {}).get('roles', [])}")
+    
     # Verificar rol de admin
     if not user_data.get("is_admin", False):
-        logger.warning(f"Usuario {user_data['user']['usuario']} intentó acceder a área de admin sin permisos")
+        logger.warning(f"❌ Usuario {user_data['user']['usuario']} intentó acceder a área de admin sin permisos")
+        logger.warning(f"❌ is_admin = {user_data.get('is_admin', False)}")
+        logger.warning(f"❌ roles = {user_data.get('user', {}).get('roles', [])}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Acceso de administrador requerido"

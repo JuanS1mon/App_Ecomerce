@@ -64,6 +64,13 @@ const navigationItems = [
         icon: 'fa-code'
     },
     { 
+        path: '/editor-visual', 
+        title: 'Editor Visual', 
+        visible: true, 
+        parent: '/admin',
+        icon: 'fa-magic'
+    },
+    { 
         path: '/admin/perfil', 
         title: 'Perfil de Usuario', 
         visible: false,
@@ -629,6 +636,7 @@ function detectNavigationPath(currentPath) {
         '/configdb': 'Configuración DB',
         '/migraciones/admin_migraciones': 'Migraciones',
         '/generar': 'Generar API',
+        '/editor-visual': 'Editor Visual',
         '/admin/perfil': 'Perfil de Usuario',
         '/docs': 'Documentación API'
     };
@@ -639,6 +647,7 @@ function detectNavigationPath(currentPath) {
         '/configdb': '/admin',
         '/migraciones/admin_migraciones': '/admin',
         '/generar': '/admin',
+        '/editor-visual': '/admin',
         '/admin/perfil': '/admin'
     };
     
@@ -725,6 +734,8 @@ function detectNavigationPath(currentPath) {
                 pageTitle = "Migraciones";
             } else if (currentPath.includes('/generar')) {
                 pageTitle = "Generar API";
+            } else if (currentPath.includes('/editor-visual')) {
+                pageTitle = "Editor Visual";
             }
             
             navItems.push({
@@ -778,6 +789,7 @@ function getPageNavConfig() {
                 case 'Configuración DB': path = '/configdb'; break;
                 case 'Migraciones': path = '/migraciones/admin_migraciones'; break;
                 case 'Generar API': path = '/generar'; break;
+                case 'Editor Visual': path = '/editor-visual'; break;
                 default: path = '#'; break;
             }
             
@@ -864,265 +876,10 @@ function loadFooter(containerId = 'footer-container') {
     });
 }
 
-// ========================================
-// INTEGRACIÓN SISTEMA DE WIDGETS
-// ========================================
-
-// Configuración de widgets para el panel admin
-const widgetConfig = {
-    baseUrl: window.location.origin,
-    widgetEndpoint: '/widgets/loader.js',
-    autoLoad: true,
-    adminMode: true
-};
-
-// Función para cargar el sistema de widgets dinámicamente
-function loadWidgetSystem() {
-    return new Promise((resolve, reject) => {
-        // Verificar si ya está cargado
-        if (window.loadMessageWidget && window.loadChatWidget) {
-            resolve(true);
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.src = widgetConfig.baseUrl + widgetConfig.widgetEndpoint;
-        script.onload = () => {
-            console.log('✅ Sistema de widgets cargado para panel admin');
-            resolve(true);
-        };
-        script.onerror = () => {
-            console.error('❌ Error al cargar sistema de widgets');
-            reject(false);
-        };
-        document.head.appendChild(script);
-    });
-}
-
-// Función para inicializar widgets en el panel admin
-function initAdminWidgets() {
-    // Crear contenedores para widgets si no existen
-    if (!document.getElementById('admin-widgets-container')) {
-        const widgetsContainer = document.createElement('div');
-        widgetsContainer.id = 'admin-widgets-container';
-        widgetsContainer.style.position = 'fixed';
-        widgetsContainer.style.bottom = '20px';
-        widgetsContainer.style.right = '20px';
-        widgetsContainer.style.zIndex = '9999';
-        document.body.appendChild(widgetsContainer);
-    }
-
-    // Cargar widgets después de que el sistema esté listo
-    loadWidgetSystem().then(() => {
-        if (window.loadMessageWidget && window.loadChatWidget) {
-            // Crear botones de control para los widgets
-            createWidgetControls();
-        }
-    }).catch(error => {
-        console.error('Error inicializando widgets:', error);
-    });
-}
-
-// Función para crear controles de widgets en el panel admin
-function createWidgetControls() {
-    const controlsContainer = document.getElementById('admin-widgets-container');
-    if (!controlsContainer) return;
-
-    // Botón para alternar widget de mensajes
-    const messageToggle = document.createElement('button');
-    messageToggle.innerHTML = '<i class="fas fa-envelope"></i>';
-    messageToggle.className = 'widget-control-btn message-widget-toggle';
-    messageToggle.title = 'Toggle Messages Widget';
-    messageToggle.onclick = toggleMessageWidget;
-
-    // Botón para alternar widget de chat
-    const chatToggle = document.createElement('button');
-    chatToggle.innerHTML = '<i class="fas fa-comments"></i>';
-    chatToggle.className = 'widget-control-btn chat-widget-toggle';
-    chatToggle.title = 'Toggle Chat Widget';
-    chatToggle.onclick = toggleChatWidget;
-
-    // Contenedor para widgets activos
-    const widgetsDisplay = document.createElement('div');
-    widgetsDisplay.id = 'admin-active-widgets';
-    widgetsDisplay.className = 'admin-widgets-display';
-
-    // Agregar estilos
-    addWidgetControlsStyles();
-
-    controlsContainer.appendChild(messageToggle);
-    controlsContainer.appendChild(chatToggle);
-    controlsContainer.appendChild(widgetsDisplay);
-}
-
-// Estados de widgets
-let messageWidgetVisible = false;
-let chatWidgetVisible = false;
-
-// Función para alternar widget de mensajes
-function toggleMessageWidget() {
-    const container = document.getElementById('admin-active-widgets');
-    const existingWidget = document.getElementById('admin-message-widget');
-
-    if (messageWidgetVisible && existingWidget) {
-        existingWidget.remove();
-        messageWidgetVisible = false;
-        document.querySelector('.message-widget-toggle').classList.remove('active');
-    } else {
-        // Crear contenedor específico para el widget
-        const widgetContainer = document.createElement('div');
-        widgetContainer.id = 'admin-message-widget';
-        widgetContainer.className = 'admin-widget-container';
-        container.appendChild(widgetContainer);
-
-        // Cargar el widget
-        if (window.loadMessageWidget) {
-            window.loadMessageWidget('admin-message-widget', {
-                position: 'inline',
-                showHeader: true,
-                maxHeight: '350px',
-                adminMode: true
-            });
-            messageWidgetVisible = true;
-            document.querySelector('.message-widget-toggle').classList.add('active');
-        }
-    }
-}
-
-// Función para alternar widget de chat
-function toggleChatWidget() {
-    const container = document.getElementById('admin-active-widgets');
-    const existingWidget = document.getElementById('admin-chat-widget');
-
-    if (chatWidgetVisible && existingWidget) {
-        existingWidget.remove();
-        chatWidgetVisible = false;
-        document.querySelector('.chat-widget-toggle').classList.remove('active');
-    } else {
-        // Crear contenedor específico para el widget
-        const widgetContainer = document.createElement('div');
-        widgetContainer.id = 'admin-chat-widget';
-        widgetContainer.className = 'admin-widget-container';
-        container.appendChild(widgetContainer);
-
-        // Cargar el widget
-        if (window.loadChatWidget) {
-            window.loadChatWidget('admin-chat-widget', {
-                position: 'inline',
-                showHeader: true,
-                maxHeight: '350px',
-                adminMode: true
-            });
-            chatWidgetVisible = true;
-            document.querySelector('.chat-widget-toggle').classList.add('active');
-        }
-    }
-}
-
-// Estilos para los controles de widgets
-function addWidgetControlsStyles() {
-    const styles = `
-        <style id="admin-widgets-styles">
-        .widget-control-btn {
-            position: relative;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #4F46E5;
-            color: white;
-            border: none;
-            margin-bottom: 10px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
-            transition: all 0.3s ease;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .widget-control-btn:hover {
-            background: #3B82F6;
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
-        }
-        
-        .widget-control-btn.active {
-            background: #10B981;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-        }
-        
-        .admin-widgets-display {
-            position: relative;
-            margin-top: 10px;
-        }
-        
-        .admin-widget-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            margin-bottom: 15px;
-            width: 350px;
-            max-height: 400px;
-            overflow: hidden;
-            border: 2px solid #E5E7EB;
-        }
-        
-        /* Responsive para dispositivos móviles */
-        @media (max-width: 768px) {
-            #admin-widgets-container {
-                bottom: 10px !important;
-                right: 10px !important;
-            }
-            
-            .admin-widget-container {
-                width: 300px;
-                max-height: 300px;
-            }
-        }
-        </style>
-    `;
-    
-    if (!document.getElementById('admin-widgets-styles')) {
-        document.head.insertAdjacentHTML('beforeend', styles);
-    }
-}
-
-// Función pública para cargar widgets manualmente
-function loadAdminWidget(type, containerId, options = {}) {
-    loadWidgetSystem().then(() => {
-        const defaultOptions = {
-            position: 'inline',
-            showHeader: true,
-            adminMode: true,
-            ...options
-        };
-
-        if (type === 'message' && window.loadMessageWidget) {
-            window.loadMessageWidget(containerId, defaultOptions);
-        } else if (type === 'chat' && window.loadChatWidget) {
-            window.loadChatWidget(containerId, defaultOptions);
-        } else {
-            console.error(`Widget tipo "${type}" no disponible o no cargado`);
-        }
-    });
-}
-
-// Hacer funciones globalmente disponibles
-window.loadAdminWidget = loadAdminWidget;
-window.initAdminWidgets = initAdminWidgets;
-window.toggleMessageWidget = toggleMessageWidget;
-window.toggleChatWidget = toggleChatWidget;
-
 // Asegurarse de que la función loadComponents está disponible globalmente
 window.loadComponents = loadComponents;
 
 // Ejecutar loadComponents automáticamente cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
     loadComponents();
-    
-    // Inicializar widgets si estamos en el panel admin
-    if (window.location.pathname.includes('/admin')) {
-        setTimeout(initAdminWidgets, 1000); // Esperar a que se carguen los componentes
-    }
 });

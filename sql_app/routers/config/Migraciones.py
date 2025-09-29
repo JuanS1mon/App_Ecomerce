@@ -1,14 +1,19 @@
 # migraciones.py
 
 # Imports de bibliotecas estándar
+import asyncio
+import concurrent.futures
 import json
 import logging
+import multiprocessing
 import os
 from datetime import datetime, timedelta
 from io import BytesIO
 
 # Imports de terceros
 import pandas as pd
+import psutil  # Para monitorear memoria
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -47,6 +52,11 @@ ALLOWED_EXTENSIONS = {
     ]
 }
 
+# Configuración para procesamiento paralelo
+MAX_WORKERS = min(multiprocessing.cpu_count(), 8)  # Máximo 8 procesos
+CHUNK_SIZE = 100_000  # 100K filas por chunk
+MEMORY_THRESHOLD = 80  # Porcentaje de memoria máximo antes de pausar
+
 
 progress_storage = {}
 # Agregamos una clase para manejar el estado de la migración
@@ -82,6 +92,38 @@ class MigracionProgress:
             "retry_count": self.retry_count
         }
 
+class ParallelMigracionProgress(MigracionProgress):
+    def __init__(self):
+        super().__init__()
+        self.total_chunks = 0
+        self.processed_chunks = 0
+        self.parallel_workers = 0
+        self.memory_usage = 0
+        self.processing_speed = 0  # filas por segundo
+        self.estimated_time_remaining = 0
+
+    def update_parallel(self, chunks_processed: int, memory_usage: float, speed: float):
+        self.processed_chunks = chunks_processed
+        self.memory_usage = memory_usage
+        self.processing_speed = speed
+        if speed > 0:
+            remaining_chunks = self.total_chunks - self.processed_chunks
+            self.estimated_time_remaining = remaining_chunks * CHUNK_SIZE / speed
+        self.progress_percentage = (self.processed_chunks / self.total_chunks) * 100 if self.total_chunks > 0 else 0
+
+    def to_dict(self):
+        """Convierte el objeto a un diccionario para serialización JSON"""
+        base_dict = super().to_dict()
+        base_dict.update({
+            "total_chunks": self.total_chunks,
+            "processed_chunks": self.processed_chunks,
+            "parallel_workers": self.parallel_workers,
+            "memory_usage": self.memory_usage,
+            "processing_speed": self.processing_speed,
+            "estimated_time_remaining": self.estimated_time_remaining
+        })
+        return base_dict
+
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
 async def process_sheet_with_retry(sheet_data, sheet_name, timestamp, user_results_dir):
     """Procesa una hoja con sistema de reintentos"""
@@ -96,6 +138,263 @@ async def process_sheet_with_retry(sheet_data, sheet_name, timestamp, user_resul
     except Exception as e:
         logging.error(f"Error procesando hoja {sheet_name}: {str(e)}")
         raise
+
+def process_chunk_worker(chunk_data, chunk_index, table_name, db_config):
+    """Worker function para procesar un chunk en paralelo"""
+    try:
+        import pandas as pd
+        from sqlalchemy import create_engine
+        import json
+        
+        # Crear conexión independiente para este worker
+        engine = create_engine(db_config['connection_string'])
+        
+        # Convertir chunk a DataFrame si no lo es ya
+        if isinstance(chunk_data, list):
+            df = pd.DataFrame(chunk_data)
+        else:
+            df = chunk_data
+            
+        # Limpiar datos
+        df.dropna(how='all', inplace=True)
+        df.dropna(axis=1, how='all', inplace=True)
+        
+        # Convertir tipos de datos problemáticos
+        for col in df.columns:
+            if df[col].dtype == 'object':
+                # Intentar convertir fechas
+                try:
+                    df[col] = pd.to_datetime(df[col], errors='ignore')
+                except:
+                    pass
+        
+        # Insertar en base de datos por chunks más pequeños
+        batch_size = 1000
+        total_inserted = 0
+        
+        for i in range(0, len(df), batch_size):
+            batch = df.iloc[i:i+batch_size]
+            batch.to_sql(
+                name=table_name,
+                con=engine,
+                if_exists='append',
+                index=False,
+                method='multi'
+            )
+            total_inserted += len(batch)
+        
+        engine.dispose()
+        
+        return {
+            'chunk_index': chunk_index,
+            'rows_processed': total_inserted,
+            'status': 'success'
+        }
+        
+    except Exception as e:
+        return {
+            'chunk_index': chunk_index,
+            'rows_processed': 0,
+            'status': 'error',
+            'error': str(e)
+        }
+
+async def read_excel_in_chunks(file_path: str, chunk_size: int):
+    """Lee archivo Excel por chunks"""
+    chunks = []
+    
+    try:
+        # Determinar motor según extensión
+        engine = 'openpyxl' if file_path.endswith('.xlsx') else 'xlrd'
+        
+        with pd.ExcelFile(file_path, engine=engine) as xls:
+            for sheet_name in xls.sheet_names:
+                logging.info(f"Leyendo hoja: {sheet_name}")
+                
+                # Leer hoja completa primero (para archivos muy grandes, considerar usar chunksize)
+                df = pd.read_excel(file_path, sheet_name=sheet_name, engine=engine)
+                
+                # Dividir en chunks
+                for i in range(0, len(df), chunk_size):
+                    chunk = df.iloc[i:i+chunk_size].copy()
+                    if not chunk.empty:
+                        chunks.append(chunk)
+                
+                del df  # Liberar memoria
+                
+    except Exception as e:
+        logging.error(f"Error leyendo Excel: {str(e)}")
+        raise
+    
+    return chunks
+
+async def read_csv_in_chunks(file_path: str, chunk_size: int):
+    """Lee archivo CSV por chunks"""
+    chunks = []
+    
+    try:
+        # Usar chunksize de pandas para archivos muy grandes
+        chunk_reader = pd.read_csv(
+            file_path,
+            chunksize=chunk_size,
+            encoding='utf-8-sig',
+            low_memory=False
+        )
+        
+        for chunk in chunk_reader:
+            if not chunk.empty:
+                chunks.append(chunk)
+                
+    except Exception as e:
+        logging.error(f"Error leyendo CSV: {str(e)}")
+        raise
+    
+    return chunks
+
+async def process_large_file_parallel(
+    file_path: str,
+    nombre_migracion: str,
+    timestamp: str,
+    user_results_dir: str,
+    db: Session,
+    current_user: UserDB,
+    progress: ParallelMigracionProgress,
+    file_type: str = 'excel'
+):
+    """Procesa archivos grandes en paralelo"""
+    try:
+        progress.status = "analizando archivo"
+        logging.info(f"Iniciando procesamiento paralelo de {file_path}")
+        
+        # Obtener configuración de base de datos
+        db_config = {
+            'connection_string': str(db.get_bind().url)
+        }
+        
+        # Leer archivo por chunks según el tipo
+        if file_type == 'excel':
+            chunks = await read_excel_in_chunks(file_path, CHUNK_SIZE)
+        else:  # CSV
+            chunks = await read_csv_in_chunks(file_path, CHUNK_SIZE)
+        
+        progress.total_chunks = len(chunks)
+        progress.status = "procesando en paralelo"
+        
+        # Crear tabla base
+        table_name = f"migracion_{nombre_migracion}_{timestamp}".replace(" ", "_").lower()
+        
+        # Usar ThreadPoolExecutor para I/O intensivo o ProcessPoolExecutor para CPU intensivo
+        executor_class = ProcessPoolExecutor if len(chunks) > 50 else ThreadPoolExecutor
+        
+        async def process_chunks_batch(chunk_batch, batch_start_index):
+            """Procesa un lote de chunks"""
+            loop = asyncio.get_event_loop()
+            
+            with executor_class(max_workers=MAX_WORKERS) as executor:
+                # Crear tareas para cada chunk en el lote
+                tasks = []
+                for i, chunk in enumerate(chunk_batch):
+                    chunk_index = batch_start_index + i
+                    task = loop.run_in_executor(
+                        executor,
+                        process_chunk_worker,
+                        chunk,
+                        chunk_index,
+                        table_name,
+                        db_config
+                    )
+                    tasks.append(task)
+                
+                # Esperar a que todos los chunks del lote se completen
+                results = await asyncio.gather(*tasks, return_exceptions=True)
+                return results
+        
+        # Procesar en lotes para controlar memoria
+        batch_size = MAX_WORKERS * 2  # Procesar 2 lotes por worker
+        total_processed = 0
+        total_errors = 0
+        start_time = datetime.now()
+        
+        for batch_start in range(0, len(chunks), batch_size):
+            # Verificar uso de memoria antes de cada lote
+            memory_percent = psutil.virtual_memory().percent
+            if memory_percent > MEMORY_THRESHOLD:
+                logging.warning(f"Memoria alta ({memory_percent}%), pausando 10 segundos...")
+                await asyncio.sleep(10)
+                continue
+            
+            batch_end = min(batch_start + batch_size, len(chunks))
+            chunk_batch = chunks[batch_start:batch_end]
+            
+            # Procesar lote
+            results = await process_chunks_batch(chunk_batch, batch_start)
+            
+            # Procesar resultados
+            for result in results:
+                if isinstance(result, Exception):
+                    total_errors += 1
+                    progress.errors.append({"chunk": "unknown", "error": str(result)})
+                elif result['status'] == 'success':
+                    total_processed += result['rows_processed']
+                else:
+                    total_errors += 1
+                    progress.errors.append({
+                        "chunk": result['chunk_index'], 
+                        "error": result.get('error', 'Unknown error')
+                    })
+            
+            # Actualizar progreso
+            elapsed_time = (datetime.now() - start_time).total_seconds()
+            speed = total_processed / elapsed_time if elapsed_time > 0 else 0
+            memory_usage = psutil.virtual_memory().percent
+            
+            progress.update_parallel(
+                chunks_processed=batch_end,
+                memory_usage=memory_usage,
+                speed=speed
+            )
+            
+            logging.info(f"Lote {batch_start//batch_size + 1} completado. "
+                        f"Procesadas {total_processed} filas, {total_errors} errores. "
+                        f"Velocidad: {speed:.0f} filas/seg")
+        
+        # Actualizar estado final
+        if total_errors > 0:
+            progress.status = f"completado con {total_errors} errores"
+        else:
+            progress.status = "completado exitosamente"
+        
+        # Crear archivo de resultado
+        result_data = {
+            "status": progress.status,
+            "total_rows_processed": total_processed,
+            "total_errors": total_errors,
+            "processing_time_seconds": elapsed_time,
+            "average_speed": speed,
+            "table_name": table_name,
+            "timestamp": timestamp
+        }
+        
+        result_path = os.path.join(user_results_dir, f"result_parallel_{timestamp}.json")
+        with open(result_path, 'w', encoding='utf-8') as f:
+            json.dump(result_data, f, ensure_ascii=False, indent=2)
+        
+        # Limpiar chunks de memoria
+        del chunks
+        import gc
+        gc.collect()
+        
+        # Eliminar archivo temporal
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        
+        logging.info(f"Procesamiento paralelo completado: {total_processed} filas, {elapsed_time:.1f}s")
+        
+    except Exception as e:
+        error_msg = f"Error en procesamiento paralelo: {str(e)}"
+        logging.error(error_msg)
+        progress.status = "error"
+        progress.errors.append({"chunk": "general", "error": error_msg})
 
 # Funciones para procesar archivos en segundo plano
 async def process_excel_file_in_background(
@@ -234,7 +533,7 @@ router = APIRouter(
 
 @router.get("/check_progress")
 async def check_progress(
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     """Verifica el progreso de la migración del usuario actual"""
     try:
@@ -253,7 +552,7 @@ async def check_progress(
 @router.get("/nueva_migracion")
 async def migraciones_page(
     request: Request,
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     """Página para crear una nueva migración"""
     try:
@@ -270,9 +569,9 @@ async def upload_migracion_file(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
-    """Sube y procesa archivos de migración (Excel/CSV)"""
+    """Sube y procesa archivos de migración con procesamiento paralelo para archivos grandes"""
     try:
         # Obtener información del usuario
         user_id = current_user.codigo
@@ -281,15 +580,26 @@ async def upload_migracion_file(
         if not user_id or not user_name:
             raise HTTPException(status_code=400, detail="Usuario no válido")
         
-        # Validar tamaño del archivo (50MB máximo)
-        if file.size and file.size > 50 * 1024 * 1024:
-            raise HTTPException(status_code=400, detail="El archivo es demasiado grande (máximo 50MB)")
+        # Validar tamaño del archivo (aumentamos el límite para archivos grandes)
+        max_size = 50 * 1024 * 1024 * 1024  # 50GB máximo
+        if file.size and file.size > max_size:
+            raise HTTPException(status_code=400, detail="El archivo es demasiado grande (máximo 50GB)")
         
         # Validar extensión del archivo
         if not file.filename or not any(file.filename.lower().endswith(ext) for ext in ['.xlsx', '.xls', '.csv']):
             raise HTTPException(status_code=400, detail="Tipo de archivo no soportado")
         
-        progress = MigracionProgress()
+        # Usar progreso paralelo para archivos grandes
+        file_size_gb = (file.size or 0) / (1024**3)
+        use_parallel = file_size_gb > 1.0  # Usar paralelo para archivos > 1GB
+        
+        if use_parallel:
+            progress = ParallelMigracionProgress()
+            logging.info(f"Archivo grande detectado ({file_size_gb:.1f}GB), usando procesamiento paralelo")
+        else:
+            progress = MigracionProgress()
+            logging.info(f"Archivo pequeño ({file_size_gb:.1f}GB), usando procesamiento secuencial")
+        
         progress_storage[user_name] = progress
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         
@@ -302,42 +612,58 @@ async def upload_migracion_file(
         # Sanitizar nombre de migración
         nombre_migracion = "".join(c for c in nombre_migracion if c.isalnum() or c in ['_', '-']).lower()
         
-        # Verificar el tipo de archivo sin leer todo el contenido
-        if file.content_type in ALLOWED_EXTENSIONS['EXCEL']:
-            # Guardar temporalmente el archivo (evita cargarlo completamente en memoria)
-            temp_file_path = os.path.join(user_results_dir, f"temp_{timestamp}_{file.filename}")
-            
-            # Leer y escribir por chunks para archivos grandes
-            CHUNK_SIZE = 1024 * 1024  # 1MB por chunk
-            try:
-                with open(temp_file_path, 'wb') as f:
-                    while chunk := await file.read(CHUNK_SIZE):
-                        if not chunk:
-                            break
-                        f.write(chunk)
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Error al guardar archivo: {str(e)}")
-            
-            # Procesar Excel en segundo plano
+        # Guardar archivo temporalmente
+        temp_file_path = os.path.join(user_results_dir, f"temp_{timestamp}_{file.filename}")
+        
+        # Usar chunks más grandes para archivos grandes
+        UPLOAD_CHUNK_SIZE = 10 * 1024 * 1024 if use_parallel else 1024 * 1024  # 10MB o 1MB
+        
+        try:
+            with open(temp_file_path, 'wb') as f:
+                while chunk := await file.read(UPLOAD_CHUNK_SIZE):
+                    if not chunk:
+                        break
+                    f.write(chunk)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error al guardar archivo: {str(e)}")
+        
+        # Determinar tipo de archivo y procesar
+        file_type = 'excel' if file.filename.lower().endswith(('.xlsx', '.xls')) else 'csv'
+        
+        if use_parallel:
+            # Procesamiento paralelo para archivos grandes
             background_tasks.add_task(
-                process_excel_file_in_background,
+                process_large_file_parallel,
                 temp_file_path,
                 nombre_migracion,
                 timestamp,
                 user_results_dir,
                 db,
                 current_user,
-                progress
+                progress,
+                file_type
             )
-            
-        elif file.content_type in ALLOWED_EXTENSIONS['CSV']:
-            # Para CSV, leer con una estrategia diferente por chunks
-            contents = await file.read()
-            if not contents:
-                raise HTTPException(status_code=400, detail="El archivo está vacío")
-            
-            # Procesar CSV en segundo plano
-            try:
+        else:
+            # Procesamiento secuencial para archivos pequeños
+            if file_type == 'excel':
+                background_tasks.add_task(
+                    process_excel_file_in_background,
+                    temp_file_path,
+                    nombre_migracion,
+                    timestamp,
+                    user_results_dir,
+                    db,
+                    current_user,
+                    progress
+                )
+            else:  # CSV
+                # Importante: ya consumimos el stream al guardar el archivo; leer desde el archivo temporal
+                try:
+                    with open(temp_file_path, 'rb') as f:
+                        contents = f.read()
+                except Exception as e:
+                    raise HTTPException(status_code=500, detail=f"Error al leer archivo temporal CSV: {str(e)}")
+
                 result = await process_csv_file(
                     contents,
                     nombre_migracion,
@@ -348,16 +674,13 @@ async def upload_migracion_file(
                     progress
                 )
                 return JSONResponse(content=result)
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Error procesando CSV: {str(e)}")
-        else:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Tipo de archivo no soportado: {file.content_type}"
-            )
 
         return JSONResponse(content={
-            "message": "Archivo recibido. El procesamiento se realizará en segundo plano.",
+            "message": f"Archivo recibido ({file_size_gb:.1f}GB). Procesamiento {'paralelo' if use_parallel else 'secuencial'} iniciado.",
+            "processing_type": "parallel" if use_parallel else "sequential",
+            "estimated_chunks": int(file_size_gb * 1000) if use_parallel else 1,
+            "max_workers": MAX_WORKERS if use_parallel else 1,
+            "chunk_size": CHUNK_SIZE if use_parallel else "N/A",
             "result_url": "/migraciones/control_migraciones",
             "progress": progress.to_dict()
         })
@@ -372,7 +695,7 @@ async def upload_migracion_file(
 @router.get("/control_migraciones")
 async def get_all_results(
     request: Request,
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     """Página de control y resultados de migraciones"""
     try:
@@ -446,7 +769,7 @@ async def get_all_results(
 async def admin_migraciones_page(
     request: Request,
     db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     """Página principal de administración de migraciones con estadísticas y tablas"""
     try:
@@ -535,7 +858,7 @@ async def admin_migraciones_page(
 async def migraciones_tablas(
     request: Request,
     db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     """Página para visualizar y gestionar tablas de migraciones"""
     try:
@@ -585,7 +908,7 @@ async def migraciones_tablas(
 async def get_table_fields(
     table_name: str,
     db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     """Obtiene los campos de una tabla específica"""
     try:
@@ -623,7 +946,7 @@ async def get_table_fields(
 async def get_table_records(
     table_name: str,
     db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     # Asegurarse de que el nombre de la tabla es una cadena
     if isinstance(table_name, list):
@@ -644,7 +967,7 @@ async def get_table_records(
 async def migrate_data(
     migration_data: dict,
     db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     source_table_name = migration_data.get('source_table')
     target_table_name = migration_data.get('target_table')
@@ -761,7 +1084,7 @@ class RenameTableRequest(BaseModel):
 async def rename_table(
     request: RenameTableRequest,
     db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     try:
         # Verificar que la tabla actual existe
@@ -823,7 +1146,7 @@ class ChangeFieldTypeRequest(BaseModel):
 async def change_field_type(
     request: ChangeFieldTypeRequest,
     db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     """Cambia el tipo de un campo en una tabla con validaciones y manejo seguro de conversiones."""
     try:
@@ -1164,7 +1487,7 @@ async def process_excel_file_in_background(
 @router.get("/")
 async def migraciones_index(
     request: Request,
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     """Página índice de migraciones - redirige a admin_migraciones"""
     return RedirectResponse(url="/migraciones/admin_migraciones", status_code=302)
@@ -1173,7 +1496,7 @@ async def migraciones_index(
 @router.get("/api/stats")
 async def get_migration_stats(
     db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     """API para obtener estadísticas de migraciones"""
     try:
@@ -1220,7 +1543,7 @@ async def get_migration_stats(
 @router.delete("/api/cleanup")
 async def cleanup_old_files(
     days: int = 30,
-    current_user: UserDB = Depends(require_role_api(["admin"]))
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
 ):
     """Limpia archivos temporales y de resultados antiguos"""
     try:
@@ -1256,3 +1579,24 @@ async def cleanup_old_files(
     except Exception as e:
         logging.error(f"Error en limpieza: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error en limpieza: {str(e)}")
+
+# Endpoint adicional para monitorear recursos del sistema
+@router.get("/api/system_resources")
+async def get_system_resources(
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
+):
+    """Obtiene información sobre recursos del sistema"""
+    try:
+        return {
+            "cpu_percent": psutil.cpu_percent(interval=1),
+            "memory_percent": psutil.virtual_memory().percent,
+            "memory_available_gb": psutil.virtual_memory().available / (1024**3),
+            "disk_usage_percent": psutil.disk_usage('.').percent,
+            "active_connections": len(psutil.net_connections()),
+            "max_workers": MAX_WORKERS,
+            "chunk_size": CHUNK_SIZE,
+            "memory_threshold": MEMORY_THRESHOLD
+        }
+    except Exception as e:
+        logging.error(f"Error obteniendo recursos del sistema: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

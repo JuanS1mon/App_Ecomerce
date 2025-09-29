@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignación de Roles - Panel de Administración</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+
+    <!-- Contenido principal -->
+    <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
+        <!-- Contenido específico de la página -->
+        <div class="w-full">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <h1 class="text-2xl font-bold text-gray-800">Asignación de Roles a Usuarios</h1>
+            </div>
+
+            <!-- Menú de navegación secundaria para gestión de usuarios/roles -->
+            <div class="mb-6">
+                <div class="bg-white rounded-lg shadow-md p-3">
+                    <nav class="flex flex-wrap gap-2">
+                        <a href="/usuarios_admin/" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center text-sm font-medium transition-colors duration-150">
+                            <i class="fas fa-users mr-2"></i>
+                            Usuarios
+                        </a>
+                        <a href="/usuarios_admin/roles" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center text-sm font-medium transition-colors duration-150">
+                            <i class="fas fa-user-tag mr-2"></i>
+                            Roles
+                        </a>
+                        <a href="/usuarios_admin/usuarios-roles" class="bg-blue-500 text-white px-4 py-2 rounded-md flex items-center text-sm font-medium">
+                            <i class="fas fa-user-shield mr-2"></i>
+                            Asignación de Roles
+                        </a>
+                        <a href="/usuarios_admin/permisos" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center text-sm font-medium transition-colors duration-150">
+                            <i class="fas fa-lock mr-2"></i>
+                            Permisos
+                        </a>
+                    </nav>
+                </div>
+            </div>
+    
+            <!-- Filtros y búsqueda -->
+            <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+                <div class="flex flex-col lg:flex-row gap-4">
+                    <div class="flex-grow">
+                        <div class="relative">
+                            <input type="text" id="searchUsuarios" placeholder="Buscar usuarios..." 
+                                class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300">
+                            <div class="absolute left-3 top-2.5 text-gray-400">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <select id="filterRol" class="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                            <option value="">Todos los roles</option>
+                            <option value="admin">Administrador</option>
+                            <option value="editor">Editor</option>
+                            <option value="usuario">Usuario estándar</option>
+                        </select>
+                        <button id="btnAplicarFiltros" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-300 w-full sm:w-auto">
+                            Aplicar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel doble: Usuarios y Asignación de roles -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Panel de usuarios -->
+                <div class="col-span-1 bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                        <h2 class="text-lg font-medium text-gray-900">Usuarios</h2>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center px-4 bg-gray-100">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center">
+                            <span class="px-4 bg-gray-100 text-sm text-gray-500">
+                                Seleccione un usuario para gestionar sus roles
+                            </span>
+                        </div>
+                    </div>
+                    <div class="overflow-y-auto max-h-96 p-2">
+                        <!-- Reemplaza el contenido del <ul id="listaUsuarios"> con estos ejemplos: -->
+                        
+                        <ul id="listaUsuarios" class="divide-y divide-gray-200">
+                            <!-- Usuario 1: Administrador -->
+                            <li class="py-3 px-2 cursor-pointer hover:bg-gray-50 bg-blue-50 border-l-4 border-blue-500" data-usuario-id="1">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium">
+                                        JR
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">Juan Rodríguez</p>
+                                        <p class="text-xs text-gray-500 truncate">jrodriguez@ejemplo.com</p>
+                                    </div>
+                                    <div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                            2 roles
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            <!-- Usuario 2: Varios roles -->
+                            <li class="py-3 px-2 cursor-pointer hover:bg-gray-50" data-usuario-id="2">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-medium">
+                                        MM
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">María Martínez</p>
+                                        <p class="text-xs text-gray-500 truncate">mmartinez@ejemplo.com</p>
+                                    </div>
+                                    <div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                            3 roles
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            <!-- Usuario 3: Editor -->
+                            <li class="py-3 px-2 cursor-pointer hover:bg-gray-50" data-usuario-id="3">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-700 font-medium">
+                                        CL
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">Carlos López</p>
+                                        <p class="text-xs text-gray-500 truncate">clopez@ejemplo.com</p>
+                                    </div>
+                                    <div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                            1 rol
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            <!-- Usuario 4: Analista -->
+                            <li class="py-3 px-2 cursor-pointer hover:bg-gray-50" data-usuario-id="4">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-medium">
+                                        AG
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">Ana Gómez</p>
+                                        <p class="text-xs text-gray-500 truncate">agomez@ejemplo.com</p>
+                                    </div>
+                                    <div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                            1 rol
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            <!-- Usuario 5: Usuario estándar -->
+                            <li class="py-3 px-2 cursor-pointer hover:bg-gray-50" data-usuario-id="5">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 font-medium">
+                                        PT
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">Pedro Trujillo</p>
+                                        <p class="text-xs text-gray-500 truncate">ptrujillo@ejemplo.com</p>
+                                    </div>
+                                    <div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                            1 rol
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            <!-- Usuario 6: Finanzas -->
+                            <li class="py-3 px-2 cursor-pointer hover:bg-gray-50" data-usuario-id="6">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-medium">
+                                        LS
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">Laura Sánchez</p>
+                                        <p class="text-xs text-gray-500 truncate">lsanchez@ejemplo.com</p>
+                                    </div>
+                                    <div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                            1 rol
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            <!-- Usuario 7: Múltiples roles -->
+                            <li class="py-3 px-2 cursor-pointer hover:bg-gray-50" data-usuario-id="7">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-red-700 font-medium">
+                                        RF
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">Raúl Ferrer</p>
+                                        <p class="text-xs text-gray-500 truncate">rferrer@ejemplo.com</p>
+                                    </div>
+                                    <div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                            3 roles
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Paginación usuarios -->
+                    <div class="bg-gray-50 px-4 py-3 border-t border-gray-200 flex justify-between items-center">
+                        <button id="btnUsuariosAnterior" class="text-gray-600 hover:text-gray-900 disabled:opacity-50">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span id="paginaUsuarios" class="text-sm text-gray-600">Página 1</span>
+                        <button id="btnUsuariosSiguiente" class="text-gray-600 hover:text-gray-900 disabled:opacity-50">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Panel de asignación de roles -->
+                <div class="col-span-2 bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+                        <h2 class="text-lg font-medium text-gray-900">Roles asignados a:</h2>
+                        <span id="nombreUsuarioSeleccionado" class="font-semibold text-blue-600">Juan Rodríguez</span>
+                    </div>
+                    
+                    <!-- Estado vacío o de carga -->
+                    <div id="estadoRoles" class="p-8 text-center text-gray-500 hidden">
+                        <div class="flex flex-col items-center justify-center py-12">
+                            <div class="rounded-full bg-gray-100 p-6 mb-4">
+                                <i class="fas fa-user-shield text-4xl text-gray-400"></i>
+                            </div>
+                            <p class="text-xl font-medium mb-2">Seleccione un usuario</p>
+                            <p class="text-sm max-w-md">Elija un usuario de la lista para ver y modificar sus roles asignados.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de roles disponibles -->
+                    <div id="seccionRoles" class="">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex flex-col md:flex-row md:items-center gap-4">
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-600">
+                                        Seleccione o deseleccione los roles que desea asignar al usuario.
+                                    </p>
+                                </div>
+                                <button id="btnGuardarRoles" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center">
+                                    <i class="fas fa-save mr-2"></i>
+                                    Guardar cambios
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div id="rolesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Roles de ejemplo para visualización (eliminar en producción) -->
+                                
+                                <!-- Rol 1: Administrador -->
+                                <div class="border rounded-lg p-3 hover:bg-gray-50 flex items-center">
+                                    <div class="flex-shrink-0 mr-3">
+                                        <input type="checkbox" id="rol-1" data-rol-id="1" class="checkbox-rol h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300">
+                                    </div>
+                                    <label for="rol-1" class="flex-1 flex items-center cursor-pointer">
+                                        <div class="flex-shrink-0 mr-3">
+                                            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-green-100 text-green-800">
+                                                <i class="fas fa-user-shield"></i>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900">Administrador</p>
+                                            <p class="text-xs text-gray-500">Acceso completo a todas las funcionalidades</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <!-- Rol 2: Supervisor -->
+                                <div class="border rounded-lg p-3 hover:bg-gray-50 flex items-center">
+                                    <div class="flex-shrink-0 mr-3">
+                                        <input type="checkbox" id="rol-2" data-rol-id="2" class="checkbox-rol h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300" checked>
+                                    </div>
+                                    <label for="rol-2" class="flex-1 flex items-center cursor-pointer">
+                                        <div class="flex-shrink-0 mr-3">
+                                            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 text-blue-800">
+                                                <i class="fas fa-user-tie"></i>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900">Supervisor</p>
+                                            <p class="text-xs text-gray-500">Puede ver y editar, pero no eliminar recursos</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <!-- Rol 3: Editor -->
+                                <div class="border rounded-lg p-3 hover:bg-gray-50 flex items-center">
+                                    <div class="flex-shrink-0 mr-3">
+                                        <input type="checkbox" id="rol-3" data-rol-id="3" class="checkbox-rol h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300" checked>
+                                    </div>
+                                    <label for="rol-3" class="flex-1 flex items-center cursor-pointer">
+                                        <div class="flex-shrink-0 mr-3">
+                                            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-yellow-100 text-yellow-800">
+                                                <i class="fas fa-edit"></i>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900">Editor</p>
+                                            <p class="text-xs text-gray-500">Puede crear y editar contenidos</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <!-- Rol 4: Usuario -->
+                                <div class="border rounded-lg p-3 hover:bg-gray-50 flex items-center">
+                                    <div class="flex-shrink-0 mr-3">
+                                        <input type="checkbox" id="rol-4" data-rol-id="4" class="checkbox-rol h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300">
+                                    </div>
+                                    <label for="rol-4" class="flex-1 flex items-center cursor-pointer">
+                                        <div class="flex-shrink-0 mr-3">
+                                            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 text-gray-800">
+                                                <i class="fas fa-user"></i>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900">Usuario</p>
+                                            <p class="text-xs text-gray-500">Acceso básico a la plataforma</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <!-- Rol 5: Analista -->
+                                <div class="border rounded-lg p-3 hover:bg-gray-50 flex items-center">
+                                    <div class="flex-shrink-0 mr-3">
+                                        <input type="checkbox" id="rol-5" data-rol-id="5" class="checkbox-rol h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300">
+                                    </div>
+                                    <label for="rol-5" class="flex-1 flex items-center cursor-pointer">
+                                        <div class="flex-shrink-0 mr-3">
+                                            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-800">
+                                                <i class="fas fa-chart-line"></i>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900">Analista</p>
+                                            <p class="text-xs text-gray-500">Acceso a informes y estadísticas</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <!-- Rol 6: Finanzas -->
+                                <div class="border rounded-lg p-3 hover:bg-gray-50 flex items-center">
+                                    <div class="flex-shrink-0 mr-3">
+                                        <input type="checkbox" id="rol-6" data-rol-id="6" class="checkbox-rol h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300">
+                                    </div>
+                                    <label for="rol-6" class="flex-1 flex items-center cursor-pointer">
+                                        <div class="flex-shrink-0 mr-3">
+                                            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-green-100 text-green-800">
+                                                <i class="fas fa-dollar-sign"></i>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900">Finanzas</p>
+                                            <p class="text-xs text-gray-500">Gestión de aspectos financieros</p>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- Cierre de seccionRoles -->
+                </div> <!-- Cierre del panel de asignación de roles -->
+            </div> <!-- Cierre del panel doble -->
+        </div> <!-- Cierre del div w-full principal -->
+
+        <!-- Notificación de éxito -->
+        <div id="notificacionExito" class="fixed right-4 top-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-lg transform transition-all duration-500 translate-x-full opacity-0 flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="mensajeExito">Operación completada con éxito</span>
+        </div>
+
+        <!-- Notificación de error -->
+        <div id="notificacionError" class="fixed right-4 top-4 bg-red-500 text-white px-6 py-3 rounded-md shadow-lg transform transition-all duration-500 translate-x-full opacity-0 flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span id="mensajeError">Ha ocurrido un error</span>
+        </div>
+
+        <!-- Modal de confirmación de cambios no guardados -->
+        <div id="modalConfirmarCambios" class="fixed inset-0 z-50 hidden overflow-y-auto">
+            <div class="flex items-center justify-center min-h-screen px-4">
+                <div id="modalConfirmarBackdrop" class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+                
+                <div class="bg-white rounded-lg max-w-md w-full z-10 shadow-xl transform transition-all">
+                    <div class="p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-3">¿Guardar cambios?</h3>
+                        <p class="text-gray-600 mb-4">
+                            Ha realizado cambios en las asignaciones de roles para este usuario. 
+                            ¿Desea guardar estos cambios antes de continuar?
+                        </p>
+                        <div class="flex justify-end space-x-3">
+                            <button id="btnDescartarCambios" class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
+                                Descartar
+                            </button>
+                            <button id="btnGuardarCambiosModal" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Script separado para la lógica -->
+    <script src="/static/html/usuarios/js/usuarios_roles.js"></script>
+</body>
+    <!-- Footer - Se cargará dinámicamente -->
+    <div id="footer-container"></div>
+</html>

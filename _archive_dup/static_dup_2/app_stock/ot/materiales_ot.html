@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Materiales - OT</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .material-card {
+            transition: all 0.3s ease;
+        }
+        .material-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .estado-planificado { 
+            background-color: #dbeafe; 
+            color: #1e40af; 
+        }
+        .estado-parcial { 
+            background-color: #fef3c7; 
+            color: #92400e; 
+        }
+        .estado-consumido { 
+            background-color: #dcfce7; 
+            color: #166534; 
+        }
+        .estado-devuelto { 
+            background-color: #f3f4f6; 
+            color: #374151; 
+        }
+        .estado-cancelado { 
+            background-color: #fee2e2; 
+            color: #991b1b; 
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="app" class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">
+                        <i class="fas fa-tools mr-2 text-blue-600"></i>
+                        Gestión de Materiales - OT
+                    </h1>
+                    <p class="text-gray-600 mt-2">Sistema de planificación y consumo de materiales en órdenes de trabajo</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button @click="modalNuevaOT = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-plus mr-2"></i>Nueva OT
+                    </button>
+                    <button @click="cargarOTs()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-sync mr-2"></i>Actualizar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros y Búsqueda -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Buscar OT</label>
+                    <input v-model="filtros.busqueda" type="text" placeholder="ID, título o descripción..." 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <select v-model="filtros.estado" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="en_proceso">En Proceso</option>
+                        <option value="finalizada">Finalizada</option>
+                        <option value="cancelada">Cancelada</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Con Materiales</label>
+                    <select v-model="filtros.conMateriales" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Todas</option>
+                        <option value="si">Con materiales</option>
+                        <option value="no">Sin materiales</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button @click="aplicarFiltros()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                        <i class="fas fa-search mr-2"></i>Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de OTs -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div v-for="ot in otsFiltradas" :key="ot.id" class="bg-white rounded-lg shadow-md material-card">
+                <!-- Header de la OT -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800">
+                                OT #{{ ot.id }} - {{ ot.id_trabajo }}
+                            </h3>
+                            <p class="text-gray-600 mt-1">{{ ot.titulo || 'Sin título' }}</p>
+                            <div class="flex items-center mt-2 space-x-4">
+                                <span :class="getEstadoClass(ot.estado)" class="px-2 py-1 rounded-full text-xs font-medium">
+                                    {{ ot.estado }}
+                                </span>
+                                <span class="text-sm text-gray-500">
+                                    <i class="fas fa-calendar mr-1"></i>
+                                    {{ formatDate(ot.fecha_creacion) }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button @click="verDetalleOT(ot)" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button @click="gestionarMateriales(ot)" class="text-green-600 hover:text-green-800">
+                                <i class="fas fa-boxes"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen de Materiales -->
+                <div class="p-6">
+                    <div v-if="ot.resumen_materiales" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">{{ ot.resumen_materiales.total_materiales || 0 }}</div>
+                            <div class="text-xs text-gray-500">Materiales</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">{{ ot.resumen_materiales.total_utilizado || 0 }}</div>
+                            <div class="text-xs text-gray-500">Utilizados</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-yellow-600">{{ ot.resumen_materiales.total_pendiente || 0 }}</div>
+                            <div class="text-xs text-gray-500">Pendientes</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600">{{ ot.resumen_materiales.eficiencia_promedio || 0 }}%</div>
+                            <div class="text-xs text-gray-500">Eficiencia</div>
+                        </div>
+                    </div>
+                    <div v-else class="text-center text-gray-500 py-4">
+                        <i class="fas fa-box-open text-4xl mb-2"></i>
+                        <p>No hay materiales planificados</p>
+                        <button @click="planificarMateriales(ot)" class="mt-2 text-blue-600 hover:text-blue-800 text-sm">
+                            <i class="fas fa-plus mr-1"></i>Planificar materiales
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div v-if="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 flex items-center space-x-4">
+                <i class="fas fa-spinner fa-spin text-2xl text-blue-600"></i>
+                <span class="text-lg">Cargando...</span>
+            </div>
+        </div>
+
+        <!-- Modal para gestión de materiales -->
+        <div v-if="modalMateriales" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl max-w-6xl w-full mx-4 max-h-screen overflow-y-auto">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            Gestión de Materiales - OT #{{ otSeleccionada.id }}
+                        </h2>
+                        <button @click="modalMateriales = false" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Contenido del modal de materiales -->
+                <div class="p-6">
+                    <!-- Tabs -->
+                    <div class="border-b border-gray-200 mb-6">
+                        <nav class="-mb-px flex space-x-8">
+                            <button @click="tabActiva = 'planificados'" 
+                                    :class="{'border-blue-500 text-blue-600': tabActiva === 'planificados'}"
+                                    class="py-2 px-1 border-b-2 border-transparent font-medium text-sm hover:text-blue-600">
+                                Materiales Planificados
+                            </button>
+                            <button @click="tabActiva = 'consumo'" 
+                                    :class="{'border-blue-500 text-blue-600': tabActiva === 'consumo'}"
+                                    class="py-2 px-1 border-b-2 border-transparent font-medium text-sm hover:text-blue-600">
+                                Registrar Consumo
+                            </button>
+                            <button @click="tabActiva = 'historial'" 
+                                    :class="{'border-blue-500 text-blue-600': tabActiva === 'historial'}"
+                                    class="py-2 px-1 border-b-2 border-transparent font-medium text-sm hover:text-blue-600">
+                                Historial
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Tab: Materiales Planificados -->
+                    <div v-if="tabActiva === 'planificados'" class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-semibold">Materiales Planificados</h3>
+                            <button @click="agregarMaterial()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+                                <i class="fas fa-plus mr-2"></i>Agregar Material
+                            </button>
+                        </div>
+                        
+                        <div v-if="materialesOT.length === 0" class="text-center py-8 text-gray-500">
+                            <i class="fas fa-box-open text-4xl mb-4"></i>
+                            <p>No hay materiales planificados para esta OT</p>
+                        </div>
+                        
+                        <div v-else class="space-y-3">
+                            <div v-for="material in materialesOT" :key="material.id" 
+                                 class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
+                                    <div>
+                                        <span class="font-medium">Art. {{ material.codigo_art }}</span>
+                                        <div class="text-sm text-gray-500">Dep. {{ material.id_deposito }}</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="font-medium">{{ material.cantidad_planificada }}</div>
+                                        <div class="text-xs text-gray-500">Planificado</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="font-medium text-green-600">{{ material.cantidad_utilizada }}</div>
+                                        <div class="text-xs text-gray-500">Utilizado</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="font-medium text-yellow-600">{{ material.cantidad_pendiente }}</div>
+                                        <div class="text-xs text-gray-500">Pendiente</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <span :class="'estado-' + material.estado" class="px-2 py-1 rounded-full text-xs font-medium">
+                                            {{ material.estado }}
+                                        </span>
+                                    </div>
+                                    <div class="flex space-x-2 justify-end">
+                                        <button @click="consumirMaterial(material)" class="text-blue-600 hover:text-blue-800">
+                                            <i class="fas fa-arrow-down"></i>
+                                        </button>
+                                        <button @click="devolverMaterial(material)" class="text-green-600 hover:text-green-800">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Registrar Consumo -->
+                    <div v-if="tabActiva === 'consumo'" class="space-y-4">
+                        <h3 class="text-lg font-semibold">Registrar Consumo de Materiales</h3>
+                        <p class="text-gray-600">Registre los materiales que se utilizaron realmente en esta OT</p>
+                        
+                        <!-- Formulario de consumo masivo -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <input v-model="consumoForm.usuario" type="text" placeholder="Usuario que registra" 
+                                       class="px-3 py-2 border border-gray-300 rounded-md">
+                                <input v-model="consumoForm.observacion" type="text" placeholder="Observación general" 
+                                       class="px-3 py-2 border border-gray-300 rounded-md">
+                                <button @click="procesarConsumoMasivo()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                                    <i class="fas fa-save mr-2"></i>Registrar Todo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Historial -->
+                    <div v-if="tabActiva === 'historial'">
+                        <h3 class="text-lg font-semibold mb-4">Historial de Movimientos</h3>
+                        <p class="text-gray-600">Histórico de consumos y devoluciones de materiales</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notificaciones Toast -->
+        <div v-if="toast.show" :class="toastClass" class="fixed bottom-4 right-4 p-4 rounded-lg shadow-lg z-50 transition-all duration-300">
+            <div class="flex items-center">
+                <i :class="toastIcon" class="mr-2"></i>
+                <span>{{ toast.message }}</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const loading = ref(false);
+                const ots = ref([]);
+                const filtros = ref({
+                    busqueda: '',
+                    estado: '',
+                    conMateriales: ''
+                });
+
+                const modalMateriales = ref(false);
+                const modalNuevaOT = ref(false);
+                const otSeleccionada = ref({});
+                const materialesOT = ref([]);
+                const tabActiva = ref('planificados');
+
+                const consumoForm = ref({
+                    usuario: '',
+                    observacion: ''
+                });
+
+                const toast = ref({
+                    show: false,
+                    message: '',
+                    type: 'info'
+                });
+
+                // Computed
+                const otsFiltradas = computed(() => {
+                    let resultado = ots.value;
+
+                    if (filtros.value.busqueda) {
+                        const busqueda = filtros.value.busqueda.toLowerCase();
+                        resultado = resultado.filter(ot => 
+                            ot.id_trabajo.toLowerCase().includes(busqueda) ||
+                            (ot.titulo && ot.titulo.toLowerCase().includes(busqueda)) ||
+                            ot.id.toString().includes(busqueda)
+                        );
+                    }
+
+                    if (filtros.value.estado) {
+                        resultado = resultado.filter(ot => ot.estado === filtros.value.estado);
+                    }
+
+                    return resultado;
+                });
+
+                const toastClass = computed(() => {
+                    const base = 'text-white';
+                    switch (toast.value.type) {
+                        case 'success': return base + ' bg-green-500';
+                        case 'error': return base + ' bg-red-500';
+                        case 'warning': return base + ' bg-yellow-500';
+                        default: return base + ' bg-blue-500';
+                    }
+                });
+
+                const toastIcon = computed(() => {
+                    switch (toast.value.type) {
+                        case 'success': return 'fas fa-check';
+                        case 'error': return 'fas fa-times';
+                        case 'warning': return 'fas fa-exclamation-triangle';
+                        default: return 'fas fa-info';
+                    }
+                });
+
+                // Methods
+                const mostrarToast = (message, type = 'info') => {
+                    toast.value = { show: true, message, type };
+                    setTimeout(() => {
+                        toast.value.show = false;
+                    }, 5000);
+                };
+
+                const cargarOTs = async () => {
+                    loading.value = true;
+                    try {
+                        const response = await axios.get('/ot/');
+                        ots.value = response.data;
+                        
+                        // Cargar resumen de materiales para cada OT
+                        for (let ot of ots.value) {
+                            try {
+                                const resumenResponse = await axios.get(`/stock/movimientos/ot/resumen-consumo/${ot.id}`);
+                                ot.resumen_materiales = resumenResponse.data.resumen;
+                            } catch (error) {
+                                console.warn(`No se pudo cargar resumen de materiales para OT ${ot.id}`);
+                                ot.resumen_materiales = null;
+                            }
+                        }
+
+                        mostrarToast(`Cargadas ${ots.value.length} órdenes de trabajo`, 'success');
+                    } catch (error) {
+                        console.error('Error al cargar OTs:', error);
+                        mostrarToast('Error al cargar las órdenes de trabajo', 'error');
+                    } finally {
+                        loading.value = false;
+                    }
+                };
+
+                const gestionarMateriales = async (ot) => {
+                    otSeleccionada.value = ot;
+                    modalMateriales.value = true;
+                    tabActiva.value = 'planificados';
+                    
+                    // Cargar materiales de la OT
+                    try {
+                        const response = await axios.get(`/ot/id/${ot.id}/materiales`);
+                        materialesOT.value = response.data.materiales_planificados || [];
+                    } catch (error) {
+                        console.error('Error al cargar materiales:', error);
+                        mostrarToast('Error al cargar materiales de la OT', 'error');
+                        materialesOT.value = [];
+                    }
+                };
+
+                const planificarMateriales = (ot) => {
+                    // Implementar lógica para planificar materiales
+                    mostrarToast('Función de planificación en desarrollo', 'info');
+                };
+
+                const consumirMaterial = (material) => {
+                    // Implementar lógica para consumir material individual
+                    mostrarToast(`Consumir material: ${material.codigo_art}`, 'info');
+                };
+
+                const devolverMaterial = (material) => {
+                    // Implementar lógica para devolver material
+                    mostrarToast(`Devolver material: ${material.codigo_art}`, 'info');
+                };
+
+                const procesarConsumoMasivo = () => {
+                    // Implementar lógica para consumo masivo
+                    mostrarToast('Procesando consumo masivo...', 'info');
+                };
+
+                const getEstadoClass = (estado) => {
+                    const clases = {
+                        'pendiente': 'bg-yellow-100 text-yellow-800',
+                        'en_proceso': 'bg-blue-100 text-blue-800',
+                        'finalizada': 'bg-green-100 text-green-800',
+                        'cancelada': 'bg-red-100 text-red-800'
+                    };
+                    return clases[estado] || 'bg-gray-100 text-gray-800';
+                };
+
+                const formatDate = (dateString) => {
+                    if (!dateString) return 'Sin fecha';
+                    return new Date(dateString).toLocaleDateString('es-ES');
+                };
+
+                const aplicarFiltros = () => {
+                    // Los filtros se aplican automáticamente por computed
+                    mostrarToast('Filtros aplicados', 'info');
+                };
+
+                const verDetalleOT = (ot) => {
+                    // Implementar vista detallada de OT
+                    mostrarToast(`Ver detalle de OT #${ot.id}`, 'info');
+                };
+
+                const agregarMaterial = () => {
+                    // Implementar agregar material
+                    mostrarToast('Función para agregar material en desarrollo', 'info');
+                };
+
+                // Lifecycle
+                onMounted(() => {
+                    cargarOTs();
+                });
+
+                return {
+                    loading,
+                    ots,
+                    filtros,
+                    otsFiltradas,
+                    modalMateriales,
+                    modalNuevaOT,
+                    otSeleccionada,
+                    materialesOT,
+                    tabActiva,
+                    consumoForm,
+                    toast,
+                    toastClass,
+                    toastIcon,
+                    mostrarToast,
+                    cargarOTs,
+                    gestionarMateriales,
+                    planificarMateriales,
+                    consumirMaterial,
+                    devolverMaterial,
+                    procesarConsumoMasivo,
+                    getEstadoClass,
+                    formatDate,
+                    aplicarFiltros,
+                    verDetalleOT,
+                    agregarMaterial
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

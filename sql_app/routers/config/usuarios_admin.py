@@ -228,17 +228,22 @@ async def obtener_estadisticas(
         # Contar usuarios activos
         usuarios_activos = db.query(UsuariosModel).filter(UsuariosModel.activo == True).count()
         
-        # Contar administradores reales
-        administradores = db.query(UsuariosModel).filter(
-            UsuariosModel.rol.ilike('%admin%')
-        ).count()
+        # Contar administradores usando la tabla de relaciones usuario_roles
+        administradores = db.execute(
+            text("""
+                SELECT COUNT(DISTINCT ur.usuario_id)
+                FROM usuario_roles ur
+                INNER JOIN Roles r ON ur.rol_id = r.id
+                WHERE r.nombre LIKE '%admin%'
+            """)
+        ).scalar() or 0
         
         # Si no se encuentran admins, asumir al menos 1 (el usuario actual)
         if administradores == 0:
             administradores = 1
         
-        # Contar roles únicos
-        roles_unicos = db.query(func.count(func.distinct(UsuariosModel.rol))).scalar()
+        # Contar roles únicos desde la tabla Roles
+        roles_unicos = db.execute(text("SELECT COUNT(*) FROM Roles")).scalar()
         total_roles = max(roles_unicos or 1, 1)  # Al menos 1 rol
         
         return EstadisticasResponse(
@@ -579,47 +584,78 @@ async def listar_roles(
     db: Session = Depends(get_db),
     current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
-    """Lista todos los roles disponibles con información real"""
+    """Lista todos los roles disponibles con información real desde la tabla Roles"""
     try:
-        from sqlalchemy import func
-        
-        # Obtener roles reales de la base de datos
-        roles_query = db.query(
-            UsuariosModel.rol, 
-            func.count(UsuariosModel.codigo).label('count')
-        ).group_by(UsuariosModel.rol).all()
+        # Consultar roles reales desde la tabla Roles con el conteo de usuarios asignados
+        roles_result = db.execute(
+            text("""
+                SELECT 
+                    r.id,
+                    r.nombre,
+                    r.descripcion,
+                    COUNT(ur.usuario_id) as usuarios_count
+                FROM Roles r
+                LEFT JOIN usuario_roles ur ON r.id = ur.rol_id
+                GROUP BY r.id, r.nombre, r.descripcion
+                ORDER BY r.nombre
+            """)
+        ).fetchall()
         
         roles = []
-        id_counter = 1
         
-        for rol, count in roles_query:
-            if rol:  # Solo incluir roles no nulos
-                # Agregar descripción basada en el rol
-                descriptions = {
-                    "admin": "Administrador del sistema con acceso completo",
-                    "manager": "Gestor con permisos avanzados",
-                    "usuario": "Usuario estándar con permisos básicos",
-                    "tecnico": "Técnico de soporte con permisos específicos",
-                    "editor": "Editor de contenido con permisos de edición",
-                    "viewer": "Solo lectura y visualización"
-                }
-                
-                description = descriptions.get(rol.lower(), f"Rol {rol} con permisos personalizados")
-                
-                roles.append(RoleResponse(
-                    id=id_counter,
-                    nombre=rol,
-                    descripcion=description,
-                    usuarios_count=count
-                ))
-                id_counter += 1
+        for rol_data in roles_result:
+            roles.append(RoleResponse(
+                id=rol_data[0],  # id del rol
+                nombre=rol_data[1],  # nombre del rol  
+                descripcion=rol_data[2] or f"Rol {rol_data[1]} con permisos específicos",  # descripción
+                usuarios_count=rol_data[3]  # conteo de usuarios
+            ))
         
-        # Si no hay roles, agregar roles por defecto
+        # Si no hay roles en la tabla Roles, crear roles básicos y usar los de la columna rol (compatibilidad)
         if not roles:
-            roles = [
-                RoleResponse(id=1, nombre="admin", descripcion="Administrador del sistema", usuarios_count=1),
-                RoleResponse(id=2, nombre="usuario", descripcion="Usuario estándar", usuarios_count=0)
+            logger.warning("No hay roles en la tabla Roles, creando roles básicos...")
+            
+            # Crear roles básicos en la tabla Roles
+            roles_basicos = [
+                ("admin", "Administrador del sistema con acceso completo"),
+                ("usuario", "Usuario estándar con permisos básicos"),
+                ("manager", "Gestor con permisos avanzados"),
+                ("tecnico", "Técnico de soporte con permisos específicos")
             ]
+            
+            for nombre_rol, descripcion_rol in roles_basicos:
+                try:
+                    db.execute(
+                        text("INSERT INTO Roles (nombre, descripcion) VALUES (:nombre, :descripcion)"),
+                        {"nombre": nombre_rol, "descripcion": descripcion_rol}
+                    )
+                except:
+                    pass  # El rol ya existe, continúa
+            
+            db.commit()
+            
+            # Volver a consultar después de crear los roles básicos
+            roles_result = db.execute(
+                text("""
+                    SELECT 
+                        r.id,
+                        r.nombre,
+                        r.descripcion,
+                        COUNT(ur.usuario_id) as usuarios_count
+                    FROM Roles r
+                    LEFT JOIN usuario_roles ur ON r.id = ur.rol_id
+                    GROUP BY r.id, r.nombre, r.descripcion
+                    ORDER BY r.nombre
+                """)
+            ).fetchall()
+            
+            for rol_data in roles_result:
+                roles.append(RoleResponse(
+                    id=rol_data[0],
+                    nombre=rol_data[1],
+                    descripcion=rol_data[2] or f"Rol {rol_data[1]} con permisos específicos",
+                    usuarios_count=rol_data[3]
+                ))
         
         return roles
         
@@ -629,7 +665,8 @@ async def listar_roles(
         return [
             RoleResponse(id=1, nombre="admin", descripcion="Administrador del sistema", usuarios_count=1),
             RoleResponse(id=2, nombre="usuario", descripcion="Usuario estándar", usuarios_count=0),
-            RoleResponse(id=3, nombre="tecnico", descripcion="Técnico de soporte", usuarios_count=0)
+            RoleResponse(id=3, nombre="manager", descripcion="Gestor con permisos avanzados", usuarios_count=0),
+            RoleResponse(id=4, nombre="tecnico", descripcion="Técnico de soporte", usuarios_count=0)
         ]
 
 @router.get("/usuarios/{user_id}/roles", response_model=Dict[str, Any])
@@ -715,19 +752,80 @@ async def asignar_roles(
     db: Session = Depends(get_db),
     current_user: UserDB = Depends(require_role_api(["admin"]))
 ):
-    """Asigna roles a un usuario"""
+    """Asigna roles a un usuario usando la tabla usuario_roles"""
     try:
+        # Verificar que el usuario existe
         usuario = db.query(UsuariosModel).filter(UsuariosModel.codigo == user_id).first()
         if not usuario:
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-        # Asignar roles (simplificado, depende de la estructura de roles en la base de datos)
-        usuario.roles = ",".join(roles_data.roles)  # Ejemplo: "admin,editor"
+        # Eliminar todos los roles existentes del usuario
+        db.execute(
+            text("DELETE FROM usuario_roles WHERE usuario_id = :user_id"),
+            {"user_id": user_id}
+        )
+
+        # Agregar nuevos roles
+        roles_asignados = []
+        for nombre_rol in roles_data.roles:
+            # Verificar que el rol existe
+            rol_result = db.execute(
+                text("SELECT id FROM Roles WHERE nombre = :nombre"),
+                {"nombre": nombre_rol}
+            ).first()
+            
+            if rol_result:
+                # Insertar la relación usuario-rol
+                db.execute(
+                    text("INSERT INTO usuario_roles (usuario_id, rol_id) VALUES (:user_id, :rol_id)"),
+                    {"user_id": user_id, "rol_id": rol_result[0]}
+                )
+                roles_asignados.append(nombre_rol)
+            else:
+                logger.warning(f"Rol '{nombre_rol}' no existe, se omite")
+
         db.commit()
-        return {"message": "Roles asignados exitosamente"}
+        
+        message = f"Roles asignados exitosamente: {', '.join(roles_asignados)}" if roles_asignados else "Todos los roles fueron removidos"
+        
+        return {
+            "success": True,
+            "message": message,
+            "roles_asignados": roles_asignados,
+            "usuario": usuario.usuario
+        }
+        
     except Exception as e:
-        logger.error(f"Error al asignar roles: {str(e)}")
+        db.rollback()
+        logger.error(f"Error al asignar roles al usuario {user_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Error interno del servidor")
+
+# ==================== FUNCIONES AUXILIARES PARA ROLES ====================
+
+def get_user_roles(db: Session, user_id: int):
+    """Obtiene los roles de un usuario específico desde la tabla usuario_roles"""
+    try:
+        # Consultar roles usando la tabla de asociación usuario_roles
+        roles_result = db.execute(
+            text("""
+                SELECT r.nombre 
+                FROM Roles r
+                INNER JOIN usuario_roles ur ON r.id = ur.rol_id
+                WHERE ur.usuario_id = :user_id
+            """),
+            {"user_id": user_id}
+        ).fetchall()
+        
+        # Si el usuario tiene roles asignados, devolverlos
+        if roles_result:
+            return [role[0] for role in roles_result]
+        
+        # Si no tiene roles asignados, devolver rol por defecto
+        return ["usuario"]
+        
+    except Exception as e:
+        logger.error(f"Error al obtener roles del usuario {user_id}: {str(e)}")
+        return ["usuario"]  # Rol por defecto en caso de error
 
 # ==================== RUTAS ADICIONALES DE GESTIÓN AVANZADA ====================
 
@@ -761,6 +859,9 @@ async def listar_usuarios_con_detalles(
         # Formatear respuesta con información detallada
         usuarios_detallados = []
         for user in usuarios:
+            # Obtener roles reales del usuario desde la base de datos
+            user_roles = get_user_roles(db, user.codigo)
+            
             usuario_data = {
                 "id": user.codigo,
                 "usuario": user.usuario,
@@ -769,7 +870,7 @@ async def listar_usuarios_con_detalles(
                 "activo": user.activo,
                 "fecha_creacion": user.fecha_creacion.isoformat() if hasattr(user, 'fecha_creacion') and user.fecha_creacion else None,
                 "ultimo_acceso": user.ultimo_acceso.isoformat() if hasattr(user, 'ultimo_acceso') and user.ultimo_acceso else None,
-                "roles": ["usuario"],  # Por defecto, se puede expandir según la estructura de roles
+                "roles": user_roles,  # Roles dinámicos desde la base de datos
                 "avatar": f"https://ui-avatars.com/api/?name={user.nombre or user.usuario}&background=random",
                 "estado_texto": "Activo" if user.activo else "Inactivo",
                 "total_sesiones": 0,  # Se puede implementar según logs
@@ -919,26 +1020,28 @@ async def obtener_estadisticas_avanzadas(
         usuarios_activos = db.query(UsuariosModel).filter(UsuariosModel.activo == True).count()
         usuarios_inactivos = total_usuarios - usuarios_activos
         
-        # Estadísticas por roles (reales)
-        roles_query = db.query(
-            UsuariosModel.rol, 
-            func.count(UsuariosModel.codigo).label('count')
-        ).group_by(UsuariosModel.rol).all()
-        
+        # Estadísticas por roles usando la tabla usuario_roles
         estadisticas_roles = {}
-        total_admins = 0
         
-        for rol, count in roles_query:
-            estadisticas_roles[rol or 'sin_rol'] = count
-            if rol and rol.lower() in ['admin', 'administrador']:
+        # Contar usuarios por rol desde la tabla de relaciones
+        roles_stats = db.execute(
+            text("""
+                SELECT r.nombre, COUNT(ur.usuario_id) as count
+                FROM Roles r
+                LEFT JOIN usuario_roles ur ON r.id = ur.rol_id
+                GROUP BY r.id, r.nombre
+            """)
+        ).fetchall()
+        
+        total_admins = 0
+        for rol_name, count in roles_stats:
+            estadisticas_roles[rol_name] = count
+            if rol_name and rol_name.lower() in ['admin', 'administrador']:
                 total_admins += count
         
-        # Si no hay admins detectados, buscar de manera más amplia
+        # Si no hay admins detectados, asumir al menos 1
         if total_admins == 0:
-            admin_count = db.query(UsuariosModel).filter(
-                UsuariosModel.rol.ilike('%admin%')
-            ).count()
-            total_admins = max(admin_count, 1)  # Al menos 1 (el usuario actual)
+            total_admins = 1
         
         # Usuarios creados en los últimos 7 días
         semana_pasada = datetime.now() - timedelta(days=7)
@@ -1162,25 +1265,56 @@ async def crear_rol(
 ):
     """Crea un nuevo rol en el sistema"""
     try:
-        # En una implementación real, esto se guardaría en una tabla de roles
-        # Por ahora, simular la creación
-        nuevo_rol = {
-            "id": random.randint(100, 999),
-            "nombre": nombre,
-            "descripcion": descripcion or f"Rol {nombre} creado automáticamente",
-            "usuarios_count": 0,
-            "fecha_creacion": datetime.now().isoformat()
-        }
+        # Verificar si el rol ya existe
+        rol_existente = db.execute(
+            text("SELECT id FROM Roles WHERE nombre = :nombre"),
+            {"nombre": nombre}
+        ).first()
         
-        logger.info(f"Rol '{nombre}' creado por usuario {current_user.usuario}")
+        if rol_existente:
+            return {
+                "success": False,
+                "message": f"El rol '{nombre}' ya existe",
+                "rol": None
+            }
         
-        return {
-            "success": True,
-            "message": f"Rol '{nombre}' creado exitosamente",
-            "rol": nuevo_rol
-        }
+        # Insertar el nuevo rol en la tabla Roles
+        resultado = db.execute(
+            text("""
+                INSERT INTO Roles (nombre, descripcion) 
+                OUTPUT INSERTED.id, INSERTED.nombre, INSERTED.descripcion
+                VALUES (:nombre, :descripcion)
+            """),
+            {
+                "nombre": nombre,
+                "descripcion": descripcion or f"Rol {nombre} creado automáticamente"
+            }
+        )
+        
+        nuevo_rol_data = resultado.first()
+        db.commit()
+        
+        if nuevo_rol_data:
+            nuevo_rol = {
+                "id": nuevo_rol_data[0],
+                "nombre": nuevo_rol_data[1],
+                "descripcion": nuevo_rol_data[2],
+                "usuarios_count": 0,
+                "fecha_creacion": datetime.now().isoformat()
+            }
+            
+            logger.info(f"Rol '{nombre}' creado exitosamente por usuario {current_user.usuario}")
+            
+            return {
+                "success": True,
+                "message": f"Rol '{nombre}' creado exitosamente",
+                "rol": nuevo_rol
+            }
+        else:
+            raise Exception("No se pudo obtener la información del rol creado")
         
     except Exception as e:
+        db.rollback()
         logger.error(f"Error al crear rol: {str(e)}")
         raise HTTPException(status_code=500, detail="Error interno del servidor")
 

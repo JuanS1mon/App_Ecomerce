@@ -7,8 +7,8 @@
 # =============================
 # CONFIGURACIÓN Y ENTORNO
 # =============================
-from sql_app.config import FRONTEND_URL, ORIGINS, STATIC_DIR, ENVIRONMENT
-from sql_app.logging_config_new import setup_logging
+from config import FRONTEND_URL, ORIGINS, STATIC_DIR, ENVIRONMENT
+from logging_config_new import setup_logging
 
 # CONFIGURAR LOGGING ULTRA VERBOSO
 setup_logging()
@@ -21,17 +21,17 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi import Request, Depends
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from sqlalchemy.orm import Session
 
 # =============================
 # IMPORTACIONES DE MIDDLEWARES Y HANDLERS
 # =============================
-from sql_app.middleware.custom import (
+from middleware.custom import (
     RequestLoggingMiddleware, FrontendRedirectMiddleware, CustomErrorMiddleware, UserTemplateMiddleware, DebugMiddleware
 )
-from sql_app.exception_handlers import register_exception_handlers
-from sql_app.middleware.jwt_middleware import JWTMiddleware
+from exception_handlers import register_exception_handlers
+from middleware.jwt_middleware import JWTMiddleware
 
 # =============================
 # IMPORTACIONES DE DB Y ROUTERS
@@ -67,6 +67,20 @@ app = FastAPI(
 )
 
 app.mount("/static", StaticFiles(directory="sql_app/static"), name="static")
+
+# --------------------------------------------------------------------------
+# Favicon handler: evita error 500 si el navegador solicita /favicon.ico
+# Sirve logo.svg como fallback (o 204 si no está disponible)
+# --------------------------------------------------------------------------
+@app.get("/favicon.ico")
+async def favicon():
+    candidate_svg = os.path.join("sql_app", "static", "logo.svg")
+    candidate_png = os.path.join("sql_app", "static", "img", "favicon.png")
+    if os.path.exists(candidate_png):
+        return FileResponse(candidate_png)
+    if os.path.exists(candidate_svg):
+        return FileResponse(candidate_svg, media_type="image/svg+xml")
+    return Response(status_code=204)
 
 # =============================
 # MIDDLEWARES

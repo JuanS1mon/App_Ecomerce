@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Calidad - Bloqueos de Stock</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+    <!-- Incluir el script para cargar componentes compartidos -->
+    <script src="/static/components/load-components.js"></script>
+    <style>
+        .alert-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #EF4444;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Placeholder para el navbar -->
+    <div id="navbar-placeholder"></div>
+    
+    <div id="app" class="container mx-auto py-8 px-4">
+        <h1 class="text-3xl font-bold mb-2 text-gray-800">Control de Calidad - Bloqueos de Stock</h1>
+        <p class="text-lg text-gray-600 mb-6">Gestión de stock bloqueado por motivos de calidad</p>
+        
+        <!-- Notificaciones Toast -->
+        <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+        
+        <!-- Tabs de navegación -->
+        <div class="mb-6 border-b border-gray-200">
+            <ul class="flex flex-wrap -mb-px">
+                <li class="mr-2">
+                    <button @click="activeTab = 'lista'" :class="{'text-blue-600 border-blue-600 border-b-2': activeTab === 'lista', 'text-gray-500 hover:text-gray-700': activeTab !== 'lista'}" class="inline-block p-4 rounded-t-lg">
+                        <i class="fas fa-list mr-2"></i>Bloqueos activos
+                    </button>
+                </li>
+                <li class="mr-2">
+                    <button @click="activeTab = 'nuevo'" :class="{'text-blue-600 border-blue-600 border-b-2': activeTab === 'nuevo', 'text-gray-500 hover:text-gray-700': activeTab !== 'nuevo'}" class="inline-block p-4 rounded-t-lg">
+                        <i class="fas fa-ban mr-2"></i>Crear bloqueo
+                    </button>
+                </li>
+                <li>
+                    <button @click="activeTab = 'historico'" :class="{'text-blue-600 border-blue-600 border-b-2': activeTab === 'historico', 'text-gray-500 hover:text-gray-700': activeTab !== 'historico'}" class="inline-block p-4 rounded-t-lg">
+                        <i class="fas fa-history mr-2"></i>Histórico
+                    </button>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Tab: Lista de bloqueos activos -->
+        <div v-if="activeTab === 'lista'">
+            <!-- Filtros de búsqueda -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Depósito</label>
+                        <select v-model="filtros.deposito" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Todos los depósitos</option>
+                            <option v-for="deposito in depositos" :value="deposito.id">{{ deposito.descripcion }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Artículo</label>
+                        <input type="number" v-model="filtros.articulo" placeholder="Código del artículo (opcional)" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    </div>
+                    <div class="flex items-end">
+                        <button @click="buscarBloqueos" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                            <i class="fas fa-search mr-2"></i>Buscar Bloqueos
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabla de bloqueos activos -->
+            <div v-if="bloqueos.length > 0" class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Bloqueos de Calidad Activos</h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Depósito</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Artículo</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad Bloqueada</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr v-for="bloqueo in bloqueos" :key="bloqueo.id_bloqueo">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ obtenerNombreDeposito(bloqueo.id_deposito) }}</div>
+                                    <div class="text-sm text-gray-500">ID: {{ bloqueo.id_deposito }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ obtenerNombreArticulo(bloqueo.codigo_art) }}</div>
+                                    <div class="text-sm text-gray-500">Cód: {{ bloqueo.codigo_art }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        {{ bloqueo.cantidad }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ bloqueo.motivo }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ formatearFecha(bloqueo.fecha_bloqueo) }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button @click="abrirModalLiberar(bloqueo)" class="text-green-600 hover:text-green-900 mr-3">
+                                        <i class="fas fa-check-circle mr-1"></i>Liberar
+                                    </button>
+                                    <button @click="verDetalleBloqueo(bloqueo)" class="text-blue-600 hover:text-blue-900">
+                                        <i class="fas fa-info-circle mr-1"></i>Detalle
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Mensaje cuando no hay bloqueos -->
+            <div v-else-if="!loadingBloqueos && busquedaRealizada" class="bg-white p-6 rounded-lg shadow-md text-center">
+                <i class="fas fa-check-circle text-green-500 text-4xl mb-4"></i>
+                <p class="text-gray-600">No hay bloqueos de calidad activos para los criterios especificados.</p>
+            </div>
+            
+            <!-- Mensaje de carga -->
+            <div v-if="loadingBloqueos" class="text-center py-8">
+                <i class="fas fa-spinner fa-spin text-blue-500 text-2xl mb-2"></i>
+                <p class="text-gray-600">Cargando bloqueos de calidad...</p>
+            </div>
+        </div>
+        
+        <!-- Tab: Crear nuevo bloqueo -->
+        <div v-if="activeTab === 'nuevo'">
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <h2 class="text-xl font-semibold mb-6 text-gray-700">Crear Nuevo Bloqueo de Calidad</h2>
+                
+                <form @submit.prevent="crearBloqueo" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Depósito</label>
+                            <select v-model="nuevoBloqueo.id_deposito" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <option value="">Seleccione un depósito</option>
+                                <option v-for="deposito in depositos" :value="deposito.id">{{ deposito.descripcion }}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Artículo</label>
+                            <input type="number" v-model="nuevoBloqueo.codigo_art" required placeholder="Código del artículo" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad a bloquear</label>
+                            <input type="number" v-model="nuevoBloqueo.cantidad" required min="0.1" step="0.01" placeholder="Cantidad" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Motivo del bloqueo</label>
+                            <select v-model="nuevoBloqueo.motivo" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <option value="">Seleccione un motivo</option>
+                                <option value="Control de Calidad">Control de Calidad</option>
+                                <option value="Defecto de fabricación">Defecto de fabricación</option>
+                                <option value="Error en embalaje">Error en embalaje</option>
+                                <option value="Daño en transporte">Daño en transporte</option>
+                                <option value="Producto vencido">Producto vencido</option>
+                                <option value="Devolución cliente">Devolución de cliente</option>
+                                <option value="Otro">Otro (especificar en observaciones)</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+                            <input type="text" v-model="nuevoBloqueo.usuario" placeholder="Nombre del usuario que realiza el bloqueo" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                            <textarea v-model="nuevoBloqueo.observaciones" rows="3" placeholder="Información adicional sobre el bloqueo" class="w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" @click="limpiarFormulario" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                            Bloquear Stock
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Información sobre stock disponible -->
+            <div v-if="stockInfo" class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold mb-4 text-gray-700">Información de Stock</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Artículo</p>
+                        <p class="font-medium">{{ stockInfo.articulo_nombre }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Depósito</p>
+                        <p class="font-medium">{{ stockInfo.deposito_nombre }}</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div class="bg-gray-50 p-3 rounded-md">
+                        <p class="text-xs text-gray-500">Stock Físico</p>
+                        <p class="text-lg font-semibold">{{ stockInfo.stock.fisico }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-md">
+                        <p class="text-xs text-gray-500">Reservado</p>
+                        <p class="text-lg font-semibold">{{ stockInfo.stock.reservado }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-md">
+                        <p class="text-xs text-gray-500">En Preparación</p>
+                        <p class="text-lg font-semibold">{{ stockInfo.stock.preparado }}</p>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-md">
+                        <p class="text-xs text-red-500">Bloqueado</p>
+                        <p class="text-lg font-semibold text-red-600">{{ stockInfo.stock.bloqueado }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-md">
+                        <p class="text-xs text-blue-500">Disponible</p>
+                        <p class="text-lg font-semibold" :class="{'text-red-600': stockInfo.stock.disponible < 0, 'text-blue-600': stockInfo.stock.disponible >= 0}">
+                            {{ stockInfo.stock.disponible }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div v-if="nuevoBloqueo.cantidad > stockInfo.stock.disponible" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                    <p class="text-yellow-700">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <strong>Advertencia:</strong> La cantidad a bloquear ({{ nuevoBloqueo.cantidad }}) es mayor que el stock disponible ({{ stockInfo.stock.disponible }}).
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab: Histórico de bloqueos -->
+        <div v-if="activeTab === 'historico'">
+            <!-- Filtros para histórico -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Depósito</label>
+                        <select v-model="filtrosHistorico.deposito" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Todos los depósitos</option>
+                            <option v-for="deposito in depositos" :value="deposito.id">{{ deposito.descripcion }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Artículo</label>
+                        <input type="number" v-model="filtrosHistorico.articulo" placeholder="Código del artículo (opcional)" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                        <select v-model="filtrosHistorico.soloActivos" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option :value="true">Solo activos</option>
+                            <option :value="false">Todos (activos e inactivos)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button @click="buscarHistorico" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                            <i class="fas fa-search mr-2"></i>Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabla de histórico -->
+            <div v-if="historico.length > 0" class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Histórico de Bloqueos</h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Depósito</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Artículo</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Bloqueo</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Liberación</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr v-for="bloqueo in historico" :key="bloqueo.id_bloqueo">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ obtenerNombreDeposito(bloqueo.id_deposito) }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ obtenerNombreArticulo(bloqueo.codigo_art) }}</div>
+                                    <div class="text-xs text-gray-500">{{ bloqueo.codigo_art }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ bloqueo.cantidad }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span :class="{
+                                        'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800': bloqueo.activo,
+                                        'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800': !bloqueo.activo
+                                    }">
+                                        {{ bloqueo.activo ? 'Bloqueado' : 'Liberado' }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ formatearFecha(bloqueo.fecha_bloqueo) }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ bloqueo.fecha_liberacion ? formatearFecha(bloqueo.fecha_liberacion) : '-' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button @click="verDetalleBloqueo(bloqueo)" class="text-blue-600 hover:text-blue-900">
+                                        <i class="fas fa-info-circle mr-1"></i>Detalle
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Mensaje cuando no hay histórico -->
+            <div v-else-if="!loadingHistorico && busquedaHistoricoRealizada" class="bg-white p-6 rounded-lg shadow-md text-center">
+                <i class="fas fa-info-circle text-blue-500 text-4xl mb-4"></i>
+                <p class="text-gray-600">No se encontraron registros de bloqueos para los criterios especificados.</p>
+            </div>
+            
+            <!-- Mensaje de carga -->
+            <div v-if="loadingHistorico" class="text-center py-8">
+                <i class="fas fa-spinner fa-spin text-blue-500 text-2xl mb-2"></i>
+                <p class="text-gray-600">Cargando histórico de bloqueos...</p>
+            </div>
+        </div>
+        
+        <!-- Modal para liberar bloqueo -->
+        <div v-if="showModalLiberar" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-40">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                <h3 class="text-lg font-semibold mb-4">Liberar Bloqueo de Calidad</h3>
+                
+                <p class="mb-4 text-gray-700">
+                    ¿Está seguro que desea liberar el bloqueo de <span class="font-medium">{{ bloqueoSeleccionado?.cantidad }}</span> 
+                    unidades del artículo <span class="font-medium">{{ obtenerNombreArticulo(bloqueoSeleccionado?.codigo_art) }}</span>?
+                </p>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+                    <input type="text" v-model="liberacionForm.usuario" placeholder="Nombre del usuario que libera el bloqueo" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                    <textarea v-model="liberacionForm.observaciones" rows="2" placeholder="Motivo de la liberación" class="w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button @click="cerrarModalLiberar" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Cancelar
+                    </button>
+                    <button @click="ejecutarLiberacion" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                        Confirmar Liberación
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal para ver detalle de bloqueo -->
+        <div v-if="showModalDetalle" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-40">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Detalle del Bloqueo</h3>
+                    <button @click="cerrarModalDetalle" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div v-if="bloqueoSeleccionado" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500">ID de Bloqueo</p>
+                            <p class="font-medium">{{ bloqueoSeleccionado.id_bloqueo }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Estado</p>
+                            <p class="font-medium">
+                                <span :class="{
+                                    'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800': bloqueoSeleccionado.activo,
+                                    'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800': !bloqueoSeleccionado.activo
+                                }">
+                                    {{ bloqueoSeleccionado.activo ? 'Bloqueado' : 'Liberado' }}
+                                </span>
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Depósito</p>
+                            <p class="font-medium">{{ obtenerNombreDeposito(bloqueoSeleccionado.id_deposito) }} (ID: {{ bloqueoSeleccionado.id_deposito }})</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Artículo</p>
+                            <p class="font-medium">{{ obtenerNombreArticulo(bloqueoSeleccionado.codigo_art) }} (Cód: {{ bloqueoSeleccionado.codigo_art }})</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Cantidad Bloqueada</p>
+                            <p class="font-medium">{{ bloqueoSeleccionado.cantidad }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Motivo</p>
+                            <p class="font-medium">{{ bloqueoSeleccionado.motivo }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Fecha de Bloqueo</p>
+                            <p class="font-medium">{{ formatearFecha(bloqueoSeleccionado.fecha_bloqueo) }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Usuario de Bloqueo</p>
+                            <p class="font-medium">{{ bloqueoSeleccionado.usuario_bloqueo || '-' }}</p>
+                        </div>
+                        <div v-if="!bloqueoSeleccionado.activo">
+                            <p class="text-sm text-gray-500">Fecha de Liberación</p>
+                            <p class="font-medium">{{ formatearFecha(bloqueoSeleccionado.fecha_liberacion) }}</p>
+                        </div>
+                        <div v-if="!bloqueoSeleccionado.activo">
+                            <p class="text-sm text-gray-500">Usuario de Liberación</p>
+                            <p class="font-medium">{{ bloqueoSeleccionado.usuario_liberacion || '-' }}</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Observaciones</p>
+                        <div class="p-3 bg-gray-50 rounded-md">
+                            <p class="text-sm whitespace-pre-wrap">{{ bloqueoSeleccionado.observaciones || 'Sin observaciones' }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end">
+                    <button @click="cerrarModalDetalle" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Explicación del sistema de control de calidad -->
+        <div class="bg-blue-50 p-6 rounded-lg border border-blue-200 mt-8">
+            <h3 class="font-semibold text-blue-800 mb-2">Sistema de Bloqueos por Control de Calidad</h3>
+            <p class="text-blue-700 mb-2">
+                Este módulo implementa la funcionalidad de bloqueo por calidad integrado con el cálculo de stock disponible:
+            </p>
+            <ul class="list-disc pl-6 text-blue-700">
+                <li class="mb-1">El stock bloqueado por calidad se resta automáticamente del stock disponible calculado en tiempo real.</li>
+                <li class="mb-1">Los bloqueos pueden ser creados por personal de calidad para apartar productos con defectos o pendientes de inspección.</li>
+                <li class="mb-1">Los bloques pueden ser liberados cuando los productos pasen las inspecciones de calidad.</li>
+                <li class="mb-1">El sistema mantiene un registro histórico de todos los bloqueos y liberaciones para trazabilidad.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Placeholder para el footer -->
+    <div id="footer-placeholder"></div>
+    
+    <script>
+        const { createApp, ref, computed, onMounted, watch } = Vue;
+        
+        createApp({
+            setup() {
+                // Estados
+                const depositos = ref([]);
+                const articulos = ref({});  // Cache de información de artículos
+                const activeTab = ref('lista');
+                const bloqueos = ref([]);
+                const historico = ref([]);
+                const stockInfo = ref(null);
+                const loadingBloqueos = ref(false);
+                const loadingHistorico = ref(false);
+                const busquedaRealizada = ref(false);
+                const busquedaHistoricoRealizada = ref(false);
+                
+                // Formularios y filtros
+                const filtros = ref({
+                    deposito: '',
+                    articulo: ''
+                });
+                
+                const filtrosHistorico = ref({
+                    deposito: '',
+                    articulo: '',
+                    soloActivos: true
+                });
+                
+                const nuevoBloqueo = ref({
+                    id_deposito: '',
+                    codigo_art: '',
+                    cantidad: '',
+                    motivo: '',
+                    usuario: '',
+                    observaciones: ''
+                });
+                
+                // Modales
+                const showModalLiberar = ref(false);
+                const showModalDetalle = ref(false);
+                const bloqueoSeleccionado = ref(null);
+                const liberacionForm = ref({
+                    usuario: '',
+                    observaciones: ''
+                });
+                
+                // Cargar datos iniciales
+                onMounted(async () => {
+                    try {
+                        // Obtener la lista real de depósitos desde la API
+                        const response = await fetch('/depositos/');
+                        if (response.ok) {
+                            const data = await response.json();
+                            depositos.value = data.map(d => ({
+                                id: d.id,
+                                descripcion: d.descripcion
+                            }));
+                        } else {
+                            // Si falla, usar datos de ejemplo
+                            depositos.value = [
+                                { id: 1, descripcion: "Depósito Principal" },
+                                { id: 2, descripcion: "Depósito Secundario" },
+                                { id: 3, descripcion: "Depósito Auxiliar" }
+                            ];
+                        }
+                        
+                        // Cargar bloqueos activos por defecto
+                        buscarBloqueos();
+                        
+                        // Cargar componentes compartidos (navbar, footer)
+                        if (typeof loadComponents === 'function') {
+                            loadComponents();
+                        }
+                    } catch (error) {
+                        console.error('Error al cargar datos iniciales:', error);
+                        mostrarToast('Error al cargar datos iniciales', 'error');
+                        
+                        // Usar datos de ejemplo en caso de error
+                        depositos.value = [
+                            { id: 1, descripcion: "Depósito Principal" },
+                            { id: 2, descripcion: "Depósito Secundario" },
+                            { id: 3, descripcion: "Depósito Auxiliar" }
+                        ];
+                    }
+                });
+                
+                // Vigilar cambios en formulario de nuevo bloqueo para buscar información de stock
+                watch([() => nuevoBloqueo.value.id_deposito, () => nuevoBloqueo.value.codigo_art], 
+                    async ([newDeposito, newArticulo], [oldDeposito, oldArticulo]) => {
+                        if (newDeposito && newArticulo && (newDeposito !== oldDeposito || newArticulo !== oldArticulo)) {
+                            await consultarStock(newDeposito, newArticulo);
+                        }
+                    }
+                );
+                
+                // Métodos para mostrar notificaciones
+                function mostrarToast(mensaje, tipo = 'info') {
+                    const toastContainer = document.getElementById('toast-container');
+                    const toast = document.createElement('div');
+                    toast.className = `p-4 mb-3 rounded-md shadow-md ${tipo === 'error' ? 'bg-red-500' : 'bg-blue-500'} text-white`;
+                    toast.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas ${tipo === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2"></i>
+                            <span>${mensaje}</span>
+                        </div>
+                    `;
+                    toastContainer.appendChild(toast);
+                    
+                    // Eliminar después de 3 segundos
+                    setTimeout(() => {
+                        toast.classList.add('opacity-0');
+                        setTimeout(() => {
+                            toastContainer.removeChild(toast);
+                        }, 300);
+                    }, 3000);
+                }
+                
+                // Función para buscar bloqueos activos
+                const buscarBloqueos = async () => {
+                    loadingBloqueos.value = true;
+                    busquedaRealizada.value = true;
+                    
+                    try {
+                        // Construir URL de consulta
+                        let url = '/stock/calidad/lista?solo_activos=true';
+                        
+                        if (filtros.value.deposito) {
+                            url += `&id_deposito=${filtros.value.deposito}`;
+                        }
+                        
+                        if (filtros.value.articulo) {
+                            url += `&codigo_art=${filtros.value.articulo}`;
+                        }
+                        
+                        // Llamar a la API
+                        const response = await fetch(url);
+                        if (!response.ok) {
+                            throw new Error(`Error: ${response.status}`);
+                        }
+                        
+                        bloqueos.value = await response.json();
+                        mostrarToast(`Se encontraron ${bloqueos.value.length} bloqueos activos`);
+                    } catch (error) {
+                        console.error('Error al buscar bloqueos:', error);
+                        mostrarToast(`Error al buscar bloqueos: ${error.message}`, 'error');
+                        bloqueos.value = [];
+                    } finally {
+                        loadingBloqueos.value = false;
+                    }
+                };
+                
+                // Función para buscar histórico de bloqueos
+                const buscarHistorico = async () => {
+                    loadingHistorico.value = true;
+                    busquedaHistoricoRealizada.value = true;
+                    
+                    try {
+                        // Construir URL de consulta
+                        let url = `/stock/calidad/lista?solo_activos=${filtrosHistorico.value.soloActivos}`;
+                        
+                        if (filtrosHistorico.value.deposito) {
+                            url += `&id_deposito=${filtrosHistorico.value.deposito}`;
+                        }
+                        
+                        if (filtrosHistorico.value.articulo) {
+                            url += `&codigo_art=${filtrosHistorico.value.articulo}`;
+                        }
+                        
+                        // Llamar a la API
+                        const response = await fetch(url);
+                        if (!response.ok) {
+                            throw new Error(`Error: ${response.status}`);
+                        }
+                        
+                        historico.value = await response.json();
+                        mostrarToast(`Se encontraron ${historico.value.length} registros en el histórico`);
+                    } catch (error) {
+                        console.error('Error al buscar histórico:', error);
+                        mostrarToast(`Error al buscar histórico: ${error.message}`, 'error');
+                        historico.value = [];
+                    } finally {
+                        loadingHistorico.value = false;
+                    }
+                };
+                
+                // Función para consultar stock de un artículo en un depósito
+                const consultarStock = async (id_deposito, codigo_art) => {
+                    try {
+                        const response = await fetch(`/stock/calculado/deposito/${id_deposito}/${codigo_art}`);
+                        if (!response.ok) {
+                            throw new Error(`Error: ${response.status}`);
+                        }
+                        
+                        stockInfo.value = await response.json();
+                        
+                        // Guardar nombre del artículo en cache
+                        if (stockInfo.value.articulo_nombre !== "Desconocido") {
+                            articulos.value[codigo_art] = stockInfo.value.articulo_nombre;
+                        }
+                    } catch (error) {
+                        console.error('Error al consultar stock:', error);
+                        mostrarToast(`Error al consultar información de stock: ${error.message}`, 'error');
+                        stockInfo.value = null;
+                    }
+                };
+                
+                // Función para crear un nuevo bloqueo
+                const crearBloqueo = async () => {
+                    try {
+                        // Validar formulario
+                        if (!nuevoBloqueo.value.id_deposito || !nuevoBloqueo.value.codigo_art || 
+                            !nuevoBloqueo.value.cantidad || !nuevoBloqueo.value.motivo) {
+                            mostrarToast('Por favor complete todos los campos requeridos', 'error');
+                            return;
+                        }
+                        
+                        // Validar que la cantidad sea mayor que cero
+                        if (parseFloat(nuevoBloqueo.value.cantidad) <= 0) {
+                            mostrarToast('La cantidad a bloquear debe ser mayor que cero', 'error');
+                            return;
+                        }
+                        
+                        // Llamar a la API para crear el bloqueo
+                        const response = await fetch('/stock/calidad/bloquear', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                id_deposito: parseInt(nuevoBloqueo.value.id_deposito),
+                                codigo_art: parseInt(nuevoBloqueo.value.codigo_art),
+                                cantidad: parseFloat(nuevoBloqueo.value.cantidad),
+                                motivo: nuevoBloqueo.value.motivo,
+                                usuario: nuevoBloqueo.value.usuario || null,
+                                observaciones: nuevoBloqueo.value.observaciones || null
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            const error = await response.json();
+                            throw new Error(error.detail || 'Error al crear bloqueo');
+                        }
+                        
+                        const resultado = await response.json();
+                        mostrarToast('Bloqueo creado correctamente');
+                        
+                        // Limpiar formulario
+                        limpiarFormulario();
+                        
+                        // Cambiar a la pestaña de lista y actualizar
+                        activeTab.value = 'lista';
+                        buscarBloqueos();
+                    } catch (error) {
+                        console.error('Error al crear bloqueo:', error);
+                        mostrarToast(`Error al crear bloqueo: ${error.message}`, 'error');
+                    }
+                };
+                
+                // Función para limpiar formulario
+                const limpiarFormulario = () => {
+                    nuevoBloqueo.value = {
+                        id_deposito: '',
+                        codigo_art: '',
+                        cantidad: '',
+                        motivo: '',
+                        usuario: '',
+                        observaciones: ''
+                    };
+                    stockInfo.value = null;
+                };
+                
+                // Funciones para modal de liberación
+                const abrirModalLiberar = (bloqueo) => {
+                    bloqueoSeleccionado.value = bloqueo;
+                    liberacionForm.value = {
+                        usuario: '',
+                        observaciones: ''
+                    };
+                    showModalLiberar.value = true;
+                };
+                
+                const cerrarModalLiberar = () => {
+                    showModalLiberar.value = false;
+                    bloqueoSeleccionado.value = null;
+                };
+                
+                const ejecutarLiberacion = async () => {
+                    try {
+                        if (!liberacionForm.value.observaciones) {
+                            mostrarToast('Por favor ingrese un motivo para la liberación', 'error');
+                            return;
+                        }
+                        
+                        // Llamar a la API para liberar el bloqueo
+                        const response = await fetch(`/stock/calidad/liberar/${bloqueoSeleccionado.value.id_bloqueo}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                usuario: liberacionForm.value.usuario || null,
+                                observaciones: liberacionForm.value.observaciones
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            const error = await response.json();
+                            throw new Error(error.detail || 'Error al liberar bloqueo');
+                        }
+                        
+                        const resultado = await response.json();
+                        mostrarToast('Bloqueo liberado correctamente');
+                        
+                        // Cerrar modal y actualizar lista
+                        cerrarModalLiberar();
+                        buscarBloqueos();
+                    } catch (error) {
+                        console.error('Error al liberar bloqueo:', error);
+                        mostrarToast(`Error al liberar bloqueo: ${error.message}`, 'error');
+                    }
+                };
+                
+                // Funciones para modal de detalle
+                const verDetalleBloqueo = (bloqueo) => {
+                    bloqueoSeleccionado.value = bloqueo;
+                    showModalDetalle.value = true;
+                };
+                
+                const cerrarModalDetalle = () => {
+                    showModalDetalle.value = false;
+                    bloqueoSeleccionado.value = null;
+                };
+                
+                // Función para formatear fechas
+                const formatearFecha = (fecha) => {
+                    if (!fecha) return '-';
+                    const date = new Date(fecha);
+                    return date.toLocaleString('es-AR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                };
+                
+                // Funciones para obtener nombres
+                const obtenerNombreDeposito = (id) => {
+                    if (!id) return "Desconocido";
+                    const deposito = depositos.value.find(d => d.id == id);
+                    return deposito ? deposito.descripcion : "Desconocido";
+                };
+                
+                const obtenerNombreArticulo = (codigo) => {
+                    if (!codigo) return "Desconocido";
+                    return articulos.value[codigo] || "Artículo " + codigo;
+                };
+                
+                return {
+                    // Estados
+                    depositos,
+                    articulos,
+                    activeTab,
+                    bloqueos,
+                    historico,
+                    stockInfo,
+                    loadingBloqueos,
+                    loadingHistorico,
+                    busquedaRealizada,
+                    busquedaHistoricoRealizada,
+                    
+                    // Filtros y formularios
+                    filtros,
+                    filtrosHistorico,
+                    nuevoBloqueo,
+                    
+                    // Modales
+                    showModalLiberar,
+                    showModalDetalle,
+                    bloqueoSeleccionado,
+                    liberacionForm,
+                    
+                    // Métodos
+                    buscarBloqueos,
+                    buscarHistorico,
+                    consultarStock,
+                    crearBloqueo,
+                    limpiarFormulario,
+                    abrirModalLiberar,
+                    cerrarModalLiberar,
+                    ejecutarLiberacion,
+                    verDetalleBloqueo,
+                    cerrarModalDetalle,
+                    formatearFecha,
+                    obtenerNombreDeposito,
+                    obtenerNombreArticulo
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Obras de Arte - Sistema de Obras de Arte</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts - Elementos del Brooklyn Museum -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Sistema de componentes y navegación -->
+    <script src="/static/js/components.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+        }
+        
+        .brooklyn-title {
+            font-family: 'Crimson Text', serif;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        
+        .artwork-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        .artwork-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #374151;
+        }
+        
+        .artwork-table {
+            border: 1px solid #e5e7eb;
+        }
+        
+        .artwork-table th {
+            background-color: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #374151;
+            padding: 1rem;
+        }
+        
+        .artwork-table td {
+            border-bottom: 1px solid #f3f4f6;
+            padding: 1rem;
+        }
+        
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .badge-sold {
+            background-color: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .badge-available {
+            background-color: #f0fdf4;
+            color: #16a34a;
+        }
+        
+        .badge-unavailable {
+            background-color: #fffbeb;
+            color: #d97706;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+
+    <!-- Navbar - Se cargará dinámicamente -->
+    <div id="navbar-container"></div>
+   
+    <!-- Contenido principal estilo Brooklyn Museum -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">   
+        
+        <!-- Header principal estilo Brooklyn Museum -->
+        <div class="mb-12">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="brooklyn-title text-4xl md:text-5xl text-gray-900 mb-4">CATÁLOGO</h1>
+                    <p class="text-gray-600 text-lg max-w-2xl">
+                        Colección completa de obras de arte del sistema
+                    </p>
+                </div>
+                <div>
+                    <a href="/app_obras/artworks/html/create" class="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors rounded-lg">
+                        <i class="fas fa-plus mr-2"></i>
+                        Nueva Obra
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 py-6 border-t border-b border-gray-200">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1">{{ artworks|length }}</div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Total de Obras</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1">
+                    {{ artworks|selectattr("is_available")|list|length }}
+                </div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Disponibles</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1">
+                    {{ artworks|selectattr("is_sold")|list|length }}
+                </div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Vendidas</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 mb-1">
+                    {{ (artworks|map(attribute='artist')|select|map(attribute='full_name')|unique|list)|length }}
+                </div>
+                <div class="text-sm text-gray-600 uppercase tracking-wider">Artistas</div>
+            </div>
+        </div>
+
+        <!-- Tabla de obras estilo minimalista -->
+        <div class="bg-white rounded-lg overflow-hidden artwork-table">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="artwork-table">
+                            <th class="text-left">Imagen</th>
+                            <th class="text-left">Código</th>
+                            <th class="text-left">Título</th>
+                            <th class="text-left">Artista</th>
+                            <th class="text-left">Año</th>
+                            <th class="text-left">Técnica</th>
+                            <th class="text-left">Estado</th>
+                            <th class="text-left">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="artwork-table">
+                        {% for artwork in artworks %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td>
+                                <div class="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                                    {% if artwork.thumbnail_url %}
+                                        <img src="{{ artwork.thumbnail_url }}" 
+                                             alt="{{ artwork.title }}" 
+                                             class="w-full h-full object-cover"
+                                             onerror="this.parentElement.innerHTML='<i class=\'fas fa-image text-gray-400\'></i>'">
+                                    {% else %}
+                                        <i class="fas fa-image text-gray-400 text-xl"></i>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="font-semibold text-gray-900">{{ artwork.inventory_code }}</div>
+                            </td>
+                            <td>
+                                <div class="font-medium text-gray-900">{{ artwork.title }}</div>
+                                {% if artwork.nickname %}
+                                    <div class="text-sm text-gray-500 italic">"{{ artwork.nickname }}"</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="text-gray-900">{{ artwork.artist.full_name if artwork.artist else 'Sin asignar' }}</div>
+                            </td>
+                            <td>
+                                <div class="text-gray-900">{{ artwork.creation_year or '-' }}</div>
+                            </td>
+                            <td>
+                                <div class="text-gray-600">{{ artwork.technique or '-' }}</div>
+                                {% if artwork.dimensions %}
+                                    <div class="text-xs text-gray-500">{{ artwork.dimensions }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if artwork.is_sold %}
+                                    <span class="badge-status badge-sold">
+                                        <i class="fas fa-check-circle mr-1"></i>
+                                        Vendida
+                                    </span>
+                                {% elif artwork.is_available %}
+                                    <span class="badge-status badge-available">
+                                        <i class="fas fa-check mr-1"></i>
+                                        Disponible
+                                    </span>
+                                {% else %}
+                                    <span class="badge-status badge-unavailable">
+                                        <i class="fas fa-clock mr-1"></i>
+                                        No Disponible
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="flex space-x-2">
+                                    <a href="/app_obras/artworks/html/edit/{{ artwork.id }}" 
+                                       class="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-edit mr-1"></i>
+                                        Editar
+                                    </a>
+                                    <button onclick="deleteArtwork('{{ artwork.id }}')" 
+                                            class="inline-flex items-center px-3 py-1 text-sm font-medium text-red-700 bg-white border border-red-300 rounded-md hover:bg-red-50 transition-colors">
+                                        <i class="fas fa-trash mr-1"></i>
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if not artworks %}
+            <!-- Estado vacío estilo Brooklyn Museum -->
+            <div class="text-center py-16">
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-images text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="brooklyn-title text-xl text-gray-900 mb-2">No hay obras registradas</h3>
+                <p class="text-gray-600 mb-6">Comienza agregando la primera obra de arte a tu colección</p>
+                <a href="/app_obras/artworks/html/create" class="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors rounded-lg">
+                    <i class="fas fa-plus mr-2"></i>
+                    Crear Primera Obra
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+    
+    <div id="footer-container"></div>
+
+    <script>
+        // Función para eliminar obra de arte
+        async function deleteArtwork(id) {
+            if (confirm('¿Está seguro de que desea eliminar esta obra de arte?')) {
+                try {
+                    const response = await fetch(`/app_obras/artworks/id/${id}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        // Recargar la página con una animación suave
+                        location.reload();
+                    } else {
+                        alert('Error al eliminar la obra de arte');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al eliminar la obra de arte');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Catálogo de obras cargado');
+            
+            // Cargar navbar si existe
+            const navbarContainer = document.getElementById('navbar-container');
+            if (navbarContainer) {
+                loadNavbar(navbarContainer);
+            }
+            
+            // Cargar footer si existe
+            const footerContainer = document.getElementById('footer-container');
+            if (footerContainer) {
+                loadFooter(footerContainer);
+            }
+        });
+    </script>
+
+</body>
+</html>

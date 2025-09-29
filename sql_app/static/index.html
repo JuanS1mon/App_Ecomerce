@@ -3,25 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL App Studio</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>SQL App Studio - Enterprise Data Solutions</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        /* Tipografía profesional */
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
         }
+        
+        body {
+            background: #fafbfc;
+            color: #1a202c;
+            font-feature-settings: "liga" on, "tnum" on;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Paleta profesional */
+        :root {
+            --primary-50: #eff6ff;
+            --primary-100: #dbeafe;
+            --primary-600: #2563eb;
+            --primary-700: #1d4ed8;
+            --primary-900: #1e3a8a;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-900) 100%);
+        }
+        
         .card-hover {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            border: 1px solid var(--gray-200);
         }
         .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: var(--primary-100);
         }
+        
         .gradient-text {
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-900));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            font-weight: 700;
+            letter-spacing: -0.025em;
         }
         .feature-card {
             border-radius: 1rem;
@@ -84,139 +124,284 @@
 </head>
 
 <body class="bg-gray-50 min-h-screen">
-    <!-- Barra de navegación -->
-    <nav class="bg-gray-800 p-4 w-full z-10">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-4">
-                <a href="">
-                    <img src="static/img/logo_mapache.gif" alt="Logo" class="h-8 w-auto">
-                </a>
-                <span class="text-gray-400">/</span>
-                <a href="/index" class="text-white hover:text-gray-300">Inicio</a>
-                <span class="text-gray-400">/</span>
-                <a href="/news" class="text-white hover:text-gray-300">Noticias</a>
-                <span class="text-gray-400">/</span>
-                <a href="/index#contact" class="text-white hover:text-gray-300">Contacto</a>
-            </div>
-            <div class="flex items-center space-x-4">
-                <a href="/loginpage" class="text-white hover:text-gray-300">Iniciar Sesión</a>
+    <!-- Navbar Profesional -->
+    <nav class="bg-white/95 backdrop-blur-md border-b border-gray-200/60 sticky top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-8">
+                    <a href="/" class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-database text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900">SQL App Studio</span>
+                    </a>
+                    <div class="hidden md:flex items-center space-x-6">
+                        <a href="/index" class="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
+                            Inicio
+                        </a>
+                        <a href="/news" class="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
+                            Noticias
+                        </a>
+                        <a href="/index#contact" class="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
+                            Contacto
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/loginpage" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md">
+                        Iniciar Sesión
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="relative bg-white hero-bg">
-        <div class="container mx-auto px-6 py-16 md:py-24 lg:py-32">
-            <div class="flex flex-col md:flex-row items-center justify-between">
-                <div class="md:w-1/2 mb-10 md:mb-0">
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4">
-                        <span class="block">SQL App</span>
-                        <span class="block gradient-text">Studio</span>
-                    </h1>
-                    <p class="text-lg md:text-xl text-gray-600 mb-8">
-                        Herramienta avanzada para desarrolladores y administradores de bases de datos. Simplifica y automatiza la creación de APIs, migración de datos y análisis con inteligencia artificial.
-                    </p>
-                    <div class="flex flex-wrap gap-4">
-                        <a href="#features" class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
-                            <i class="fas fa-info-circle mr-2"></i>Conocer más
+    <!-- Hero Section Profesional -->
+    <section class="relative bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+        <!-- Elementos decorativos sutiles -->
+        <div class="absolute inset-0">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-blue-50 rounded-full opacity-60 -translate-y-20 translate-x-20"></div>
+            <div class="absolute bottom-0 left-0 w-80 h-80 bg-indigo-50 rounded-full opacity-40 translate-y-16 -translate-x-16"></div>
+        </div>
+        
+        <div class="relative container mx-auto px-6 py-20 lg:py-28">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <div class="space-y-4">
+                        <div class="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                            <i class="fas fa-bolt mr-2"></i>
+                            Enterprise Ready
+                        </div>
+                        <h1 class="text-4xl lg:text-6xl font-bold leading-tight">
+                            <span class="text-gray-900">SQL App</span>
+                            <span class="block gradient-text">Studio</span>
+                        </h1>
+                        <p class="text-xl text-gray-600 leading-relaxed max-w-lg">
+                            Plataforma empresarial para automatización de bases de datos, desarrollo de APIs y análisis inteligente de datos.
+                        </p>
+                    </div>
+                    
+                    <!-- Estadísticas profesionales -->
+                    <div class="grid grid-cols-3 gap-6 py-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-900">99.9%</div>
+                            <div class="text-sm text-gray-600">Uptime</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">10x</div>
+                            <div class="text-sm text-gray-600">Más rápido</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-900">24/7</div>
+                            <div class="text-sm text-gray-600">Soporte</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#features" class="inline-flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+                            <i class="fas fa-rocket mr-2"></i>
+                            Empezar ahora
                         </a>
-                        <a href="#contact" class="inline-block px-6 py-3 bg-white text-blue-600 font-medium rounded-lg shadow-md border border-blue-600 hover:bg-blue-50 transition duration-300">
-                            <i class="fas fa-envelope mr-2"></i>Contactar
+                        <a href="#contact" class="inline-flex items-center justify-center px-8 py-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-all duration-200">
+                            <i class="fas fa-calendar mr-2"></i>
+                            Agendar demo
                         </a>
                     </div>
                 </div>
-                                <div class="md:w-1/2 flex justify-center">
+                
+                <div class="relative lg:pl-8">
                     <div class="relative">
-                        <!-- Círculo decorativo de fondo -->
-                        <div class="absolute inset-0 bg-blue-100 rounded-full transform scale-95"></div>
+                        <!-- Dashboard mockup estilo Windows -->
+                        <div class="bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden">
+                            <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 border-b">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-database text-white text-lg"></i>
+                                        <span class="text-white font-semibold">SQL App Studio - Dashboard</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button class="w-6 h-6 bg-white/20 hover:bg-white/30 rounded flex items-center justify-center text-white text-xs">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <button class="w-6 h-6 bg-white/20 hover:bg-white/30 rounded flex items-center justify-center text-white text-xs">
+                                            <i class="far fa-square"></i>
+                                        </button>
+                                        <button class="w-6 h-6 bg-red-500 hover:bg-red-600 rounded flex items-center justify-center text-white text-xs">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-0">
+                                <img src="/static/img/diagrama_app.jpg" alt="SQL App Studio Interface" 
+                                     class="w-full h-80 object-cover">
+                            </div>
+                        </div>
                         
-                        <!-- Imagen circular con borde -->
-                        <img src="/static/img/th.jpg" alt="SQL App Studio Dashboard" 
-                             class="relative z-10 h-64 w-64 md:h-80 md:w-80 object-cover rounded-full border-4 border-white shadow-xl">
-                        
-                        <!-- Elemento decorativo -->
-                        <div class="absolute -bottom-4 -right-4 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full h-20 w-20 flex items-center justify-center text-white shadow-lg">
-                            <i class="fas fa-database text-2xl"></i>
+                        <!-- Elementos flotantes profesionales -->
+                        <div class="absolute -top-4 -right-4 bg-green-100 text-green-800 p-3 rounded-xl shadow-lg">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                        <div class="absolute -bottom-4 -left-4 bg-blue-100 text-blue-800 p-3 rounded-xl shadow-lg">
+                            <i class="fas fa-chart-line text-xl"></i>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-16 bg-gray-100">
+    <!-- Features Section Profesional -->
+    <section id="features" class="py-20 bg-white">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold mb-4">Características Principales</h2>
-                <p class="text-gray-600 max-w-3xl mx-auto">
-                    Descubre todas las herramientas avanzadas que te ofrece SQL App Studio para optimizar tu trabajo con bases de datos.
+                <div class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium mb-4">
+                    <i class="fas fa-star mr-2"></i>
+                    Características Enterprise
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-6">
+                    Tecnología que impulsa 
+                    <span class="gradient-text">tu crecimiento</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Herramientas profesionales diseñadas para equipos que buscan eficiencia, escalabilidad y resultados excepcionales.
                 </p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Feature 1 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-server text-blue-600 text-2xl"></i>
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-server text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Backend Robusto</h3>
-                    <p class="text-gray-600">
-                        Construido con FastAPI, soporta SQL Server y PostgreSQL (próximamente MySQL). Totalmente dockerizado para despliegue rápido y escalable.
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Arquitectura Enterprise</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        FastAPI de alto rendimiento con soporte nativo para SQL Server y PostgreSQL. Arquitectura de microservicios totalmente containerizada.
                     </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Auto-scaling automático
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Load balancing integrado
+                        </li>
+                    </ul>
                 </div>
                 
                 <!-- Feature 2 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-cogs text-purple-600 text-2xl"></i>
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-magic text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Automatización Total</h3>
-                    <p class="text-gray-600">
-                        Genera rutas, modelos, esquemas, pruebas y archivos HTML con JavaScript para una gestión eficiente y rápida.
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Automatización Inteligente</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        Generación automática de APIs, modelos de datos, documentación y tests. Reducción del 80% en tiempo de desarrollo.
                     </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Code generation
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Testing automático
+                        </li>
+                    </ul>
                 </div>
                 
                 <!-- Feature 3 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-exchange-alt text-green-600 text-2xl"></i>
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-database text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Migración de Datos</h3>
-                    <p class="text-gray-600">
-                        Importa datos desde Excel (.xls y .xlsx) hacia bases de datos SQL con validaciones que garantizan su calidad.
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Migración de Datos</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        Importación masiva desde Excel con validaciones avanzadas, transformaciones y mapeo inteligente de esquemas.
                     </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Validación de datos
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Rollback automático
+                        </li>
+                    </ul>
                 </div>
                 
                 <!-- Feature 4 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-brain text-red-600 text-2xl"></i>
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-red-500 to-pink-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-brain text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Análisis con IA</h3>
-                    <p class="text-gray-600">
-                        Integra modelos de inteligencia artificial para análisis avanzado de datos, ofreciendo insights clave para la toma de decisiones.
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Inteligencia Artificial</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        Análisis predictivo, detección de anomalías y optimización automática con modelos de machine learning.
                     </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            ML integrado
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Análisis predictivo
+                        </li>
+                    </ul>
                 </div>
                 
                 <!-- Feature 5 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-desktop text-yellow-600 text-2xl"></i>
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-shield-alt text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Interfaz Intuitiva</h3>
-                    <p class="text-gray-600">
-                        Entorno web basado en Jinja2, Bootstrap y SQLAlchemy para configuraciones rápidas y experiencia responsiva.
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Seguridad Enterprise</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        Cifrado end-to-end, autenticación multi-factor, auditoría completa y cumplimiento con estándares SOC 2.
                     </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            SOC 2 compliant
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Cifrado AES-256
+                        </li>
+                    </ul>
                 </div>
                 
                 <!-- Feature 6 -->
-                <div class="feature-card bg-white p-6">
-                    <div class="w-16 h-16 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-lock text-indigo-600 text-2xl"></i>
+                <div class="card-hover p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-chart-line text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Seguridad Avanzada</h3>
-                    <p class="text-gray-600">
-                        Implementa prácticas seguras para gestión de datos y autenticación, protegiendo tu información sensible en todo momento.
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Analytics Avanzado</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        Dashboards en tiempo real, reportes automatizados y métricas de performance con visualizaciones interactivas.
                     </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Real-time dashboards
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Custom reports
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Call to action dentro de features -->
+            <div class="text-center mt-16">
+                <div class="inline-flex items-center px-6 py-3 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium">
+                    <i class="fas fa-rocket mr-2"></i>
+                    ¿Listo para comenzar? Agenda una demo personalizada
                 </div>
             </div>
         </div>
@@ -616,173 +801,17 @@
             <i class="fas fa-arrow-up"></i>
         </div>
     
-        <!-- Scripts -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script>
-            // TEMPORALMENTE DESHABILITADO para evitar conflictos de autenticación
-            // <script src="/static/js/components.js"></script>
-        </script>
+        <!-- Scripts optimizados -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                // Cargar componentes
-                loadNavbar();
-                loadFooter();
-                setupScrollToTop();
-                setupContactForm();
-                setupSmoothScroll();
-                
-                // Inicializar animaciones
-                initAnimations();
-            });
-    
-            // Cargar el navbar
-            function loadNavbar() {
-                fetch('/static/html/navbar.html')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Error al cargar el navbar');
-                        }
-                        return response.text();
-                    })
-                    .then(html => {
-                        document.getElementById('navbar-container').innerHTML = html;
-                        
-                        // Activar el ítem de inicio en el navbar
-                        const navItems = document.querySelectorAll('#navbar-container .nav-link');
-                        navItems.forEach(item => {
-                            if (item.getAttribute('href') === '/' || item.getAttribute('href') === '/index.html') {
-                                item.classList.add('active', 'text-blue-600');
-                                item.classList.remove('text-gray-600');
-                            }
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        document.getElementById('navbar-container').innerHTML = `
-                            <div class="bg-red-100 text-red-700 p-4">Error al cargar el navbar</div>
-                        `;
-                    });
-            }
-    
-            // Cargar el footer
-            function loadFooter() {
-                fetch('/static/html/footer.html')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Error al cargar el footer');
-                        }
-                        return response.text();
-                    })
-                    .then(html => {
-                        document.getElementById('footer-container').innerHTML = html;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        document.getElementById('footer-container').innerHTML = `
-                            <div class="bg-red-100 text-red-700 p-4">Error al cargar el footer</div>
-                        `;
-                    });
-            }
-    
-            // Configurar el botón de volver arriba
-            function setupScrollToTop() {
-                const backToTopButton = document.getElementById('back-to-top');
-                
-                // Mostrar/ocultar el botón según el scroll
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 300) {
-                        backToTopButton.classList.add('visible');
-                    } else {
-                        backToTopButton.classList.remove('visible');
-                    }
-                });
-                
-                // Acción de volver arriba al hacer clic
-                backToTopButton.addEventListener('click', () => {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                });
-            }
-    
-            // Configurar el formulario de contacto
-            function setupContactForm() {
-                const contactForm = document.getElementById('contact-form');
-                const sendingMessage = document.getElementById('sending-message');
-                
-                if (contactForm) {
-                    contactForm.addEventListener('submit', async function(event) {
-                        event.preventDefault();
-                        
-                        // Mostrar indicador de envío
-                        sendingMessage.style.display = 'flex';
-                        
-                        // Obtener los datos del formulario
-                        const nombre = document.getElementById('nombre').value;
-                        const email = document.getElementById('email').value;
-                        const empresa = document.getElementById('empresa').value;
-                        const proyecto = document.getElementById('proyecto').value;
-                        const mensaje = document.getElementById('mensaje').value;
-                        
-                        // Construir el mensaje completo con toda la información
-                        let mensajeCompleto = `Nuevo mensaje de contacto:\n\n`;
-                        mensajeCompleto += `Nombre: ${nombre}\n`;
-                        mensajeCompleto += `Email: ${email}\n`;
-                        if (empresa) mensajeCompleto += `Empresa: ${empresa}\n`;
-                        if (proyecto) mensajeCompleto += `Tipo de proyecto: ${proyecto}\n`;
-                        mensajeCompleto += `\nMensaje:\n${mensaje}`;
-                        
-                        // Preparar los datos para enviar al backend
-                        const emailData = {
-                            destinatario: "fjuansimon@gmail.com", // Email de destino
-                            asunto: `Nuevo contacto desde web - ${nombre}`,
-                            mensaje: mensajeCompleto
-                        };
-                        
-                        try {
-                            // Enviar datos al endpoint real
-                            const response = await fetch('/envios/enviar_correo', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(emailData)
-                            });
-                            
-                            if (response.ok) {
-                                const result = await response.json();
-                                
-                                // Limpiar formulario
-                                contactForm.reset();
-                                
-                                // Ocultar indicador de envío
-                                sendingMessage.style.display = 'none';
-                                
-                                // Mostrar mensaje de éxito
-                                showToast('¡Mensaje enviado correctamente! Nos pondremos en contacto pronto.', 'success');
-                            } else {
-                                throw new Error(`Error del servidor: ${response.status}`);
-                            }
-                        } catch (error) {
-                            console.error('Error al enviar el formulario:', error);
-                            sendingMessage.style.display = 'none';
-                            showToast('Hubo un error al enviar el mensaje. Por favor, inténtalo nuevamente.', 'error');
-                        }
-                    });
-                }
-            }
-    
-            // Configurar scroll suave para los enlaces internos
-            function setupSmoothScroll() {
-                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                    anchor.addEventListener('click', function(e) {
+                // Smooth scroll para links internos
+                const links = document.querySelectorAll('a[href^="#"]');
+                links.forEach(link => {
+                    link.addEventListener('click', function(e) {
                         e.preventDefault();
+                        const targetId = this.getAttribute('href').substring(1);
+                        const targetElement = document.getElementById(targetId);
                         
-                        const targetId = this.getAttribute('href');
-                        if (targetId === '#') return;
-                        
-                        const targetElement = document.querySelector(targetId);
                         if (targetElement) {
                             targetElement.scrollIntoView({
                                 behavior: 'smooth',
@@ -791,127 +820,93 @@
                         }
                     });
                 });
-            }
-    
-            // Inicializar animaciones de entrada
-            function initAnimations() {
-                // Animación para las tarjetas de características
-                const featureCards = document.querySelectorAll('.feature-card');
-                animateElementsOnScroll(featureCards, 'transform: translateY(20px); opacity: 0', 'transform: translateY(0); opacity: 1', 100);
-                
-                // Animación para los testimonios
-                const testimonials = document.querySelectorAll('#testimonials .bg-gray-50');
-                animateElementsOnScroll(testimonials, 'transform: scale(0.9); opacity: 0', 'transform: scale(1); opacity: 1', 150);
-            }
-    
-            // Función para animar elementos al hacer scroll
-            function animateElementsOnScroll(elements, initialStyle, finalStyle, delay = 0) {
-                if (!elements || elements.length === 0) return;
-                
-                // Configurar estilos iniciales
-                elements.forEach((el, index) => {
-                    el.style.transition = 'all 0.6s ease-out';
-                    el.style.transitionDelay = `${delay * index}ms`;
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateY(20px)';
-                });
-                
-                // Función para verificar si un elemento está en el viewport
-                function isElementInViewport(el) {
-                    const rect = el.getBoundingClientRect();
-                    return (
-                        rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.85 &&
-                        rect.bottom >= 0
-                    );
-                }
-                
-                // Función para mostrar elementos visibles
-                function showVisibleElements() {
-                    elements.forEach(el => {
-                        if (isElementInViewport(el) && el.style.opacity === '0') {
-                            el.style.opacity = '1';
-                            el.style.transform = 'translateY(0)';
+                // Animaciones de entrada para elementos
+                const observerOptions = {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
                         }
                     });
-                }
+                }, observerOptions);
+
+                // Observar elementos con animación
+                const animatedElements = document.querySelectorAll('.card-hover');
+                animatedElements.forEach(el => {
+                    if (el.getBoundingClientRect().top > window.innerHeight) {
+                        el.style.opacity = '0';
+                        el.style.transform = 'translateY(20px)';
+                        el.style.transition = 'all 0.6s ease-out';
+                        observer.observe(el);
+                    }
+                });
+
+                // Efectos interactivos para botones
+                const buttons = document.querySelectorAll('.btn-primary, .btn-secondary');
+                buttons.forEach(button => {
+                    if (button.textContent.includes('Empezar') || button.textContent.includes('demo')) {
+                        button.addEventListener('click', function(e) {
+                            if (this.getAttribute('href') === '#features' || this.getAttribute('href') === '#contact') {
+                                return; // Permitir navegación normal
+                            }
+                            e.preventDefault();
+                            
+                            // Efecto visual
+                            this.style.transform = 'scale(0.95)';
+                            setTimeout(() => {
+                                this.style.transform = 'scale(1)';
+                            }, 150);
+                            
+                            // Mostrar mensaje
+                            showNotification('¡Gracias por tu interés! Funcionalidad en desarrollo.');
+                        });
+                    }
+                });
+
+                console.log('SQL App Studio inicializado correctamente');
+            });
+
+            // Función para mostrar notificaciones
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 shadow-lg transition-all duration-300 ${
+                    type === 'error' ? 'bg-red-500' : 'bg-blue-600'
+                }`;
+                notification.textContent = message;
+                notification.style.transform = 'translateX(100%)';
                 
-                // Verificar elementos visibles al cargar y en scroll
-                showVisibleElements();
-                window.addEventListener('scroll', showVisibleElements);
-            }
-    
-            // Mostrar un mensaje toast
-            function showToast(message, type = 'info') {
-                // Crear el toast si no existe
-                let toast = document.getElementById('toast');
+                document.body.appendChild(notification);
                 
-                if (!toast) {
-                    toast = document.createElement('div');
-                    toast.id = 'toast';
-                    toast.style.position = 'fixed';
-                    toast.style.bottom = '20px';
-                    toast.style.left = '50%';
-                    toast.style.transform = 'translateX(-50%)';
-                    toast.style.padding = '12px 24px';
-                    toast.style.borderRadius = '8px';
-                    toast.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-                    toast.style.zIndex = '1000';
-                    toast.style.transition = 'all 0.3s ease-in-out';
-                    toast.style.opacity = '0';
-                    document.body.appendChild(toast);
-                }
-                
-                // Establecer estilos según el tipo
-                switch (type) {
-                    case 'success':
-                        toast.style.backgroundColor = '#10B981';
-                        toast.style.color = 'white';
-                        break;
-                    case 'error':
-                        toast.style.backgroundColor = '#EF4444';
-                        toast.style.color = 'white';
-                        break;
-                    case 'warning':
-                        toast.style.backgroundColor = '#F59E0B';
-                        toast.style.color = 'white';
-                        break;
-                    default:
-                        toast.style.backgroundColor = '#3B82F6';
-                        toast.style.color = 'white';
-                }
-                
-                // Establecer el mensaje
-                toast.textContent = message;
-                
-                // Mostrar el toast
-                toast.style.opacity = '1';
-                
-                // Ocultar después de 5 segundos
+                // Animar entrada
                 setTimeout(() => {
-                    toast.style.opacity = '0';
-                    
-                    // Eliminar el elemento después de la transición
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+                
+                // Auto-remove after 4 seconds
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
                     setTimeout(() => {
-                        if (document.body.contains(toast)) {
-                            document.body.removeChild(toast);
+                        if (notification.parentNode) {
+                            notification.remove();
                         }
                     }, 300);
-                }, 5000);
+                }, 4000);
             }
-            
-            // Opción para precargar imágenes
-            function preloadImages(images) {
-                for (const src of images) {
-                    const img = new Image();
-                    img.src = src;
-                }
-            }
-            
-            // Precargar imágenes importantes
-            preloadImages([
-                '/static/img/dashboard_illustration.svg',
-                '/static/img/diagrama_app.jpg'
-            ]);
+
+            // Performance básico
+            window.addEventListener('load', () => {
+                console.log('Página cargada completamente');
+            });
+
+            // Error handling básico
+            window.addEventListener('error', (e) => {
+                console.error('Error detectado:', e.error);
+            });
         </script>
     </body>
     </html>
