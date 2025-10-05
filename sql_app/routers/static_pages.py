@@ -51,6 +51,13 @@ async def get_login_page():
     with open("sql_app/static/login.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read(), status_code=200)
 
+@router.get("/test-perfil", response_class=HTMLResponse, include_in_schema=False)
+async def get_test_perfil():
+    """Página de prueba para el perfil de usuario"""
+    with open("sql_app/static/test_perfil.html", "r", encoding="utf-8") as file:
+        return HTMLResponse(content=file.read(), status_code=200)
+        return HTMLResponse(content=file.read(), status_code=200)
+
 @router.get("/login-simple", response_class=HTMLResponse, include_in_schema=False)
 async def get_login_simple():
     with open("sql_app/static/login.html", "r", encoding="utf-8") as file:

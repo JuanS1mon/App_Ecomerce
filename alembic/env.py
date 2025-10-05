@@ -7,17 +7,20 @@ import sys
 # Añadir la ruta del proyecto para importar modelos
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from sql_app.db.database import Base
-# Importa todos los modelos aquí para que Alembic los detecte
-from sql_app.db.models_import import *
+try:
+    from sql_app.db.database import Base
+    target_metadata = Base.metadata
+except Exception as e:
+    print(f"Warning: Could not import Base metadata: {e}")
+    target_metadata = None
 
 # Configuración Alembic
 config = context.config
-fileConfig(config.config_file_name)
-target_metadata = Base.metadata
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
 
 def run_migrations_offline():
-    url = os.getenv("SQLALCHEMY_DATABASE_URL")
+    url = os.getenv("SQLALCHEMY_DATABASE_URL") or config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -29,8 +32,8 @@ def run_migrations_offline():
 
 def run_migrations_online():
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix='sqlalchemy.',
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
     with connectable.connect() as connection:

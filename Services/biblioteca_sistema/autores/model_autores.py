@@ -25,4 +25,4 @@ class Autores(Base):
     fecha_creacion = Column(DateTime)
 
     def __repr__(self):
-        return f"<Autores(id={self.id})">
+        return f"<Autores(id={self.id})>"

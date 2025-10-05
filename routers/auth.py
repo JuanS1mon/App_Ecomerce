@@ -278,6 +278,25 @@ async def logout(
         response.delete_cookie(key="access_token")
         return response
 
+@router.get("/test-user")
+async def test_user_endpoint():
+    """Endpoint temporal para probar la funcionalidad del frontend"""
+    # SVG de avatar de prueba en base64
+    test_avatar = "PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjUwIiBmaWxsPSIjNEY0NkU1Ii8+CiAgICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjM1IiByPSIxNSIgZmlsbD0id2hpdGUiLz4KICAgIDxlbGxpcHNlIGN4PSI1MCIgY3k9Ijc1IiByeD0iMjAiIHJ5PSIxNSIgZmlsbD0id2hpdGUiLz4KICAgIDx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiBmaWxsPSIjNEY0NkU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5KPC90ZXh0Pgo8L3N2Zz4="
+    
+    user_data = {
+        "codigo": 1,
+        "usuario": "juan",
+        "nombre": "Juan Admin",
+        "email": "juan@admin.com",
+        "imagen_perfil": test_avatar,
+        "autenticado": True,
+        "activo": True,
+        "roles": ["admin"]
+    }
+    
+    return user_data
+
 @router.get("/me")
 async def get_current_user_info(
     request: Request,
@@ -291,6 +310,7 @@ async def get_current_user_info(
             "usuario": user.usuario,
             "nombre": user.nombre,
             "email": user.mail,
+            "imagen_perfil": user.imagen_perfil if hasattr(user, 'imagen_perfil') else None,
             "autenticado": True,
             "activo": user.activo,
             "roles": user.roles if hasattr(user, "roles") and user.roles else []

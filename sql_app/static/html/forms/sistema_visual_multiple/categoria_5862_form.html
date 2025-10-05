@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categoria 5862 - sistema_visual_multiple</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 20px;
+            padding: 30px;
+        }
+        .btn-custom {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            color: white;
+        }
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .alert {
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="display-5 text-primary mb-3">
+                    <i class="fas fa-edit me-3"></i>Categoria 5862
+                </h1>
+                <p class="lead text-muted">Formulario para gestión de Módulo categoria_5862 generado desde Editor Visual</p>
+                <div class="d-flex justify-content-center gap-2 mb-3">
+                    <a href="index.html" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Volver al índice
+                    </a>
+                    <a href="/sistema_visual_multiple/categoria_5862/" target="_blank" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-external-link-alt me-1"></i>Ver API
+                    </a>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-plus-circle me-2"></i>Crear nuevo Categoria 5862
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="categoria_5862Form">
+                                
+    <div class="mb-3">
+        <label for="field_nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="field_nombre" name="nombre"  >
+        
+    </div>
+
+    <div class="mb-3">
+        <label for="field_descripcion" class="form-label">Descripcion</label>
+        <input type="text" class="form-control" id="field_descripcion" name="descripcion"  >
+        
+    </div>
+<div class="mb-3">
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="field_activa" name="activa" value="true">
+            <label class="form-check-label" for="field_activa">Activa</label>
+        </div></div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-md-6">
+                                        <button type="submit" class="btn btn-custom w-100">
+                                            <i class="fas fa-save me-2"></i>Guardar
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button type="reset" class="btn btn-outline-secondary w-100">
+                                            <i class="fas fa-undo me-2"></i>Limpiar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista existente -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>Registros existentes
+                            </h5>
+                            <button id="refresh-btn" class="btn btn-light btn-sm">
+                                <i class="fas fa-sync-alt me-1"></i>Actualizar
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="loading" class="text-center py-4" style="display: none;">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                            </div>
+                            <div id="data-table" class="table-responsive">
+                                <!-- La tabla se cargará dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas -->
+            <div id="alerts-container" class="mt-3"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = '/sistema_visual_multiple/categoria_5862';
+        
+        // Manejar envío del formulario
+        document.getElementById('categoria_5862Form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                // Convertir tipos según sea necesario
+                if (value === '') {
+                    data[key] = null;
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            try {
+                showLoading(true);
+                const response = await fetch(API_BASE + '/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showAlert('Registro creado exitosamente', 'success');
+                    this.reset();
+                    loadData();
+                } else {
+                    const errorData = await response.json();
+                    showAlert('Error: ' + (errorData.detail || 'Error desconocido'), 'danger');
+                }
+            } catch (error) {
+                showAlert('Error de conexión: ' + error.message, 'danger');
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        // Cargar datos existentes
+        async function loadData() {
+            try {
+                showLoading(true);
+                const response = await fetch(API_BASE + '/');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayData(data);
+                } else {
+                    showAlert('Error cargando datos', 'warning');
+                }
+            } catch (error) {
+                showAlert('Error de conexión al cargar datos', 'warning');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Mostrar datos en tabla
+        function displayData(data) {
+            const container = document.getElementById('data-table');
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center py-4">No hay registros disponibles</p>';
+                return;
+            }
+            
+            const headers = Object.keys(data[0]);
+            let tableHTML = `
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            ${headers.map(h => `<th>${h.replace('_', ' ').toUpperCase()}</th>`).join('')}
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            data.forEach(row => {
+                tableHTML += '<tr>';
+                headers.forEach(header => {
+                    let value = row[header];
+                    if (value === null || value === undefined) value = '-';
+                    if (typeof value === 'boolean') value = value ? 'Sí' : 'No';
+                    tableHTML += `<td>${value}</td>`;
+                });
+                tableHTML += `
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editRecord(${row.id || row[headers[0]]})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord(${row.id || row[headers[0]]})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            
+            tableHTML += '</tbody></table>';
+            container.innerHTML = tableHTML;
+        }
+        
+        // Funciones de utilidad
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alerts-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.appendChild(alert);
+            
+            setTimeout(() => alert.remove(), 5000);
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+        
+        async function editRecord(id) {
+            // Implementar edición
+            showAlert('Función de edición en desarrollo', 'info');
+        }
+        
+        async function deleteRecord(id) {
+            if (confirm('¿Está seguro de eliminar este registro?')) {
+                try {
+                    const response = await fetch(API_BASE + `/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        showAlert('Registro eliminado exitosamente', 'success');
+                        loadData();
+                    } else {
+                        showAlert('Error al eliminar registro', 'danger');
+                    }
+                } catch (error) {
+                    showAlert('Error de conexión', 'danger');
+                }
+            }
+        }
+        
+        // Evento del botón refrescar
+        document.getElementById('refresh-btn').addEventListener('click', loadData);
+        
+        // Cargar datos al inicio
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

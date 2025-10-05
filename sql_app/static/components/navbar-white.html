@@ -199,32 +199,148 @@
         }).join('');
     }
     
-    // Función para actualizar información del usuario
+    // Función para obtener y actualizar información del usuario
     function updateUserInfo() {
-        // Simular obtener datos del usuario (en producción vendría de una API)
-        const userData = {
-            name: 'Juan Administrador',
-            email: 'juan@sqlappstudio.com',
-            initial: 'J'
-        };
+        console.log('🔍 Iniciando carga del perfil de usuario (navbar-white)...');
         
-        // Actualizar elementos del DOM
         const userInitial = document.getElementById('user-initial');
         const userDisplayName = document.getElementById('user-display-name');
         const userName = document.getElementById('user-name');
         const userEmail = document.getElementById('user-email');
         
-        if (userInitial) userInitial.textContent = userData.initial;
-        if (userDisplayName) userDisplayName.textContent = userData.name;
-        if (userName) userName.textContent = userData.name;
-        if (userEmail) userEmail.textContent = userData.email;
+        // Intentar múltiples endpoints
+        async function tryEndpoint(url) {
+            try {
+                const response = await fetch(url, {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(`✅ Datos obtenidos de ${url}:`, data);
+                    return data;
+                }
+                return null;
+            } catch (error) {
+                console.log(`❌ Error en ${url}:`, error);
+                return null;
+            }
+        }
+        
+        async function loadUserData() {
+            const endpoints = ['/auth/test-user', '/api/public/auth/me', '/auth/current-user'];
+            
+            for (const endpoint of endpoints) {
+                const data = await tryEndpoint(endpoint);
+                if (data) {
+                    updateUserElements(data);
+                    return;
+                }
+            }
+            
+            // Si no se obtuvieron datos, usar valores por defecto
+            console.log('ℹ️ Usando datos por defecto');
+            useDefaultUserData();
+        }
+        
+        function updateUserElements(data) {
+            console.log('🔄 Actualizando elementos del usuario (navbar-white):', data);
+            
+            if (!data) {
+                console.warn('⚠️ No hay datos de usuario para actualizar');
+                return;
+            }
+            
+            // Actualizar nombres
+            const displayName = data.nombre || data.name || data.usuario || 'Usuario';
+            if (userDisplayName) userDisplayName.textContent = displayName;
+            if (userName) userName.textContent = displayName;
+            
+            // Actualizar email
+            const displayEmail = data.email || data.correo || 'Sin email';
+            if (userEmail) userEmail.textContent = displayEmail;
+            
+            // Actualizar inicial y posible imagen
+            if (userInitial) {
+                // Si hay imagen SVG, usarla
+                if (data.imagen && data.imagen.startsWith('data:image/svg+xml')) {
+                    console.log('🖼️ Configurando imagen SVG para el avatar');
+                    
+                    // Encontrar el contenedor del avatar
+                    const avatarContainer = userInitial.closest('.w-8.h-8, .w-10.h-10, [class*="w-"], [class*="h-"]') || userInitial.parentElement;
+                    
+                    if (avatarContainer) {
+                        // Crear elemento img para la imagen SVG
+                        const imgElement = document.createElement('img');
+                        imgElement.src = data.imagen;
+                        imgElement.alt = 'Avatar de ' + displayName;
+                        imgElement.className = 'w-full h-full rounded-full object-cover';
+                        imgElement.style.width = '100%';
+                        imgElement.style.height = '100%';
+                        
+                        // Reemplazar el contenido del contenedor
+                        avatarContainer.innerHTML = '';
+                        avatarContainer.appendChild(imgElement);
+                        
+                        console.log('✅ Imagen SVG aplicada correctamente');
+                    } else {
+                        // Fallback: usar inicial
+                        const inicial = displayName.charAt(0).toUpperCase();
+                        userInitial.textContent = inicial;
+                        console.log('📝 Usando inicial como fallback:', inicial);
+                    }
+                } else {
+                    // Sin imagen: usar inicial
+                    const inicial = displayName.charAt(0).toUpperCase();
+                    userInitial.textContent = inicial;
+                    console.log('📝 Usando inicial del nombre:', inicial);
+                }
+            }
+            
+            console.log('✅ Actualización de elementos completada (navbar-white)');
+        }
+        
+        function useDefaultUserData() {
+            if (userInitial) userInitial.textContent = 'U';
+            if (userDisplayName) userDisplayName.textContent = 'Usuario Invitado';
+            if (userName) userName.textContent = 'Usuario Invitado';
+            if (userEmail) userEmail.textContent = 'Sin autenticar';
+        }
+        
+        loadUserData();
     }
     
     // Función de logout
     window.logout = function() {
         if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-            // En producción esto redirigiría a la ruta de logout
-            window.location.href = '/logout';
+            console.log('🚪 Cerrando sesión...');
+            
+            fetch('/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(function(response) {
+                if (response.ok || response.redirected) {
+                    console.log('✅ Sesión cerrada correctamente');
+                    // Limpiar localStorage
+                    localStorage.removeItem('access_token');
+                    window.location.href = '/loginpage';
+                } else {
+                    throw new Error('Error al cerrar sesión');
+                }
+            })
+            .catch(function(error) {
+                console.error('❌ Error en logout:', error);
+                alert('Error al cerrar sesión. Por favor, inténtelo de nuevo.');
+            });
         }
     };
     

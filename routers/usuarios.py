@@ -54,7 +54,7 @@ from ..db.schemas.config.Usuarios import (UserDB, UserRegistration, UserUpdate, 
 
 from ..db.crud.config.Usuarios import (get_usuario,create_usuario,update_usuario,delete_usuario,gets_usuarios)
 
-from ..Services.security.security import (crear_access_token,get_current_user_secure,get_current_user,encriptar_clave,sanitize_for_log,log_security_event,verify_password)
+from ..Services.security.security import (crear_access_token,get_current_user_secure,get_current_user,get_current_user_for_admin,encriptar_clave,sanitize_for_log,log_security_event,verify_password)
 
 from ..Services.mail.mail import validar_email, enviar_email_simple
 from ..Services.security.get_optional_user import get_optional_user
@@ -115,11 +115,115 @@ usuarios_router = APIRouter(
 # NUEVAS RUTAS PARA COMPATIBILIDAD CON FRONTEND
 # ============================================================================
 
+# Helper function to get user from request (cookies or headers)
+async def get_current_user_from_request(request: Request, db: Session = Depends(get_db)):
+    """Extrae el usuario desde cookies o headers Authorization"""
+    token = None
+    
+    # Intentar obtener token de Authorization header
+    authorization = request.headers.get("Authorization")
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ")[1]
+    
+    # Si no hay header Authorization, intentar con cookies
+    if not token:
+        token = request.cookies.get("access_token")
+    
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token no proporcionado"
+        )
+    
+    try:
+        # Decodificar token usando la función existente
+        from ..Services.security.security import decodifica_token
+        from ..db.models.config.usuarios import Usuarios
+        
+        payload = decodifica_token(token)
+        username = payload.get("sub")
+        
+        if not username:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token inválido"
+            )
+        
+        # Buscar usuario en la base de datos
+        user = db.query(Usuarios).filter(Usuarios.usuario == username).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Usuario no encontrado"
+            )
+        
+        return user
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido"
+        )
+
+@usuarios_router.get("/profile")
+async def obtener_perfil_usuario(
+    request: Request,
+    response: Response,
+    user: UsuariosModel = Depends(get_current_user_from_request)
+):
+    """Obtener información del perfil del usuario autenticado - Endpoint específico para perfil"""
+    try:
+        # Retornar información del usuario autenticado
+        user_data = {
+            "id": user.codigo,
+            "codigo": user.codigo,
+            "usuario": user.usuario,
+            "nombre": user.nombre,
+            "email": user.mail,
+            "mail": user.mail,  # Por compatibilidad
+            "imagen_perfil": user.imagen_perfil if hasattr(user, 'imagen_perfil') else None,
+            "autenticado": True,
+            "activo": user.activo,
+            "fecha_creacion": user.fecha_creacion.isoformat() if hasattr(user, 'fecha_creacion') and user.fecha_creacion else None,
+            "ultimo_acceso": user.ultimo_acceso.isoformat() if hasattr(user, 'ultimo_acceso') and user.ultimo_acceso else None
+        }
+        
+        # Incluir roles si están disponibles
+        if hasattr(user, "roles") and user.roles:
+            user_data["roles"] = [
+                {
+                    "id": role.id if hasattr(role, 'id') else 0,
+                    "nombre": role.nombre if hasattr(role, 'nombre') else str(role),
+                    "descripcion": role.descripcion if hasattr(role, 'descripcion') else ""
+                }
+                for role in user.roles
+            ]
+        else:
+            user_data["roles"] = []
+        
+        # Determinar si es admin (para compatibilidad frontend)
+        is_admin = False
+        if hasattr(user, "roles") and user.roles:
+            is_admin = any(
+                role.nombre.lower() in ['admin', 'administrador'] 
+                for role in user.roles
+            )
+        user_data["is_admin"] = is_admin
+        
+        return user_data
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo perfil del usuario: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno obteniendo información del perfil"
+        )
+
 @usuarios_router.get("/current")
 async def obtener_usuario_actual(
     request: Request,
     response: Response,
-    user: UsuariosModel = Depends(get_current_user_secure)
+    user: UsuariosModel = Depends(get_current_user_from_request)
 ):
     """Obtener información del usuario actualmente autenticado - Compatible con frontend"""
     try:
@@ -131,6 +235,7 @@ async def obtener_usuario_actual(
             "nombre": user.nombre,
             "email": user.mail,
             "mail": user.mail,  # Por compatibilidad
+            "imagen_perfil": user.imagen_perfil if hasattr(user, 'imagen_perfil') else None,
             "autenticado": True,
             "activo": user.activo,
             "fecha_creacion": user.fecha_creacion.isoformat() if hasattr(user, 'fecha_creacion') and user.fecha_creacion else None,

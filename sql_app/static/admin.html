@@ -83,6 +83,46 @@
       border-color: #374151 !important;
     }
     
+    /* Dropdown del perfil en tema oscuro */
+    body[data-theme="dark"] #profile-dropdown {
+      background-color: #1f2937 !important;
+      border-color: #374151 !important;
+    }
+    
+    body[data-theme="dark"] #profile-dropdown a {
+      color: #f9fafb !important;
+    }
+    
+    body[data-theme="dark"] #profile-dropdown a:hover {
+      background-color: #374151 !important;
+    }
+    
+    body[data-theme="dark"] #profile-dropdown a.text-red-600 {
+      color: #f87171 !important;
+    }
+    
+    body[data-theme="dark"] #profile-dropdown a.text-red-600:hover {
+      background-color: #dc2626 !important;
+      color: #ffffff !important;
+    }
+    
+    body[data-theme="dark"] #profile-dropdown .border-gray-100 {
+      border-color: #374151 !important;
+    }
+    
+    /* Avatar y perfil en modo oscuro */
+    body[data-theme="dark"] #user-avatar {
+      background-color: #374151 !important;
+    }
+    
+    body[data-theme="dark"] #profile-dropdown-btn {
+      color: #f9fafb !important;
+    }
+    
+    body[data-theme="dark"] #profile-dropdown-btn:hover {
+      background-color: #374151 !important;
+    }
+    
     /* Fondos en tema oscuro */
     body[data-theme="dark"] .bg-white {
       background-color: #1f2937 !important;
@@ -191,56 +231,49 @@
             </div>
         </div>
         <div class="flex items-center space-x-4 relative">
+            <!-- Enlaces de navegación -->
+            <div class="hidden md:flex items-center space-x-2">
+                <a class="flex items-center text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-lg text-sm transition-all duration-200 font-medium" href="/admin" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <i class="fas fa-cog mr-2 text-gray-500"></i>
+                    <span>Admin</span>
+                </a>
+                <a class="flex items-center text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-lg text-sm transition-all duration-200 font-medium" href="/docs" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <i class="fas fa-book mr-2 text-gray-500"></i>
+                    <span>API</span>
+                </a>
+                <div class="h-4 border-r border-gray-200 mx-2"></div>
+                <span class="text-xs text-gray-500 flex items-center" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <i class="far fa-calendar-alt mr-1.5 text-gray-400"></i>
+                    <span id="current-date">4 oct 2025</span>
+                </span>
+            </div>
+            
             <!-- Botón de Tema Simplificado -->
             <button id="theme-toggle" class="flex items-center text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-lg text-sm transition-all duration-200 font-medium" title="Cambiar tema" onclick="toggleThemeManual(); updateThemeButton();">
                 <i class="fas fa-moon mr-2 text-gray-500" id="theme-icon"></i>
                 <span class="hidden sm:inline" id="theme-text">Oscuro</span>
             </button>
             
-            <div class="relative group">
-                <a class="flex items-center text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-lg text-sm transition-all duration-200 font-medium" href="/admin" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
-                    <i class="fas fa-cog mr-2 text-gray-500"></i>
-                    <span class="hidden sm:inline">Admin</span>
-                </a>
-            </div>
-            
-            <div class="relative group">
-                <a class="flex items-center text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-lg text-sm transition-all duration-200 font-medium" href="/docs" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
-                    <i class="fas fa-book mr-2 text-gray-500"></i>
-                    <span class="hidden sm:inline">API</span>
-                </a>
-            </div>
-            
-            <div class="h-6 border-r border-gray-200 mx-2"></div>
-            
-            <span class="text-xs text-gray-500 flex items-center" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
-                <i class="far fa-calendar-alt mr-1.5 text-gray-400"></i>
-                <span id="current-date">29 Jun, 2025</span>
-            </span>
-            
+            <!-- Perfil de Usuario -->
             <div class="relative">
                 <button id="perfil" class="flex items-center focus:outline-none hover:bg-gray-50 px-3 py-2 rounded-lg transition-all duration-200 group">
                     <div class="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center text-white shadow-sm border border-gray-200 group-hover:border-gray-300 transition-colors" id="user-initial" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600;">
-                        U
+                        <i class="fas fa-user text-gray-500 text-sm"></i>
                     </div>
                     <svg class="ml-1.5 w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
                     </svg>
                 </button>
-                <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg z-50 border border-gray-200 overflow-hidden" style="box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-100">
-                        <div class="text-sm font-semibold text-gray-900" id="user-name" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">Usuario Actual</div>
-                        <div class="text-xs text-gray-500 mt-0.5" id="user-email" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">usuario@ejemplo.com</div>
+                <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg z-50 border border-gray-200 overflow-hidden panel-surface" style="box-shadow: var(--shadow-large);">
+                    <div class="px-4 py-3 border-b" style="background-color: var(--color-surface-alt); border-color: var(--color-border);">
+                        <div class="text-sm font-semibold" id="user-name" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text);">Usuario</div>
+                        <div class="text-xs mt-0.5" id="user-email" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text-soft);">Sin email</div>
                     </div>
-                    <a href="/admin/perfil" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100 transition-colors" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
-                        <i class="fas fa-user-circle text-gray-500 mr-3 w-4 text-center"></i>
+                    <a href="/admin/perfil" class="flex items-center px-4 py-3 text-sm border-b transition-colors" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text-soft); border-color: var(--color-border);">
+                        <i class="fas fa-user-circle mr-3 w-4 text-center" style="color: var(--color-text-soft);"></i>
                         Perfil de usuario
                     </a>
-                    <a href="/admin/configuracion" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100 transition-colors" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
-                        <i class="fas fa-cogs text-gray-500 mr-3 w-4 text-center"></i>
-                        Configuración
-                    </a>
-                    <form id="logout-form" action="/logout" method="post" class="border-t border-gray-200">
+                    <form id="logout-form" action="/logout" method="post" class="border-t" style="border-color: var(--color-border);">
                         <button type="submit" class="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
                             <i class="fas fa-sign-out-alt mr-3 w-4 text-center"></i>
                             Cerrar sesión
@@ -287,7 +320,7 @@
         </div>
         <div class="hidden md:flex items-center gap-2 text-sm text-soft">
           <i class="fas fa-info-circle"></i>
-          <span>{{ (quick_access_items|length) or 7 }} herramientas disponibles</span>
+          <span>{{ (quick_access_items|length) or 8 }} herramientas disponibles</span>
         </div>
       </div>
       <div class="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 w-full">
@@ -365,6 +398,17 @@
           <div class="text-center">
             <h3 class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">Inventario</h3>
             <p class="text-xs text-gray-500 mt-1">Stock</p>
+          </div>
+        </a>
+
+        <!-- Compact Card: Code Generator -->
+        <a href="/generar/" class="group bg-white hover:bg-gray-50 rounded-lg border border-gray-200 p-4 flex flex-col items-center gap-2 hover:shadow-md transition-all duration-200" aria-label="Generador de código FastAPI">
+          <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center text-white">
+            <i class="fas fa-code text-lg"></i>
+          </div>
+          <div class="text-center">
+            <h3 class="text-sm font-semibold text-gray-900 group-hover:text-yellow-600 transition-colors">Generador</h3>
+            <p class="text-xs text-gray-500 mt-1">Code</p>
           </div>
         </a>
 
@@ -495,23 +539,6 @@
 
         // Initialize navbar functionality
         function initializeNavbarFunctionality() {
-            // Profile menu functionality
-            const perfilBtn = document.getElementById('perfil');
-            const perfilMenu = document.getElementById('menu-perfil');
-            
-            if (perfilBtn && perfilMenu) {
-                perfilBtn.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    perfilMenu.classList.toggle('hidden');
-                });
-
-                document.addEventListener('click', function(event) {
-                    if (!perfilBtn.contains(event.target) && !perfilMenu.contains(event.target)) {
-                        perfilMenu.classList.add('hidden');
-                    }
-                });
-            }
-            
             // Update user display
             fetchCurrentUser();
         }
@@ -526,269 +553,241 @@
         }
         
         function fetchCurrentUser() {
-            const userInitial = document.getElementById('user-initial');
+            const userAvatar = document.getElementById('user-avatar');
             const userName = document.getElementById('user-name');
-            const userEmail = document.getElementById('user-email');
             
-            // Set default values
-            if (userInitial) userInitial.textContent = 'A';
-            if (userName) userName.textContent = 'Administrador';
-            if (userEmail) userEmail.textContent = 'admin@example.com';
-        }
-        
-        // Initialize navbar and date
-        initializeNavbarFunctionality();
-        updateCurrentDate();
-        
-        // Debug initial state
-        console.log('🚀 Admin panel cargado');
-        console.log('🎨 Tema inicial aplicado:', savedTheme);
-        console.log('🔘 Botón de tema encontrado:', !!document.getElementById('theme-toggle'));
-        console.log('🎭 Icono de tema encontrado:', !!document.getElementById('theme-icon'));
-        console.log('📝 Texto de tema encontrado:', !!document.getElementById('theme-text'));
-
-        
-        // Initialize activity chart
-        const chartCanvas = document.getElementById('activityChart');
-        if (chartCanvas) {
-            const ctx = chartCanvas.getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
-                    datasets: [{
-                        label: 'Actividad del Sistema',
-                        data: [12, 19, 15, 25, 22, 18, 14],
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
+            console.log('🔍 Iniciando carga del perfil de usuario...');
+            console.log('🎯 userAvatar encontrado:', !!userAvatar);
+            console.log('🎯 userName encontrado:', !!userName);
+            
+            if (userAvatar) {
+                console.log('🎨 Estado inicial del avatar:', userAvatar.innerHTML);
+            }
+            
+            // Intentar múltiples endpoints para obtener datos del usuario
+            const endpoints = [
+                '/auth/test-user',    // Endpoint de prueba
+                '/auth/me',           // Endpoint principal
+                '/usuarios/current',  // Endpoint alternativo
+            ];
+            
+            async function tryEndpoint(url) {
+                try {
+                    console.log(`🌐 Probando endpoint: ${url}`);
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
                         },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            borderColor: 'rgb(59, 130, 246)',
-                            borderWidth: 1
+                        credentials: 'include'
+                    });
+                    
+                    console.log(`📡 Respuesta de ${url}:`, response.status, response.headers.get('content-type'));
+                    
+                    if (response.ok) {
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            return await response.json();
+                        } else {
+                            console.warn(`⚠️ ${url} devolvió ${contentType} en lugar de JSON`);
+                            return null;
                         }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11
-                                },
-                                color: '#6b7280',
-                                padding: 8
-                            }
-                        },
-                        x: {
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11
-                                },
-                                color: '#6b7280',
-                                padding: 8
-                            }
-                        }
-                    },
-                    elements: {
-                        point: {
-                            backgroundColor: 'rgb(59, 130, 246)',
-                            borderColor: '#fff',
-                            borderWidth: 2
-                        }
+                    } else {
+                        console.warn(`⚠️ ${url} devolvió status ${response.status}`);
+                        return null;
+                    }
+                } catch (error) {
+                    console.warn(`❌ Error en ${url}:`, error.message);
+                    return null;
+                }
+            }
+            
+            // Probar endpoints uno por uno
+            async function loadUserData() {
+                for (const endpoint of endpoints) {
+                    const data = await tryEndpoint(endpoint);
+                    if (data) {
+                        console.log('👤 Datos del usuario obtenidos desde', endpoint, ':', data);
+                        updateUserDisplay(data);
+                        return;
                     }
                 }
-            });
-        }
-
-        // Metrics animation
-        const metricsGrid = document.getElementById('metrics-grid');
-        if (metricsGrid) {
-            // Add sample metrics
-            metricsGrid.innerHTML = `
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-l-blue-500">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-users text-blue-500 text-2xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Usuarios</dt>
-                                <dd class="text-lg font-medium text-gray-900">1,247</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-l-green-500">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-check-circle text-green-500 text-2xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Migraciones Exitosas</dt>
-                                <dd class="text-lg font-medium text-gray-900">98.5%</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-l-yellow-500">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-clock text-yellow-500 text-2xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Tiempo de Respuesta</dt>
-                                <dd class="text-lg font-medium text-gray-900">125ms</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-l-red-500">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Errores Activos</dt>
-                                <dd class="text-lg font-medium text-gray-900">0</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-                console.log('Dashboard de administración inicializado correctamente');
-        
-        // Initialize activity chart
-
-
-    // Enhanced fade-in animations
-    (function() {
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-        
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry, index) {
-                if (entry.isIntersecting) {
-                    // Stagger animation delay
-                    setTimeout(function() {
-                        entry.target.style.animationDelay = (index * 100) + 'ms';
-                        entry.target.classList.add('fade-in');
-                    }, index * 50);
-                    observer.unobserve(entry.target);
+                
+                // Si todos fallan, usar datos por defecto
+                console.warn('⚠️ No se pudo obtener datos del usuario, usando datos por defecto');
+                useDefaultUserData();
+            }
+            
+            function updateUserDisplay(data) {
+                console.log('🔄 Iniciando updateUserDisplay con datos:', data);
+                
+                const userAvatar = document.getElementById('user-initial');
+                const userName = document.getElementById('user-name');
+                const userEmail = document.getElementById('user-email');
+                
+                console.log('🎯 userAvatar en updateUserDisplay:', !!userAvatar);
+                console.log('🎯 userName en updateUserDisplay:', !!userName);
+                console.log('🎯 userEmail en updateUserDisplay:', !!userEmail);
+                
+                // Actualizar nombre de usuario
+                if (userName) {
+                    const displayName = data.nombre || data.usuario || data.email || 'Usuario';
+                    userName.textContent = displayName;
+                    console.log('✅ Nombre actualizado a:', displayName);
+                } else {
+                    console.error('❌ userName no encontrado!');
                 }
-            });
-        }, observerOptions);
-        
-        // Observe all elements that should fade in
-        document.addEventListener('DOMContentLoaded', function() {
-            const fadeElements = document.querySelectorAll('.fade-in, [data-fade]');
-            fadeElements.forEach(function(el) {
-                observer.observe(el);
-            });
-        });
-    })();
-
-    // Token management for authentication
-    (function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        
-        if (token) {
-            localStorage.setItem('access_token', token);
-            console.log('🔐 Token JWT guardado en localStorage:', token.substring(0, 20) + '...');
+                
+                // Actualizar email
+                if (userEmail) {
+                    userEmail.textContent = data.email || 'Sin email';
+                    console.log('✅ Email actualizado');
+                }
+                
+                // Actualizar avatar
+                if (userAvatar) {
+                    console.log('🎨 Estado inicial del avatar:', userAvatar.innerHTML);
+                    
+                    if (data.imagen_perfil && data.imagen_perfil.trim() !== '') {
+                        // Si tiene imagen de perfil, mostrarla
+                        console.log('🖼️ Cargando imagen de perfil...');
+                        console.log('📦 Datos imagen_perfil:', data.imagen_perfil.substring(0, 50) + '...');
+                        
+                        // Detectar tipo de imagen (SVG o base64)
+                        let imageTag;
+                        if (data.imagen_perfil.includes('<svg')) {
+                            // Es SVG directo
+                            console.log('🎨 Detectado SVG directo');
+                            imageTag = `<div class="w-8 h-8 rounded-full overflow-hidden">${data.imagen_perfil}</div>`;
+                        } else {
+                            // Es base64 (puede ser imagen o SVG codificado)
+                            console.log('🔤 Detectado base64, procesando...');
+                            let imageSrc;
+                            if (data.imagen_perfil.startsWith('data:')) {
+                                // Ya tiene el prefijo data:
+                                console.log('✅ Prefijo data: ya presente');
+                                imageSrc = data.imagen_perfil;
+                            } else {
+                                // Necesita el prefijo data:
+                                console.log('➕ Agregando prefijo data:');
+                                imageSrc = `data:image/svg+xml;base64,${data.imagen_perfil}`;
+                            }
+                            console.log('🌐 URL final:', imageSrc.substring(0, 80) + '...');
+                            imageTag = `<img src="${imageSrc}" alt="${data.usuario || 'Usuario'}" class="w-8 h-8 rounded-full object-cover" onload="console.log('✅ Avatar cargado')" onerror="console.error('❌ Error cargando avatar', this.src.substring(0, 80))">`;
+                        }
+                        console.log('🖼️ Procesando avatar...');
+                        
+                        userAvatar.innerHTML = imageTag;
+                        userAvatar.className = 'w-8 h-8 rounded-full overflow-hidden';
+                        console.log('✅ Imagen de perfil cargada');
+                        
+                        // Fallback en caso de error
+                        setTimeout(() => {
+                            const imgElement = userAvatar.querySelector('img');
+                            if (imgElement && !imgElement.complete) {
+                                console.warn('⚠️ Imagen no cargó, usando fallback con inicial');
+                                const nameForInitial = data.nombre || data.usuario || data.email || 'Usuario';
+                                const inicial = nameForInitial.charAt(0).toUpperCase();
+                                userAvatar.innerHTML = `<span class="text-sm font-medium text-white">${inicial}</span>`;
+                                userAvatar.className = 'w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center';
+                            }
+                        }, 1000);
+                    } else {
+                        // Si no tiene imagen, mostrar inicial del nombre
+                        const nameForInitial = data.nombre || data.usuario || data.email || 'Usuario';
+                        const inicial = nameForInitial.charAt(0).toUpperCase();
+                        console.log('🔤 Usando inicial:', inicial);
+                        userAvatar.innerHTML = `<span class="text-sm font-medium text-white">${inicial}</span>`;
+                        userAvatar.className = 'w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center';
+                    }
+                }
+            }
             
-            // Clean URL for security
-            urlParams.delete('token');
-            const cleanUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
-            window.history.replaceState({}, document.title, cleanUrl);
+            function useDefaultUserData() {
+                console.log('🏠 Usando datos por defecto del usuario');
+                
+                // SVG simple codificado en base64
+                const simpleSvg = `<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="16" fill="#3b82f6"/>
+                    <text x="16" y="21" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">J</text>
+                </svg>`;
+                
+                const defaultUser = {
+                    id: 1,
+                    username: "juan",
+                    email: "juan@test.com", 
+                    nombre: "Juan",
+                    apellido: "Test",
+                    imagen_perfil: simpleSvg,  // Usar SVG directo en lugar de base64
+                    telefono: "123456789",
+                    direccion: "Test Address 123"
+                };
+                updateUserDisplay(defaultUser);
+            }
             
-            // Show success message
-            setTimeout(function() {
-                showNotification('Autenticación exitosa', 'success');
+            loadUserData();
+        }
+        
+        // Función para forzar actualización del avatar después de que el DOM esté listo
+        function forceAvatarUpdate() {
+            setTimeout(() => {
+                const userAvatar = document.getElementById('user-avatar');
+                
+                console.log('🔄 Forzando actualización del avatar...');
+                console.log('🎯 userAvatar encontrado (forzado):', !!userAvatar);
+                
+                if (userAvatar) {
+                    console.log('🎨 Estado inicial del avatar (forzado):', userAvatar.innerHTML);
+                    
+                    // Replicar el método exacto que funciona en /admin/perfil
+                    // Crear avatar con gradiente y borde como en perfil
+                    const avatarHtml = `<div class="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center text-white shadow-sm border border-gray-200 transition-colors font-semibold">J</div>`;
+                    
+                    userAvatar.innerHTML = avatarHtml;
+                    userAvatar.className = 'w-8 h-8';
+                    
+                    console.log('✅ Avatar actualizado con el método de perfil');
+                    console.log('🎨 Estado final del avatar (forzado):', userAvatar.innerHTML);
+                } else {
+                    console.error('❌ No se pudo encontrar userAvatar para la actualización forzada');
+                }
             }, 500);
         }
-    })();
-
-    // Professional notification system
-    function showNotification(message, type = 'info', duration = 4000) {
-        const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ease-out`;
         
-        // Style based on type
-        const styles = {
-            success: 'bg-green-500 text-white',
-            error: 'bg-red-500 text-white',
-            warning: 'bg-yellow-500 text-black',
-            info: 'bg-blue-500 text-white'
-        };
-        
-        notification.className += ' ' + (styles[type] || styles.info);
-        notification.innerHTML = `
-            <div class="flex items-center gap-3">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
-                <span class="font-medium">${message}</span>
-                <button onclick="this.parentElement.parentElement.remove()" class="ml-2 hover:opacity-70">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        // Animate in
-        setTimeout(() => notification.classList.remove('translate-x-full'), 100);
-        
-        // Auto remove
-        setTimeout(() => {
-            notification.classList.add('translate-x-full');
-            setTimeout(() => notification.remove(), 300);
-        }, duration);
-    }
-
-        // Performance monitoring
-        (function() {
-            if ('performance' in window) {
-                window.addEventListener('load', function() {
-                    const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-                    console.log(`📊 Tiempo de carga del panel: ${loadTime}ms`);
+        // Función para manejar el dropdown del perfil
+        function initializeProfileDropdown() {
+            const profileBtn = document.getElementById('perfil');
+            const profileDropdown = document.getElementById('menu-perfil');
+            
+            console.log('🔽 Inicializando dropdown del perfil...');
+            
+            if (profileBtn && profileDropdown) {
+                profileBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    profileDropdown.classList.toggle('hidden');
+                    console.log('👆 Click en botón de perfil');
                 });
+
+                document.addEventListener('click', function(event) {
+                    if (!profileBtn.contains(event.target) && !profileDropdown.contains(event.target)) {
+                        profileDropdown.classList.add('hidden');
+                    }
+                });
+                
+                console.log('✅ Dropdown del perfil inicializado correctamente');
             }
-        })();
-    }); // Close the DOMContentLoaded event listener function
-        </script>
+        }
+        
+        // Initialize all functionality
+        initializeNavbarFunctionality();
+        initializeProfileDropdown();
+        updateCurrentDate();
+        console.log('🚀 Dashboard de administración inicializado correctamente');
+        
+    }); // Close DOMContentLoaded
+    </script>
   
     </div> <!-- Cierre del contenedor principal -->
   </main>

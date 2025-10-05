@@ -18,15 +18,37 @@
         }
         
         body {
-            background: #fafbfc;
-            color: #1a202c;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             font-feature-settings: "liga" on, "tnum" on;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            transition: all 0.3s ease;
         }
 
-        /* Paleta profesional */
+        /* Variables CSS para tema claro/oscuro */
         :root {
+            /* Tema claro */
+            --bg-primary: #fafbfc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f9fafb;
+            --text-primary: #1a202c;
+            --text-secondary: #4b5563;
+            --text-soft: #6b7280;
+            --border-color: #e5e7eb;
+            --card-bg: #ffffff;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* Efectos y gradientes - Tema claro */
+            --card-gradient: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            --card-border: rgba(148, 163, 184, 0.15);
+            --card-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --backdrop-blur: blur(10px);
+            
+            /* Colores de tema */
             --primary-50: #eff6ff;
             --primary-100: #dbeafe;
             --primary-600: #2563eb;
@@ -40,19 +62,61 @@
             --gray-900: #111827;
         }
 
+        /* Tema oscuro */
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-soft: #94a3b8;
+            --border-color: #334155;
+            --card-bg: #1e293b;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            
+            /* Efectos y gradientes - Tema oscuro */
+            --card-gradient: linear-gradient(145deg, #1e293b 0%, #334155 100%);
+            --card-border: rgba(100, 116, 139, 0.3);
+            --card-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.25);
+            --glass-bg: rgba(30, 41, 59, 0.8);
+            --glass-border: rgba(100, 116, 139, 0.2);
+            --backdrop-blur: blur(10px);
+        }
+
+        body[data-theme="dark"] {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
         .gradient-bg {
             background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-900) 100%);
         }
         
         .card-hover {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: white;
-            border: 1px solid var(--gray-200);
+            background: var(--card-gradient);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .card-hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-600), transparent);
+            opacity: 0.4;
+        }
+        
         .card-hover:hover {
             transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border-color: var(--primary-100);
+            box-shadow: var(--card-hover-shadow);
+            border-color: var(--primary-600);
         }
         
         .gradient-text {
@@ -63,21 +127,183 @@
             font-weight: 700;
             letter-spacing: -0.025em;
         }
+        
         .feature-card {
             border-radius: 1rem;
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
             transition: all 0.3s ease;
         }
+        
         .feature-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        /* Estilos específicos para tema oscuro */
+        [data-theme="dark"] .feature-card {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+        }
+        
+        [data-theme="dark"] .gradient-text {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Botón de tema */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .theme-toggle i {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+        }
+
+        /* ==================== CLASES DE EFECTOS PROFESIONALES ==================== */
+        .card-premium {
+            background: var(--card-gradient);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-premium:hover {
+            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-2px);
+        }
+
+        .card-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-600), transparent);
+            opacity: 0.3;
+        }
+
+        .glass-effect {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+        }
+
+        .subtle-gradient {
+            background: var(--card-gradient);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .professional-shadow {
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.08),
+                0 4px 6px rgba(0, 0, 0, 0.05),
+                0 8px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        .soft-border {
+            border: 1px solid var(--card-border);
+        }
+
+        .theme-adaptive {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        /* ==================== FORMULARIOS ADAPTATIVOS ==================== */
+        .form-input {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-600);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-soft);
+        }
+
+        .form-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-select {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+        }
+
+        .form-textarea {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+            resize: vertical;
+        }
+        
+        /* Navbar adaptativa */
+        .navbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        [data-theme="dark"] .navbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* Texto adaptativo */
+        .text-adaptive {
+            color: var(--text-primary);
+        }
+        
+        .text-adaptive-secondary {
+            color: var(--text-secondary);
+        }
+        
+        .text-adaptive-soft {
+            color: var(--text-soft);
         }
         .back-to-top {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background-color: #2563eb;
+            background-color: var(--primary-600);
             color: white;
             width: 40px;
             height: 40px;
@@ -103,7 +329,7 @@
             display: none;
             align-items: center;
             font-size: 16px;
-            color: #1a202c;
+            color: var(--text-primary);
             margin-left: 10px;
             animation: fly 2s infinite;
         }
@@ -123,9 +349,14 @@
     </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen">
+<body>
+    <!-- Botón de toggle de tema -->
+    <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+        <i id="theme-icon" class="fas fa-moon"></i>
+    </button>
+
     <!-- Navbar Profesional -->
-    <nav class="bg-white/95 backdrop-blur-md border-b border-gray-200/60 sticky top-0 z-50 transition-all duration-300">
+    <nav class="navbar backdrop-blur-md sticky top-0 z-50 transition-all duration-300">
         <div class="container mx-auto px-6">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-8">
@@ -133,16 +364,16 @@
                         <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
                             <i class="fas fa-database text-white text-sm"></i>
                         </div>
-                        <span class="text-xl font-bold text-gray-900">SQL App Studio</span>
+                        <span class="text-xl font-bold" style="color: var(--text-primary);">SQL App Studio</span>
                     </a>
                     <div class="hidden md:flex items-center space-x-6">
-                        <a href="/index" class="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
+                        <a href="/index" class="font-medium transition-colors duration-200" style="color: var(--text-secondary);" onmouseover="this.style.color='var(--primary-600)'" onmouseout="this.style.color='var(--text-secondary)'">
                             Inicio
                         </a>
-                        <a href="/news" class="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
+                        <a href="/news" class="font-medium transition-colors duration-200" style="color: var(--text-secondary);" onmouseover="this.style.color='var(--primary-600)'" onmouseout="this.style.color='var(--text-secondary)'">
                             Noticias
                         </a>
-                        <a href="/index#contact" class="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
+                        <a href="/index#contact" class="font-medium transition-colors duration-200" style="color: var(--text-secondary);" onmouseover="this.style.color='var(--primary-600)'" onmouseout="this.style.color='var(--text-secondary)'">
                             Contacto
                         </a>
                     </div>
@@ -168,15 +399,15 @@
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="space-y-8">
                     <div class="space-y-4">
-                        <div class="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                        <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium" style="background: var(--primary-100); color: var(--primary-700);">
                             <i class="fas fa-bolt mr-2"></i>
                             Enterprise Ready
                         </div>
                         <h1 class="text-4xl lg:text-6xl font-bold leading-tight">
-                            <span class="text-gray-900">SQL App</span>
+                            <span style="color: var(--text-primary);">SQL App</span>
                             <span class="block gradient-text">Studio</span>
                         </h1>
-                        <p class="text-xl text-gray-600 leading-relaxed max-w-lg">
+                        <p class="text-xl leading-relaxed max-w-lg" style="color: var(--text-secondary);">
                             Plataforma empresarial para automatización de bases de datos, desarrollo de APIs y análisis inteligente de datos.
                         </p>
                     </div>
@@ -184,16 +415,16 @@
                     <!-- Estadísticas profesionales -->
                     <div class="grid grid-cols-3 gap-6 py-6">
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-gray-900">99.9%</div>
-                            <div class="text-sm text-gray-600">Uptime</div>
+                            <div class="text-2xl font-bold" style="color: var(--text-primary);">99.9%</div>
+                            <div class="text-sm" style="color: var(--text-secondary);">Uptime</div>
                         </div>
                         <div class="text-center">
                             <div class="text-2xl font-bold text-blue-600">10x</div>
-                            <div class="text-sm text-gray-600">Más rápido</div>
+                            <div class="text-sm" style="color: var(--text-secondary);">Más rápido</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-gray-900">24/7</div>
-                            <div class="text-sm text-gray-600">Soporte</div>
+                            <div class="text-2xl font-bold" style="color: var(--text-primary);">24/7</div>
+                            <div class="text-sm" style="color: var(--text-secondary);">Soporte</div>
                         </div>
                     </div>
                     
@@ -202,7 +433,7 @@
                             <i class="fas fa-rocket mr-2"></i>
                             Empezar ahora
                         </a>
-                        <a href="#contact" class="inline-flex items-center justify-center px-8 py-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-all duration-200">
+                        <a href="#contact" class="theme-adaptive inline-flex items-center justify-center px-8 py-4 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200" style="color: var(--text-primary);">
                             <i class="fas fa-calendar mr-2"></i>
                             Agendar demo
                         </a>
@@ -212,7 +443,7 @@
                 <div class="relative lg:pl-8">
                     <div class="relative">
                         <!-- Dashboard mockup estilo Windows -->
-                        <div class="bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden">
+                        <div class="card-premium rounded-lg shadow-2xl overflow-hidden">
                             <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 border-b">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-3">
@@ -253,18 +484,18 @@
     </section>
 
     <!-- Features Section Profesional -->
-    <section id="features" class="py-20 bg-white">
+    <section id="features" class="py-20" style="background: var(--bg-primary);">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
-                <div class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium mb-4">
+                <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-4" style="background: var(--bg-tertiary); color: var(--text-secondary);">
                     <i class="fas fa-star mr-2"></i>
                     Características Enterprise
                 </div>
-                <h2 class="text-4xl font-bold text-gray-900 mb-6">
+                <h2 class="text-4xl font-bold mb-6" style="color: var(--text-primary);">
                     Tecnología que impulsa 
                     <span class="gradient-text">tu crecimiento</span>
                 </h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                <p class="text-xl max-w-3xl mx-auto" style="color: var(--text-secondary);">
                     Herramientas profesionales diseñadas para equipos que buscan eficiencia, escalabilidad y resultados excepcionales.
                 </p>
             </div>
@@ -275,11 +506,11 @@
                     <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                         <i class="fas fa-server text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Arquitectura Enterprise</h3>
-                    <p class="text-gray-600 leading-relaxed mb-4">
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Arquitectura Enterprise</h3>
+                    <p class="leading-relaxed mb-4" style="color: var(--text-secondary);">
                         FastAPI de alto rendimiento con soporte nativo para SQL Server y PostgreSQL. Arquitectura de microservicios totalmente containerizada.
                     </p>
-                    <ul class="space-y-2 text-sm text-gray-500">
+                    <ul class="space-y-2 text-sm" style="color: var(--text-soft);">
                         <li class="flex items-center">
                             <i class="fas fa-check text-green-500 mr-2"></i>
                             Auto-scaling automático
@@ -296,11 +527,11 @@
                     <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                         <i class="fas fa-magic text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Automatización Inteligente</h3>
-                    <p class="text-gray-600 leading-relaxed mb-4">
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Automatización Inteligente</h3>
+                    <p class="leading-relaxed mb-4" style="color: var(--text-secondary);">
                         Generación automática de APIs, modelos de datos, documentación y tests. Reducción del 80% en tiempo de desarrollo.
                     </p>
-                    <ul class="space-y-2 text-sm text-gray-500">
+                    <ul class="space-y-2 text-sm" style="color: var(--text-soft);">
                         <li class="flex items-center">
                             <i class="fas fa-check text-green-500 mr-2"></i>
                             Code generation
@@ -317,11 +548,11 @@
                     <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                         <i class="fas fa-database text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Migración de Datos</h3>
-                    <p class="text-gray-600 leading-relaxed mb-4">
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Migración de Datos</h3>
+                    <p class="leading-relaxed mb-4" style="color: var(--text-secondary);">
                         Importación masiva desde Excel con validaciones avanzadas, transformaciones y mapeo inteligente de esquemas.
                     </p>
-                    <ul class="space-y-2 text-sm text-gray-500">
+                    <ul class="space-y-2 text-sm" style="color: var(--text-soft);">
                         <li class="flex items-center">
                             <i class="fas fa-check text-green-500 mr-2"></i>
                             Validación de datos
@@ -338,11 +569,11 @@
                     <div class="w-14 h-14 bg-gradient-to-br from-red-500 to-pink-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                         <i class="fas fa-brain text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Inteligencia Artificial</h3>
-                    <p class="text-gray-600 leading-relaxed mb-4">
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Inteligencia Artificial</h3>
+                    <p class="leading-relaxed mb-4" style="color: var(--text-secondary);">
                         Análisis predictivo, detección de anomalías y optimización automática con modelos de machine learning.
                     </p>
-                    <ul class="space-y-2 text-sm text-gray-500">
+                    <ul class="space-y-2 text-sm" style="color: var(--text-soft);">
                         <li class="flex items-center">
                             <i class="fas fa-check text-green-500 mr-2"></i>
                             ML integrado
@@ -359,11 +590,11 @@
                     <div class="w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                         <i class="fas fa-shield-alt text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Seguridad Enterprise</h3>
-                    <p class="text-gray-600 leading-relaxed mb-4">
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Seguridad Enterprise</h3>
+                    <p class="leading-relaxed mb-4" style="color: var(--text-secondary);">
                         Cifrado end-to-end, autenticación multi-factor, auditoría completa y cumplimiento con estándares SOC 2.
                     </p>
-                    <ul class="space-y-2 text-sm text-gray-500">
+                    <ul class="space-y-2 text-sm" style="color: var(--text-soft);">
                         <li class="flex items-center">
                             <i class="fas fa-check text-green-500 mr-2"></i>
                             SOC 2 compliant
@@ -380,11 +611,11 @@
                     <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                         <i class="fas fa-chart-line text-white text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Analytics Avanzado</h3>
-                    <p class="text-gray-600 leading-relaxed mb-4">
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Analytics Avanzado</h3>
+                    <p class="leading-relaxed mb-4" style="color: var(--text-secondary);">
                         Dashboards en tiempo real, reportes automatizados y métricas de performance con visualizaciones interactivas.
                     </p>
-                    <ul class="space-y-2 text-sm text-gray-500">
+                    <ul class="space-y-2 text-sm" style="color: var(--text-soft);">
                         <li class="flex items-center">
                             <i class="fas fa-check text-green-500 mr-2"></i>
                             Real-time dashboards
@@ -408,15 +639,15 @@
     </section>
 
     <!-- Diagrama Section -->
-    <section class="py-16 bg-white">
+    <section class="py-16" style="background: var(--bg-primary);">
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row items-center gap-12">
                 <div class="md:w-1/2">
                     <h2 class="text-3xl font-bold mb-6">Cómo Funciona</h2>
-                    <p class="text-gray-600 mb-4">
+                    <p class="mb-4" style="color: var(--text-secondary);">
                         SQL App Studio simplifica el flujo de trabajo desde la configuración de la base de datos hasta la implementación de APIs. Nuestro enfoque modular permite una integración perfecta con sistemas existentes.
                     </p>
-                    <p class="text-gray-600 mb-6">
+                    <p class="mb-6" style="color: var(--text-secondary);">
                         La plataforma automatiza tareas repetitivas y proporciona herramientas avanzadas para la manipulación y análisis de datos, ahorrando tiempo valioso en el desarrollo.
                     </p>
                     <ul class="space-y-2">
@@ -445,7 +676,7 @@
         </div>
     </section>
 <!-- News Section -->
-<section id="news" class="py-16 bg-gray-100">
+<section id="news" class="py-16" style="background: var(--bg-tertiary);">
     <div class="container mx-auto px-6">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold mb-4">
@@ -461,7 +692,7 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for post in blog_posts %}
-            <div class="news-card bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 animate-fadeIn">
+            <div class="news-card card-premium rounded-xl overflow-hidden shadow-md animate-fadeIn">
                 <div class="image-container relative">
                     {% if post.image_url %}
                     <img src="{{ post.image_url }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
@@ -479,11 +710,11 @@
                 
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm text-gray-500 flex items-center">
+                        <span class="text-sm flex items-center" style="color: var(--text-secondary);">
                             <i class="far fa-calendar-alt mr-1"></i>
                             {{ post.created_at.strftime('%d/%m/%Y') }}
                         </span>
-                        <span class="text-sm text-gray-500 flex items-center">
+                        <span class="text-sm flex items-center" style="color: var(--text-secondary);">
                             <i class="far fa-eye mr-1"></i>
                             {{ post.views|default('0') }} lecturas
                         </span>
@@ -497,11 +728,11 @@
                             {% if post.author_avatar %}
                             <img src="{{ post.author_avatar }}" alt="{{ post.author_name }}" class="w-6 h-6 rounded-full mr-2">
                             {% else %}
-                            <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center mr-2">
-                                <i class="fas fa-user text-xs text-gray-500"></i>
+                            <div class="w-6 h-6 rounded-full flex items-center justify-center mr-2" style="background: var(--bg-tertiary);">
+                                <i class="fas fa-user text-xs" style="color: var(--text-soft);"></i>
                             </div>
                             {% endif %}
-                            <span class="text-xs text-gray-500">{{ post.author_name|default('Admin') }}</span>
+                            <span class="text-xs" style="color: var(--text-soft);">{{ post.author_name|default('Admin') }}</span>
                         </div>
                         
                         <a href="/news/{{ post.id }}" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center transition-colors text-sm">
@@ -535,18 +766,18 @@
 </section>
 
     <!-- Testimonials Section -->
-    <section id="testimonials" class="py-16 bg-white">
+    <section id="testimonials" class="py-16" style="background: var(--bg-primary);">
         <div class="container mx-auto px-6">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold mb-4">Lo Que Dicen Nuestros Usuarios</h2>
-                <p class="text-gray-600 max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold mb-4" style="color: var(--text-primary);">Lo Que Dicen Nuestros Usuarios</h2>
+                <p class="max-w-3xl mx-auto" style="color: var(--text-secondary);">
                     Descubre cómo SQL App Studio ha transformado los flujos de trabajo de nuestros clientes.
                 </p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Testimonial 1 -->
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                <div class="card-premium p-6 rounded-lg">
                     <div class="flex items-center mb-4">
                         <div class="text-yellow-400 flex">
                             <i class="fas fa-star"></i>
@@ -556,22 +787,22 @@
                             <i class="fas fa-star"></i>
                         </div>
                     </div>
-                    <p class="text-gray-600 italic mb-4">
+                    <p class="italic mb-4" style="color: var(--text-secondary);">
                         "Esta herramienta ha reducido nuestro tiempo de desarrollo en un 60%. La capacidad de generar APIs automáticamente nos ha permitido centrarnos en la lógica de negocio."
                     </p>
                     <div class="flex items-center">
-                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                            <i class="fas fa-user text-gray-600"></i>
+                        <div class="h-10 w-10 rounded-full flex items-center justify-center" style="background: var(--bg-tertiary);">
+                            <i class="fas fa-user" style="color: var(--text-secondary);"></i>
                         </div>
                         <div class="ml-3">
-                            <h4 class="font-medium">Carlos Martínez</h4>
-                            <p class="text-sm text-gray-500">CTO, TechSolutions</p>
+                            <h4 class="font-medium" style="color: var(--text-primary);">Carlos Martínez</h4>
+                            <p class="text-sm" style="color: var(--text-soft);">CTO, TechSolutions</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Testimonial 2 -->
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                <div class="card-premium p-6 rounded-lg">
                     <div class="flex items-center mb-4">
                         <div class="text-yellow-400 flex">
                             <i class="fas fa-star"></i>
@@ -581,22 +812,22 @@
                             <i class="fas fa-star"></i>
                         </div>
                     </div>
-                    <p class="text-gray-600 italic mb-4">
+                    <p class="italic mb-4" style="color: var(--text-secondary);">
                         "La migración de datos nunca había sido tan sencilla. Ahora podemos transferir información entre sistemas heterogéneos con total confianza en la integridad de los datos."
                     </p>
                     <div class="flex items-center">
-                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                            <i class="fas fa-user text-gray-600"></i>
+                        <div class="h-10 w-10 rounded-full flex items-center justify-center" style="background: var(--bg-tertiary);">
+                            <i class="fas fa-user" style="color: var(--text-secondary);"></i>
                         </div>
                         <div class="ml-3">
-                            <h4 class="font-medium">Laura Gómez</h4>
-                            <p class="text-sm text-gray-500">Data Analyst, Fintech Inc.</p>
+                            <h4 class="font-medium" style="color: var(--text-primary);">Laura Gómez</h4>
+                            <p class="text-sm" style="color: var(--text-soft);">Data Analyst, Fintech Inc.</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Testimonial 3 -->
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                <div class="card-premium p-6 rounded-lg">
                     <div class="flex items-center mb-4">
                         <div class="text-yellow-400 flex">
                             <i class="fas fa-star"></i>
@@ -606,16 +837,16 @@
                             <i class="fas fa-star-half-alt"></i>
                         </div>
                     </div>
-                    <p class="text-gray-600 italic mb-4">
+                    <p class="italic mb-4" style="color: var(--text-secondary);">
                         "Los insights generados por la IA han sido cruciales para nuestras decisiones estratégicas. La interfaz intuitiva permite que incluso los no técnicos puedan aprovecharlo."
                     </p>
                     <div class="flex items-center">
-                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                            <i class="fas fa-user text-gray-600"></i>
+                        <div class="h-10 w-10 rounded-full flex items-center justify-center" style="background: var(--bg-tertiary);">
+                            <i class="fas fa-user" style="color: var(--text-secondary);"></i>
                         </div>
                         <div class="ml-3">
-                            <h4 class="font-medium">Alejandro Torres</h4>
-                            <p class="text-sm text-gray-500">CEO, DataDriven Co.</p>
+                            <h4 class="font-medium" style="color: var(--text-primary);">Alejandro Torres</h4>
+                            <p class="text-sm" style="color: var(--text-soft);">CEO, DataDriven Co.</p>
                         </div>
                     </div>
                 </div>
@@ -649,17 +880,17 @@
                     <!-- Left side - Contact Info -->
                     <div class="space-y-8">
                         <!-- Main CTA Card -->
-                        <div class="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+                        <div class="card-premium rounded-3xl p-8 shadow-xl">
                             <div class="flex items-center mb-6">
                                 <div class="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
                                     <i class="fas fa-rocket text-white text-xl"></i>
                                 </div>
                                 <div class="ml-4">
-                                    <h3 class="text-2xl font-bold text-gray-800">¡Empecemos!</h3>
-                                    <p class="text-gray-600">Tu próximo gran proyecto nos espera</p>
+                                    <h3 class="text-2xl font-bold" style="color: var(--text-primary);">¡Empecemos!</h3>
+                                    <p style="color: var(--text-secondary);">Tu próximo gran proyecto nos espera</p>
                                 </div>
                             </div>
-                            <p class="text-gray-700 mb-6 leading-relaxed">
+                            <p class="mb-6 leading-relaxed" style="color: var(--text-secondary);">
                                 Cuéntanos sobre tu proyecto y descubre cómo SQL App Studio puede acelerar tu desarrollo y optimizar tus datos.
                             </p>
                             <div class="flex flex-wrap gap-3">
@@ -720,38 +951,38 @@
                     </div>
 
                     <!-- Right side - Contact Form -->
-                    <div class="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+                    <div class="card-premium rounded-3xl p-8 shadow-xl">
                         <div class="mb-8">
-                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Cuéntanos tu proyecto</h3>
-                            <p class="text-gray-600">Completa el formulario y nos pondremos en contacto contigo</p>
+                            <h3 class="text-2xl font-bold mb-2" style="color: var(--text-primary);">Cuéntanos tu proyecto</h3>
+                            <p style="color: var(--text-secondary);">Completa el formulario y nos pondremos en contacto contigo</p>
                         </div>
 
                         <form id="contact-form" class="space-y-6">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div class="space-y-2">
-                                    <label for="nombre" class="text-sm font-medium text-gray-700">Nombre *</label>
+                                    <label for="nombre" class="text-sm form-label">Nombre *</label>
                                     <input type="text" id="nombre" name="nombre" required 
-                                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none"
+                                           class="form-input w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                                            placeholder="Tu nombre">
                                 </div>
                                 <div class="space-y-2">
-                                    <label for="email" class="text-sm font-medium text-gray-700">Email *</label>
+                                    <label for="email" class="text-sm form-label">Email *</label>
                                     <input type="email" id="email" name="email" required 
-                                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none"
+                                           class="form-input w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                                            placeholder="tu@email.com">
                                 </div>
                             </div>
 
                             <div class="space-y-2">
-                                <label for="empresa" class="text-sm font-medium text-gray-700">Empresa</label>
+                                <label for="empresa" class="text-sm form-label">Empresa</label>
                                 <input type="text" id="empresa" name="empresa"
-                                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none"
+                                       class="form-input w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                                        placeholder="Nombre de tu empresa">
                             </div>
 
                             <div class="space-y-2">
-                                <label for="proyecto" class="text-sm font-medium text-gray-700">Tipo de proyecto</label>
-                                <select id="proyecto" name="proyecto" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none bg-white">
+                                <label for="proyecto" class="text-sm form-label">Tipo de proyecto</label>
+                                <select id="proyecto" name="proyecto" class="form-select w-full px-4 py-3 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300">
                                     <option value="">Selecciona una opción</option>
                                     <option value="api">Desarrollo de API</option>
                                     <option value="migration">Migración de datos</option>
@@ -762,9 +993,9 @@
                             </div>
 
                             <div class="space-y-2">
-                                <label for="mensaje" class="text-sm font-medium text-gray-700">Mensaje *</label>
+                                <label for="mensaje" class="text-sm form-label">Mensaje *</label>
                                 <textarea id="mensaje" name="mensaje" rows="4" required
-                                          class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 outline-none resize-none"
+                                          class="form-textarea w-full px-4 py-3 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                                           placeholder="Cuéntanos más sobre tu proyecto, necesidades y objetivos..."></textarea>
                             </div>
 
@@ -907,6 +1138,74 @@
             window.addEventListener('error', (e) => {
                 console.error('Error detectado:', e.error);
             });
+
+            // ==================== SISTEMA DE TEMAS ====================
+
+            // Función para toggle de tema
+            function toggleTheme() {
+                const body = document.body;
+                const html = document.documentElement;
+                let currentTheme = body.getAttribute('data-theme') || 'light';
+                
+                console.log('🎨 Cambiando tema de:', currentTheme);
+                
+                // Cambiar tema
+                currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+                
+                // Aplicar nuevo tema
+                body.setAttribute('data-theme', currentTheme);
+                html.setAttribute('data-theme', currentTheme);
+                
+                // Guardar en localStorage
+                localStorage.setItem('theme-preference', currentTheme);
+                
+                // Actualizar icono
+                updateThemeIcon();
+                
+                console.log('✅ Tema cambiado a:', currentTheme);
+            }
+
+            // Función para actualizar icono del tema
+            function updateThemeIcon() {
+                const themeIcon = document.getElementById('theme-icon');
+                const currentTheme = document.body.getAttribute('data-theme') || 'light';
+                
+                if (themeIcon) {
+                    if (currentTheme === 'dark') {
+                        themeIcon.className = 'fas fa-sun';
+                    } else {
+                        themeIcon.className = 'fas fa-moon';
+                    }
+                }
+            }
+
+            // Inicializar tema al cargar la página
+            function initTheme() {
+                const body = document.body;
+                const html = document.documentElement;
+                let savedTheme = localStorage.getItem('theme-preference') || 'light';
+                
+                console.log('🎯 Inicializando tema:', savedTheme);
+                
+                // Aplicar tema guardado
+                body.setAttribute('data-theme', savedTheme);
+                html.setAttribute('data-theme', savedTheme);
+                
+                // Actualizar icono
+                updateThemeIcon();
+                
+                console.log('✅ Tema inicializado:', savedTheme);
+            }
+
+            // Inicializar tema temprano
+            initTheme();
+
+            // Hacer las funciones globales
+            window.toggleTheme = toggleTheme;
+            window.updateThemeIcon = updateThemeIcon;
+            window.initTheme = initTheme;
         </script>
     </body>
     </html>
+
+

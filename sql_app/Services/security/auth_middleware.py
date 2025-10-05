@@ -79,7 +79,7 @@ def extract_token_from_request(request: Request) -> Optional[str]:
     logger.debug("No se encontró token en la petición")
     return None
 
-def get_user_from_token(token: str, db: Session) -> UserDB:
+def get_user_from_token(token: str, db: Session) -> Usuarios:
     """
     Obtiene el usuario desde un token JWT validado
     
@@ -163,7 +163,7 @@ def get_user_from_token(token: str, db: Session) -> UserDB:
         logger.error(f"Error obteniendo usuario desde token: {str(e)}")
         raise AuthenticationError(f"Error de autenticación: {str(e)}")
 
-def get_dashboard_data(user: UserDB, db: Session) -> Dict[str, Any]:
+def get_dashboard_data(user: Usuarios, db: Session) -> Dict[str, Any]:
     """
     Obtiene datos para el dashboard del usuario autenticado
     
@@ -199,7 +199,11 @@ def get_dashboard_data(user: UserDB, db: Session) -> Dict[str, Any]:
                 "nombre": user.nombre,
                 "mail": user.mail,
                 "roles": user.roles,
-                "activo": user.activo
+                "activo": user.activo,
+                "telefono": user.telefono or '',
+                "direccion": user.direccion or '',
+                "fecha_nacimiento": user.fecha_nacimiento.strftime('%Y-%m-%d') if user.fecha_nacimiento else '',
+                "imagen_perfil": user.imagen_perfil or ''
             },
             "user_count": user_count,
             "activity_count": len(activities),

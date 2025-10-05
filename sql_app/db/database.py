@@ -223,9 +223,11 @@ def run_alembic_upgrade():
     import subprocess
     import logging
     try:
+        # Usar el directorio raíz del proyecto donde está el alembic correcto
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         result = subprocess.run([
             sys.executable, '-m', 'alembic', 'upgrade', 'head'
-        ], cwd=os.path.dirname(os.path.dirname(__file__)), capture_output=True, text=True)
+        ], cwd=project_root, capture_output=True, text=True)
         if result.returncode == 0:
             return True
         else:
@@ -238,7 +240,7 @@ def run_alembic_upgrade():
         return False
 
 # Ejecutar migraciones automáticamente al importar este módulo
-run_alembic_upgrade()
+# run_alembic_upgrade()  # Temporalmente deshabilitado hasta resolver el conflicto de directorios
 
 # La base de datos se crea pero las tablas no se crean automáticamente
 # para evitar problemas de orden de creación

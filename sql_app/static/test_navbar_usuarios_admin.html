@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Navbar Usuarios Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .test-result {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+        }
+        .success { background-color: #dcfce7; border-color: #16a34a; }
+        .error { background-color: #fef2f2; border-color: #dc2626; }
+        .loading { background-color: #fef3c7; border-color: #d97706; }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-6">🧪 Test de Navbar Estandarizada - Usuarios Admin</h1>
+        
+        <div id="test-results">
+            <div class="test-result loading">
+                <h3>🔍 Iniciando pruebas...</h3>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <h2 class="text-xl font-bold mb-4">📋 Pruebas a Realizar:</h2>
+            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                <li>Verificar que el endpoint <code>/auth/test-user</code> responde correctamente</li>
+                <li>Comprobar que el navbar carga los datos del usuario</li>
+                <li>Validar que se muestra la imagen SVG del avatar</li>
+                <li>Verificar elementos: user-initial, user-name, user-email</li>
+                <li>Comprobar logging detallado en la consola</li>
+            </ul>
+        </div>
+
+        <div class="mt-6">
+            <button id="run-tests" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg">
+                🚀 Ejecutar Pruebas
+            </button>
+            <button id="view-console" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg ml-4">
+                📱 Ver Consola
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const resultsContainer = document.getElementById('test-results');
+        
+        function addResult(title, message, type = 'loading') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `
+                <h3>${title}</h3>
+                <p>${message}</p>
+                <small>Tiempo: ${new Date().toLocaleTimeString()}</small>
+            `;
+            resultsContainer.appendChild(div);
+            div.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function runTests() {
+            resultsContainer.innerHTML = '';
+            addResult('🚀 Iniciando Pruebas', 'Ejecutando suite de pruebas para navbar estandarizada...');
+
+            // Test 1: Verificar endpoint /auth/test-user
+            try {
+                addResult('1️⃣ Test Endpoint', 'Probando /auth/test-user...', 'loading');
+                
+                const response = await fetch('/auth/test-user', {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('1️⃣ Test Endpoint', `✅ Endpoint funcionando. Datos: ${JSON.stringify(data)}`, 'success');
+                    
+                    // Test 2: Verificar estructura de datos
+                    const requiredFields = ['nombre', 'email', 'usuario'];
+                    const missingFields = requiredFields.filter(field => !data[field]);
+                    
+                    if (missingFields.length === 0) {
+                        addResult('2️⃣ Test Estructura', '✅ Todos los campos requeridos presentes', 'success');
+                    } else {
+                        addResult('2️⃣ Test Estructura', `❌ Campos faltantes: ${missingFields.join(', ')}`, 'error');
+                    }
+
+                    // Test 3: Verificar imagen SVG
+                    if (data.imagen && data.imagen.startsWith('data:image/svg+xml')) {
+                        addResult('3️⃣ Test Imagen SVG', '✅ Imagen SVG presente y válida', 'success');
+                    } else {
+                        addResult('3️⃣ Test Imagen SVG', '❌ Imagen SVG no encontrada o inválida', 'error');
+                    }
+
+                } else {
+                    addResult('1️⃣ Test Endpoint', `❌ Error ${response.status}: ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                addResult('1️⃣ Test Endpoint', `❌ Error de conexión: ${error.message}`, 'error');
+            }
+
+            // Test 4: Verificar elementos del DOM
+            addResult('4️⃣ Test Elementos DOM', 'Buscando elementos del navbar...', 'loading');
+            
+            const elements = {
+                'user-initial': document.getElementById('user-initial'),
+                'user-name': document.getElementById('user-name'),
+                'user-email': document.getElementById('user-email')
+            };
+
+            let foundElements = 0;
+            for (const [id, element] of Object.entries(elements)) {
+                if (element) {
+                    foundElements++;
+                    addResult(`4️⃣ Elemento ${id}`, `✅ Encontrado: "${element.textContent}"`, 'success');
+                } else {
+                    addResult(`4️⃣ Elemento ${id}`, '❌ No encontrado en el DOM', 'error');
+                }
+            }
+
+            // Test 5: Resumen final
+            if (foundElements === 3) {
+                addResult('🎉 Resumen Final', '✅ Todos los tests principales pasaron. Navbar estandarizada funcionando correctamente!', 'success');
+            } else {
+                addResult('⚠️ Resumen Final', `❌ ${3 - foundElements} elementos faltantes. Es posible que el navbar no esté completamente cargado.`, 'error');
+            }
+
+            addResult('📝 Instrucciones', 'Revisa la consola del navegador (F12) para ver los logs detallados del navbar.', 'loading');
+        }
+
+        document.getElementById('run-tests').addEventListener('click', runTests);
+        document.getElementById('view-console').addEventListener('click', () => {
+            alert('Presiona F12 para abrir las herramientas de desarrollador y ve a la pestaña "Console" para ver los logs detallados.');
+        });
+
+        // Ejecutar automáticamente después de un breve delay
+        setTimeout(runTests, 2000);
+    </script>
+</body>
+</html>

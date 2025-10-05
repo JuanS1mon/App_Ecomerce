@@ -151,7 +151,7 @@ async def usuarios_admin_page(
         print("🔄 Renderizando template con URLs autenticadas...")
 
         response = templates.TemplateResponse(
-            "html/config/usuarios_admin_limpio.html",
+            "html/config/usuarios_admin.html",
             {
                 "request": request,
                 **user_data

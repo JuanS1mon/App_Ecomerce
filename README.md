@@ -19,12 +19,42 @@ Para configurar la aplicación, sigue estos pasos:
 4. Implementa tus operaciones CRUD en `crud.py`.
 5. Configura tu aplicación en `main.py`.
 
-## Ejecución de la Aplicación
+## 🚀 Ejecución de la Aplicación
 
-Para ejecutar la aplicación, navega a la carpeta del proyecto y ejecuta el siguiente comando:
+### **Método Recomendado (Scripts Automatizados):**
 
-```sh
-uvicorn main:app --reload
+1. **Para desarrollo rápido (servidor simplificado):**
+   ```powershell
+   .\start-dev.ps1
+   ```
+
+2. **Para servidor completo (cuando las migraciones estén OK):**
+   ```powershell
+   .\start-main.ps1
+   ```
+
+### **Comandos Manuales:**
+
+1. **Activar entorno virtual:**
+   ```powershell
+   & sql_app\env\Scripts\Activate.ps1
+   ```
+
+2. **Servidor de desarrollo (recomendado):**
+   ```bash
+   uvicorn main_simple:app --host 127.0.0.1 --port 8001 --reload --log-level info
+   ```
+
+3. **Servidor principal (completo):**
+   ```bash
+   uvicorn main:app --host 127.0.0.1 --port 8000 --reload --log-level info
+   ```
+
+### **URLs de Acceso:**
+- 🌐 **Principal:** http://localhost:8001/
+- 🎨 **Editor Visual:** http://localhost:8001/editor-visual
+- ⚙️ **Generador:** http://localhost:8001/generar/test
+- 📚 **Documentación completa:** Ver `COMANDOS_UVICORN.md`
 
 
 ESTRUCTURA de carpetas. 

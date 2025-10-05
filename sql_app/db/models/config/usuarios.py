@@ -1,5 +1,5 @@
 # Imports de terceros
-from sqlalchemy import Column, Integer, NVARCHAR, Boolean, DateTime
+from sqlalchemy import Column, Integer, NVARCHAR, Boolean, DateTime, Date, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -17,6 +17,12 @@ class Usuarios(Base):
     clave = Column(NVARCHAR(250), nullable=False)
     fecha_creacion = Column(DateTime(timezone=True), nullable=True)
     ultimo_acceso = Column(DateTime(timezone=True), nullable=True)
+    
+    # Nuevos campos agregados
+    telefono = Column(NVARCHAR(20), nullable=True)
+    direccion = Column(NVARCHAR(255), nullable=True)
+    fecha_nacimiento = Column(Date, nullable=True)
+    imagen_perfil = Column(Text, nullable=True)  # Base64 de imagen comprimida
     
     # Nota: La relación con roles se maneja en roles.py para evitar imports circulares
     

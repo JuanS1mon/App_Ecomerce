@@ -22,9 +22,9 @@ class Libros(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     titulo = Column(String(200), nullable=False)
     isbn = Column(String(20), unique=True)
-    autor_id = Column(Integer, nullable=False, ForeignKey("autores.id"))
+    autor_id = Column(Integer, ForeignKey("autores.id"), nullable=False)
     fecha_publicacion = Column(DateTime)
     precio = Column(Numeric)
 
     def __repr__(self):
-        return f"<Libros(id={self.id})">
+        return f"<Libros(id={self.id})>"

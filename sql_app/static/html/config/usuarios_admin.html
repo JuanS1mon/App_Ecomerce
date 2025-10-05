@@ -4,24 +4,215 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Usuarios - Panel de Administración</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-      <!-- Interceptor eliminado: La autenticación se maneja completamente por el backend -->
+    <script>
+        // Suprimir warning del CDN de Tailwind en desarrollo
+        const originalConsoleWarn = console.warn;
+        console.warn = function(...args) {
+          if (args[0] && args[0].includes('cdn.tailwindcss.com should not be used in production')) {
+            return; // Suprimir este warning específico
+          }
+          originalConsoleWarn.apply(console, args);
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/static/css/admin.css?v=2.0" rel="stylesheet" />
     
-    <!-- Sistema de componentes y navegación -->
-    <script src="/static/js/components.js"></script>
-    
+    <!-- Estilos específicos del tema para usuarios admin -->
     <style>
+        /* Sistema de Temas Mejorado - Aplicación más directa */
+        
+        /* Tema Claro (por defecto) */
+        body {
+          background-color: #f8fafc;
+          color: #1f2937;
+          transition: all 0.3s ease;
+        }
+        
+        /* Tema Oscuro - Aplicar al body directamente */
+        body[data-theme="dark"] {
+          background-color: #111827 !important;
+          color: #f9fafb !important;
+        }
+        
+        /* Navbar en tema oscuro */
+        body[data-theme="dark"] nav,
+        body[data-theme="dark"] #main-navbar {
+          background-color: #1f2937 !important;
+          border-color: #374151 !important;
+        }
+        
+        /* Fondos en tema oscuro */
+        body[data-theme="dark"] .bg-white {
+          background-color: #1f2937 !important;
+        }
+        
+        body[data-theme="dark"] .bg-gray-50 {
+          background-color: #0f172a !important;
+        }
+        
+        body[data-theme="dark"] .bg-gray-100 {
+          background-color: #374151 !important;
+        }
+        
+        /* Textos en tema oscuro */
+        body[data-theme="dark"] .text-gray-900,
+        body[data-theme="dark"] .text-gray-800,
+        body[data-theme="dark"] .text-gray-700 {
+          color: #f9fafb !important;
+        }
+        
+        body[data-theme="dark"] .text-gray-600,
+        body[data-theme="dark"] .text-gray-500 {
+          color: #d1d5db !important;
+        }
+        
+        body[data-theme="dark"] .text-gray-400 {
+          color: #9ca3af !important;
+        }
+        
+        /* Bordes en tema oscuro */
+        body[data-theme="dark"] .border-gray-200,
+        body[data-theme="dark"] .border-gray-100 {
+          border-color: #374151 !important;
+        }
+        
+        /* Hover states en tema oscuro */
+        body[data-theme="dark"] .hover\:bg-gray-50:hover {
+          background-color: #374151 !important;
+        }
+        
+        body[data-theme="dark"] .hover\:text-gray-900:hover {
+          color: #f9fafb !important;
+        }
+        
+        /* Sombras en tema oscuro */
+        body[data-theme="dark"] .shadow,
+        body[data-theme="dark"] .shadow-sm,
+        body[data-theme="dark"] .shadow-lg {
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+        }
+        
+        /* Paneles y superficies en tema oscuro */
+        body[data-theme="dark"] .panel-surface {
+          background-color: #1f2937 !important;
+          border-color: #374151 !important;
+          color: #f9fafb !important;
+        }
+        
+        /* Encabezado hero en tema oscuro */
+        body[data-theme="dark"] .header-hero {
+          background: linear-gradient(135deg, #1f2937 0%, #374151 100%) !important;
+          border-color: #4b5563 !important;
+          color: #f9fafb !important;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        }
+        
+        /* Elementos dentro del header-hero en tema oscuro */
+        body[data-theme="dark"] .header-hero h1,
+        body[data-theme="dark"] .header-hero h2,
+        body[data-theme="dark"] .header-hero h3 {
+          color: #f9fafb !important;
+        }
+        
+        body[data-theme="dark"] .header-hero p,
+        body[data-theme="dark"] .header-hero span {
+          color: #cbd5e1 !important;
+        }
+        
+        /* Etiquetas/badges en header-hero modo oscuro */
+        body[data-theme="dark"] .header-hero span.px-3 {
+          background-color: #374151 !important;
+          color: #e5e7eb !important;
+          border: 1px solid #4b5563 !important;
+        }
+        
+        /* Colores específicos para cada tipo de etiqueta en modo oscuro */
+        body[data-theme="dark"] .header-hero span.px-3:first-of-type {
+          background-color: #312e81 !important;
+          color: #c4b5fd !important;
+          border-color: #4c1d95 !important;
+        }
+        
+        body[data-theme="dark"] .header-hero span.px-3:nth-of-type(2) {
+          background-color: #14532d !important;
+          color: #86efac !important;
+          border-color: #166534 !important;
+        }
+        
+        body[data-theme="dark"] .header-hero span.px-3:nth-of-type(3) {
+          background-color: #451a03 !important;
+          color: #fbbf24 !important;
+          border-color: #92400e !important;
+        }
+        
+        /* Iconos blancos en modo oscuro - mantener blancos */
+        body[data-theme="dark"] .text-white,
+        body[data-theme="dark"] i.text-white {
+          color: #ffffff !important;
+        }
+        
+        /* Iconos en gradientes y contenedores especiales */
+        body[data-theme="dark"] .icon-gradient-1 i,
+        body[data-theme="dark"] .icon-gradient-2 i,
+        body[data-theme="dark"] .icon-gradient-3 i,
+        body[data-theme="dark"] .icon-gradient-4 i,
+        body[data-theme="dark"] .icon-gradient-5 i {
+          color: #ffffff !important;
+        }
+        
+        /* Inputs en tema oscuro */
+        body[data-theme="dark"] input[type="text"],
+        body[data-theme="dark"] input[type="email"],
+        body[data-theme="dark"] input[type="search"],
+        body[data-theme="dark"] input[type="password"],
+        body[data-theme="dark"] select {
+          background-color: #374151 !important;
+          border-color: #4b5563 !important;
+          color: #f9fafb !important;
+        }
+        
+        body[data-theme="dark"] input[type="text"]:focus,
+        body[data-theme="dark"] input[type="email"]:focus,
+        body[data-theme="dark"] input[type="search"]:focus,
+        body[data-theme="dark"] input[type="password"]:focus,
+        body[data-theme="dark"] select:focus {
+          border-color: #8b5cf6 !important;
+          box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2) !important;
+        }
+        
+        /* Labels en tema oscuro */
+        body[data-theme="dark"] label {
+          color: #f9fafb !important;
+        }
+        
+        /* Tablas en tema oscuro */
+        body[data-theme="dark"] table {
+          background-color: #1f2937 !important;
+        }
+        
+        body[data-theme="dark"] thead {
+          background-color: #374151 !important;
+        }
+        
+        body[data-theme="dark"] tbody tr {
+          border-color: #4b5563 !important;
+        }
+        
+        body[data-theme="dark"] tbody tr:hover {
+          background-color: #374151 !important;
+        }
+        
+        /* Card hover effects mejorados */
         .card-hover {
             transition: all 0.3s ease;
         }
         .card-hover:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-large);
         }
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
+        
+        /* Status indicators */
         .status-active {
             background-color: #10b981;
         }
@@ -29,78 +220,215 @@
             background-color: #ef4444;
         }
     </style>
+    
+    <!-- Funciones de tema definidas temprano para onclick -->
+    <script>
+        // Funciones globales para el tema (definidas primero)
+        window.toggleThemeManual = function() {
+            console.log('🎨 CAMBIANDO TEMA...');
+            const body = document.body;
+            const html = document.documentElement;
+            let currentTheme = body.getAttribute('data-theme') || 'light';
+            
+            console.log('🔍 Estado actual:', currentTheme);
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', currentTheme);
+            html.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('admin-theme', currentTheme);
+            
+            console.log('✅ Nuevo estado aplicado:', currentTheme);
+            console.log('📋 Body data-theme:', body.getAttribute('data-theme'));
+            
+            // Actualizar botón inmediatamente
+            updateThemeButton();
+        };
+        
+        window.updateThemeButton = function() {
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            const currentTheme = document.body.getAttribute('data-theme') || 'light';
+            
+            if (currentTheme === 'dark') {
+                if (themeIcon) themeIcon.className = 'fas fa-sun mr-2 text-yellow-500';
+                if (themeText) themeText.textContent = 'Claro';
+                console.log('🌙 Botón actualizado a modo claro');
+            } else {
+                if (themeIcon) themeIcon.className = 'fas fa-moon mr-2 text-gray-500';
+                if (themeText) themeText.textContent = 'Oscuro';
+                console.log('☀️ Botón actualizado a modo oscuro');
+            }
+        };
+        
+        // Inicializar tema temprano
+        window.initTheme = function() {
+            const body = document.body;
+            const html = document.documentElement;
+            let savedTheme = localStorage.getItem('admin-theme') || 'light';
+            
+            console.log('🎯 Inicializando tema:', savedTheme);
+            
+            // Aplicar tema guardado
+            body.setAttribute('data-theme', savedTheme);
+            html.setAttribute('data-theme', savedTheme);
+            
+            // Actualizar botón cuando esté disponible
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', updateThemeButton);
+            } else {
+                updateThemeButton();
+            }
+            
+            console.log('✅ Tema inicializado:', savedTheme);
+        };
+        
+        // Ejecutar inmediatamente
+        initTheme();
+    </script>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <!-- Navbar - Se cargará dinámicamente -->
-    <div id="navbar-container"></div>    <!-- Contenido principal -->
-    <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
-        <!-- Header con información de la página -->
-        <div class="mb-8">
-            <div class="gradient-bg text-white rounded-lg shadow-lg p-6 sm:p-10">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                    <div>
-                        <h1 class="text-3xl font-bold mb-2">
-                            <i class="fas fa-users-cog mr-3"></i>
-                            Gestión de Usuarios
-                        </h1>
-                        <p class="text-white text-opacity-90">
-                            Administra usuarios, roles, permisos y configuraciones del sistema
-                        </p>
+<body class="min-h-screen" style="background-color: var(--color-bg-deep);">
+    <!-- Navbar Moderno con imagen de usuario -->
+    <nav id="main-navbar" class="panel-surface border-b p-4 sticky top-0 z-30 shadow-sm" style="border-color: var(--color-border); margin: 0; border-radius: 0;">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <a class="flex items-center space-x-3 hover:opacity-80 transition-opacity group" href="/index">
+                    <div class="bg-gray-50 p-2 rounded-lg shadow-sm border border-gray-100 group-hover:border-gray-200 transition-colors">
+                        <img alt="Logo" class="h-6 w-auto" src="/static/img/logo_mapache.gif"/>
                     </div>
-                    <div class="mt-4 md:mt-0">
-                        <button id="btnNuevoUsuario" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg">
-                            <i class="fas fa-user-plus mr-2"></i>
-                            Nuevo Usuario
+                    <span class="text-gray-900 font-semibold text-lg hidden md:block" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text);">
+                        SQL App Studio
+                    </span>
+                </a>
+                <div class="flex items-center space-x-1 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100" id="breadcrumb-container" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--color-surface-alt); border-color: var(--color-border);">
+                    <span style="color: var(--color-text-soft);">Inicio / Panel Admin / Usuarios</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4 relative">
+                <!-- Botón de Tema Simplificado -->
+                <button id="theme-toggle" class="flex items-center hover:bg-gray-50 px-3 py-2 rounded-lg text-sm transition-all duration-200 font-medium" title="Cambiar tema" onclick="toggleThemeManual(); updateThemeButton();" style="color: var(--color-text-soft);">
+                    <i class="fas fa-moon mr-2 text-gray-500" id="theme-icon"></i>
+                    <span class="hidden sm:inline" id="theme-text">Oscuro</span>
+                </button>
+                
+                <div class="relative group">
+                    <a class="flex items-center hover:bg-gray-50 px-3 py-2 rounded-lg text-sm transition-all duration-200 font-medium" href="/admin" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text-soft);">
+                        <i class="fas fa-cog mr-2 text-gray-500"></i>
+                        <span class="hidden sm:inline">Admin</span>
+                    </a>
+                </div>
+                
+                <div class="h-6 border-r border-gray-200 mx-2" style="border-color: var(--color-border);"></div>
+                
+                <div class="relative">
+                    <button id="perfil" class="flex items-center focus:outline-none hover:bg-gray-50 px-3 py-2 rounded-lg transition-all duration-200 group">
+                        <div class="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center text-white shadow-sm border border-gray-200 group-hover:border-gray-300 transition-colors" id="user-initial" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600;">
+                            U
+                        </div>
+                        <svg class="ml-1.5 w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg z-50 border border-gray-200 overflow-hidden panel-surface" style="box-shadow: var(--shadow-large);">
+                        <div class="px-4 py-3 border-b" style="background-color: var(--color-surface-alt); border-color: var(--color-border);">
+                            <div class="text-sm font-semibold" id="user-name" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text);">Usuario Actual</div>
+                            <div class="text-xs mt-0.5" id="user-email" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text-soft);">usuario@ejemplo.com</div>
+                        </div>
+                        <a href="/admin/perfil" class="flex items-center px-4 py-3 text-sm border-b transition-colors" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text-soft); border-color: var(--color-border);">
+                            <i class="fas fa-user-circle mr-3 w-4 text-center" style="color: var(--color-text-soft);"></i>
+                            Perfil de usuario
+                        </a>
+                        <form id="logout-form" action="/logout" method="post" class="border-t" style="border-color: var(--color-border);">
+                            <button type="submit" class="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
+                                <i class="fas fa-sign-out-alt mr-3 w-4 text-center"></i>
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>    <!-- Contenido principal -->
+    <main class="w-full min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Encabezado principal mejorado -->
+            <section class="header-hero rounded-xl shadow-lg p-8 mb-8">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl icon-gradient-5 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-users-cog text-white text-lg"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h1 class="text-2xl lg:text-3xl font-bold mb-2" style="color: var(--color-text);">Gestión de Usuarios</h1>
+                            <p class="text-base lg:text-lg mb-4" style="color: var(--color-text-soft);">
+                                Administra usuarios, roles, permisos y configuraciones del sistema de manera centralizada
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium" style="background-color: var(--color-accent-light, #e0e7ff); color: var(--color-accent);">
+                                    <i class="fas fa-shield-alt mr-1"></i>Control de Acceso
+                                </span>
+                                <span class="px-3 py-1 rounded-full text-xs font-medium" style="background-color: var(--color-success-light, #dcfce7); color: var(--color-success, #16a34a);">
+                                    <i class="fas fa-user-check mr-1"></i>Gestión de Roles
+                                </span>
+                                <span class="px-3 py-1 rounded-full text-xs font-medium" style="background-color: var(--color-warning-light, #fef3c7); color: var(--color-warning, #d97706);">
+                                    <i class="fas fa-cog mr-1"></i>Configuraciones
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 flex-shrink-0">
+                        <button id="btnNuevoUsuario" class="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white transition-all duration-200 hover:shadow-lg transform hover:translateY(-1px) hover:scale-105" 
+                                style="background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-alt) 100%);">
+                            <i class="fas fa-user-plus text-sm"></i>
+                            <span>Nuevo Usuario</span>
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>        <!-- Estadísticas de usuarios -->
+            </section>        <!-- Estadísticas de usuarios -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="panel-surface rounded-xl shadow-md p-6 card-hover">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Total Usuarios</p>
-                        <p id="total-users" class="text-3xl font-bold text-gray-900">0</p>
+                        <p class="text-sm font-medium mb-1" style="color: var(--color-text-soft);">Total Usuarios</p>
+                        <p id="total-users" class="text-3xl font-bold" style="color: var(--color-text);">0</p>
                     </div>
-                    <div class="p-3 bg-blue-100 rounded-full">
-                        <i class="fas fa-users text-2xl text-blue-600"></i>
+                    <div class="w-12 h-12 rounded-xl icon-gradient-4 flex items-center justify-center">
+                        <i class="fas fa-users text-white text-xl"></i>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="panel-surface rounded-xl shadow-md p-6 card-hover">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Usuarios Activos</p>
+                        <p class="text-sm font-medium mb-1" style="color: var(--color-text-soft);">Usuarios Activos</p>
                         <p id="active-users" class="text-3xl font-bold text-green-600">0</p>
                     </div>
-                    <div class="p-3 bg-green-100 rounded-full">
-                        <i class="fas fa-user-check text-2xl text-green-600"></i>
+                    <div class="w-12 h-12 rounded-xl icon-gradient-5 flex items-center justify-center">
+                        <i class="fas fa-user-check text-white text-xl"></i>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="panel-surface rounded-xl shadow-md p-6 card-hover">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Administradores</p>
+                        <p class="text-sm font-medium mb-1" style="color: var(--color-text-soft);">Administradores</p>
                         <p id="admin-users" class="text-3xl font-bold text-purple-600">0</p>
                     </div>
-                    <div class="p-3 bg-purple-100 rounded-full">
-                        <i class="fas fa-user-shield text-2xl text-purple-600"></i>
+                    <div class="w-12 h-12 rounded-xl icon-gradient-2 flex items-center justify-center">
+                        <i class="fas fa-user-shield text-white text-xl"></i>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="panel-surface rounded-xl shadow-md p-6 card-hover">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Roles Totales</p>
+                        <p class="text-sm font-medium mb-1" style="color: var(--color-text-soft);">Roles Totales</p>
                         <p id="total-roles" class="text-3xl font-bold text-orange-600">0</p>
                     </div>
-                    <div class="p-3 bg-orange-100 rounded-full">
-                        <i class="fas fa-tags text-2xl text-orange-600"></i>
+                    <div class="w-12 h-12 rounded-xl icon-gradient-1 flex items-center justify-center">
+                        <i class="fas fa-tags text-white text-xl"></i>
                     </div>
                 </div>
             </div>
@@ -129,96 +457,48 @@
                 </nav>
             </div>
         </div>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-700">Total Usuarios</h3>
-                        <p class="text-2xl font-bold text-blue-600" id="total-users">-</p>
-                    </div>
-                </div>
-            </div>
 
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-green-100 text-green-600">
-                        <i class="fas fa-user-check text-2xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-700">Usuarios Activos</h3>
-                        <p class="text-2xl font-bold text-green-600" id="active-users">-</p>
-                    </div>
-                </div>
-            </div>
 
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
-                        <i class="fas fa-user-shield text-2xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-700">Administradores</h3>
-                        <p class="text-2xl font-bold text-yellow-600" id="admin-users">-</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                        <i class="fas fa-key text-2xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-700">Roles</h3>
-                        <p class="text-2xl font-bold text-purple-600" id="total-roles">-</p>
-                    </div>
-                </div>
-            </div>
-        </div>        <!-- Action Buttons -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Acciones Rápidas</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button onclick="openCreateUserModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center">
-                    <i class="fas fa-user-plus mr-2"></i>
-                    Crear Usuario
-                </button>
-                <button onclick="openRoleAssignModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center">
-                    <i class="fas fa-user-tag mr-2"></i>
-                    Asignar Roles
-                </button>
-                <button onclick="refreshStatistics()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center">
-                    <i class="fas fa-chart-bar mr-2"></i>
-                    Actualizar Stats
-                </button>
-            </div>
-        </div>
 
         <!-- Contenido de las pestañas -->
         <div id="content-usuarios" class="tab-content">
             <!-- Filtros y búsqueda avanzada -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                    <i class="fas fa-filter mr-2"></i>
+            <div class="panel-surface rounded-xl shadow-md p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2" style="color: var(--color-text);">
+                    <div class="w-6 h-6 rounded-lg icon-gradient-3 flex items-center justify-center">
+                        <i class="fas fa-filter text-white text-xs"></i>
+                    </div>
                     Filtros y Búsqueda
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Buscar usuario</label>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Buscar usuario</label>
                         <div class="relative">
                             <input type="text" id="searchUsuarios" placeholder="Nombre, usuario o email..." 
-                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                class="w-full pl-10 pr-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200" 
+                                style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-soft);"
+                                onFocus="this.style.borderColor='var(--color-accent)'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.1)'"
+                                onBlur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='var(--shadow-soft)'">
+                            <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                        <select id="filterEstado" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Estado</label>
+                        <select id="filterEstado" class="w-full p-3 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200" 
+                                style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-soft);"
+                                onFocus="this.style.borderColor='var(--color-accent)'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.1)'"
+                                onBlur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='var(--shadow-soft)'">
                             <option value="">Todos los estados</option>
                             <option value="true">Activos</option>
                             <option value="false">Inactivos</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Rol</label>
-                        <select id="filterRol" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Rol</label>
+                        <select id="filterRol" class="w-full p-3 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200" 
+                                style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-soft);"
+                                onFocus="this.style.borderColor='var(--color-accent)'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.1)'"
+                                onBlur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='var(--shadow-soft)'">
                             <option value="">Todos los roles</option>
                             <option value="admin">Administrador</option>
                             <option value="manager">Gestor</option>
@@ -227,7 +507,8 @@
                         </select>
                     </div>
                     <div class="flex items-end">
-                        <button id="btnAplicarFiltros" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-200">
+                        <button id="btnAplicarFiltros" class="w-full py-3 px-4 rounded-lg font-medium text-white transition-all duration-200 hover:shadow-lg transform hover:translateY(-1px)" 
+                                style="background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-alt) 100%);">
                             <i class="fas fa-search mr-2"></i>
                             Buscar
                         </button>
@@ -236,7 +517,7 @@
             </div>
 
             <!-- Tabla de usuarios -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="panel-surface rounded-xl shadow-md overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                     <h3 class="text-lg font-semibold text-gray-800">
                         <i class="fas fa-users mr-2"></i>
@@ -487,8 +768,959 @@
         </div>
     </div>
 
+    <!-- Modal para editar roles de usuario -->
+    <div id="modalEditarRoles" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-50">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="panel-surface rounded-xl shadow-2xl max-w-md w-full p-6 relative">
+                <button type="button" onclick="cerrarModal('modalEditarRoles')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-lg icon-gradient-3 flex items-center justify-center">
+                        <i class="fas fa-user-tag text-white"></i>
+                    </div>
+                    <div>
+                        <h3 id="modalRolesTitulo" class="text-xl font-bold" style="color: var(--color-text);">Editar Roles</h3>
+                        <p class="text-sm" style="color: var(--color-text-soft);">Gestionar roles del usuario</p>
+                    </div>
+                </div>
+                
+                <form id="formEditarRoles">
+                    <div class="mb-4">
+                        <label for="usuarioNombreRoles" class="block text-sm font-medium mb-2" style="color: var(--color-text);">Usuario</label>
+                        <input type="text" id="usuarioNombreRoles" class="w-full p-3 rounded-lg border bg-gray-100" 
+                               style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text-soft);" 
+                               readonly>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="rolesDisponibles" class="block text-sm font-medium mb-2" style="color: var(--color-text);">Roles Disponibles</label>
+                        <div id="rolesDisponibles" class="space-y-2 max-h-40 overflow-y-auto p-3 border rounded-lg" 
+                             style="border-color: var(--color-border); background-color: var(--color-surface);">
+                            <!-- Los roles se cargarán dinámicamente -->
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Roles Actuales</label>
+                        <div id="rolesActuales" class="flex flex-wrap gap-2 p-3 border rounded-lg min-h-[50px]" 
+                             style="border-color: var(--color-border); background-color: var(--color-surface);">
+                            <!-- Los roles actuales se mostrarán aquí -->
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button type="button" onclick="cerrarModal('modalEditarRoles')" 
+                                class="flex-1 py-3 px-4 rounded-lg border font-medium transition-all duration-200 hover:bg-gray-50" 
+                                style="border-color: var(--color-border); color: var(--color-text);">
+                            Cancelar
+                        </button>
+                        <button type="submit" 
+                                class="flex-1 py-3 px-4 rounded-lg font-medium text-white transition-all duration-200 hover:shadow-lg transform hover:translateY(-1px)" 
+                                style="background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-alt) 100%);">
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Notificaciones -->
-    <div id="notificaciones" class="fixed top-4 right-4 z-50 space-y-2"></div>    <!-- JavaScript para gestión de usuarios -->
+    <div id="notificaciones" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Script de inicialización del tema y navbar -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 DOM cargado, configurando usuarios admin...');
+        
+        // Inicialización del tema (asegurar que esté aplicado)
+        const body = document.body;
+        const html = document.documentElement;
+        let savedTheme = localStorage.getItem('admin-theme') || 'light';
+        
+        console.log('🎨 Aplicando tema guardado:', savedTheme);
+        
+        // Aplicar tema guardado con fuerza
+        body.setAttribute('data-theme', savedTheme);
+        html.setAttribute('data-theme', savedTheme);
+        
+        // Actualizar botón del tema
+        setTimeout(() => {
+            updateThemeButton();
+            console.log('🔄 Botón de tema actualizado');
+        }, 100);
+        
+        // Funcionalidad del menú de perfil
+        const perfilBtn = document.getElementById('perfil');
+        const perfilMenu = document.getElementById('menu-perfil');
+        
+        if (perfilBtn && perfilMenu) {
+            perfilBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                perfilMenu.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!perfilBtn.contains(event.target) && !perfilMenu.contains(event.target)) {
+                    perfilMenu.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Cargar información del usuario actual
+        fetchCurrentUser();
+        
+        function fetchCurrentUser() {
+            // Intentar obtener datos del usuario del localStorage o de una API
+            try {
+                // Simulamos datos del usuario - en producción esto vendría de una API
+                const userData = {
+                    usuario: 'Admin',
+                    mail: 'admin@ejemplo.com',
+                    imagen_perfil: null // Aquí iría la imagen base64 si existe
+                };
+                
+                updateUserDisplay(userData);
+            } catch (error) {
+                console.log('🔍 No se pudieron cargar datos del usuario:', error);
+                // Valores por defecto
+                updateUserDisplay({
+                    usuario: 'Admin',
+                    mail: 'admin@ejemplo.com',
+                    imagen_perfil: null
+                });
+            }
+        }
+        
+        function updateUserDisplay(userData) {
+            const userInitial = document.getElementById('user-initial');
+            const userName = document.getElementById('user-name');
+            const userEmail = document.getElementById('user-email');
+            
+            if (userInitial) {
+                if (userData.imagen_perfil) {
+                    userInitial.innerHTML = `
+                        <img src="data:image/jpeg;base64,${userData.imagen_perfil}" alt="Imagen de perfil" class="w-full h-full object-cover rounded-full">
+                    `;
+                } else {
+                    userInitial.textContent = userData.usuario.charAt(0).toUpperCase();
+                }
+            }
+            
+            if (userName) userName.textContent = userData.usuario;
+            if (userEmail) userEmail.textContent = userData.mail || 'Sin email';
+        }
+        
+        console.log('✅ Usuarios admin configurado correctamente');
+        
+        // ==================== FUNCIONES DE CARGA DE DATOS ====================
+        
+        // Función para cargar usuarios desde la API
+        async function cargarUsuariosInline() {
+            console.log('🔄 Cargando usuarios desde API...');
+            
+            try {
+                const response = await fetch('/usuarios_admin/usuarios-con-detalles/');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const usuarios = await response.json();
+                console.log('✅ Usuarios cargados:', usuarios.length);
+                
+                // Actualizar contador de usuarios
+                const totalUsuariosElement = document.getElementById('totalUsuarios');
+                if (totalUsuariosElement) {
+                    totalUsuariosElement.textContent = usuarios.length;
+                }
+                
+                // Renderizar tabla de usuarios
+                renderizarTablaUsuarios(usuarios);
+                
+            } catch (error) {
+                console.error('❌ Error cargando usuarios:', error);
+                mostrarMensajeError('Error al cargar usuarios: ' + error.message);
+            }
+        }
+        
+        // Función para renderizar la tabla de usuarios
+        function renderizarTablaUsuarios(usuarios) {
+            const tableBody = document.getElementById('users-table-body');
+            if (!tableBody) {
+                console.error('❌ No se encontró el elemento users-table-body');
+                return;
+            }
+            
+            if (usuarios.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            No hay usuarios registrados
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            usuarios.forEach(usuario => {
+                const estadoClass = usuario.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                const estadoTexto = usuario.activo ? 'Activo' : 'Inactivo';
+                
+                html += `
+                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <img class="h-10 w-10 rounded-full" 
+                                         src="${usuario.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(usuario.nombre || usuario.usuario) + '&background=random'}" 
+                                         alt="Avatar">
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">${usuario.nombre || 'Sin nombre'}</div>
+                                    <div class="text-sm text-gray-500">@${usuario.usuario}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${usuario.email || 'Sin email'}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${estadoClass}">
+                                ${estadoTexto}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${(usuario.roles || ['usuario']).join(', ')}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${usuario.ultimo_acceso ? new Date(usuario.ultimo_acceso).toLocaleDateString() : 'Nunca'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <button onclick="editarUsuario(${usuario.id})" 
+                                        class="text-blue-600 hover:text-blue-900 transition-colors duration-200" 
+                                        title="Editar usuario">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="editarRolesUsuario(${usuario.id})" 
+                                        class="text-purple-600 hover:text-purple-900 transition-colors duration-200" 
+                                        title="Editar roles">
+                                    <i class="fas fa-user-tag"></i>
+                                </button>
+                                <button onclick="verHistorial(${usuario.id})" 
+                                        class="text-green-600 hover:text-green-900 transition-colors duration-200" 
+                                        title="Ver historial">
+                                    <i class="fas fa-history"></i>
+                                </button>
+                                <button onclick="toggleUsuarioStatus(${usuario.id})" 
+                                        class="text-yellow-600 hover:text-yellow-900 transition-colors duration-200" 
+                                        title="${usuario.activo ? 'Desactivar' : 'Activar'} usuario">
+                                    <i class="fas fa-${usuario.activo ? 'user-slash' : 'user-check'}"></i>
+                                </button>
+                                <button onclick="eliminarUsuario(${usuario.id})" 
+                                        class="text-red-600 hover:text-red-900 transition-colors duration-200" 
+                                        title="Eliminar usuario">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = html;
+            console.log('✅ Tabla de usuarios renderizada con', usuarios.length, 'usuarios');
+        }
+        
+        // Función para cargar estadísticas
+        async function cargarEstadisticasInline() {
+            console.log('🔄 Cargando estadísticas...');
+            
+            try {
+                const response = await fetch('/usuarios_admin/estadisticas-avanzadas/');
+                
+                if (!response.ok) {
+                    console.warn('⚠️ API de estadísticas no disponible, usando valores por defecto');
+                    // Usar estadísticas básicas si la API avanzada falla
+                    return cargarEstadisticasBasicas();
+                }
+                
+                const stats = await response.json();
+                console.log('✅ Estadísticas cargadas:', stats);
+                
+                // Actualizar elementos de estadísticas
+                const totalUsersElement = document.getElementById('total-users');
+                const activeUsersElement = document.getElementById('active-users');
+                const adminUsersElement = document.getElementById('admin-users');
+                const totalRolesElement = document.getElementById('total-roles');
+                
+                if (totalUsersElement) totalUsersElement.textContent = stats.resumen?.total_usuarios || 0;
+                if (activeUsersElement) activeUsersElement.textContent = stats.resumen?.usuarios_activos || 0;
+                if (adminUsersElement) adminUsersElement.textContent = stats.resumen?.total_administradores || 0;
+                if (totalRolesElement) totalRolesElement.textContent = stats.resumen?.total_roles || 0;
+                
+            } catch (error) {
+                console.error('❌ Error cargando estadísticas:', error);
+                cargarEstadisticasBasicas();
+            }
+        }
+        
+        // Función de respaldo para estadísticas básicas
+        async function cargarEstadisticasBasicas() {
+            try {
+                const response = await fetch('/usuarios_admin/usuarios-con-detalles/');
+                if (response.ok) {
+                    const usuarios = await response.json();
+                    const usuariosActivos = usuarios.filter(u => u.activo).length;
+                    const admins = usuarios.filter(u => u.roles && u.roles.includes('admin')).length;
+                    
+                    document.getElementById('total-users').textContent = usuarios.length;
+                    document.getElementById('active-users').textContent = usuariosActivos;
+                    document.getElementById('admin-users').textContent = Math.max(admins, 1);
+                    document.getElementById('total-roles').textContent = 3; // Valor por defecto
+                    
+                    console.log('✅ Estadísticas básicas cargadas');
+                }
+            } catch (error) {
+                console.error('❌ Error en estadísticas básicas:', error);
+            }
+        }
+        
+        // Función para mostrar mensajes de error
+        function mostrarMensajeError(mensaje) {
+            console.error('❌', mensaje);
+            // Aquí podrías agregar una notificación visual al usuario
+        }
+        
+        // Funciones placeholder para las acciones de usuario
+        window.editarUsuario = function(id) { 
+            console.log('Editar usuario:', id);
+            abrirModalUsuario(id);
+        };
+        window.verHistorial = function(id) { 
+            console.log('Ver historial:', id);
+            abrirModalHistorial(id);
+        };
+        window.toggleUsuarioStatus = function(id) { 
+            console.log('Toggle status:', id);
+            cambiarEstadoUsuario(id);
+        };
+        window.eliminarUsuario = function(id) { 
+            console.log('Eliminar usuario:', id);
+            confirmarEliminarUsuario(id);
+        };
+        
+        // ==================== FUNCIONES DE MODALES ====================
+        
+        // Función para abrir modal de usuario (crear/editar)
+        function abrirModalUsuario(usuarioId = null) {
+            const modal = document.getElementById('modalUsuario');
+            const titulo = document.getElementById('modalTitulo');
+            const form = document.getElementById('formUsuario');
+            
+            if (!modal || !titulo || !form) {
+                console.error('Elementos del modal no encontrados');
+                return;
+            }
+            
+            // Limpiar formulario
+            form.reset();
+            
+            // Almacenar ID del usuario en el modal para edición
+            if (usuarioId) {
+                modal.dataset.usuarioId = usuarioId;
+                titulo.textContent = 'Editar Usuario';
+                cargarDatosUsuario(usuarioId);
+                
+                // En modo edición, el campo usuario debe ser readonly
+                const usuarioField = document.getElementById('usuario');
+                if (usuarioField) {
+                    usuarioField.readOnly = true;
+                    usuarioField.style.backgroundColor = '#f3f4f6';
+                }
+                
+                // Password no es requerido en edición
+                const passwordField = document.getElementById('password');
+                if (passwordField) {
+                    passwordField.required = false;
+                    passwordField.placeholder = 'Dejar vacío para mantener actual';
+                }
+            } else {
+                // Modo creación
+                delete modal.dataset.usuarioId;
+                titulo.textContent = 'Nuevo Usuario';
+                
+                // En modo creación, usuario es editable y password requerido
+                const usuarioField = document.getElementById('usuario');
+                if (usuarioField) {
+                    usuarioField.readOnly = false;
+                    usuarioField.style.backgroundColor = '';
+                }
+                
+                const passwordField = document.getElementById('password');
+                if (passwordField) {
+                    passwordField.required = true;
+                    passwordField.placeholder = 'Contraseña del usuario';
+                }
+            }
+            
+            // Mostrar modal
+            modal.classList.remove('hidden');
+            
+            // Event listeners para cerrar modal (siempre necesarios)
+            setupModalEventListeners();
+        }
+        
+        // Función para cargar datos del usuario en el modal
+        async function cargarDatosUsuario(usuarioId) {
+            try {
+                console.log('Cargando datos del usuario:', usuarioId);
+                const response = await fetch(`/usuarios_admin/usuarios/${usuarioId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                
+                const usuario = await response.json();
+                console.log('Datos del usuario cargados:', usuario);
+                
+                // Llenar el formulario con los datos del usuario
+                document.getElementById('usuario').value = usuario.usuario || '';
+                document.getElementById('nombre').value = usuario.nombre || '';
+                document.getElementById('correo').value = usuario.correo || '';
+                document.getElementById('rol').value = usuario.rol || 'user';
+                
+                // El password no se carga por seguridad
+                const passwordField = document.getElementById('password');
+                if (passwordField) {
+                    passwordField.value = '';
+                    passwordField.placeholder = 'Dejar vacío para mantener actual';
+                    passwordField.required = false;
+                }
+                
+            } catch (error) {
+                console.error('Error al cargar datos del usuario:', error);
+                alert('Error al cargar los datos del usuario: ' + error.message);
+            }
+        }
+        
+        // Función para configurar event listeners de modales
+        function setupModalEventListeners() {
+            // Cerrar modal al hacer clic en el fondo
+            const modales = ['modalUsuario', 'modalCambiarPassword', 'modalHistorial', 'modalConfirmar', 'modalEditarRoles'];
+            
+            modales.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === modal) {
+                            cerrarModal(modalId);
+                        }
+                    });
+                }
+            });
+            
+            // Botones de cancelar/cerrar específicos
+            const btnCancelar = document.getElementById('btnCancelar');
+            if (btnCancelar) {
+                btnCancelar.addEventListener('click', () => cerrarModal('modalUsuario'));
+            }
+            
+            const btnCancelarPassword = document.getElementById('btnCancelarPassword');
+            if (btnCancelarPassword) {
+                btnCancelarPassword.addEventListener('click', () => cerrarModal('modalCambiarPassword'));
+            }
+            
+            const btnCerrarHistorial = document.getElementById('btnCerrarHistorial');
+            if (btnCerrarHistorial) {
+                btnCerrarHistorial.addEventListener('click', () => cerrarModal('modalHistorial'));
+            }
+            
+            const btnCancelarConfirmar = document.getElementById('btnCancelarConfirmar');
+            if (btnCancelarConfirmar) {
+                btnCancelarConfirmar.addEventListener('click', () => cerrarModal('modalConfirmar'));
+            }
+            
+            // Botón Nuevo Usuario
+            const btnNuevoUsuario = document.getElementById('btnNuevoUsuario');
+            if (btnNuevoUsuario) {
+                btnNuevoUsuario.addEventListener('click', () => abrirModalUsuario());
+            }
+            
+            // Formulario de usuario
+            const formUsuario = document.getElementById('formUsuario');
+            if (formUsuario) {
+                formUsuario.addEventListener('submit', handleSubmitUsuario);
+            }
+            
+            console.log('✅ Event listeners de modales configurados');
+        }
+        
+        // Función para cerrar modal
+        function cerrarModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+        
+        // Función para manejar submit del formulario de usuario
+        async function handleSubmitUsuario(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const usuarioData = {
+                usuario: formData.get('usuario'),
+                nombre: formData.get('nombre'),
+                correo: formData.get('correo'),  // Corregido: correo en lugar de email
+                rol: formData.get('rol'),        // Agregado: rol
+                password: formData.get('password')
+            };
+            
+            try {
+                // Determinar si es creación o edición basado en el título del modal
+                const titulo = document.getElementById('modalTitulo').textContent;
+                const isEdit = titulo.includes('Editar');
+                
+                let response;
+                if (isEdit) {
+                    // Para edición, obtener el ID del usuario del modal
+                    const usuarioId = document.getElementById('modalUsuario').dataset.usuarioId;
+                    
+                    if (!usuarioId) {
+                        throw new Error('ID de usuario no encontrado para edición');
+                    }
+                    
+                    // Preparar datos para edición (sin password si no se cambió)
+                    const dataForEdit = {
+                        nombre: usuarioData.nombre,
+                        correo: usuarioData.correo,
+                        rol: usuarioData.rol
+                    };
+                    
+                    // Solo incluir password si se proporcionó
+                    if (usuarioData.password && usuarioData.password.trim() !== '') {
+                        dataForEdit.password = usuarioData.password;
+                    }
+                    
+                    // Editar usuario existente
+                    response = await fetch(`/usuarios_admin/usuarios/${usuarioId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(dataForEdit)
+                    });
+                } else {
+                    // Crear nuevo usuario - password es obligatorio
+                    if (!usuarioData.password) {
+                        throw new Error('La contraseña es obligatoria para crear un usuario');
+                    }
+                    
+                    response = await fetch('/usuarios_admin/usuarios/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            usuario: usuarioData.usuario,
+                            nombre: usuarioData.nombre,
+                            correo: usuarioData.correo,
+                            password: usuarioData.password,
+                            rol: usuarioData.rol || 'user'  // Rol por defecto
+                        })
+                    });
+                }
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    mostrarNotificacion(`Usuario ${isEdit ? 'actualizado' : 'creado'} exitosamente`, 'success');
+                    cerrarModal('modalUsuario');
+                    cargarUsuariosInline(); // Recargar lista
+                    cargarEstadisticasInline(); // Actualizar estadísticas
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        throw new Error(errorJson.detail || 'Error en la operación');
+                    } catch (parseError) {
+                        throw new Error(`Error ${response.status}: ${response.statusText}`);
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Función para cambiar estado de usuario
+        async function cambiarEstadoUsuario(usuarioId) {
+            try {
+                const response = await fetch(`/usuarios_admin/usuarios/${usuarioId}/toggle-status`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    mostrarNotificacion(result.message, 'success');
+                    cargarUsuariosInline(); // Recargar lista
+                } else {
+                    throw new Error('Error al cambiar estado del usuario');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al cambiar estado del usuario', 'error');
+            }
+        }
+        
+        // Función para confirmar eliminación de usuario
+        function confirmarEliminarUsuario(usuarioId) {
+            const modal = document.getElementById('modalConfirmar');
+            const titulo = document.getElementById('confirmarTitulo');
+            const mensaje = document.getElementById('confirmarMensaje');
+            const btnConfirmar = document.getElementById('btnConfirmarAccion');
+            
+            if (modal && titulo && mensaje && btnConfirmar) {
+                titulo.textContent = 'Eliminar Usuario';
+                mensaje.textContent = '¿Está seguro que desea eliminar este usuario? Esta acción no se puede deshacer.';
+                
+                // Configurar acción de confirmación
+                btnConfirmar.onclick = function() {
+                    eliminarUsuarioConfirmado(usuarioId);
+                };
+                
+                modal.classList.remove('hidden');
+            }
+        }
+        
+        // Función para eliminar usuario confirmado
+        async function eliminarUsuarioConfirmado(usuarioId) {
+            try {
+                const response = await fetch(`/usuarios_admin/usuarios/${usuarioId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    mostrarNotificacion(result.message, 'success');
+                    cerrarModal('modalConfirmar');
+                    cargarUsuariosInline(); // Recargar lista
+                } else {
+                    throw new Error('Error al eliminar usuario');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al eliminar usuario', 'error');
+            }
+        }
+        
+        // ==================== FUNCIONES DE EDICIÓN DE ROLES ====================
+        
+        // Función para abrir modal de edición de roles
+        async function editarRolesUsuario(usuarioId) {
+            console.log('🏷️ Abriendo modal de edición de roles para usuario:', usuarioId);
+            
+            try {
+                // Cargar datos del usuario
+                const userResponse = await fetch(`/usuarios_admin/usuarios/${usuarioId}`);
+                if (!userResponse.ok) {
+                    throw new Error('Error al cargar datos del usuario');
+                }
+                const usuario = await userResponse.json();
+                
+                // Cargar roles disponibles
+                const rolesResponse = await fetch('/usuarios_admin/roles/');
+                let rolesDisponibles = [];
+                if (rolesResponse.ok) {
+                    rolesDisponibles = await rolesResponse.json();
+                } else {
+                    // Roles por defecto si no se pueden cargar
+                    rolesDisponibles = [
+                        { nombre: 'admin', descripcion: 'Administrador del sistema' },
+                        { nombre: 'user', descripcion: 'Usuario estándar' },
+                        { nombre: 'moderator', descripcion: 'Moderador' },
+                        { nombre: 'guest', descripcion: 'Invitado' }
+                    ];
+                }
+                
+                // Configurar modal
+                const modal = document.getElementById('modalEditarRoles');
+                const usuarioNombre = document.getElementById('usuarioNombreRoles');
+                
+                if (modal && usuarioNombre) {
+                    modal.dataset.usuarioId = usuarioId;
+                    usuarioNombre.value = `${usuario.nombre} (@${usuario.usuario})`;
+                    
+                    // Renderizar roles disponibles
+                    renderizarRolesDisponibles(rolesDisponibles, usuario.rol || 'user');
+                    
+                    // Mostrar modal
+                    modal.classList.remove('hidden');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al cargar información de roles', 'error');
+            }
+        }
+        
+        // Función para renderizar roles disponibles
+        function renderizarRolesDisponibles(roles, rolActual) {
+            const container = document.getElementById('rolesDisponibles');
+            const rolesActualesContainer = document.getElementById('rolesActuales');
+            
+            if (!container || !rolesActualesContainer) return;
+            
+            // Limpiar contenedores
+            container.innerHTML = '';
+            rolesActualesContainer.innerHTML = '';
+            
+            // Crear checkboxes para roles disponibles
+            roles.forEach(rol => {
+                const isActual = rolActual === rol.nombre;
+                
+                const div = document.createElement('div');
+                div.className = 'flex items-center space-x-2 p-2 hover:bg-gray-50 rounded';
+                div.innerHTML = `
+                    <input type="checkbox" id="rol_${rol.nombre}" value="${rol.nombre}" 
+                           ${isActual ? 'checked' : ''} 
+                           onchange="toggleRol('${rol.nombre}')"
+                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <label for="rol_${rol.nombre}" class="flex-1 cursor-pointer">
+                        <span class="font-medium">${rol.nombre}</span>
+                        <span class="text-sm text-gray-500 block">${rol.descripcion || 'Sin descripción'}</span>
+                    </label>
+                `;
+                container.appendChild(div);
+                
+                // Si es el rol actual, mostrarlo en roles actuales
+                if (isActual) {
+                    agregarRolActual(rol.nombre);
+                }
+            });
+        }
+        
+        // Función para toggle de rol
+        function toggleRol(rolNombre) {
+            const checkbox = document.getElementById(`rol_${rolNombre}`);
+            if (checkbox.checked) {
+                agregarRolActual(rolNombre);
+            } else {
+                quitarRolActual(rolNombre);
+            }
+        }
+        
+        // Función para agregar rol actual
+        function agregarRolActual(rolNombre) {
+            const container = document.getElementById('rolesActuales');
+            if (!container) return;
+            
+            // Verificar si ya existe
+            if (container.querySelector(`[data-rol="${rolNombre}"]`)) return;
+            
+            const span = document.createElement('span');
+            span.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800';
+            span.setAttribute('data-rol', rolNombre);
+            span.innerHTML = `
+                ${rolNombre}
+                <button type="button" onclick="quitarRolActual('${rolNombre}')" class="ml-2 text-blue-600 hover:text-blue-800">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            `;
+            container.appendChild(span);
+        }
+        
+        // Función para quitar rol actual
+        function quitarRolActual(rolNombre) {
+            const container = document.getElementById('rolesActuales');
+            const checkbox = document.getElementById(`rol_${rolNombre}`);
+            const elemento = container?.querySelector(`[data-rol="${rolNombre}"]`);
+            
+            if (elemento) {
+                elemento.remove();
+            }
+            if (checkbox) {
+                checkbox.checked = false;
+            }
+        }
+        
+        // Event listener para el formulario de editar roles
+        document.addEventListener('DOMContentLoaded', function() {
+            const formEditarRoles = document.getElementById('formEditarRoles');
+            if (formEditarRoles) {
+                formEditarRoles.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    await guardarCambiosRoles();
+                });
+            }
+        });
+        
+        // Función para guardar cambios de roles
+        async function guardarCambiosRoles() {
+            const modal = document.getElementById('modalEditarRoles');
+            const usuarioId = modal?.dataset.usuarioId;
+            
+            if (!usuarioId) {
+                mostrarNotificacion('Error: ID de usuario no encontrado', 'error');
+                return;
+            }
+            
+            // Obtener roles seleccionados
+            const checkboxes = document.querySelectorAll('#rolesDisponibles input[type="checkbox"]:checked');
+            const rolesSeleccionados = Array.from(checkboxes).map(cb => cb.value);
+            
+            // Tomar solo el primer rol (el sistema actual maneja un rol por usuario)
+            const rolPrincipal = rolesSeleccionados[0] || 'user';
+            
+            try {
+                const response = await fetch(`/usuarios_admin/usuarios/${usuarioId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        rol: rolPrincipal
+                    })
+                });
+                
+                if (response.ok) {
+                    mostrarNotificacion('Roles actualizados exitosamente', 'success');
+                    cerrarModal('modalEditarRoles');
+                    cargarUsuariosInline(); // Recargar lista
+                } else {
+                    const errorData = await response.json().catch(() => null);
+                    throw new Error(errorData?.detail || 'Error al actualizar roles');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al actualizar roles: ' + error.message, 'error');
+            }
+        }
+        
+        // Función para abrir modal de historial
+        async function abrirModalHistorial(usuarioId) {
+            const modal = document.getElementById('modalHistorial');
+            const content = document.getElementById('historialContent');
+            
+            if (!modal || !content) {
+                console.error('Modal de historial no encontrado');
+                return;
+            }
+            
+            // Mostrar loading
+            content.innerHTML = '<p class="text-center text-gray-500">Cargando historial...</p>';
+            modal.classList.remove('hidden');
+            
+            try {
+                const response = await fetch(`/usuarios_admin/usuarios/${usuarioId}/historial`);
+                if (response.ok) {
+                    const data = await response.json();
+                    renderizarHistorial(data);
+                } else {
+                    throw new Error('Error al cargar historial');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                content.innerHTML = '<p class="text-center text-red-500">Error al cargar historial</p>';
+            }
+        }
+        
+        // Función para renderizar historial
+        function renderizarHistorial(data) {
+            const content = document.getElementById('historialContent');
+            if (!content) return;
+            
+            let html = `
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold">Usuario: ${data.usuario.nombre} (@${data.usuario.usuario})</h3>
+                    <p class="text-sm text-gray-500">Total de eventos: ${data.total_eventos}</p>
+                </div>
+            `;
+            
+            if (data.historial && data.historial.length > 0) {
+                html += '<div class="space-y-3">';
+                data.historial.forEach(evento => {
+                    html += `
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-medium">${evento.accion}</p>
+                                    <p class="text-sm text-gray-600">${evento.detalles}</p>
+                                </div>
+                                <div class="text-right text-sm text-gray-500">
+                                    <p>${new Date(evento.fecha).toLocaleDateString()}</p>
+                                    <p>${evento.ip}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            } else {
+                html += '<p class="text-center text-gray-500">No hay historial disponible</p>';
+            }
+            
+            content.innerHTML = html;
+        }
+        
+        // Función para mostrar notificaciones
+        function mostrarNotificacion(mensaje, tipo = 'info') {
+            const container = document.getElementById('notificaciones');
+            if (!container) return;
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            
+            const notif = document.createElement('div');
+            notif.className = `${colors[tipo]} text-white px-4 py-2 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full`;
+            notif.textContent = mensaje;
+            
+            container.appendChild(notif);
+            
+            // Animar entrada
+            setTimeout(() => {
+                notif.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Remover después de 3 segundos
+            setTimeout(() => {
+                notif.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (notif.parentNode) {
+                        notif.parentNode.removeChild(notif);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // Cargar datos iniciales
+        setTimeout(() => {
+            cargarUsuariosInline();
+            cargarEstadisticasInline();
+            setupModalEventListeners(); // Configurar event listeners de modales
+        }, 500); // Pequeño delay para asegurar que el DOM esté listo
+    });
+    </script>
+
+    <!-- JavaScript para gestión de usuarios -->
     <script src="/static/html/usuarios/js/usuarios_admin_corregido.js"></script>
 </body>
 </html>

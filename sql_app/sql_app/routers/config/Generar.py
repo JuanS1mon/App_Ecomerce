@@ -303,7 +303,7 @@ def generate_and_save_route(module_name, field_names, field_types):
             # Asegurar que exista el directorio
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             
-            with open(file_path, 'w') as file:
+            with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(route_code)
                 logger.info(f"Archivo {file_path} creado con éxito.")
         except Exception as e:
@@ -322,7 +322,7 @@ def generate_and_save_crud(module_name, field_names, field_types):
         print(f"El archivo {file_path} ya existe.")
     else:
         try:
-            with open(file_path, 'w') as file:
+            with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(crud_code)
                 print(f"Archivo {file_path} creado con éxito.")
         except Exception as e:
@@ -341,7 +341,7 @@ def generate_and_save_schema(module_name, field_names, field_types):
         print(f"El archivo {file_path} ya existe.")
     else:
         try:
-            with open(file_path, 'w') as file:
+            with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(schema_code)
                 print(f"Archivo {file_path} creado con éxito.")
         except Exception as e:
@@ -360,7 +360,7 @@ def generate_and_save_model(module_name, field_names, field_types):
         print(f"El archivo {file_path} ya existe.")
     else:
         try:
-            with open(file_path, 'w') as file:
+            with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(model_code)
                 print(f"Archivo {file_path} creado con éxito.")
         except Exception as e:
@@ -396,7 +396,7 @@ def generate_and_save_tests(module_name, field_names, field_types):
         print(f"El archivo {file_path} ya existe.")
     else:
         try:
-            with open(file_path, 'w') as file:
+            with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(test_code)
                 print(f"Archivo {file_path} creado con éxito.")
         except Exception as e:
@@ -415,7 +415,7 @@ def add_new_route_to_main(new_route):
                 last_maestros_index = i
         if last_maestros_index is not None:
             lines.insert(last_maestros_index + 1, f'app.include_router(Route_{new_route}.router)\n')
-        with open('main.py', 'w') as file:
+        with open('main.py', 'w', encoding='utf-8') as file:
             file.writelines(lines)
     except Exception as e:
         print(f"Error al agregar la nueva ruta al main.py: {e}")

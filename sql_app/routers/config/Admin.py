@@ -1,7 +1,7 @@
 # Imports necesarios
 from datetime import date, timedelta, timezone
 from typing import Optional, Dict, Any
-from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request, status
+from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request, status, File, UploadFile
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
@@ -11,6 +11,9 @@ from sql_app.Services.security.auth_middleware import require_admin_for_template
 from sql_app.db.database import get_db
 from sql_app.db.models.config.usuarios import Usuarios
 from sql_app.db.schemas.config.Usuarios import UserDB
+import base64
+from PIL import Image
+import io
 
 
 # Definir la instancia de Jinja2Templates
@@ -106,13 +109,51 @@ async def user_perfil(
     user_data: Dict[str, Any] = Depends(require_admin_for_template)
 ):
     """Página de perfil de usuario - AUTENTICACIÓN BACKEND"""
-    return templates.TemplateResponse(
-        "/usuarios/usuario_admin.html",
-        {
-            "request": request, 
-            **user_data
-        }
-    )
+    try:
+        print("🔍 DEBUG PERFIL: Datos del usuario recibidos:")
+        print(f"user_data keys: {list(user_data.keys())}")
+        print(f"user data: {user_data.get('user', {})}")
+        
+        # Asegurar que el usuario tenga todos los campos necesarios
+        user = user_data.get('user', {})
+        
+        # Completar campos faltantes con valores por defecto
+        if not user.get('telefono'):
+            user['telefono'] = ''
+        if not user.get('direccion'):
+            user['direccion'] = ''
+        if not user.get('fecha_nacimiento'):
+            user['fecha_nacimiento'] = ''
+        if not user.get('imagen_perfil'):
+            user['imagen_perfil'] = ''
+        if not isinstance(user.get('roles'), list):
+            # Si roles no es una lista, convertirlo en una lista de objetos con nombre
+            if 'admin' in str(user.get('roles', '')).lower():
+                user['roles'] = [{'nombre': 'Administrador'}]
+            else:
+                user['roles'] = [{'nombre': 'Usuario'}]
+        elif user['roles'] and isinstance(user['roles'][0], str):
+            # Si es una lista de strings, convertir a objetos
+            user['roles'] = [{'nombre': role.title()} for role in user['roles']]
+        
+        print(f"🔍 DEBUG PERFIL: Usuario procesado: {user}")
+        
+        return templates.TemplateResponse(
+            "html/usuarios/usuario_admin.html",
+            {
+                "request": request, 
+                **user_data
+            }
+        )
+        
+    except Exception as e:
+        print(f"❌ ERROR EN PERFIL: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error cargando perfil: {str(e)}"
+        )
 
 @router.post("/perfil")
 async def update_perfil(
@@ -123,41 +164,113 @@ async def update_perfil(
     direccion: str = Form(...),
     fecha_nacimiento: Optional[str] = Form(None),
     password: Optional[str] = Form(None),
+    imagen_perfil: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
-    user: UserDB = Depends(get_authenticated_user)
+    user_data: Dict[str, Any] = Depends(require_admin_for_template)
 ):
     """Actualización del perfil de usuario - AUTENTICACIÓN BACKEND"""
-    db_user = db.query(Usuarios).filter(Usuarios.codigo == user.codigo).first()
-    if not db_user:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-
-    db_user.nombre = nombre
-    db_user.telefono = telefono
-    db_user.mail = email
-    db_user.direccion = direccion
-    if fecha_nacimiento:
-        db_user.fecha_nacimiento = fecha_nacimiento
-    if password:
-        db_user.clave = encriptar_clave(password)
-
     try:
+        user = user_data.get('user', {})
+        user_id = user.get('codigo')
+        
+        if not user_id:
+            raise HTTPException(status_code=400, detail="Usuario no válido")
+        
+        # Buscar usuario en la base de datos
+        db_user = db.query(Usuarios).filter(Usuarios.codigo == user_id).first()
+        if not db_user:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+        # Actualizar campos
+        db_user.nombre = nombre
+        if hasattr(db_user, 'telefono'):
+            db_user.telefono = telefono
+        db_user.mail = email
+        if hasattr(db_user, 'direccion'):
+            db_user.direccion = direccion
+        if fecha_nacimiento and hasattr(db_user, 'fecha_nacimiento'):
+            db_user.fecha_nacimiento = fecha_nacimiento
+        
+        # Actualizar contraseña si se proporcionó
+        if password and len(password.strip()) > 0:
+            from sql_app.Services.security.utils import encriptar_clave
+            db_user.clave = encriptar_clave(password)
+
+        # Procesar imagen de perfil si se proporcionó
+        if imagen_perfil and imagen_perfil.size > 0:
+            try:
+                # Leer el contenido de la imagen
+                contents = await imagen_perfil.read()
+                
+                # Validar tamaño máximo (10MB)
+                if len(contents) > 10 * 1024 * 1024:
+                    raise HTTPException(status_code=400, detail="La imagen es demasiado grande. Máximo 10MB.")
+                
+                # Procesar imagen con PIL para comprimir
+                image = Image.open(io.BytesIO(contents))
+                
+                # Redimensionar si es muy grande (máximo 400x400)
+                if image.width > 400 or image.height > 400:
+                    image.thumbnail((400, 400), Image.Resampling.LANCZOS)
+                
+                # Convertir a RGB si está en otro formato
+                if image.mode in ('RGBA', 'P'):
+                    rgb_image = Image.new('RGB', image.size, (255, 255, 255))
+                    if image.mode == 'P':
+                        image = image.convert('RGBA')
+                    rgb_image.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+                    image = rgb_image
+                
+                # Comprimir y convertir a base64
+                output = io.BytesIO()
+                image.save(output, format='JPEG', quality=85, optimize=True)
+                compressed_image = output.getvalue()
+                
+                # Convertir a base64 para almacenar en la base de datos
+                imagen_base64 = base64.b64encode(compressed_image).decode('utf-8')
+                
+                # Actualizar en la base de datos
+                if hasattr(db_user, 'imagen_perfil'):
+                    db_user.imagen_perfil = imagen_base64
+                    
+            except Exception as e:
+                print(f"Error procesando imagen: {str(e)}")
+                # No detener el proceso por un error de imagen, solo mostrar aviso
+                pass
+
+        # Guardar cambios
         db.commit()
         db.refresh(db_user)
+        
         message = "Perfil actualizado exitosamente"
+        
+        # Actualizar los datos del usuario para mostrar en el template
+        user_data['user'].update({
+            'nombre': nombre,
+            'telefono': telefono,
+            'mail': email,
+            'direccion': direccion,
+            'fecha_nacimiento': fecha_nacimiento,
+            'imagen_perfil': getattr(db_user, 'imagen_perfil', None)
+        })
+        user_data['message'] = message
+
+        return templates.TemplateResponse(
+            "html/usuarios/usuario_admin.html",
+            {
+                "request": request, 
+                **user_data
+            }
+        )
+        
+    except HTTPException:
+        raise
     except Exception as e:
         db.rollback()
+        print(f"❌ ERROR ACTUALIZANDO PERFIL: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error al actualizar el perfil: {str(e)}")
-
-    return templates.TemplateResponse(
-        "/usuarios/usuario_admin.html",
-        {
-            "request": request, 
-            "user": user, 
-            "message": message,
-            "is_authenticated": True,
-            "is_admin": "admin" in getattr(user, 'roles', [])
-        }
-    )
 
 # ============================================================================
 # ROUTER DEBUG: Endpoint de admin simplificado para diagnóstico

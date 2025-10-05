@@ -303,7 +303,7 @@ def generate_and_save_route(module_name, field_names, field_types):
             # Asegurar que exista el directorio
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             
-            with open(file_path, 'w') as file:
+            with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(route_code)
                 logger.info(f"Archivo {file_path} creado con éxito.")
         except Exception as e:
@@ -322,7 +322,7 @@ def generate_and_save_crud(module_name, field_names, field_types):
         print(f"El archivo {file_path} ya existe.")
     else:
         try:
-            with open(file_path, 'w') as file:
+            with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(crud_code)
                 print(f"Archivo {file_path} creado con éxito.")
         except Exception as e:
@@ -341,7 +341,7 @@ def generate_and_save_schema(module_name, field_names, field_types):
         print(f"El archivo {file_path} ya existe.")
     else:
         try:
-            with open(file_path, 'w') as file:
+            with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(schema_code)
                 print(f"Archivo {file_path} creado con éxito.")
         except Exception as e:

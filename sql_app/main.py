@@ -837,6 +837,438 @@ configure_obras_routes(app)
 
 # Importar y registrar el router de restablecimiento de contraseña
 from sql_app.routers.password_reset import router as password_reset_router
+from sql_app.Services.sistema_visual_multiple.usuario_5862.route_usuario_5862 import router as usuario_5862_router
+from sql_app.Services.sistema_visual_multiple.producto_5862.route_producto_5862 import router as producto_5862_router
+from sql_app.Services.sistema_visual_multiple.orden_5862.route_orden_5862 import router as orden_5862_router
+from sql_app.Services.sistema_visual_multiple.detalle_orden_5862.route_detalle_orden_5862 import router as detalle_orden_5862_router
+from sql_app.Services.sistema_visual_multiple.categoria_5862.route_categoria_5862 import router as categoria_5862_router
+
+# === AUTO-GENERATED ROUTES FOR SISTEMA_VISUAL_MULTIPLE === START
+app.include_router(usuario_5862_router, prefix="/sistema_visual_multiple")
+app.include_router(producto_5862_router, prefix="/sistema_visual_multiple")
+app.include_router(orden_5862_router, prefix="/sistema_visual_multiple")
+app.include_router(detalle_orden_5862_router, prefix="/sistema_visual_multiple")
+app.include_router(categoria_5862_router, prefix="/sistema_visual_multiple")
+# === AUTO-GENERATED ROUTES FOR SISTEMA_VISUAL_MULTIPLE === END
+app.include_router(aut_usuario.router)
+app.include_router(aut_usuario.usuarios_router)
+app.include_router(auth_router.router)
+
+# Logging específico para el router de mensajes - MOVIDO AL PRINCIPIO
+logger.info("🔔 Registrando router de mensajes...")
+try:
+    app.include_router(mensajes_router)
+    logger.info(f"✅ Router de mensajes registrado con prefix: {mensajes_router.prefix}")
+    # Verificar rutas registradas
+    rutas_mensajes = [route for route in app.routes if hasattr(route, 'path') and '/api/mensajes' in route.path]
+    logger.info(f"📋 {len(rutas_mensajes)} rutas de mensajes registradas")
+except Exception as e:
+    logger.error(f"❌ Error al registrar router de mensajes: {e}")
+    import traceback
+    
+# Registrar router de administración de mensajes
+logger.info("🛠️ Registrando router de administración de mensajes...")
+try:
+    app.include_router(mensajes_admin_router)
+    logger.info(f"✅ Router de administración de mensajes registrado con prefix: {mensajes_admin_router.prefix}")
+except Exception as e:
+    logger.error(f"❌ Error al registrar router de admin mensajes: {e}")
+    import traceback
+
+# Registrar router de archivos estáticos de mensajes
+logger.info("📁 Registrando router de archivos estáticos de mensajes...")
+try:
+    app.include_router(mensajes_static_router)
+    logger.info(f"✅ Router de estáticos de mensajes registrado con prefix: {mensajes_static_router.prefix}")
+except Exception as e:
+    logger.error(f"❌ Error al registrar router de estáticos mensajes: {e}")
+    import traceback
+
+# Registrar router de API de chat
+logger.info("💬 Registrando router de API de chat...")
+try:
+    app.include_router(chat_api_router)
+    logger.info(f"✅ Router de API de chat registrado con prefix: {chat_api_router.prefix}")
+except Exception as e:
+    logger.error(f"❌ Error al registrar router de API de chat: {e}")
+    import traceback
+
+# Registrar router WebSocket de mensajes
+logger.info("🔌 Registrando router WebSocket de mensajes...")
+try:
+    app.include_router(websocket_router)
+    logger.info(f"✅ Router WebSocket de mensajes registrado con prefix: {websocket_router.prefix}")
+except Exception as e:
+    logger.error(f"❌ Error al registrar router WebSocket mensajes: {e}")
+    import traceback
+
+# Registrar router WebSocket de chat
+logger.info("💬 Registrando router WebSocket de chat...")
+try:
+    from sql_app.Services.chat.websocket.router import router as chat_websocket_router
+    app.include_router(
+        chat_websocket_router,
+        prefix="/chat",
+        tags=["chat-websocket"]
+    )
+    logger.info("✅ Router WebSocket de chat registrado con prefix: /chat")
+except Exception as e:
+    logger.error(f"❌ Error al registrar router WebSocket chat: {e}")
+    import traceback
+
+# Registrar router API REST del chat
+logger.info("💬 Registrando router API REST del chat...")
+try:
+    from sql_app.Services.chat.api_router import router as chat_api_router
+    app.include_router(
+        chat_api_router,
+        tags=["chat-api"]
+    )
+    logger.info("✅ Router API REST del chat registrado")
+except Exception as e:
+    logger.error(f"❌ Error al registrar router API del chat: {e}")
+
+# Registrar archivos estáticos del chat
+logger.info("📁 Registrando archivos estáticos del chat...")
+try:
+    from fastapi.staticfiles import StaticFiles
+    app.mount("/static/chat", StaticFiles(directory="sql_app/Services/chat"), name="chat-static")
+    logger.info("✅ Archivos estáticos del chat registrados en /static/chat")
+except Exception as e:
+    logger.error(f"❌ Error al registrar archivos estáticos del chat: {e}")
+    import traceback
+
+# Endpoint directo para la página de pruebas del chat
+logger.info("🧪 Registrando endpoint directo para página de pruebas de chat...")
+try:
+    @app.get("/chat-test")
+    async def serve_chat_test_page():
+        """Servir la página HTML de pruebas del sistema de chat"""
+        from fastapi.responses import FileResponse
+        import os
+        
+        test_file_path = os.path.join("sql_app", "Services", "chat", "test_chat_system.html")
+        if os.path.exists(test_file_path):
+            return FileResponse(
+                path=test_file_path,
+                media_type="text/html",
+                filename="test_chat_system.html"
+            )
+        else:
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail=f"Archivo no encontrado en: {test_file_path}")
+    
+    # Endpoint público para admin mensajes (sin autenticación)
+    @app.get("/mensajes-admin-public")
+    async def serve_admin_mensajes_public():
+        """Servir la página de administración de mensajes sin autenticación"""
+        from fastapi.responses import FileResponse
+        import os
+        
+        html_file = os.path.join("sql_app", "Services", "mensajes", "frontend", "admin", "mensajes.html")
+        if os.path.exists(html_file):
+            return FileResponse(html_file, media_type="text/html")
+        else:
+            # Fallback al archivo en static
+            html_file_static = os.path.join("sql_app", "static", "admin", "mensajes.html")
+            if os.path.exists(html_file_static):
+                return FileResponse(html_file_static, media_type="text/html")
+            else:
+                from fastapi import HTTPException
+                raise HTTPException(status_code=404, detail=f"Archivo no encontrado")
+
+    # Endpoint para demo de widgets
+    @app.get("/widgets-demo")
+    async def serve_widgets_demo():
+        """Servir la página de demostración de widgets"""
+        from fastapi.responses import FileResponse
+        import os
+        
+        demo_file = os.path.join("sql_app", "Services", "widgets", "demo.html")
+        if os.path.exists(demo_file):
+            return FileResponse(demo_file, media_type="text/html")
+        else:
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail=f"Archivo demo no encontrado")
+    
+    logger.info("✅ Endpoints /chat-test y /mensajes-admin-public registrados correctamente")
+except Exception as e:
+    logger.error(f"❌ Error al registrar endpoint de chat: {e}")
+    import traceback
+    traceback.print_exc()
+
+# Endpoints públicos para testing del sistema de mensajes (sin autenticación)
+logger.info("🧪 Registrando endpoints de testing para mensajes...")
+try:
+    @app.get("/api/test/hello")
+    async def test_hello():
+        """Endpoint simple de prueba"""
+        return {"message": "Hello, testing!", "status": "OK"}
+    
+    @app.get("/api/test/mensajes/no-leidos/count")
+    async def test_contador_mensajes_public():
+        """Endpoint público para testing del contador de mensajes"""
+        try:
+            from sqlalchemy.orm import Session
+            from sql_app.db.database import get_db
+            from sql_app.Services.mensajes.crud_mensajes import CrudMensajes
+            
+            # Usar una sesión de base de datos directa
+            db_gen = get_db()
+            db = next(db_gen)
+            try:
+                # Usar un usuario de prueba o devolver datos ficticios
+                count = 3  # Datos ficticios para testing
+                return {"count": count, "test": True}
+            finally:
+                db.close()
+        except Exception as e:
+            logger.error(f"Error en test contador mensajes: {e}")
+            return {"count": 0, "test": True, "error": str(e)}
+    
+    @app.get("/api/test/mensajes/navbar")
+    async def test_mensajes_navbar_public():
+        """Endpoint público para testing de mensajes del navbar"""
+        try:
+            # Devolver datos ficticios para testing
+            mensajes_test = [
+                {
+                    "id": 1,
+                    "titulo": "Mensaje de prueba 1",
+                    "contenido": "Este es un mensaje de prueba",
+                    "tipo": "sistema",
+                    "prioridad": "normal",
+                    "leido": False,
+                    "fecha_creacion": "2025-07-21T20:00:00Z",
+                    "nombre_emisor": "Sistema"
+                },
+                {
+                    "id": 2,
+                    "titulo": "Notificación importante",
+                    "contenido": "Esta es una notificación de prueba",
+                    "tipo": "alerta",
+                    "prioridad": "alta",
+                    "leido": True,
+                    "fecha_creacion": "2025-07-21T19:30:00Z",
+                    "nombre_emisor": "Admin"
+                }
+            ]
+            return mensajes_test
+        except Exception as e:
+            logger.error(f"Error en test mensajes navbar: {e}")
+            return []
+    
+    @app.get("/api/test/auth/me")
+    async def test_auth_me_public():
+        """Endpoint público para testing de autenticación"""
+        return {
+            "usuario": {
+                "id": 1,
+                "username": "test_user",
+                "email": "test@example.com",
+                "is_admin": True,
+                "codigo": "TEST001"
+            },
+            "test": True
+        }
+    
+    logger.info("✅ Endpoints de testing para mensajes registrados correctamente")
+except Exception as e:
+    logger.error(f"❌ Error al registrar endpoints de testing: {e}")
+    import traceback
+    traceback.print_exc()
+
+# Endpoints públicos para testing de mensajes sin autenticación (usando usuario juan)
+logger.info("🧪 Registrando endpoints públicos para testing de mensajes...")
+try:
+    @app.get("/api/public/mensajes/no-leidos/count")
+    async def public_contador_mensajes():
+        """Endpoint público para testing del contador de mensajes usando usuario juan"""
+        try:
+            from sqlalchemy.orm import Session
+            from sql_app.db.database import get_db
+            from sql_app.Services.mensajes.crud_mensajes import CrudMensajes
+            
+            db_gen = get_db()
+            db = next(db_gen)
+            try:
+                # Buscar usuario juan para testing
+                from sql_app.db.models.config.usuarios import Usuarios
+                usuario_juan = db.query(Usuarios).filter(Usuarios.usuario == "juan").first()
+                if usuario_juan:
+                    count = CrudMensajes.contar_mensajes_no_leidos(db, usuario_juan.codigo)
+                    return {"count": count, "test": True, "usuario": "juan"}
+                else:
+                    return {"count": 0, "test": True, "error": "Usuario juan no encontrado"}
+            finally:
+                db.close()
+        except Exception as e:
+            logger.error(f"Error en contador público mensajes: {e}")
+            return {"count": 0, "test": True, "error": str(e)}
+    
+    @app.get("/api/public/mensajes/navbar")
+    async def public_mensajes_navbar():
+        """Endpoint público para testing de mensajes del navbar usando usuario juan"""
+        try:
+            from sqlalchemy.orm import Session
+            from sql_app.db.database import get_db
+            from sql_app.Services.mensajes.crud_mensajes import CrudMensajes
+            
+            db_gen = get_db()
+            db = next(db_gen)
+            try:
+                # Buscar usuario juan para testing
+                from sql_app.db.models.config.usuarios import Usuarios
+                usuario_juan = db.query(Usuarios).filter(Usuarios.usuario == "juan").first()
+                if usuario_juan:
+                    mensajes = CrudMensajes.get_mensajes_navbar(db, usuario_juan.codigo)
+                    return mensajes
+                else:
+                    return []
+            finally:
+                db.close()
+        except Exception as e:
+            logger.error(f"Error en mensajes navbar público: {e}")
+            return []
+    
+    @app.get("/api/public/auth/me")
+    async def public_auth_me():
+        """Endpoint público para simular autenticación con usuario juan"""
+        try:
+            from sqlalchemy.orm import Session
+            from sql_app.db.database import get_db
+            
+            db_gen = get_db()
+            db = next(db_gen)
+            try:
+                from sql_app.db.models.config.usuarios import Usuarios
+                usuario_juan = db.query(Usuarios).filter(Usuarios.usuario == "juan").first()
+                if usuario_juan:
+                    return {
+                        "usuario": {
+                            "id": usuario_juan.codigo,
+                            "username": usuario_juan.usuario,
+                            "email": usuario_juan.mail,
+                            "is_admin": True,  # Para testing
+                            "codigo": usuario_juan.codigo
+                        },
+                        "test": True
+                    }
+                else:
+                    return {"error": "Usuario juan no encontrado", "test": True}
+            finally:
+                db.close()
+        except Exception as e:
+            logger.error(f"Error en auth público: {e}")
+            return {"error": str(e), "test": True}
+    
+    @app.get("/api/public/mensajes/estadisticas")
+    async def public_estadisticas_mensajes():
+        """Endpoint público para estadísticas de mensajes usando usuario juan"""
+        try:
+            from sqlalchemy.orm import Session
+            from sql_app.db.database import get_db
+            from sql_app.Services.mensajes.crud_mensajes import CrudMensajes
+            
+            db_gen = get_db()
+            db = next(db_gen)
+            try:
+                from sql_app.db.models.config.usuarios import Usuarios
+                usuario_juan = db.query(Usuarios).filter(Usuarios.usuario == "juan").first()
+                if usuario_juan:
+                    # Obtener estadísticas básicas
+                    total_mensajes = CrudMensajes.contar_todos_mensajes(db, usuario_juan.codigo)
+                    mensajes_no_leidos = CrudMensajes.contar_mensajes_no_leidos(db, usuario_juan.codigo)
+                    
+                    # Simular otras estadísticas
+                    return {
+                        "total_mensajes": total_mensajes,
+                        "mensajes_no_leidos": mensajes_no_leidos,
+                        "mensajes_urgentes": 1,  # Simulado
+                        "usuarios_activos": 1,
+                        "test": True
+                    }
+                else:
+                    return {
+                        "total_mensajes": 0,
+                        "mensajes_no_leidos": 0,
+                        "mensajes_urgentes": 0,
+                        "usuarios_activos": 0,
+                        "test": True
+                    }
+            finally:
+                db.close()
+        except Exception as e:
+            logger.error(f"Error en estadísticas públicas: {e}")
+            return {
+                "total_mensajes": 0,
+                "mensajes_no_leidos": 0,
+                "mensajes_urgentes": 0,
+                "usuarios_activos": 0,
+                "error": str(e),
+                "test": True
+            }
+    
+    logger.info("✅ Endpoints públicos de mensajes registrados correctamente")
+except Exception as e:
+    logger.error(f"❌ Error al registrar endpoints públicos: {e}")
+    import traceback
+    traceback.print_exc()
+
+# Registrar router de widgets
+logger.info("🧩 Registrando router de widgets...")
+try:
+    app.include_router(widgets_router)
+    logger.info(f"✅ Router de widgets registrado con prefix: {widgets_router.prefix}")
+except Exception as e:
+    logger.error(f"❌ Error al registrar router de widgets: {e}")
+    import traceback
+    traceback.print_exc()
+except Exception as e:
+    logger.error(f"❌ Error al registrar endpoint de chat: {e}")
+    import traceback
+    traceback.print_exc()
+    
+# Registrar router de páginas de administración
+logger.info("📄 Registrando router de páginas de administración...")
+try:
+    app.include_router(admin_pages_router)
+    logger.info(f"✅ Router de páginas de administración registrado con prefix: {admin_pages_router.prefix}")
+except Exception as e:
+    logger.error(f"❌ Error al registrar router de páginas admin: {e}")
+    import traceback
+
+# Registrar router simple de administración (sin autenticación)
+logger.info("🔓 Registrando router simple de administración...")
+try:
+    app.include_router(admin_simple_router)
+    logger.info(f"✅ Router simple de administración registrado con prefix: {admin_simple_router.prefix}")
+except Exception as e:
+    logger.error(f"❌ Error al registrar router simple admin: {e}")
+    import traceback
+    logger.error(f"Traceback: {traceback.format_exc()}")
+
+app.include_router(usuarios_admin.router)
+app.include_router(Generar.router)
+app.include_router(configDB.router)
+app.include_router(admin_router)
+app.include_router(frontend_pages.router)
+app.include_router(Blog.router)
+app.include_router(Migraciones.router)
+app.include_router(Analisis.router)
+app.include_router(mail_router)
+app.include_router(Scraping.router)
+app.include_router(route_ticket.router)
+
+app.include_router(roles_router)
+app.include_router(static_pages_router)
+from sql_app.routers.usuarios import usuarios_router
+app.include_router(usuarios_router)
+configure_stock_routes(app)
+configure_obras_routes(app)
+
+# Importar y registrar el router de restablecimiento de contraseña
+from sql_app.routers.password_reset import router as password_reset_router
 app.include_router(password_reset_router)
 
 # =============================

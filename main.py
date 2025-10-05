@@ -183,6 +183,15 @@ app.include_router(auth_router.router)
 app.include_router(usuarios_admin.router)
 app.include_router(Generar.router)
 
+# CONFIGURADOR AUTO DE RUTAS MULTI-TABLA - BIBLIOTECA SISTEMA
+try:
+    from sql_app.Services.biblioteca_sistema.route_config_biblioteca_sistema import configure_biblioteca_sistema_routes
+    configure_biblioteca_sistema_routes(app)
+    print("✅ Sistema biblioteca_sistema configurado exitosamente")
+    print("🔗 Accede a: http://localhost:8000/static/html/forms/biblioteca_sistema/index.html")
+except Exception as e:
+    print(f"⚠️ Sistema biblioteca_sistema no disponible: {e}")
+
 # ROUTER TEMPORAL PARA PROBAR GENERADOR OPTIMIZADO
 try:
     from sql_app.routers.config.generador_test_optimizado import router as generador_optimizado_router
@@ -210,6 +219,21 @@ configure_obras_routes(app)
 # Importar y registrar el router de restablecimiento de contraseña
 from sql_app.routers.password_reset import router as password_reset_router
 app.include_router(password_reset_router)
+
+# ENDPOINT DE PRUEBA PARA PROFILE
+@app.get("/api/test-user")
+async def test_user_simple():
+    """Endpoint simple para probar la funcionalidad del avatar"""
+    return {
+        "id": 1,
+        "username": "juan",
+        "email": "juan@test.com",
+        "nombre": "Juan",
+        "apellido": "Test",
+        "imagen_perfil": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0Yjc2ODgiLz4KPHRleHQgeD0iMjAiIHk9IjI2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTZweCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIj5KPC90ZXh0Pgo8L3N2Zz4=",
+        "telefono": "123456789",
+        "direccion": "Test Address 123"
+    }
 
 # ============================================================================# ============================================================================
 # EJECUCIÓN DEL SERVIDOR

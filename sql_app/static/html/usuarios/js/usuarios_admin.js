@@ -757,4 +757,98 @@ function mostrarModal() {
         }
         return originalFetch(input, init);
     };
+
+    // ----- Funcionalidad de imagen de perfil -----
+    
+    // Previsualización de imagen de perfil
+    const inputImagenPerfil = document.getElementById('imagen_perfil');
+    if (inputImagenPerfil) {
+        inputImagenPerfil.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validar tipo de archivo
+                if (!file.type.startsWith('image/')) {
+                    alert('Por favor selecciona un archivo de imagen válido.');
+                    this.value = '';
+                    return;
+                }
+                
+                // Validar tamaño (10MB máximo)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('La imagen es demasiado grande. Máximo 10MB.');
+                    this.value = '';
+                    return;
+                }
+                
+                // Crear preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Buscar el avatar en el header
+                    const avatarContainer = document.querySelector('.w-24.h-24');
+                    if (avatarContainer) {
+                        avatarContainer.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview" class="w-full h-full object-cover rounded-full">
+                        `;
+                    }
+                    
+                    // Actualizar preview en el área de drag and drop
+                    const dropArea = inputImagenPerfil.closest('.border-dashed');
+                    if (dropArea) {
+                        const previewContainer = dropArea.querySelector('.space-y-1');
+                        if (previewContainer) {
+                            previewContainer.innerHTML = `
+                                <img src="${e.target.result}" alt="Preview" class="mx-auto h-32 w-32 object-cover rounded-lg">
+                                <p class="text-sm text-green-600 font-medium">Imagen seleccionada: ${file.name}</p>
+                                <p class="text-xs text-gray-500">Tamaño: ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                            `;
+                        }
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Drag and drop para imagen de perfil
+    const dropArea = document.querySelector('#imagen_perfil').closest('.border-dashed');
+    if (dropArea) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            dropArea.classList.add('border-blue-500', 'bg-blue-50');
+        }
+
+        function unhighlight(e) {
+            dropArea.classList.remove('border-blue-500', 'bg-blue-50');
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length > 0) {
+                inputImagenPerfil.files = files;
+                // Disparar evento change manualmente
+                const event = new Event('change', { bubbles: true });
+                inputImagenPerfil.dispatchEvent(event);
+            }
+        }
+    }
 });

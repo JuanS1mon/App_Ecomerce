@@ -1,17 +1,40 @@
 #!/usr/bin/env python3
 """
-Servidor main simplificado para que funcione el Editor Visual
+Servidor main simplificado para que funcione el Editor Visual y Generar
 """
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from sql_app.routers import frontend_pages
+import logging
 import os
+
+# Configurar logging básico
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Sistema de Stock - Simplificado")
 
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Incluir rutas de frontend
 app.include_router(frontend_pages.router)
+
+# Importar y registrar el router de Generar
+try:
+    from sql_app.routers.config import Generar
+    app.include_router(Generar.router)
+    logger.info("✅ Router de Generar registrado")
+except Exception as e:
+    logger.error(f"❌ Error al registrar router de Generar: {e}")
 
 # Configurar archivos estáticos
 app.mount("/static", StaticFiles(directory="sql_app/static"), name="static")

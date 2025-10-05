@@ -4,140 +4,747 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil de Usuario - Panel de Administración</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/styles.css">
-    <!-- Sistema de componentes y navegación -->
-    <script src="/static/js/navigation.js"></script>
-    <script src="/static/js/components.js"></script>
+    <script>
+        // Suprimir warning del CDN de Tailwind en desarrollo
+        const originalConsoleWarn = console.warn;
+        console.warn = function(...args) {
+          if (args[0] && args[0].includes('cdn.tailwindcss.com should not be used in production')) {
+            return; // Suprimir este warning específico
+          }
+          originalConsoleWarn.apply(console, args);
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/static/css/admin.css?v=2.0" rel="stylesheet" />
+    
+    <!-- Estilos específicos del tema para el perfil -->
+    <style>
+        /* Importar variables CSS del sistema admin */
+        :root {
+          --color-bg-deep: #f8fafc;
+          --color-bg-alt: #f1f5f9;
+          --color-accent: #8b5cf6;
+          --color-accent-alt: #06b6d4;
+          --color-accent-light: #e0e7ff;
+          --color-success: #16a34a;
+          --color-success-light: #dcfce7;
+          --color-warning: #d97706;
+          --color-warning-light: #fef3c7;
+          --color-border: #e2e8f0;
+          --color-text: #1e293b;
+          --color-text-soft: #64748b;
+          --color-surface: #ffffff;
+          --color-surface-alt: #fefefe;
+          --color-card: #fdfdfd;
+          --color-gradient-1: #fef3c7;
+          --color-gradient-2: #ddd6fe;
+          --color-gradient-3: #fce7f3;
+          --shadow-soft: 0 4px 6px -1px rgba(139, 92, 246, 0.1), 0 2px 4px -1px rgba(139, 92, 246, 0.06);
+          --shadow-medium: 0 10px 15px -3px rgba(139, 92, 246, 0.1), 0 4px 6px -2px rgba(139, 92, 246, 0.05);
+          --shadow-large: 0 25px 50px -12px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Tema oscuro pastel */
+        :root.dark {
+          --color-bg-deep: #1a1f2e;
+          --color-bg-alt: #252b3b;
+          --color-accent: #c4b5fd;
+          --color-accent-alt: #7dd3fc;
+          --color-accent-light: #312e81;
+          --color-success: #22c55e;
+          --color-success-light: #14532d;
+          --color-warning: #f59e0b;
+          --color-warning-light: #451a03;
+          --color-border: #374151;
+          --color-text: #f8fafc;
+          --color-text-soft: #cbd5e1;
+          --color-surface: #2d3748;
+          --color-surface-alt: #374151;
+          --color-card: #344054;
+          --color-gradient-1: #374151;
+          --color-gradient-2: #4c1d95;
+          --color-gradient-3: #831843;
+          --shadow-soft: 0 4px 6px -1px rgba(196, 181, 253, 0.2), 0 2px 4px -1px rgba(196, 181, 253, 0.1);
+          --shadow-medium: 0 10px 15px -3px rgba(196, 181, 253, 0.2), 0 4px 6px -2px rgba(196, 181, 253, 0.1);
+          --shadow-large: 0 25px 50px -12px rgba(196, 181, 253, 0.3);
+        }
+        
+        /* Sistema de Temas Mejorado */
+        body {
+          background-color: var(--color-bg-deep);
+          color: var(--color-text);
+          transition: all 0.3s ease;
+        }
+        
+        /* Tema Oscuro - Aplicar al body y html directamente */
+        body[data-theme="dark"],
+        html[data-theme="dark"] {
+          --color-bg-deep: #1a1f2e;
+          --color-bg-alt: #252b3b;
+          --color-accent: #c4b5fd;
+          --color-accent-alt: #7dd3fc;
+          --color-accent-light: #312e81;
+          --color-success: #22c55e;
+          --color-success-light: #14532d;
+          --color-warning: #f59e0b;
+          --color-warning-light: #451a03;
+          --color-border: #374151;
+          --color-text: #f8fafc;
+          --color-text-soft: #cbd5e1;
+          --color-surface: #2d3748;
+          --color-surface-alt: #374151;
+          --color-card: #344054;
+        }
+        
+        /* Aplicar variables de forma consistente */
+        .bg-white { background-color: var(--color-surface) !important; }
+        .bg-gray-50 { background-color: var(--color-surface-alt) !important; }
+        .bg-gray-100 { background-color: var(--color-bg-alt) !important; }
+        .text-gray-900, .text-gray-800, .text-gray-700 { color: var(--color-text) !important; }
+        .text-gray-600, .text-gray-500 { color: var(--color-text-soft) !important; }
+        .border-gray-200, .border-gray-300 { border-color: var(--color-border) !important; }
+        
+        /* Inputs modernos con variables CSS */
+        input[type="text"], input[type="email"], input[type="date"], input[type="password"] {
+          background-color: var(--color-surface);
+          border-color: var(--color-border);
+          color: var(--color-text);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        input[type="text"]:focus, input[type="email"]:focus, 
+        input[type="date"]:focus, input[type="password"]:focus {
+          border-color: var(--color-accent);
+          box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1), 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-1px);
+        }
+        
+        input[type="text"]:hover, input[type="email"]:hover, 
+        input[type="date"]:hover, input[type="password"]:hover {
+          border-color: var(--color-accent-light);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Labels modernos */
+        label { color: var(--color-text); }
+        
+        /* Gradientes de iconos modernos */
+        .icon-gradient-1 { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
+        .icon-gradient-2 { background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%); }
+        .icon-gradient-3 { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+        .icon-gradient-4 { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .icon-gradient-5 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .icon-gradient-6 { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); }
+        .icon-gradient-7 { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        
+        /* Botón principal con gradiente */
+        .btn-primary-gradient {
+          background: linear-gradient(135deg, var(--color-accent) 0%, #7c3aed 100%);
+          border: none;
+          color: white;
+          transition: all 0.3s ease;
+          box-shadow: var(--shadow-soft);
+        }
+        
+        .btn-primary-gradient:hover {
+          background: linear-gradient(135deg, #7c3aed 0%, var(--color-accent) 100%);
+          box-shadow: var(--shadow-medium);
+          transform: translateY(-2px);
+        }
+        
+        /* Efectos hover mejorados */
+        .hover-card {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-card:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-large);
+        }
+    </style>
+    
+    <!-- Funciones de tema definidas temprano para onclick -->
+    <script>
+        // Funciones globales para el tema (definidas primero)
+        window.toggleThemeManual = function() {
+            console.log('🎨 CAMBIANDO TEMA...');
+            const body = document.body;
+            const html = document.documentElement;
+            let currentTheme = body.getAttribute('data-theme') || 'light';
+            
+            console.log('🔍 Estado actual:', currentTheme);
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', currentTheme);
+            html.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('admin-theme', currentTheme);
+            
+            console.log('✅ Nuevo estado aplicado:', currentTheme);
+            console.log('📋 Body data-theme:', body.getAttribute('data-theme'));
+            
+            // Actualizar botón inmediatamente
+            updateThemeButton();
+        };
+        
+        window.updateThemeButton = function() {
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            const currentTheme = document.body.getAttribute('data-theme') || 'light';
+            
+            if (currentTheme === 'dark') {
+                if (themeIcon) themeIcon.className = 'fas fa-sun mr-2 text-yellow-500';
+                if (themeText) themeText.textContent = 'Claro';
+                console.log('🌙 Botón actualizado a modo claro');
+            } else {
+                if (themeIcon) themeIcon.className = 'fas fa-moon mr-2 text-gray-500';
+                if (themeText) themeText.textContent = 'Oscuro';
+                console.log('☀️ Botón actualizado a modo oscuro');
+            }
+        };
+        
+        // Inicializar tema temprano
+        window.initTheme = function() {
+            const body = document.body;
+            const html = document.documentElement;
+            let savedTheme = localStorage.getItem('admin-theme') || 'light';
+            
+            console.log('🎯 Inicializando tema:', savedTheme);
+            
+            // Aplicar tema guardado
+            body.setAttribute('data-theme', savedTheme);
+            html.setAttribute('data-theme', savedTheme);
+            
+            // Actualizar botón cuando esté disponible
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', updateThemeButton);
+            } else {
+                updateThemeButton();
+            }
+            
+            console.log('✅ Tema inicializado:', savedTheme);
+        };
+        
+        // Ejecutar inmediatamente
+        initTheme();
+    </script>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <!-- Navbar - Se cargará dinámicamente -->
-    <div id="navbar-container"></div>
-    <div id="page-config" data-navbar-path="Inicio / Panel Admin / Perfil" style="display:none;"></div>
-
-    <!-- Contenido principal -->
-    <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
-        <!-- Encabezado de la página -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <h1 class="text-2xl font-bold text-gray-800">Perfil de Usuario</h1>
-            <a href="/admin" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors duration-300 flex items-center">
-                <i class="fas fa-arrow-left mr-2"></i>Volver al Panel
-            </a>
-        </div>
-
-        <!-- Contenido del perfil -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="p-6 border-b border-gray-200 bg-gray-50">
-                <div class="flex flex-col md:flex-row items-center gap-6">
-                    <div class="flex-shrink-0">
-                        <div class="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center text-white text-3xl font-bold">
-                            {{ user.nombre[0]|upper }}
-                        </div>
+<body class="min-h-screen" style="background-color: var(--color-bg-deep);">
+    <!-- Navbar Simplificado -->
+    <nav id="main-navbar" class="panel-surface border-b p-4 sticky top-0 z-30 shadow-sm" style="border-color: var(--color-border); margin: 0; border-radius: 0;">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <a class="flex items-center space-x-3 hover:opacity-80 transition-opacity group" href="/index">
+                    <div class="bg-gray-50 p-2 rounded-lg shadow-sm border border-gray-100 group-hover:border-gray-200 transition-colors">
+                        <img alt="Logo" class="h-6 w-auto" src="/static/img/logo_mapache.gif"/>
                     </div>
-                    <div class="text-center md:text-left">
-                        <h2 class="text-xl font-bold text-gray-800">{{ user.usuario }}</h2>
-                        <p class="text-gray-600">{{ user.mail }}</p>
-                        <div class="mt-2">
-                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                                {% for role in user.roles %}
-                                    {{ role.nombre }}{% if not loop.last %}, {% endif %}
-                                {% endfor %}
-                            </span>
+                    <span class="text-gray-900 font-semibold text-lg hidden md:block" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text);">
+                        SQL App Studio
+                    </span>
+                </a>
+                <div class="flex items-center space-x-1 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100" id="breadcrumb-container" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--color-surface-alt); border-color: var(--color-border);">
+                    <span style="color: var(--color-text-soft);">Inicio / Panel Admin / Perfil</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4 relative">
+                <!-- Botón de Tema Simplificado -->
+                <button id="theme-toggle" class="flex items-center hover:bg-gray-50 px-3 py-2 rounded-lg text-sm transition-all duration-200 font-medium" title="Cambiar tema" onclick="toggleThemeManual(); updateThemeButton();" style="color: var(--color-text-soft);">
+                    <i class="fas fa-moon mr-2 text-gray-500" id="theme-icon"></i>
+                    <span class="hidden sm:inline" id="theme-text">Oscuro</span>
+                </button>
+                
+                <div class="relative group">
+                    <a class="flex items-center hover:bg-gray-50 px-3 py-2 rounded-lg text-sm transition-all duration-200 font-medium" href="/admin" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text-soft);">
+                        <i class="fas fa-cog mr-2 text-gray-500"></i>
+                        <span class="hidden sm:inline">Admin</span>
+                    </a>
+                </div>
+                
+                <div class="h-6 border-r border-gray-200 mx-2" style="border-color: var(--color-border);"></div>
+                
+                <div class="relative">
+                    <button id="perfil" class="flex items-center focus:outline-none hover:bg-gray-50 px-3 py-2 rounded-lg transition-all duration-200 group">
+                        <div class="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center text-white shadow-sm border border-gray-200 group-hover:border-gray-300 transition-colors" id="user-initial" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600;">
+                            {% if user.imagen_perfil %}
+                                <img src="data:image/jpeg;base64,{{ user.imagen_perfil }}" alt="Imagen de perfil" class="w-full h-full object-cover rounded-full">
+                            {% else %}
+                                {{ user.nombre[0]|upper if user.nombre else user.usuario[0]|upper }}
+                            {% endif %}
                         </div>
+                        <svg class="ml-1.5 w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.354a.75.75 0 011.14.976l-4.25 5A.75.75 0 0110 13a.75.75 0 01-.6-.3l-4.25-5a.75.75 0 01.08-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="menu-perfil" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg z-50 border border-gray-200 overflow-hidden panel-surface" style="box-shadow: var(--shadow-large);">
+                        <div class="px-4 py-3 border-b" style="background-color: var(--color-surface-alt); border-color: var(--color-border);">
+                            <div class="text-sm font-semibold" id="user-name" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text);">{{ user.usuario }}</div>
+                            <div class="text-xs mt-0.5" id="user-email" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text-soft);">{{ user.mail or 'Sin email' }}</div>
+                        </div>
+                        <a href="/admin/perfil" class="flex items-center px-4 py-3 text-sm border-b transition-colors" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--color-text-soft); border-color: var(--color-border);">
+                            <i class="fas fa-user-circle mr-3 w-4 text-center" style="color: var(--color-text-soft);"></i>
+                            Perfil de usuario
+                        </a>
+                        <form id="logout-form" action="/logout" method="post" class="border-t" style="border-color: var(--color-border);">
+                            <button type="submit" class="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
+                                <i class="fas fa-sign-out-alt mr-3 w-4 text-center"></i>
+                                Cerrar sesión
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
+        </div>
+    </nav>
 
-            <!-- Formulario de perfil -->
-            <div class="p-6">
-                {% if message %}
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
-                    <p>{{ message }}</p>
-                </div>
-                {% endif %}
-
-                <form action="/admin/perfil" method="post" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Nombre -->
-                        <div>
-                            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre Completo</label>
-                            <input type="text" name="nombre" id="nombre" 
-                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                                   value="{{ user.nombre }}">
+    <!-- Contenido principal -->
+    <main class="w-full min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Encabezado de la página con estilo admin -->
+            <section class="mb-6 panel-surface rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg icon-gradient-2 flex items-center justify-center">
+                            <i class="fas fa-user-circle text-white text-sm"></i>
                         </div>
-                        
-                        <!-- Teléfono -->
                         <div>
-                            <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono</label>
-                            <input type="text" name="telefono" id="telefono" 
-                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                                   value="{{ user.telefono }}">
-                        </div>
-                        
-                        <!-- Email -->
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input type="email" name="email" id="email" 
-                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                                   value="{{ user.mail }}">
-                        </div>
-                        
-                        <!-- Dirección -->
-                        <div>
-                            <label for="direccion" class="block text-sm font-medium text-gray-700">Dirección</label>
-                            <input type="text" name="direccion" id="direccion" 
-                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                                   value="{{ user.direccion }}">
-                        </div>
-                        
-                        <!-- Fecha de Nacimiento -->
-                        <div>
-                            <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
-                            <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" 
-                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                                   value="{{ user.fecha_nacimiento }}">
+                            <h1 class="text-xl font-semibold" style="color: var(--color-text);">Perfil de Usuario</h1>
+                            <p class="text-sm" style="color: var(--color-text-soft);">Gestiona tu información personal y configuración</p>
                         </div>
                     </div>
-
-                    <!-- Sección de Contraseña -->
-                    <div class="pt-5 border-t border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Cambiar Contraseña</h3>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Nueva Contraseña -->
-                            <div>
-                                <label for="password" class="block text-sm font-medium text-gray-700">Nueva Contraseña</label>
-                                <input type="password" name="password" id="password" 
-                                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <p class="mt-1 text-sm text-gray-500">Dejar en blanco para mantener la contraseña actual</p>
-                            </div>
-                            
-                            <!-- Confirmar Contraseña -->
-                            <div>
-                                <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
-                                <input type="password" name="confirm_password" id="confirm_password" 
-                                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Botones de acción -->
-                    <div class="flex justify-end pt-6 border-t border-gray-200">
-                        <a href="/admin" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3">
-                            Cancelar
+                    <div class="flex items-center gap-2">
+                        <a href="/admin" class="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 hover:shadow-md" style="color: var(--color-text-soft); border-color: var(--color-border); background-color: var(--color-surface);">
+                            <i class="fas fa-arrow-left text-sm"></i>
+                            <span class="hidden sm:inline">Volver al Panel</span>
                         </a>
-                        <button type="submit" class="bg-blue-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Actualizar Perfil
-                        </button>
                     </div>
-                </form>
+                </div>
+            </section>
+
+            <!-- Contenido del perfil con nueva estética -->
+            <div class="panel-surface rounded-xl shadow-md overflow-hidden hover-card"
+                 style="background-color: var(--color-surface); border: 1px solid var(--color-border);"
+                 onmouseover="this.style.boxShadow='var(--shadow-large)'; this.style.transform='translateY(-4px)'"
+                 onmouseout="this.style.boxShadow='var(--shadow-medium)'; this.style.transform='translateY(0)'">
+                <!-- Header del perfil con gradiente -->
+                <div class="p-6 border-b gradient-bg" style="border-color: var(--color-border);">
+                    <div class="flex flex-col md:flex-row items-center gap-6">
+                        <div class="flex-shrink-0 relative">
+                            <div class="w-24 h-24 rounded-full flex items-center justify-content text-white text-3xl font-bold overflow-hidden shadow-lg border-4 border-white" style="background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-alt) 100%);">
+                                {% if user.imagen_perfil %}
+                                    <img src="data:image/jpeg;base64,{{ user.imagen_perfil }}" alt="Imagen de perfil" class="w-full h-full object-cover">
+                                {% else %}
+                                    {{ user.nombre[0]|upper if user.nombre else user.usuario[0]|upper }}
+                                {% endif %}
+                            </div>
+                            <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
+                                <i class="fas fa-check text-white text-xs"></i>
+                            </div>
+                        </div>
+                        <div class="text-center md:text-left flex-1">
+                            <h2 class="text-2xl font-bold mb-2" style="color: var(--color-text);">{{ user.usuario }}</h2>
+                            <p class="mb-3" style="color: var(--color-text-soft);">{{ user.mail or 'No especificado' }}</p>
+                            <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+                                {% if user.roles %}
+                                    {% for role in user.roles %}
+                                        <span class="status-indicator status-success">
+                                            <i class="fas fa-shield-alt text-xs"></i>
+                                            {{ role.nombre if role.nombre else role }}
+                                        </span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="status-indicator" style="background-color: rgba(139, 92, 246, 0.1); color: var(--color-accent); border: 1px solid rgba(139, 92, 246, 0.2);">
+                                        <i class="fas fa-user text-xs"></i>
+                                        Usuario
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario de perfil -->
+                <div class="p-6">
+                    {% if message %}
+                    <div class="mb-6 p-4 rounded-lg border-l-4 border-l-green-500" style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e;" role="alert">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle"></i>
+                            <p class="font-medium">{{ message }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <form action="/admin/perfil" method="post" enctype="multipart/form-data" class="space-y-8">
+                        <!-- Información Personal -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2" style="color: var(--color-text);">
+                                <div class="w-6 h-6 rounded-lg icon-gradient-4 flex items-center justify-center">
+                                    <i class="fas fa-user text-white text-xs"></i>
+                                </div>
+                                Información Personal
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Nombre -->
+                                <div>
+                                    <label for="nombre" class="block text-sm font-medium mb-2" style="color: var(--color-text);">Nombre Completo</label>
+                                    <input type="text" name="nombre" id="nombre" 
+                                           class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200" 
+                                           style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-soft);" 
+                                           value="{{ user.nombre or '' }}"
+                                           onFocus="this.style.borderColor='var(--color-accent)'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.1)'"
+                                           onBlur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='var(--shadow-soft)'">
+                                </div>
+                                
+                                <!-- Teléfono -->
+                                <div>
+                                    <label for="telefono" class="block text-sm font-medium mb-2" style="color: var(--color-text);">Teléfono</label>
+                                    <input type="text" name="telefono" id="telefono" 
+                                           class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200" 
+                                           style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-soft);" 
+                                           value="{{ user.telefono or '' }}"
+                                           onFocus="this.style.borderColor='var(--color-accent)'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.1)'"
+                                           onBlur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='var(--shadow-soft)'">
+                                </div>
+                                
+                                <!-- Email -->
+                                <div>
+                                    <label for="email" class="block text-sm font-medium mb-2" style="color: var(--color-text);">Email</label>
+                                    <input type="email" name="email" id="email" 
+                                           class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200" 
+                                           style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-soft);" 
+                                           value="{{ user.mail or '' }}"
+                                           onFocus="this.style.borderColor='var(--color-accent)'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.1)'"
+                                           onBlur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='var(--shadow-soft)'">
+                                </div>
+                                
+                                <!-- Dirección -->
+                                <div>
+                                    <label for="direccion" class="block text-sm font-medium mb-2" style="color: var(--color-text);">Dirección</label>
+                                    <input type="text" name="direccion" id="direccion" 
+                                           class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200" 
+                                           style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-soft);" 
+                                           value="{{ user.direccion or '' }}"
+                                           onFocus="this.style.borderColor='var(--color-accent)'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.1)'"
+                                           onBlur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='var(--shadow-soft)'">
+                                </div>
+                                
+                                <!-- Fecha de Nacimiento -->
+                                <div class="md:col-span-2">
+                                    <label for="fecha_nacimiento" class="block text-sm font-medium mb-2" style="color: var(--color-text);">Fecha de Nacimiento</label>
+                                    <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" 
+                                           class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200" 
+                                           style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-soft);" 
+                                           value="{{ user.fecha_nacimiento or '' }}"
+                                           onFocus="this.style.borderColor='var(--color-accent)'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.1)'"
+                                           onBlur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='var(--shadow-soft)'">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Imagen de Perfil -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2" style="color: var(--color-text);">
+                                <div class="w-6 h-6 rounded-lg icon-gradient-3 flex items-center justify-center">
+                                    <i class="fas fa-camera text-white text-xs"></i>
+                                </div>
+                                Imagen de Perfil
+                            </h3>
+                            <div class="flex flex-col lg:flex-row gap-6">
+                                <!-- Vista previa actual -->
+                                {% if user.imagen_perfil %}
+                                <div class="flex-shrink-0">
+                                    <div class="w-32 h-32 rounded-xl overflow-hidden border-4 border-white shadow-lg">
+                                        <img src="data:image/jpeg;base64,{{ user.imagen_perfil }}" alt="Imagen actual" class="w-full h-full object-cover">
+                                    </div>
+                                    <p class="text-center text-sm mt-2" style="color: var(--color-text-soft);">Imagen actual</p>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Área de subida -->
+                                <div class="flex-1">
+                                    <div id="drop-area" class="relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer hover-card" 
+                                         style="border-color: var(--color-border); background-color: var(--color-surface-alt);"
+                                         onmouseover="this.style.borderColor='var(--color-accent)'; this.style.backgroundColor='var(--color-accent-light)'; this.style.transform='scale(1.02)'"
+                                         onmouseout="this.style.borderColor='var(--color-border)'; this.style.backgroundColor='var(--color-surface-alt)'; this.style.transform='scale(1)'">
+                                        <input type="file" name="imagen_perfil" id="imagen_perfil" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                        <div id="upload-content" class="space-y-3">
+                                            <div class="w-16 h-16 mx-auto rounded-full icon-gradient-3 flex items-center justify-center">
+                                                <i class="fas fa-cloud-upload-alt text-white text-2xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-lg font-medium" style="color: var(--color-text);">Subir nueva imagen</p>
+                                                <p class="text-sm mt-1" style="color: var(--color-text-soft);">Arrastra y suelta una imagen o haz clic para seleccionar</p>
+                                            </div>
+                                            <div class="flex items-center justify-center gap-4 text-xs" style="color: var(--color-text-soft);">
+                                                <span class="flex items-center gap-1">
+                                                    <i class="fas fa-check text-green-500"></i>
+                                                    PNG, JPG, GIF
+                                                </span>
+                                                <span class="flex items-center gap-1">
+                                                    <i class="fas fa-weight text-blue-500"></i>
+                                                    Máx. 10MB
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección de Contraseña -->
+                        <div class="pt-6 border-t" style="border-color: var(--color-border);">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2" style="color: var(--color-text);">
+                                <div class="w-6 h-6 rounded-lg icon-gradient-6 flex items-center justify-center">
+                                    <i class="fas fa-lock text-white text-xs"></i>
+                                </div>
+                                Seguridad
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Nueva Contraseña -->
+                                <div>
+                                    <label for="password" class="block text-sm font-medium mb-2" style="color: var(--color-text);">Nueva Contraseña</label>
+                                    <input type="password" name="password" id="password" 
+                                           class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200" 
+                                           style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-soft);"
+                                           onFocus="this.style.borderColor='var(--color-accent)'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.1)'"
+                                           onBlur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='var(--shadow-soft)'">
+                                    <p class="mt-2 text-sm" style="color: var(--color-text-soft);">Dejar en blanco para mantener la contraseña actual</p>
+                                </div>
+                                
+                                <!-- Confirmar Contraseña -->
+                                <div>
+                                    <label for="confirm_password" class="block text-sm font-medium mb-2" style="color: var(--color-text);">Confirmar Contraseña</label>
+                                    <input type="password" name="confirm_password" id="confirm_password" 
+                                           class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200" 
+                                           style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-soft);"
+                                           onFocus="this.style.borderColor='var(--color-accent)'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.1)'"
+                                           onBlur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='var(--shadow-soft)'">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t" style="border-color: var(--color-border);">
+                            <a href="/admin" class="px-6 py-3 rounded-lg border font-medium text-center transition-all duration-200 hover:shadow-md" 
+                               style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text-soft);">
+                                <i class="fas fa-times mr-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn-primary-gradient px-6 py-3 rounded-lg font-medium text-white">
+                                <i class="fas fa-save mr-2"></i>Actualizar Perfil
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </main>
-    <script src="/static/html/usuarios/js/usuarios_admin.js"></script>
-    <!-- Footer - Se cargará dinámicamente -->
-    <div id="footer-container"></div>
+    
+    <script>
+    // Script del perfil con nueva estética
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 DOM cargado, configurando perfil...');
+        
+        // Inicialización del tema (asegurar que esté aplicado)
+        const body = document.body;
+        const html = document.documentElement;
+        let savedTheme = localStorage.getItem('admin-theme') || 'light';
+        
+        console.log('🎨 Aplicando tema guardado:', savedTheme);
+        
+        // Aplicar tema guardado con fuerza
+        body.setAttribute('data-theme', savedTheme);
+        html.setAttribute('data-theme', savedTheme);
+        
+        // Actualizar botón del tema
+        setTimeout(() => {
+            updateThemeButton();
+            console.log('🔄 Botón de tema actualizado');
+        }, 100);
+        
+        // Funcionalidad del menú de perfil
+        const perfilBtn = document.getElementById('perfil');
+        const perfilMenu = document.getElementById('menu-perfil');
+        
+        if (perfilBtn && perfilMenu) {
+            perfilBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                perfilMenu.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!perfilBtn.contains(event.target) && !perfilMenu.contains(event.target)) {
+                    perfilMenu.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Funcionalidad mejorada de imagen
+        const inputImagen = document.getElementById('imagen_perfil');
+        const dropArea = document.getElementById('drop-area');
+        const uploadContent = document.getElementById('upload-content');
+        
+        if (inputImagen && dropArea) {
+            // Previsualización de imagen mejorada
+            inputImagen.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    handleImageFile(file);
+                }
+            });
+            
+            // Drag and drop mejorado
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, function() {
+                    dropArea.style.borderColor = 'var(--color-accent)';
+                    dropArea.style.backgroundColor = 'rgba(139, 92, 246, 0.1)';
+                    dropArea.style.transform = 'scale(1.02)';
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, function() {
+                    dropArea.style.borderColor = 'var(--color-border)';
+                    dropArea.style.backgroundColor = 'var(--color-surface-alt)';
+                    dropArea.style.transform = 'scale(1)';
+                }, false);
+            });
+
+            dropArea.addEventListener('drop', function(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files.length > 0) {
+                    handleImageFile(files[0]);
+                    inputImagen.files = files;
+                }
+            }, false);
+        }
+        
+        function handleImageFile(file) {
+            // Validar tipo de archivo
+            if (!file.type.startsWith('image/')) {
+                showNotification('Por favor selecciona un archivo de imagen válido.', 'error');
+                inputImagen.value = '';
+                return;
+            }
+            
+            // Validar tamaño (10MB máximo)
+            if (file.size > 10 * 1024 * 1024) {
+                showNotification('La imagen es demasiado grande. Máximo 10MB.', 'error');
+                inputImagen.value = '';
+                return;
+            }
+            
+            // Crear preview moderno
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Actualizar avatar en el header
+                const avatarContainer = document.querySelector('#user-initial');
+                if (avatarContainer) {
+                    avatarContainer.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" class="w-full h-full object-cover rounded-full">
+                    `;
+                }
+                
+                // Actualizar preview en el área principal
+                const mainAvatar = document.querySelector('.w-24.h-24');
+                if (mainAvatar) {
+                    mainAvatar.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" class="w-full h-full object-cover">
+                    `;
+                }
+                
+                // Actualizar área de upload con preview elegante
+                if (uploadContent) {
+                    uploadContent.innerHTML = `
+                        <div class="w-24 h-24 mx-auto rounded-xl overflow-hidden border-4 border-white shadow-lg">
+                            <img src="${e.target.result}" alt="Preview" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <p class="text-lg font-medium text-green-600">✓ Imagen seleccionada</p>
+                            <p class="text-sm" style="color: var(--color-text-soft);">${file.name}</p>
+                            <p class="text-xs mt-1" style="color: var(--color-text-soft);">Tamaño: ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                        <button type="button" onclick="resetImageUpload()" class="text-sm px-4 py-2 rounded-lg border transition-colors hover:bg-gray-50" style="border-color: var(--color-border); color: var(--color-text-soft);">
+                            <i class="fas fa-times mr-1"></i>Cambiar imagen
+                        </button>
+                    `;
+                }
+                
+                showNotification('Imagen cargada correctamente', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Función global para resetear
+        window.resetImageUpload = function() {
+            if (inputImagen) inputImagen.value = '';
+            if (uploadContent) {
+                uploadContent.innerHTML = `
+                    <div class="w-16 h-16 mx-auto rounded-full icon-gradient-3 flex items-center justify-center">
+                        <i class="fas fa-cloud-upload-alt text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-medium" style="color: var(--color-text);">Subir nueva imagen</p>
+                        <p class="text-sm mt-1" style="color: var(--color-text-soft);">Arrastra y suelta una imagen o haz clic para seleccionar</p>
+                    </div>
+                    <div class="flex items-center justify-center gap-4 text-xs" style="color: var(--color-text-soft);">
+                        <span class="flex items-center gap-1">
+                            <i class="fas fa-check text-green-500"></i>
+                            PNG, JPG, GIF
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <i class="fas fa-weight text-blue-500"></i>
+                            Máx. 10MB
+                        </span>
+                    </div>
+                `;
+            }
+        };
+        
+        // Sistema de notificaciones
+        function showNotification(message, type = 'info', duration = 4000) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ease-out`;
+            
+            const styles = {
+                success: 'status-success',
+                error: 'status-error',
+                warning: 'status-warning',
+                info: 'bg-blue-500 text-white'
+            };
+            
+            notification.className += ' ' + (styles[type] || styles.info);
+            notification.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                    <span class="font-medium">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 hover:opacity-70">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.remove('translate-x-full'), 100);
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
+        }
+        
+        console.log('🎨 Perfil moderno cargado correctamente');
+    });
+    </script>
 
 </body>
 </html>

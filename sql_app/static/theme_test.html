@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Temas - Perfil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Sistema de Temas */
+        body {
+          background-color: #f8fafc;
+          color: #1f2937;
+          transition: all 0.3s ease;
+        }
+        
+        body[data-theme="dark"] {
+          background-color: #111827 !important;
+          color: #f9fafb !important;
+        }
+        
+        body[data-theme="dark"] .bg-white {
+          background-color: #1f2937 !important;
+        }
+        
+        body[data-theme="dark"] .text-gray-900,
+        body[data-theme="dark"] .text-gray-800,
+        body[data-theme="dark"] .text-gray-700 {
+          color: #f9fafb !important;
+        }
+        
+        body[data-theme="dark"] .border-gray-200 {
+          border-color: #374151 !important;
+        }
+    </style>
+    
+    <script>
+        window.toggleThemeManual = function() {
+            console.log('🎨 CAMBIANDO TEMA...');
+            const body = document.body;
+            const html = document.documentElement;
+            let currentTheme = body.getAttribute('data-theme') || 'light';
+            
+            console.log('🔍 Estado actual:', currentTheme);
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', currentTheme);
+            html.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('admin-theme', currentTheme);
+            
+            console.log('✅ Nuevo estado aplicado:', currentTheme);
+            updateThemeButton();
+        };
+        
+        window.updateThemeButton = function() {
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            const currentTheme = document.body.getAttribute('data-theme') || 'light';
+            
+            if (currentTheme === 'dark') {
+                if (themeIcon) themeIcon.className = 'fas fa-sun mr-2 text-yellow-500';
+                if (themeText) themeText.textContent = 'Claro';
+                console.log('🌙 Botón actualizado a modo claro');
+            } else {
+                if (themeIcon) themeIcon.className = 'fas fa-moon mr-2 text-gray-500';
+                if (themeText) themeText.textContent = 'Oscuro';
+                console.log('☀️ Botón actualizado a modo oscuro');
+            }
+        };
+        
+        window.initTheme = function() {
+            const body = document.body;
+            const html = document.documentElement;
+            let savedTheme = localStorage.getItem('admin-theme') || 'light';
+            
+            body.setAttribute('data-theme', savedTheme);
+            html.setAttribute('data-theme', savedTheme);
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', updateThemeButton);
+            } else {
+                updateThemeButton();
+            }
+        };
+        
+        initTheme();
+    </script>
+</head>
+<body class="min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-2xl font-bold text-gray-900">Prueba del Sistema de Temas</h1>
+                <button id="theme-toggle" 
+                        class="flex items-center px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-all duration-200" 
+                        onclick="toggleThemeManual();">
+                    <i id="theme-icon" class="fas fa-moon mr-2 text-gray-500"></i>
+                    <span id="theme-text">Oscuro</span>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <p class="text-gray-700">
+                    Este es un texto que debería cambiar de color cuando cambies el tema.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h3 class="font-semibold text-gray-900 mb-2">Panel 1</h3>
+                        <p class="text-gray-700">Contenido del panel que debe adaptarse al tema.</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h3 class="font-semibold text-gray-900 mb-2">Panel 2</h3>
+                        <p class="text-gray-700">Más contenido que cambia con el tema.</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Instrucciones:</h3>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                        <li>Haz clic en el botón "Oscuro/Claro" arriba</li>
+                        <li>Observa cómo cambian los colores</li>
+                        <li>Recarga la página - el tema debe persistir</li>
+                        <li>Abre la consola del navegador para ver los logs</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Página de prueba cargada');
+            updateThemeButton();
+        });
+    </script>
+</body>
+</html>

@@ -391,6 +391,20 @@ async def login_debug(username: str, request: Request, db: Session = Depends(get
     
     return response
 
+@router.get("/test-user")
+async def test_user_endpoint():
+    """Endpoint de prueba para testing del frontend - devuelve usuario hardcodeado con avatar"""
+    return {
+        "id": 1,
+        "username": "juan",
+        "email": "juan@test.com",
+        "nombre": "Juan",
+        "apellido": "Test",
+        "imagen_perfil": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0Yjc2ODgiLz4KPHRleHQgeD0iMjAiIHk9IjI2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTZweCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIj5KPC90ZXh0Pgo8L3N2Zz4=",
+        "telefono": "123456789",
+        "direccion": "Test Address 123"
+    }
+
 # NOTA IMPORTANTE PARA RUTAS PROTEGIDAS:
 # Todas las rutas que requieran autenticación deben usar Depends(get_current_user) y esperar el token en el header Authorization: Bearer <token>.
 # El frontend debe enviar el token en cada petición protegida. Si usas HTML básico, necesitas JS para leer el token de la URL y guardarlo.
