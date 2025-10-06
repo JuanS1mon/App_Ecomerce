@@ -457,25 +457,49 @@ async def generate_multi_table(request: Request):
         logger.info(f"🌐 Solicitud multi-tabla recibida")
         logger.info(f"📋 Datos recibidos: {json_data.keys()}")
         
+        # Logging detallado para debugging
+        logger.info(f"🔍 service_name: {json_data.get('service_name', 'N/A')}")
+        logger.info(f"🔍 description: {json_data.get('description', 'N/A')}")
+        logger.info(f"🔍 Número de tablas: {len(json_data.get('tables', []))}")
+        
         # Importar las clases necesarias
         from .generator_config import MultiTableServiceConfig, TableConfig, FieldConfig, RelationshipConfig, MULTI_TABLE_VALIDATOR
         from .nuevo_generador_multi_tabla import generar_estructura_completa_por_tabla
         
         # Validar estructura JSON básica
+        logger.info("🔍 Iniciando validación JSON básica...")
         validation_errors = MULTI_TABLE_VALIDATOR.validate_json_structure(json_data)
         if validation_errors:
+            logger.error(f"❌ Errores de validación JSON: {validation_errors}")
             return JSONResponse(content={
                 "success": False,
                 "message": "❌ Errores de validación JSON",
                 "errors": validation_errors
             }, status_code=400)
         
+        logger.info("✅ Validación JSON básica completada")
+        
         # Crear configuración de servicio
-        service_config = crear_configuracion_desde_json(json_data)
+        logger.info("🔍 Creando configuración desde JSON...")
+        try:
+            service_config = crear_configuracion_desde_json(json_data)
+            logger.info("✅ Configuración creada exitosamente")
+        except Exception as e:
+            logger.error(f"❌ Error creando configuración: {str(e)}")
+            logger.error(f"❌ Tipo de error: {type(e).__name__}")
+            import traceback
+            logger.error(f"❌ Stack trace: {traceback.format_exc()}")
+            return JSONResponse(content={
+                "success": False,
+                "message": f"❌ Error creando configuración: {str(e)}",
+                "error_type": type(e).__name__
+            }, status_code=400)
         
         # Validar configuración completa
+        logger.info("🔍 Validando configuración completa...")
         errors = MULTI_TABLE_VALIDATOR.validate_service_config(service_config)
         if errors:
+            logger.error(f"❌ Errores en la configuración del servicio: {errors}")
             return JSONResponse(content={
                 "success": False,
                 "message": "❌ Errores en la configuración del servicio",
@@ -1413,5 +1437,230 @@ def generate_html_form(module_name: str, field_names: List[str], field_types: Li
 </html>'''
     return html_content
 
+# ============================================================================
+# EXPLORADOR DE TABLAS DINÁMICAS - NUEVA FUNCIONALIDAD
+# ============================================================================
+
+from sqlalchemy import inspect, text
+from typing import Dict, List, Any, Optional
+from sql_app.db.database import get_db, engine
+
+# Tablas core del sistema que NO deben mostrarse en el explorador
+CORE_TABLES = {
+    # Tablas de autenticación y usuarios (en minúsculas para comparación)
+    'usuarios', 'usuario_roles', 'roles', 'permisos', 'user_sessions', 'tokens',
+    'sesiones', 'auth_sessions',
+    
+    # Tablas de sistema y administración  
+    'alembic_version', 'migrations', 'system_config', 'app_config',
+    
+    # Tablas de logs y auditoría
+    'activity_log', 'logs', 'audit_logs', 'security_logs', 'system_logs',
+    
+    # Tablas de comunicación del sistema
+    'tickets', 'mensajes', 'chat_rooms', 'chat_messages', 'chat_members',
+    
+    # Tablas de métricas y KPIs del sistema
+    'resultados_kpi',
+    
+    # Tablas temporales y cache
+    'cache', 'temp_data'
+}
+
+@router.get("/list-tables")
+async def list_dynamic_tables():
+    """Listar todas las tablas dinámicas (excluyendo core tables)"""
+    try:
+        inspector = inspect(engine)
+        all_tables = inspector.get_table_names()
+        
+        # Filtrar tablas core
+        dynamic_tables = []
+        
+        for table_name in all_tables:
+            if table_name.lower() not in CORE_TABLES:
+                # Obtener información básica de la tabla
+                try:
+                    with engine.connect() as conn:
+                        # Contar registros
+                        count_result = conn.execute(text(f"SELECT COUNT(*) FROM [{table_name}]"))
+                        record_count = count_result.scalar()
+                        
+                        # Obtener columnas
+                        columns = inspector.get_columns(table_name)
+                        column_count = len(columns)
+                        
+                        # Información de la tabla
+                        table_info = {
+                            "name": table_name,
+                            "record_count": record_count,
+                            "column_count": column_count,
+                            "columns": [{"name": col["name"], "type": str(col["type"])} for col in columns[:5]]  # Primeras 5 columnas
+                        }
+                        dynamic_tables.append(table_info)
+                        
+                except Exception as e:
+                    logger.warning(f"Error al obtener info de tabla {table_name}: {e}")
+                    continue
+        
+        return JSONResponse(content={
+            "success": True,
+            "message": f"✅ Se encontraron {len(dynamic_tables)} tablas dinámicas",
+            "tables": dynamic_tables,
+            "total_count": len(dynamic_tables)
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Error al listar tablas: {str(e)}")
+        return JSONResponse(content={
+            "success": False,
+            "message": f"Error al obtener tablas: {str(e)}"
+        }, status_code=500)
+
+@router.get("/table-content/{table_name}")
+async def get_table_content(table_name: str, page: int = 1, limit: int = 50):
+    """Obtener contenido de una tabla específica con paginación"""
+    try:
+        # Validar que la tabla no sea core
+        if table_name.lower() in CORE_TABLES:
+            return JSONResponse(content={
+                "success": False,
+                "message": f"❌ Acceso denegado a tabla core: {table_name}"
+            }, status_code=403)
+        
+        # Validar que la tabla existe
+        inspector = inspect(engine)
+        if table_name not in inspector.get_table_names():
+            return JSONResponse(content={
+                "success": False,
+                "message": f"❌ Tabla '{table_name}' no encontrada"
+            }, status_code=404)
+        
+        offset = (page - 1) * limit
+        
+        with engine.connect() as conn:
+            # Obtener total de registros
+            count_result = conn.execute(text(f"SELECT COUNT(*) FROM [{table_name}]"))
+            total_records = count_result.scalar()
+            
+            # Obtener datos paginados
+            data_result = conn.execute(text(f"SELECT * FROM [{table_name}] ORDER BY 1 OFFSET {offset} ROWS FETCH NEXT {limit} ROWS ONLY"))
+            
+            # Convertir resultados a lista de diccionarios
+            columns = list(data_result.keys())  # Convertir a lista para poder usar índices
+            rows = []
+            for row in data_result:
+                row_dict = {}
+                for i, value in enumerate(row):
+                    # Convertir tipos no serializables
+                    if hasattr(value, 'isoformat'):  # datetime
+                        row_dict[columns[i]] = value.isoformat()
+                    elif value is None:
+                        row_dict[columns[i]] = None
+                    else:
+                        row_dict[columns[i]] = str(value)
+                rows.append(row_dict)
+            
+            # Calcular metadatos de paginación
+            total_pages = (total_records + limit - 1) // limit
+            has_next = page < total_pages
+            has_prev = page > 1
+            
+            # Mensaje adaptado según si hay datos o no
+            if total_records == 0:
+                message = f"📋 Tabla '{table_name}' está vacía (sin registros)"
+            else:
+                message = f"✅ Datos de tabla '{table_name}' obtenidos ({total_records} registros)"
+            
+            return JSONResponse(content={
+                "success": True,
+                "message": message,
+                "table_name": table_name,
+                "data": rows,
+                "pagination": {
+                    "page": page,
+                    "limit": limit,
+                    "total_records": total_records,
+                    "total_pages": total_pages,
+                    "has_next": has_next,
+                    "has_prev": has_prev
+                },
+                "columns": columns,
+                "is_empty": total_records == 0
+            })
+            
+    except Exception as e:
+        logger.error(f"❌ Error al obtener contenido de tabla {table_name}: {str(e)}")
+        return JSONResponse(content={
+            "success": False,
+            "message": f"Error al obtener datos: {str(e)}"
+        }, status_code=500)
+
+@router.get("/table-schema/{table_name}")
+async def get_table_schema(table_name: str):
+    """Obtener esquema detallado de una tabla"""
+    try:
+        # Validar que la tabla no sea core
+        if table_name.lower() in CORE_TABLES:
+            return JSONResponse(content={
+                "success": False,
+                "message": f"❌ Acceso denegado a tabla core: {table_name}"
+            }, status_code=403)
+        
+        inspector = inspect(engine)
+        
+        # Validar que la tabla existe
+        if table_name not in inspector.get_table_names():
+            return JSONResponse(content={
+                "success": False,
+                "message": f"❌ Tabla '{table_name}' no encontrada"
+            }, status_code=404)
+        
+        # Obtener información detallada
+        columns = inspector.get_columns(table_name)
+        primary_keys = inspector.get_pk_constraint(table_name)
+        foreign_keys = inspector.get_foreign_keys(table_name)
+        indexes = inspector.get_indexes(table_name)
+        
+        # Formatear información de columnas
+        column_info = []
+        for col in columns:
+            col_data = {
+                "name": col["name"],
+                "type": str(col["type"]),
+                "nullable": col.get("nullable", True),
+                "default": str(col.get("default")) if col.get("default") else None,
+                "autoincrement": col.get("autoincrement", False),
+                "primary_key": col["name"] in primary_keys.get("constrained_columns", [])
+            }
+            column_info.append(col_data)
+        
+        # Formatear foreign keys
+        fk_info = []
+        for fk in foreign_keys:
+            fk_info.append({
+                "name": fk.get("name"),
+                "constrained_columns": fk.get("constrained_columns", []),
+                "referred_table": fk.get("referred_table"),
+                "referred_columns": fk.get("referred_columns", [])
+            })
+        
+        return JSONResponse(content={
+            "success": True,
+            "message": f"✅ Esquema de tabla '{table_name}' obtenido",
+            "table_name": table_name,
+            "columns": column_info,
+            "primary_key": primary_keys,
+            "foreign_keys": fk_info,
+            "indexes": indexes
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Error al obtener esquema de tabla {table_name}: {str(e)}")
+        return JSONResponse(content={
+            "success": False,
+            "message": f"Error al obtener esquema: {str(e)}"
+        }, status_code=500)
+
 # Fin del archivo - todas las funciones están listas
-# El generador ahora está completamente funcional
+# El generador ahora está completamente funcional con explorador de tablas

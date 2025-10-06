@@ -1,0 +1,72 @@
+{
+  "service_name": "test_service",
+  "description": "Servicio de prueba generado desde editor visual",
+  "editor_version": "3.0",
+  "generated_timestamp": "2025-10-05T12:00:00",
+  "tables": [
+    {
+      "name": "productos",
+      "description": "Tabla de productos del sistema",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "Integer",
+          "primary_key": true,
+          "auto_increment": true,
+          "nullable": false
+        },
+        {
+          "name": "nombre",
+          "field_type": "String",
+          "max_length": 100,
+          "nullable": false
+        },
+        {
+          "name": "precio",
+          "field_type": "Float",
+          "nullable": false
+        },
+        {
+          "name": "descripcion",
+          "field_type": "Text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "categorias",
+      "description": "Tabla de categorías de productos",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "Integer",
+          "primary_key": true,
+          "auto_increment": true,
+          "nullable": false
+        },
+        {
+          "name": "nombre",
+          "field_type": "String",
+          "max_length": 50,
+          "nullable": false
+        },
+        {
+          "name": "descripcion",
+          "field_type": "Text",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "type": "one_to_many",
+      "source_table": "categorias",
+      "target_table": "productos",
+      "source_field": "id",
+      "target_field": "categoria_id"
+    }
+  ],
+  "generate_crud_for_all": true,
+  "generate_relationship_endpoints": true
+}

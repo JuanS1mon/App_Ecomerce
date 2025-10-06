@@ -1035,6 +1035,7 @@
                 nameInput.addEventListener('change', () => {
                     data.name = nameInput.value;
                     this.updateTableDisplay(data);
+                    this.updateCodePreviewIfOpen(); // 🔄 Actualizar vista previa automáticamente
                 });
                 
                 // Agregar campo
@@ -1067,6 +1068,10 @@
                 }));
                 
                 this.updateTableDisplay(data);
+                
+                // Actualizar vista previa si está abierta
+                this.updateCodePreviewIfOpen();
+                console.log('🔄 Campos actualizados, vista previa refrescada');
             }
             
             addField(data) {
@@ -1093,6 +1098,75 @@
                 const tableElement = document.getElementById(data.id);
                 tableElement.innerHTML = this.generateTableHTML(data);
                 this.setupTableEvents(tableElement, data);
+                
+                // Actualizar vista previa automáticamente si está abierta
+                this.updateCodePreviewIfOpen();
+            }
+            
+            updateCodePreviewIfOpen() {
+                const modal = document.getElementById('code-preview-modal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    // La vista previa está abierta, actualizarla
+                    const codeData = this.generateCodeFromTables();
+                    this.displayCode(codeData);
+                    console.log('🔄 Vista previa actualizada automáticamente');
+                }
+            }
+            
+            syncAllTablesFromUI() {
+                try {
+                    // Sincronizar todas las tablas con los datos del UI antes de guardar
+                    console.log('🔄 [SYNC] Iniciando sincronización desde UI...');
+                    
+                    // Si hay una tabla seleccionada actualmente en el panel de propiedades, actualizarla
+                    if (this.selectedElement && this.selectedElement.data) {
+                        const currentTableId = this.selectedElement.data.id;
+                        const currentTableData = this.tables.get(currentTableId);
+                        
+                        if (currentTableData) {
+                            console.log(`🔄 [SYNC] Sincronizando tabla: ${currentTableData.name}`);
+                            
+                            // Sincronizar nombre de tabla desde input
+                            const nameInput = document.getElementById('table-name-input');
+                            if (nameInput && nameInput.value) {
+                                const oldName = currentTableData.name;
+                                currentTableData.name = nameInput.value;
+                                console.log(`🔄 [SYNC] Nombre actualizado: ${oldName} → ${nameInput.value}`);
+                            }
+                            
+                            // Sincronizar campos desde el panel de propiedades
+                            const fieldEditors = document.querySelectorAll('.field-editor');
+                            if (fieldEditors.length > 0) {
+                                const oldFieldsCount = currentTableData.fields.length;
+                                currentTableData.fields = Array.from(fieldEditors).map((editor, index) => ({
+                                    name: editor.querySelector('.field-name').value,
+                                    type: editor.querySelector('.field-type').value,
+                                    primary: currentTableData.fields[index]?.primary || false
+                                }));
+                                console.log(`🔄 [SYNC] Campos sincronizados: ${oldFieldsCount} → ${fieldEditors.length}`);
+                            }
+                            
+                            // Actualizar también el elemento visual
+                            const tableElement = document.getElementById(currentTableId);
+                            if (tableElement) {
+                                tableElement.innerHTML = this.generateTableHTML(currentTableData);
+                                this.setupTableEvents(tableElement, currentTableData);
+                                console.log(`🔄 [SYNC] Elemento visual actualizado para: ${currentTableData.name}`);
+                            }
+                            
+                            console.log(`✅ [SYNC] Tabla "${currentTableData.name}" sincronizada correctamente`);
+                        } else {
+                            console.warn(`⚠️ [SYNC] No se encontró tabla con ID: ${currentTableId}`);
+                        }
+                    } else {
+                        console.log('ℹ️ [SYNC] No hay tabla seleccionada para sincronizar');
+                    }
+                    
+                    console.log('✅ [SYNC] Sincronización completa');
+                } catch (error) {
+                    console.error('❌ [SYNC] Error durante la sincronización:', error);
+                    // No lanzar el error para no interrumpir el guardado
+                }
             }
             
             deleteTable(tableId) {
@@ -1164,6 +1238,9 @@
             }
             
             generateCode() {
+                // Sincronizar estado antes de generar código
+                this.syncAllTablesFromUI();
+                
                 document.getElementById('code-preview-modal').classList.remove('hidden');
                 
                 const codeData = this.generateCodeFromTables();
@@ -1250,191 +1327,80 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
             }
             
             generateConfigJSON(tables) {
-                // Generar formato compatible con el Generador
+                // Generar formato compatible con el endpoint generate-multi-table
                 
-                // DEPURACIÓN: Mostrar datos de entrada
-                console.log('🔍 [EDITOR v2.1.0] Generando JSON...');
+                console.log('🔍 [EDITOR v2.1.0] Generando JSON para endpoint...');
                 console.log('📊 Tablas recibidas:', tables.map(t => t.name));
                 console.log('🔗 Relaciones encontradas:', this.relationships.length);
-                this.relationships.forEach((rel, i) => {
-                    console.log(`   ${i+1}. ${rel.from?.tableName || 'UNDEFINED'} → ${rel.to?.tableName || 'UNDEFINED'} (${rel.type})`);
-                });
                 
-                // PASO 1: Analizar relaciones para identificar foreign keys necesarios
-                const foreignKeys = new Map(); // tableName -> [foreign_key_fields]
+                // Mapear tipos de Editor Visual a tipos del Generador
+                const typeMapping = {
+                    'string': 'String',
+                    'integer': 'Integer',
+                    'boolean': 'Boolean',
+                    'datetime': 'DateTime',
+                    'email': 'String',
+                    'url': 'String'
+                };
                 
-                this.relationships.forEach(rel => {
-                    const fromTable = rel.from.tableName;
-                    const toTable = rel.to.tableName;
+                // Convertir tablas al formato esperado
+                const convertedTables = tables.map(table => {
+                    // Asegurar que siempre haya un campo ID
+                    const fields = [];
                     
-                    if (rel.type === "one-to-many") {
-                        // En one-to-many: to_table necesita foreign key de from_table
-                        const fkField = `id_${fromTable}`;
-                        if (!foreignKeys.has(toTable)) {
-                            foreignKeys.set(toTable, []);
-                        }
-                        foreignKeys.get(toTable).push({
-                            name: fkField,
-                            field_type: "integer",
-                            primary_key: false,
-                            auto_increment: false,
-                            foreign_key: `${fromTable}.id`,
-                            nullable: false
-                        });
-                    } else if (rel.type === "many-to-one") {
-                        // En many-to-one: from_table necesita foreign key de to_table  
-                        const fkField = `id_${toTable}`;
-                        if (!foreignKeys.has(fromTable)) {
-                            foreignKeys.set(fromTable, []);
-                        }
-                        foreignKeys.get(fromTable).push({
-                            name: fkField,
-                            field_type: "integer",
-                            primary_key: false,
-                            auto_increment: false,
-                            foreign_key: `${toTable}.id`,
+                    // Agregar campo ID si no existe
+                    const hasId = table.fields.some(f => f.primary || f.name.toLowerCase() === 'id');
+                    if (!hasId) {
+                        fields.push({
+                            name: 'id',
+                            field_type: 'Integer',
+                            primary_key: true,
+                            auto_increment: true,
                             nullable: false
                         });
                     }
+                    
+                    // Agregar otros campos
+                    table.fields.forEach(field => {
+                        fields.push({
+                            name: field.name,
+                            field_type: typeMapping[field.type] || 'String',
+                            primary_key: field.primary || false,
+                            auto_increment: field.primary || false,
+                            nullable: !field.primary,
+                            unique: false,
+                            index: false
+                        });
+                    });
+                    
+                    return {
+                        name: table.name,
+                        description: `Tabla ${table.name} generada desde Editor Visual`,
+                        fields: fields
+                    };
                 });
                 
-                // DEPURACIÓN: Mostrar foreign keys detectados
-                console.log('🔑 [EDITOR v2.1.0] Foreign Keys detectados:');
-                foreignKeys.forEach((fks, tableName) => {
-                    console.log(`   📋 ${tableName}:`, fks.map(fk => fk.name));
-                });
+                // Convertir relaciones
+                const convertedRelationships = this.relationships.map(rel => ({
+                    type: rel.type.replace('-', '_'), // one-to-many -> one_to_many
+                    source_table: rel.from.tableName,
+                    target_table: rel.to.tableName,
+                    source_field: 'id',
+                    target_field: `${rel.from.tableName}_id`
+                }));
                 
                 const config = {
-                    service_name: this.getProjectName() || "sistema_visual",
-                    description: this.getProjectDescription() || "Sistema generado con Editor Visual",
-                    editor_version: "2.1.0", // NUEVA: Versión del editor
-                    generated_timestamp: new Date().toISOString(), // NUEVA: Timestamp de generación
-                    tables: tables.map(table => {
-                        // Asegurar que cada tabla tenga un campo ID primario
-                        const fields = [];
-                        
-                        // Agregar ID automáticamente si no existe
-                        const hasId = table.fields.some(field => field.name === 'id' || field.primary);
-                        if (!hasId) {
-                            fields.push({
-                                name: "id",
-                                field_type: "integer",
-                                primary_key: true,
-                                auto_increment: true,
-                                nullable: false
-                            });
-                        }
-                        
-                        // Agregar el resto de campos originales
-                        fields.push(...table.fields
-                            .filter(field => !field.primary || field.name === 'id') // Incluir ID si existe
-                            .map(field => ({
-                                name: field.name,
-                                field_type: field.type === 'integer' ? 'integer' : 
-                                           field.type === 'boolean' ? 'boolean' :
-                                           field.type === 'datetime' ? 'datetime' :
-                                           field.type === 'email' ? 'email' : 'string',
-                                primary_key: field.primary || field.name === 'id',
-                                auto_increment: field.primary || field.name === 'id',
-                                nullable: field.name === 'id' ? false : true
-                            })));
-                        
-                        // PASO 2: Agregar foreign keys automáticamente
-                        if (foreignKeys.has(table.name)) {
-                            const tableFKs = foreignKeys.get(table.name);
-                            console.log(`🔑 [EDITOR] Agregando FKs a tabla '${table.name}':`, tableFKs.map(fk => fk.name));
-                            tableFKs.forEach(fk => {
-                                // Verificar que no exista ya un campo con el mismo nombre
-                                const existsField = fields.some(f => f.name === fk.name);
-                                if (!existsField) {
-                                    fields.push(fk);
-                                    console.log(`   ✅ FK agregado: ${fk.name} → ${fk.foreign_key}`);
-                                } else {
-                                    console.log(`   ⚠️ FK ya existe: ${fk.name}`);
-                                }
-                            });
-                        } else {
-                            console.log(`ℹ️ [EDITOR] Tabla '${table.name}' no necesita FKs`);
-                        }
-                        
-                        return {
-                            name: table.name,
-                            description: `Módulo ${table.name} generado desde Editor Visual`,
-                            fields: fields
-                        };
-                    }),
-                    relationships: this.relationships
-                        .map(rel => {
-                            // VALIDACIÓN: Verificar que las tablas existan
-                            const fromTable = rel.from.tableName;
-                            const toTable = rel.to.tableName;
-                            
-                            // Buscar si las tablas existen en la lista de tablas
-                            const fromTableExists = tables.some(t => t.name === fromTable);
-                            const toTableExists = tables.some(t => t.name === toTable);
-                            
-                            if (!fromTableExists) {
-                                console.error(`❌ [EDITOR v2.1.0] Tabla origen '${fromTable}' no existe. Tablas disponibles:`, tables.map(t => t.name));
-                                return null; // Excluir esta relación
-                            }
-                            
-                            if (!toTableExists) {
-                                console.error(`❌ [EDITOR v2.1.0] Tabla destino '${toTable}' no existe. Tablas disponibles:`, tables.map(t => t.name));
-                                return null; // Excluir esta relación
-                            }
-                            
-                            // CORRECCIÓN: Identificar correctamente los campos de relación
-                            // Para relaciones one-to-many o many-to-one:
-                            // from_field debería ser la PK de la tabla padre (normalmente "id")
-                            // to_field debería ser el FK en la tabla hija (ej: "id_usuario")
-                            
-                            let fromField, toField;
-                            
-                            // Determinar el campo FK en la tabla destino
-                            if (rel.type === "one-to-many") {
-                                // En one-to-many: from_table(id) → to_table(id_from_table)
-                                // Ejemplo: usuario(id) → orden(id_usuario)
-                                fromField = "id";
-                                toField = `id_${fromTable}`;
-                            } else if (rel.type === "many-to-one") {
-                                // En many-to-one: from_table(id_to_table) → to_table(id)
-                                // Ejemplo: orden(id_usuario) → usuario(id)
-                                fromField = `id_${toTable}`;
-                                toField = "id";
-                            } else {
-                                // Para one-to-one y many-to-many, usar naming estándar
-                                fromField = "id";
-                                toField = `id_${fromTable}`;
-                            }
-                            
-                            console.log(`✅ [EDITOR v2.1.0] Relación válida: ${fromTable}(${fromField}) → ${toTable}(${toField}) [${rel.type}]`);
-                            
-                            return {
-                                from_table: fromTable,
-                                to_table: toTable,
-                                relationship_type: rel.type.replace("-", "_"), // Normalizar formato
-                                from_field: fromField,
-                                to_field: toField,
-                                relationship_name: `${fromTable}_to_${toTable}`,
-                                back_populates: null,
-                                cascade_delete: false,
-                                lazy_loading: "select"
-                            };
-                        })
-                        .filter(rel => rel !== null), // Filtrar relaciones nulas/inválidas
+                    service_name: document.getElementById('project-name')?.value || 'sistema_visual',
+                    description: document.getElementById('project-description')?.value || 'Sistema generado desde Editor Visual',
+                    editor_version: '3.0',
+                    generated_timestamp: new Date().toISOString(),
+                    tables: convertedTables,
+                    relationships: convertedRelationships,
                     generate_crud_for_all: true,
                     generate_relationship_endpoints: true
                 };
                 
-                // LOGS DE DEPURACIÓN
-                console.log('🔍 [EDITOR v2.1.0] JSON Generado:');
-                console.log('📊 Tablas:', config.tables.length);
-                console.log('🔗 Relaciones:', config.relationships.length);
-                config.relationships.forEach((rel, index) => {
-                    console.log(`   ${index + 1}. ${rel.from_table}(${rel.from_field}) → ${rel.to_table}(${rel.to_field}) [${rel.relationship_type}]`);
-                });
-                console.log('🔍 JSON completo:', config);
-                
+                console.log('✅ JSON generado:', JSON.stringify(config, null, 2));
                 return JSON.stringify(config, null, 2);
             }
             
@@ -1509,41 +1475,238 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
                 return types[type] || 'str';
             }
             
-            saveProject() {
-                console.log('📊 Guardando proyecto. Tablas actuales:', this.tables.size);
-                console.log('📋 Contenido de tablas:', Array.from(this.tables.values()));
+            async saveProject() {
+                console.log('📊 [SAVE] Iniciando guardado del proyecto...');
+                console.log('📊 [SAVE] Tablas actuales:', this.tables.size);
+                console.log('📋 [SAVE] Contenido de tablas:', Array.from(this.tables.values()));
                 
-                // Formatear tablas para compatibilidad
-                const formattedTables = Array.from(this.tables.values()).map(table => ({
-                    id: table.id,
-                    name: table.name,
-                    fields: table.fields,
-                    x: table.position?.x || table.x || 50,
-                    y: table.position?.y || table.y || 50,
-                    position: table.position || { x: table.x || 50, y: table.y || 50 }
-                }));
-                
-                const projectData = {
-                    tables: formattedTables,
-                    relationships: this.relationships,
-                    metadata: {
-                        name: 'Mi Proyecto Visual',
-                        created: new Date().toISOString(),
-                        version: '1.0'
+                try {
+                    // 🔄 SINCRONIZAR DATOS DEL UI ANTES DE GUARDAR
+                    console.log('🔄 [SAVE] Ejecutando sincronización...');
+                    this.syncAllTablesFromUI();
+                    console.log('✅ [SAVE] Sincronización completada');
+                    
+                    // Formatear tablas para compatibilidad
+                    console.log('📝 [SAVE] Formateando tablas...');
+                    const formattedTables = Array.from(this.tables.values()).map(table => ({
+                        id: table.id,
+                        name: table.name,
+                        fields: table.fields,
+                        x: table.position?.x || table.x || 50,
+                        y: table.position?.y || table.y || 50,
+                        position: table.position || { x: table.x || 50, y: table.y || 50 }
+                    }));
+                    console.log('✅ [SAVE] Tablas formateadas:', formattedTables.length);
+                    
+                    const projectData = {
+                        tables: formattedTables,
+                        relationships: this.relationships,
+                        metadata: {
+                            name: 'Mi Proyecto Visual',
+                            created: new Date().toISOString(),
+                            version: '1.0'
+                        }
+                    };
+                    
+                    console.log('💾 [SAVE] Datos del proyecto a guardar:', projectData);
+                    
+                    console.log('📄 [SAVE] Creando blob...');
+                    const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
+                    
+                    // 🔧 MÉTODO 1: Intentar forzar diálogo "Guardar como"
+                    if (window.showSaveFilePicker) {
+                        // API moderna de File System Access (Chrome 86+)
+                        try {
+                            console.log('� [SAVE] Usando File System Access API...');
+                            const fileHandle = await window.showSaveFilePicker({
+                                suggestedName: 'proyecto-visual.json',
+                                types: [{
+                                    description: 'Archivos JSON',
+                                    accept: { 'application/json': ['.json'] }
+                                }]
+                            });
+                            
+                            const writable = await fileHandle.createWritable();
+                            await writable.write(blob);
+                            await writable.close();
+                            
+                            console.log('✅ [SAVE] Archivo guardado con diálogo de ubicación');
+                            this.showSaveSuccessNotification();
+                            return;
+                        } catch (fsError) {
+                            console.log('⚠️ [SAVE] File System API cancelado o no disponible:', fsError.message);
+                        }
                     }
-                };
+                    
+                    // 🔧 MÉTODO 2: Descarga tradicional mejorada
+                    console.log('🔗 [SAVE] Usando método de descarga tradicional...');
+                    const url = URL.createObjectURL(blob);
+                    console.log('📎 [SAVE] Creando elemento de descarga...');
+                    
+                    // 🎯 OPCIÓN A: Intentar forzar diálogo con user gesture
+                    const userWantsDialog = confirm('¿Deseas elegir dónde guardar el archivo?\n\n✅ SÍ = Elegir ubicación\n❌ NO = Descargar automáticamente');
+                    
+                    if (userWantsDialog) {
+                        // Mostrar modal con descarga manual para elegir ubicación
+                        this.showManualDownloadLink(url, projectData);
+                        return;
+                    }
+                    
+                    // 🎯 OPCIÓN B: Descarga automática tradicional
+                    // Crear elemento de descarga invisible
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'proyecto-visual.json';
+                    a.style.display = 'none';
+                    
+                    // Agregar al DOM temporalmente
+                    document.body.appendChild(a);
+                    
+                    console.log('🖱️ [SAVE] Ejecutando click para descarga...');
+                    
+                    // Intentar forzar la descarga con múltiples métodos
+                    try {
+                        a.click();
+                        console.log('✅ [SAVE] Click ejecutado correctamente');
+                    } catch (clickError) {
+                        console.error('❌ [SAVE] Error en click automático:', clickError);
+                        // Método alternativo: usar dispatchEvent
+                        try {
+                            const event = new MouseEvent('click', {
+                                view: window,
+                                bubbles: true,
+                                cancelable: true
+                            });
+                            a.dispatchEvent(event);
+                            console.log('✅ [SAVE] Descarga forzada con dispatchEvent');
+                        } catch (eventError) {
+                            console.error('❌ [SAVE] Error en dispatchEvent:', eventError);
+                            // Último recurso: mostrar link manual
+                            this.showManualDownloadLink(url, projectData);
+                        }
+                    }
+                    
+                    // Usar timeout para asegurar que el click se procese
+                    setTimeout(() => {
+                        console.log('🧹 [SAVE] Limpiando elemento y URL del blob...');
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                    
+                    // Mostrar notificación de éxito
+                    this.showSaveSuccessNotification();
+                    
+                    console.log('✅ [SAVE] Proyecto guardado exitosamente');
+                } catch (error) {
+                    console.error('❌ [SAVE] Error durante el guardado:', error);
+                    alert('Error al guardar el proyecto: ' + error.message);
+                }
+            }
+            
+            showManualDownloadLink(url, projectData) {
+                // Mostrar modal con link de descarga manual y opciones de guardado
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 max-w-lg mx-4">
+                        <div class="text-center">
+                            <div class="text-blue-500 text-6xl mb-4">�</div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Guardar Proyecto</h3>
+                            <p class="text-sm text-gray-600 mb-6">
+                                Tu proyecto está listo para descargar. Elige una opción:
+                            </p>
+                            
+                            <div class="space-y-4">
+                                <!-- Método 1: Descarga directa -->
+                                <div class="border rounded-lg p-4 bg-blue-50">
+                                    <h4 class="font-semibold text-blue-800 mb-2">📥 Descarga Directa</h4>
+                                    <p class="text-xs text-blue-600 mb-3">Descarga el archivo a tu carpeta de descargas</p>
+                                    <a href="${url}" download="proyecto-visual.json" 
+                                       class="block w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors">
+                                        Descargar proyecto-visual.json
+                                    </a>
+                                </div>
+                                
+                                <!-- Método 2: Copy to clipboard -->
+                                <div class="border rounded-lg p-4 bg-green-50">
+                                    <h4 class="font-semibold text-green-800 mb-2">📋 Copiar Contenido</h4>
+                                    <p class="text-xs text-green-600 mb-3">Copia el JSON y pégalo en tu editor preferido</p>
+                                    <button onclick="navigator.clipboard.writeText('${JSON.stringify(projectData, null, 2).replace(/'/g, "\\'")}').then(() => {
+                                        this.innerHTML = '✅ ¡Copiado!'; 
+                                        this.className = 'w-full bg-green-600 text-white font-bold py-2 px-4 rounded';
+                                        setTimeout(() => this.closest('.fixed').remove(), 1500);
+                                    })" 
+                                            class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition-colors">
+                                        📋 Copiar al Portapapeles
+                                    </button>
+                                </div>
+                                
+                                <!-- Información del proyecto -->
+                                <div class="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600">
+                                    <div class="font-medium mb-1">📊 Contenido del proyecto:</div>
+                                    <div>• ${projectData.tables.length} tablas definidas</div>
+                                    <div>• ${projectData.relationships.length} relaciones configuradas</div>
+                                    <div>• Generado: ${new Date().toLocaleDateString('es-ES')}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button onclick="this.closest('.fixed').remove()" 
+                                        class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition-colors">
+                                    Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
                 
-                console.log('💾 Datos del proyecto a guardar:', projectData);
+                document.body.appendChild(modal);
                 
-                const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'proyecto-visual.json';
-                a.click();
-                URL.revokeObjectURL(url);
+                // Cerrar modal al hacer clic en el fondo
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
                 
-                console.log('💾 Proyecto guardado');
+                console.log('📋 [SAVE] Modal de descarga manual avanzado mostrado');
+            }
+            
+            showSaveSuccessNotification() {
+                // Crear notificación de éxito
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 transform transition-all duration-300';
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium">¡Proyecto guardado exitosamente!</p>
+                            <p class="text-xs opacity-90">El archivo se descargará automáticamente</p>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Animación de entrada
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 10);
+                
+                // Quitar la notificación después de 4 segundos
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }, 4000);
             }
             
             loadProject() {
@@ -1650,6 +1813,9 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
                     // Ocultar mensaje de bienvenida
                     document.getElementById('welcome-message').style.display = 'none';
                     
+                    // 🔄 IMPORTANTE: Reconfigurar sincronización después de cargar
+                    this.setupPostLoadSynchronization();
+                    
                     console.log('✅ Proyecto cargado exitosamente');
                     alert(`✅ Proyecto cargado exitosamente!\n\n📊 ${projectData.tables.length} tablas importadas\n🔗 ${this.relationships.length} relaciones restauradas`);
                     
@@ -1657,6 +1823,30 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
                     console.error('Error al cargar proyecto:', error);
                     alert('Error al cargar el proyecto. El archivo no tiene el formato correcto.');
                 }
+            }
+            
+            setupPostLoadSynchronization() {
+                // 🔄 Función para reconfigurar sincronización después de cargar proyecto
+                console.log('🔄 Configurando sincronización post-carga...');
+                
+                // Verificar que todas las tablas tengan eventos configurados correctamente
+                this.tables.forEach((tableData, tableId) => {
+                    const tableElement = document.getElementById(tableId);
+                    if (tableElement) {
+                        // Reconfigurar eventos de sincronización
+                        this.setupTableEvents(tableElement, tableData);
+                        console.log(`✅ Eventos reconfigurados para tabla: ${tableData.name}`);
+                    }
+                });
+                
+                // Verificar que la sincronización de vista previa funcione
+                const modal = document.getElementById('code-preview-modal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    // Si el modal está abierto, actualizar contenido
+                    this.updateCodePreviewIfOpen();
+                }
+                
+                console.log('✅ Sincronización post-carga completada');
             }
             
             createTableFromData(tableData) {
@@ -1681,21 +1871,19 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
                 document.getElementById('design-canvas').appendChild(tableElement);
                 
                 // Guardar en el map de tablas con la estructura correcta
-                this.tables.set(tableId, {
+                const fullTableData = {
                     id: tableId,
                     name: tableData.name,
                     fields: tableData.fields,
                     x: posX,
                     y: posY,
                     position: { x: posX, y: posY }
-                });
+                };
+                
+                this.tables.set(tableId, fullTableData);
                 
                 // IMPORTANTE: Configurar todos los eventos para que sea editable
-                this.setupTableEvents(tableElement, {
-                    id: tableId,
-                    name: tableData.name,
-                    fields: tableData.fields
-                });
+                this.setupTableEvents(tableElement, fullTableData);
                 
                 console.log(`✅ Tabla "${tableData.name}" recreada con ${tableData.fields.length} campos`);
             }
@@ -1727,6 +1915,10 @@ def create_${table.name}(db: Session, ${table.name}: schemas.${this.toPascalCase
             
             sendToGenerator() {
                 console.log('🚀 [DEBUG] sendToGenerator iniciado');
+                
+                // SINCRONIZAR ESTADO ANTES DE ENVIAR
+                this.syncAllTablesFromUI();
+                
                 console.log('🚀 [DEBUG] Número de tablas:', this.tables.size);
                 console.log('🚀 [DEBUG] Tablas disponibles:', Array.from(this.tables.keys()));
                 console.log('🚀 [DEBUG] Número de relaciones:', this.relationships.length);

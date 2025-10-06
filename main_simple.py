@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Servidor main simplificado para que funcione el Editor Visual y Generar
+Ahora incluye soporte para Explorador de Tablas
 """
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
@@ -14,7 +15,17 @@ import os
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Sistema de Stock - Simplificado")
+# Inicializar base de datos (necesario para el explorador de tablas)
+try:
+    from sql_app.db.database import engine, create_tables, create_database
+    # Crear base de datos y tablas si no existen
+    create_database()
+    create_tables()
+    logger.info("✅ Base de datos inicializada")
+except Exception as e:
+    logger.warning(f"⚠️ Error al inicializar BD (puede ser normal): {e}")
+
+app = FastAPI(title="Sistema de Stock - Simplificado con Explorador")
 
 # Configurar CORS
 app.add_middleware(
@@ -32,7 +43,7 @@ app.include_router(frontend_pages.router)
 try:
     from sql_app.routers.config import Generar
     app.include_router(Generar.router)
-    logger.info("✅ Router de Generar registrado")
+    logger.info("✅ Router de Generar registrado (con Explorador de Tablas)")
 except Exception as e:
     logger.error(f"❌ Error al registrar router de Generar: {e}")
 
