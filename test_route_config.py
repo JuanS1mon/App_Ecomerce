@@ -10,8 +10,8 @@ import os
 sys.path.append('.')
 
 # Imports necesarios
-from sql_app.routers.config.nuevo_generador_multi_tabla import generar_estructura_completa_por_tabla
-from sql_app.routers.config.generator_config import MultiTableServiceConfig
+from routers.config.nuevo_generador_multi_tabla import generar_estructura_completa_por_tabla
+from routers.config.generator_config import MultiTableServiceConfig
 
 def test_route_config():
     """Probar la generación de route_config"""

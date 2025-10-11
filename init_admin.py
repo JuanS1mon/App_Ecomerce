@@ -11,7 +11,7 @@ import os
 # Agregar el directorio raíz al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sql_app.Services.security.security import encriptar_clave
+from Services.security.security import encriptar_clave
 
 def init_admin_user():
     """Inicializa la base de datos con el usuario admin 'juan'"""

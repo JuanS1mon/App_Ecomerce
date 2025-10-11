@@ -146,7 +146,7 @@ def get_articulos_en_deposito(db: Session, id_deposito: int) -> List[int]:
         Lista de códigos de artículos
     """
     try:
-        from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+        from Services.app_stock.stock.model_stock import Stock as StockModel
         
         articulos = db.query(StockModel.codigo_art).filter(
             StockModel.id_deposito == id_deposito
@@ -169,7 +169,7 @@ def get_depositos_con_articulo(db: Session, codigo_art: int) -> List[int]:
         Lista de IDs de depósitos
     """
     try:
-        from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+        from Services.app_stock.stock.model_stock import Stock as StockModel
         
         depositos = db.query(StockModel.id_deposito).filter(
             StockModel.codigo_art == codigo_art
@@ -193,7 +193,7 @@ def get_ultimo_registro_stock(db: Session, id_deposito: int, codigo_art: int) ->
         Información del último registro de stock
     """
     try:
-        from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+        from Services.app_stock.stock.model_stock import Stock as StockModel
         from sqlalchemy import and_
         
         ultimo_registro = db.query(StockModel).filter(
@@ -382,7 +382,7 @@ def get_articulos_distintos_en_deposito(db: Session, id_deposito: int) -> List[i
         Lista de códigos de artículos
     """
     try:
-        from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+        from Services.app_stock.stock.model_stock import Stock as StockModel
         
         articulos = db.query(StockModel.codigo_art).filter(
             StockModel.id_deposito == id_deposito
@@ -405,7 +405,7 @@ def get_depositos_distintos_con_articulo(db: Session, codigo_art: int) -> List[i
         Lista de IDs de depósitos
     """
     try:
-        from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+        from Services.app_stock.stock.model_stock import Stock as StockModel
         
         depositos = db.query(StockModel.id_deposito).filter(
             StockModel.codigo_art == codigo_art
@@ -429,7 +429,7 @@ def get_ultimo_stock_almacenado(db: Session, id_deposito: int, codigo_art: int) 
         Diccionario con las cantidades del último registro
     """
     try:
-        from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+        from Services.app_stock.stock.model_stock import Stock as StockModel
         from sqlalchemy import and_
         
         ultimo_registro = db.query(StockModel).filter(

@@ -1,5 +1,5 @@
 # Imports de bibliotecas estándar
-from sql_app.Services.app_stock.depositos_tipos.model_depositos_tipos import Depositos_tipos  # Corregida la importación
+from Services.app_stock.depositos_tipos.model_depositos_tipos import Depositos_tipos  # Corregida la importación
 from typing import List, Optional, Dict, Any
 import logging
 

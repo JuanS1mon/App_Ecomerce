@@ -18,10 +18,10 @@ from sqlalchemy.orm import Session
 import numpy as np
 import pandas as pd
 
-from sql_app.Services.security.jwt_auth import get_current_user
-from sql_app.db.crud.tablas import get_tables
-from sql_app.db.database import get_db
-from sql_app.db.schemas.config.Usuarios import UserDB
+from security.jwt_auth import get_current_user
+from db.crud.tablas import get_tables
+from db.database import get_db
+from db.schemas.config.Usuarios import UserDB
 
 def limpiar_datos(df: pd.DataFrame) -> pd.DataFrame:
     """

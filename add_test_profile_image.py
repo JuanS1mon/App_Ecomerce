@@ -3,8 +3,8 @@
 Script para agregar una imagen de perfil de prueba al usuario 'juan'
 """
 import base64
-from sql_app.db.database import get_db
-from sql_app.db.models.config.usuarios import Usuarios
+from db.database import get_db
+from db.models.config.usuarios import Usuarios
 from sqlalchemy.orm import Session
 
 def create_test_avatar():

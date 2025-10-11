@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
-from sql_app.db.database import get_db
+from db.database import get_db
 from .service_tabla1 import tabla1_service
 from .schema_tabla1 import Tabla1, Tabla1Create, Tabla1Update
 

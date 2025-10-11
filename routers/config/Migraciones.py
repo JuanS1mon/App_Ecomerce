@@ -32,13 +32,22 @@ from sqlalchemy.orm import Session
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 # Imports del proyecto
-from sql_app.Services.Analisis.analisis import clean_data
-from sql_app.Services.migracion.migracion import procesar_archivo
-from sql_app.Services.security.auth_middleware import require_role_api
-from sql_app.db.crud.tablas import get_tables
-from sql_app.db.database import get_db
-from sql_app.db.models.config.activityLog import ActivityLog
-from sql_app.db.schemas.config.Usuarios import UserDB
+# from Services.Analisis.analisis import clean_data
+# from Services.migracion.migracion import procesar_archivo
+
+# Funciones stub temporales
+def clean_data(data):
+    """Función temporal stub para clean_data"""
+    return data
+
+def procesar_archivo(*args, **kwargs):
+    """Función temporal stub para procesar_archivo"""
+    pass
+from security.auth_middleware import require_role_api
+from db.crud.tablas import get_tables
+from db.database import get_db
+from db.models.config.activityLog import ActivityLog
+from db.schemas.config.Usuarios import UserDB
 
 ALLOWED_EXTENSIONS = {
     'EXCEL': [

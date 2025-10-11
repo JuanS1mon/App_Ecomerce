@@ -11,9 +11,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.db.database import get_db
-from sql_app.Services.app_stock.articulos.schema_articulos import CodigoBarrasRequest, QRCodeRequest
-from sql_app.Services.app_stock.articulos.service_codigos import (
+from db.database import get_db
+from Services.app_stock.articulos.schema_articulos import CodigoBarrasRequest, QRCodeRequest
+from Services.app_stock.articulos.service_codigos import (
     generar_codigo_barras, 
     generar_codigo_qr, 
     generar_etiqueta_completa

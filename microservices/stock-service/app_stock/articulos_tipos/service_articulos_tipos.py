@@ -10,7 +10,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.Services.app_stock.articulos_tipos.model_articulos_tipos import Articulos_tipos
+from Services.app_stock.articulos_tipos.model_articulos_tipos import Articulos_tipos
 
 logger = logging.getLogger(__name__)
 

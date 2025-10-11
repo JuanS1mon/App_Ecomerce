@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.Services.security.security import require_admin
+from Services.security.security import require_admin
 from sql_app.db.crud.config.roles import get_role_by_name, create_role, delete_role, get_all_roles
-from sql_app.db.database import get_db
-from sql_app.db.schemas.config.roles import Role, RoleAssignment, RoleCreate
+from db.database import get_db
+from db.schemas.config.roles import Role, RoleAssignment, RoleCreate
 
 router = APIRouter(
     prefix="/admin/roles",

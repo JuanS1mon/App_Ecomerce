@@ -8,7 +8,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 try:
-    from sql_app.db.database import Base
+    from db.database import Base
     target_metadata = Base.metadata
 except Exception as e:
     print(f"Warning: Could not import Base metadata: {e}")

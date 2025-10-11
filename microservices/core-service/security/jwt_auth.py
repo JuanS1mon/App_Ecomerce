@@ -11,12 +11,12 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 
-from sql_app.config import SECRET_KEY, ALGORITHM
-from sql_app.db.database import get_db
-from sql_app.db.models.config.usuarios import Usuarios
-from sql_app.db.models.config.roles import Roles, usuario_roles
-from sql_app.db.schemas.config.Usuarios import UserDB, TokenData
-from sql_app.Services.security.security import verificar_clave
+from config import SECRET_KEY, ALGORITHM
+from db.database import get_db
+from db.models.config.usuarios import Usuarios
+from db.models.config.roles import Roles, usuario_roles
+from db.schemas.config.Usuarios import UserDB, TokenData
+from Services.security.security import verificar_clave
 
 # Configurar logger
 logger = logging.getLogger("jwt_auth")

@@ -19,11 +19,11 @@ async def generar_formularios_html_biblioteca():
     print("=" * 50)
     
     try:
-        from sql_app.routers.config.generator_config import (
+        from routers.config.generator_config import (
             MultiTableServiceConfig, TableConfig, FieldConfig, RelationshipConfig
         )
-        from sql_app.routers.config.nuevo_generador_multi_tabla import generar_estructura_completa_por_tabla
-        from sql_app.routers.config.Generar import generate_dynamic_html_forms
+        from routers.config.nuevo_generador_multi_tabla import generar_estructura_completa_por_tabla
+        from routers.config.Generar import generate_dynamic_html_forms
         
         # Configuración de ejemplo
         config_data = {
@@ -153,7 +153,7 @@ async def main():
         print("\n💡 Para probar el sistema completo:")
         print("   1. Ejecuta: uvicorn sql_app.main:app --reload")
         print("   2. Registra las rutas en main.py:")
-        print("      from sql_app.Services.biblioteca_sistema.route_config_biblioteca_sistema import configure_biblioteca_sistema_routes")
+        print("      from Services.biblioteca_sistema.route_config_biblioteca_sistema import configure_biblioteca_sistema_routes")
         print("      configure_biblioteca_sistema_routes(app)")
         print("   3. Accede a los formularios usando las URLs de arriba")
     else:

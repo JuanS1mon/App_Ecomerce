@@ -17,9 +17,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.Services.app_stock.articulos.model_articulos import Articulos
-from sql_app.Services.app_stock.articulos.model_precios_historial import PreciosHistorial  # Importando el modelo de precios historial
-from sql_app.Services.app_stock.articulos.service_precios_historial import registrar_cambio_precio
+from Services.app_stock.articulos.model_articulos import Articulos
+from Services.app_stock.articulos.model_precios_historial import PreciosHistorial  # Importando el modelo de precios historial
+from Services.app_stock.articulos.service_precios_historial import registrar_cambio_precio
 
 logger = logging.getLogger(__name__)
 

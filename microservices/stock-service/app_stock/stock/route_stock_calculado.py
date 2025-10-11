@@ -10,7 +10,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.db.database import get_db    get_top_articulos_por_stock
+from db.database import get_db    get_top_articulos_por_stock
 
 )
 

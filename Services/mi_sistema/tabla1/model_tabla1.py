@@ -9,7 +9,7 @@ Tabla generada automáticamente
 
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Text, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
-from sql_app.db.database import Base
+from db.database import Base
 from datetime import datetime
 
 class Tabla1(Base):

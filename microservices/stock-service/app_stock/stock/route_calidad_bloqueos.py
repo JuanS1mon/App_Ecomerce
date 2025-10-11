@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.db.database import get_db# Configurar logger
+from db.database import get_db# Configurar logger
 
 logger = logging.getLogger(__name__)
 

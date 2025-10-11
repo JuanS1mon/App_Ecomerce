@@ -1,6 +1,6 @@
 # Imports de bibliotecas estándar
-from sql_app.Services.app_stock.articulos.model_precios_historial import PreciosHistorial
-from sql_app.Services.app_stock.articulos.schema_precios_historial import (
+from Services.app_stock.articulos.model_precios_historial import PreciosHistorial
+from Services.app_stock.articulos.schema_precios_historial import (
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional
 import logging
@@ -10,14 +10,14 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.db.database import get_db
+from db.database import get_db
 
     PreciosHistorialCreate, 
     PreciosHistorialUpdate, 
     PreciosHistorialRead,
     PreciosHistorialFiltro
 )
-from sql_app.Services.app_stock.articulos.service_precios_historial import (
+from Services.app_stock.articulos.service_precios_historial import (
     registrar_cambio_precio,
     obtener_historial_por_articulo,
     busqueda_avanzada_historial

@@ -12,10 +12,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text, func
 
 # Imports del proyecto
-from sql_app.db.database import get_db
-from sql_app.db.models.config.usuarios import Usuarios
-from sql_app.db.schemas.config.Usuarios import UserDB
-from sql_app.Services.security.security import get_current_user_secure
+from db.database import get_db
+from db.models.config.usuarios import Usuarios
+from db.schemas.config.Usuarios import UserDB
+from Services.security.security import get_current_user_secure
 
 # Configuración de templates
 try:

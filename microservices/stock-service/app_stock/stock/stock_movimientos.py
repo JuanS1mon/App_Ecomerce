@@ -1,6 +1,6 @@
 # Imports de bibliotecas estándar
-from sql_app.Services.app_stock.articulos.model_confirmacion_movimiento import ConfirmacionMovimiento
-from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+from Services.app_stock.articulos.model_confirmacion_movimiento import ConfirmacionMovimiento
+from Services.app_stock.stock.model_stock import Stock as StockModel
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import List, Optional, Dict, Any
@@ -803,7 +803,7 @@ def calcular_stock_disponible(db: Session, id_deposito: int, codigo_art: int, in
         # Obtenemos bloqueos por calidad activos para este artículo en este depósito
         # Primero importamos el modelo si es necesario
         try:
-            from sql_app.Services.app_stock.articulos.model_calidad import CalidadBloqueo
+            from Services.app_stock.articulos.model_calidad import CalidadBloqueo
             
             # Sumamos todas las cantidades bloqueadas activas
             bloqueados_calidad = db.query(func.sum(CalidadBloqueo.cantidad)).filter(

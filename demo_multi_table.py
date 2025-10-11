@@ -13,12 +13,12 @@ from pathlib import Path
 # Agregar el path del proyecto
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sql_app.routers.config.generator_config import (
+from routers.config.generator_config import (
     MultiTableServiceConfig, TableConfig, FieldConfig, RelationshipConfig,
     MULTI_TABLE_VALIDATOR
 )
-from sql_app.routers.config.multi_table_generator import multi_table_factory
-from sql_app.routers.config.Generar import create_service_config_from_json, generate_multi_table_service
+from routers.config.multi_table_generator import multi_table_factory
+from routers.config.Generar import create_service_config_from_json, generate_multi_table_service
 
 async def demo_complete_workflow():
     """Demostración completa del flujo de trabajo multi-tabla"""
@@ -235,7 +235,7 @@ async def demo_complete_workflow():
         print(f"📁 Directorio temporal: {temp_dir}")
         
         # Cambiar temporalmente la configuración
-        from sql_app.routers.config.generator_config import GENERATOR_CONFIG
+        from routers.config.generator_config import GENERATOR_CONFIG
         original_services_path = GENERATOR_CONFIG.paths.services
         GENERATOR_CONFIG.paths.services = temp_dir
         

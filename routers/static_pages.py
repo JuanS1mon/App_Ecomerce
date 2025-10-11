@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
-from sql_app.db.database import get_db
-from sql_app.utils.templates import templates
+from db.database import get_db
+from utils.templates import templates
 import logging
 logger = logging.getLogger("main")
 

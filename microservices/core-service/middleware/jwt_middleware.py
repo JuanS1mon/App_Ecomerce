@@ -23,7 +23,7 @@ from fastapi import Request, status
 from fastapi.responses import JSONResponse, RedirectResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
-from sql_app.Services.security.jwt_auth import verify_token, JWTAuthError
+from Services.security.jwt_auth import verify_token, JWTAuthError
 
 logger = logging.getLogger("jwt_middleware")
 

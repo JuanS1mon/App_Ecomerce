@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
-from sql_app.db.database import get_db
+from db.database import get_db
 from .service_usuario_5372 import usuario_5372_service
 from .schema_usuario_5372 import Usuario_5372, Usuario_5372Create, Usuario_5372Update
 

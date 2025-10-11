@@ -9,10 +9,10 @@ import json
 import asyncio
 import logging
 from datetime import datetime
-from sql_app.Services.chat.websocket_manager import ChatWebSocketManager
-from sql_app.Services.chat.models import ChatRoom, ChatMessage
-from sql_app.Services.chat.schemas import ChatRoomCreate, ChatMessageCreate
-from sql_app.db.database import get_db
+from Services.chat.websocket_manager import ChatWebSocketManager
+from Services.chat.models import ChatRoom, ChatMessage
+from Services.chat.schemas import ChatRoomCreate, ChatMessageCreate
+from db.database import get_db
 from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)

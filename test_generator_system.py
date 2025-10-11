@@ -14,7 +14,7 @@ def test_generator_config():
     print("🧪 Probando configuración del generador...")
     
     try:
-        from sql_app.routers.config.generator_config import GENERATOR_CONFIG, VALIDATOR, PATH_MANAGER
+        from routers.config.generator_config import GENERATOR_CONFIG, VALIDATOR, PATH_MANAGER
         
         print("✅ Imports exitosos")
         print(f"📁 Rutas configuradas: {GENERATOR_CONFIG.paths}")
@@ -31,7 +31,7 @@ def test_generator_validator():
     print("\n🧪 Probando validador...")
     
     try:
-        from sql_app.routers.config.generator_config import VALIDATOR
+        from routers.config.generator_config import VALIDATOR
         
         # Probar validación de módulo
         VALIDATOR.validate_module_name("test_module")
@@ -60,7 +60,7 @@ def test_generator_factory():
     print("\n🧪 Probando factory de generadores...")
     
     try:
-        from sql_app.routers.config.generator_factory import generator_factory
+        from routers.config.generator_factory import generator_factory
         
         # Listar generadores disponibles
         available = generator_factory.get_available_generators()
@@ -80,7 +80,7 @@ def test_generator_logger():
     print("\n🧪 Probando sistema de logging...")
     
     try:
-        from sql_app.routers.config.generator_logger import main_logger, GenerationSession
+        from routers.config.generator_logger import main_logger, GenerationSession
         
         # Probar logging básico
         main_logger.log_generation_start("test_module", "test")

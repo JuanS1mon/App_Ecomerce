@@ -9,7 +9,7 @@ import os
 
 from ...db.database import get_db
 from ...Services.security.security import get_current_user
-from sql_app.db.models.config.usuarios import Usuarios
+from db.models.config.usuarios import Usuarios
 
 router = APIRouter(
     prefix="/admin",

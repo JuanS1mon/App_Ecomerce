@@ -48,7 +48,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
 class FrontendRedirectMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-        from sql_app.config import FRONTEND_URL
+        from config import FRONTEND_URL
         frontend_prefix = "/frontend"
         if request.url.path.startswith(frontend_prefix):
             try:

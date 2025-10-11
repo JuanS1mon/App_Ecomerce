@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 # Imports del proyecto
-from sql_app.db.database import Base
+from db.database import Base
 
 class Depositos(Base):
     __tablename__ = 'depositos'

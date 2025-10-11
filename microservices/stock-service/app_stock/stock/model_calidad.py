@@ -3,7 +3,7 @@
 from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
-from sql_app.db.database import Baseclass CalidadBloqueo(Base):
+from db.database import Baseclass CalidadBloqueo(Base):
 
     Modelo para almacenar bloqueos de calidad sobre artículos en depósitos específicos.
     """

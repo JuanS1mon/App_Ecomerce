@@ -10,8 +10,8 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.db.database import get_db
-from sql_app.Services.app_stock.articulos.service_historial_precios import (
+from db.database import get_db
+from Services.app_stock.articulos.service_historial_precios import (
     get_historial_precios_por_articulo,
     get_estadisticas_historial_precios,
     get_historial_precios_con_filtros

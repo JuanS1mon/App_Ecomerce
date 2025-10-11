@@ -8,11 +8,11 @@ def encriptar_clave(password: str) -> str:
 
 from fastapi import Request, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sql_app.db.schemas.config.Usuarios import UserDB
-from sql_app.db.database import get_db
+from db.schemas.config.Usuarios import UserDB
+from db.database import get_db
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
-from sql_app.config import SECRET_KEY, ALGORITHM
+from config import SECRET_KEY, ALGORITHM
 import logging
 
 # Inicializar logger

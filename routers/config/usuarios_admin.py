@@ -30,7 +30,7 @@ from sqlalchemy import text
 from pydantic import BaseModel
 import jwt  # Asegúrate de que PyJWT esté instalado
 
-from sql_app.Services.security.auth_middleware import require_admin_for_template, require_role_api
+from Services.security.auth_middleware import require_admin_for_template, require_role_api
 from ...Services.security.security import get_current_user, require_admin, encriptar_clave, require_role
 from ...db.database import get_db
 from ...db.schemas.config.Usuarios import UserDB

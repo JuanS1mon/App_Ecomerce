@@ -15,8 +15,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.Services.app_stock.articulos.model_articulos import Articulos
-from sql_app.Services.app_stock.articulos.service_articulos import get_articulos, update_articulos
+from Services.app_stock.articulos.model_articulos import Articulos
+from Services.app_stock.articulos.service_articulos import get_articulos, update_articulos
 
 logger = logging.getLogger(__name__)
 

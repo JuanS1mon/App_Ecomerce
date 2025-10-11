@@ -9,7 +9,7 @@ Este middleware maneja la autenticación puramente desde el backend:
 4. Sistema reutilizable para cualquier ruta que requiera autenticación
 
 Uso:
-    from sql_app.Services.security.auth_middleware import require_auth_for_template
+    from Services.security.auth_middleware import require_auth_for_template
     
     @router.get("/admin")
     async def admin_page(request: Request, user_data: dict = Depends(require_auth_for_template)):
@@ -27,11 +27,11 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from sql_app.db.database import get_db
-from sql_app.db.models.config.usuarios import Usuarios
-from sql_app.db.models.config.roles import Roles, usuario_roles
-from sql_app.db.schemas.config.Usuarios import UserDB
-from sql_app.Services.security.jwt_auth import verify_token, JWTAuthError
+from db.database import get_db
+from db.models.config.usuarios import Usuarios
+from db.models.config.roles import Roles, usuario_roles
+from db.schemas.config.Usuarios import UserDB
+from Services.security.jwt_auth import verify_token, JWTAuthError
 
 # Configurar logger
 logger = logging.getLogger("auth_middleware")

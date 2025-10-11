@@ -3,7 +3,7 @@
 from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from sql_app.db.database import Baseclass ConfirmacionMovimiento(Base):
+from db.database import Baseclass ConfirmacionMovimiento(Base):
 
     Modelo para almacenar confirmaciones de movimientos de stock.
     """

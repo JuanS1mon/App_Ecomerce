@@ -13,7 +13,7 @@ from fastapi.responses import HTMLResponse
 import uvicorn
 
 # Importar solo los módulos del generador que necesitamos
-from sql_app.routers.config.Generar import router as generar_router
+from routers.config.Generar import router as generar_router
 
 app = FastAPI(title="Generador Multi-Tabla - Demo")
 

@@ -16,10 +16,10 @@ import shutil
 from pathlib import Path
 
 # Importar funcionalidades de Fase 2
-from sql_app.routers.config.phase2_templates import Phase2Templates
-from sql_app.routers.config.phase2_advanced_generator import create_phase2_generator
-from sql_app.routers.config.Generar import create_service_config_from_json
-from sql_app.routers.config.generator_config import MULTI_TABLE_VALIDATOR
+from routers.config.phase2_templates import Phase2Templates
+from routers.config.phase2_advanced_generator import create_phase2_generator
+from routers.config.Generar import create_service_config_from_json
+from routers.config.generator_config import MULTI_TABLE_VALIDATOR
 
 async def demo_template_system():
     """Demostrar sistema de templates"""
@@ -76,7 +76,7 @@ async def demo_ecommerce_generation():
     
     try:
         # Cambiar temporalmente la configuración
-        from sql_app.routers.config.generator_config import GENERATOR_CONFIG
+        from routers.config.generator_config import GENERATOR_CONFIG
         original_services_path = GENERATOR_CONFIG.paths.services
         GENERATOR_CONFIG.paths.services = temp_dir
         

@@ -7,9 +7,9 @@ import sys
 # Añadir la ruta del proyecto para importar modelos
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from sql_app.db.database import Base
+from db.database import Base
 # Importa todos los modelos aquí para que Alembic los detecte
-from sql_app.db.models_import import *
+from db.models_import import *
 
 # Configuración Alembic
 config = context.config

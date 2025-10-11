@@ -5,10 +5,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import FileResponse, HTMLResponse
 from sqlalchemy.orm import Session
 
-from sql_app.db.database import get_db
-from sql_app.Services.app_stock.stock_historico.model_stock_historico import Stock_historico as Stock_historicoModel
-from sql_app.Services.app_stock.stock_historico.schema_stock_historico import Stock_historicoCreate, Stock_historicoRead, Stock_historicoUpdate
-from sql_app.Services.app_stock.stock_historico.service_stock_historico import (
+from db.database import get_db
+from Services.app_stock.stock_historico.model_stock_historico import Stock_historico as Stock_historicoModel
+from Services.app_stock.stock_historico.schema_stock_historico import Stock_historicoCreate, Stock_historicoRead, Stock_historicoUpdate
+from Services.app_stock.stock_historico.service_stock_historico import (
     create_stock_historico,
     delete_stock_historico,
     get_stock_historico,

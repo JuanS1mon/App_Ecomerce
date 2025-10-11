@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 
 # Imports del proyecto
-from sql_app.Services.security.security import get_current_user
+from security.security import get_current_user
 
 logger = logging.getLogger(__name__)
 

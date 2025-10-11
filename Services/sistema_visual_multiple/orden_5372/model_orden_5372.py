@@ -9,7 +9,7 @@ Módulo orden_5372 generado desde Editor Visual
 
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Text, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
-from sql_app.db.database import Base
+from db.database import Base
 from datetime import datetime
 
 class Orden5372(Base):

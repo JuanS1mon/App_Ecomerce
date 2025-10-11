@@ -13,9 +13,9 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 # Project-specific imports
-from ..db.database import get_db
-from ..db.schemas.config.Usuarios import Token, UserDB
-from ..Services.security.jwt_auth import (
+from db.database import get_db
+from db.schemas.config.Usuarios import Token, UserDB
+from security.jwt_auth import (
     create_access_token,
     get_current_user,
     get_optional_user,
@@ -344,7 +344,7 @@ async def login_debug(username: str, request: Request, db: Session = Depends(get
     """
     Endpoint de debug para login automático - SOLO PARA DESARROLLO
     """
-    from sql_app.Services.security.jwt_auth import authenticate_user_jwt, create_access_token
+    from security.jwt_auth import authenticate_user_jwt, create_access_token
     from datetime import timedelta
     
     print(f"🔧 DEBUG LOGIN para: {username}")

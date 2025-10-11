@@ -15,7 +15,7 @@ from fastapi.templating import Jinja2Templates
 import fileinput
 import traceback
 
-from sql_app.Services.security.auth_middleware import require_auth_for_template
+from security.auth_middleware import require_auth_for_template
 
 templates = Jinja2Templates(directory="sql_app/static")
 

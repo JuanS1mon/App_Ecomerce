@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 
-from sql_app.db.database import get_db, get_async_db
+from db.database import get_db, get_async_db
 from .service_configuracion import configuracion_service
 from .schema_configuracion import Configuracion, ConfiguracionCreate, ConfiguracionUpdate
 

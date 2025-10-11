@@ -10,7 +10,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.Services.app_stock.ot.model_ot import OT as Ot, Operacion, ReporteTiempo
+from Services.app_stock.ot.model_ot import OT as Ot, Operacion, ReporteTiempo
 
 logger = logging.getLogger(__name__)
 

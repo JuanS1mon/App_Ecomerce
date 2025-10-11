@@ -36,13 +36,22 @@ import pandas as pd
 import requests
 
 # Imports del proyecto
-from ...Services.scraping.scraping import extract_with_beautifulsoup, extract_with_selenium
-from ...db.schemas.Scraping import ScraperTestConfig
-from sql_app.Services.security.jwt_auth import get_current_user
-from sql_app.Services.security.auth_middleware import require_auth_for_template
-from sql_app.db.database import get_db
-from sql_app.db.models.config.activityLog import ActivityLog
-from sql_app.db.schemas.config.Usuarios import UserDB
+# from ...Services.scraping.scraping import extract_with_beautifulsoup, extract_with_selenium
+from db.schemas.Scraping import ScraperTestConfig
+from security.jwt_auth import get_current_user
+from security.auth_middleware import require_auth_for_template
+
+# Funciones stub temporales
+def extract_with_beautifulsoup(config):
+    """Función temporal stub para extract_with_beautifulsoup"""
+    return []
+
+def extract_with_selenium(config):
+    """Función temporal stub para extract_with_selenium"""
+    return []
+from db.database import get_db
+from db.models.config.activityLog import ActivityLog
+from db.schemas.config.Usuarios import UserDB
 
 # Configuración de logging
 logging.basicConfig(

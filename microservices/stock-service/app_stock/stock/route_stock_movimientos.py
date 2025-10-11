@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from sql_app.db.database import get_db
+from db.database import get_db
 from .stock_movimientos import (
     cerrar_movimiento,
     confirmar_movimiento,

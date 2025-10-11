@@ -11,12 +11,12 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 
-from ..db.database import get_db
-from ..db.models.config.usuarios import Usuarios as UsuariosModel
-from ..db.schemas.config.Usuarios import SecurePasswordResetRequest, ConfirmPasswordReset
-from ..Services.security.security import encriptar_clave, crear_access_token, sanitize_for_log, log_security_event
-from ..Services.mail.mail import enviar_email_simple
-from sql_app.config import BASE_URL, SECRET_KEY, ALGORITHM
+from db.database import get_db
+from db.models.config.usuarios import Usuarios as UsuariosModel
+from db.schemas.config.Usuarios import SecurePasswordResetRequest, ConfirmPasswordReset
+from Services.security.security import encriptar_clave, crear_access_token, sanitize_for_log, log_security_event
+from Services.mail.mail import enviar_email_simple
+from config import BASE_URL, SECRET_KEY, ALGORITHM
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -318,7 +318,7 @@ async def confirm_password_reset(
         
         # Verificar que la nueva contraseña no sea igual a la actual
         try:
-            from ..Services.security.security import verificar_clave
+            from Services.security.security import verificar_clave
             if verificar_clave(reset_data.new_password, user.clave):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,

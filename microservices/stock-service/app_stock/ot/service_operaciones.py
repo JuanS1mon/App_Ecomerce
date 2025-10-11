@@ -11,7 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.Services.app_stock.ot.model_ot import Operacion, ReporteTiempo
+from Services.app_stock.ot.model_ot import Operacion, ReporteTiempo
 
 logger = logging.getLogger(__name__)
 
@@ -271,7 +271,7 @@ def update_operacion(db: Session, id: int, operacion_data: Dict[str, Any]) -> Op
         
         # Si se cambió el estado a "finalizada", verificar si todas las operaciones están finalizadas
         if operacion_data_copy.get('estado') == 'finalizada':
-            from sql_app.Services.app_stock.ot.service_ot import verificar_estado_ot
+            from Services.app_stock.ot.service_ot import verificar_estado_ot
             todas_finalizadas = verificar_estado_ot(db, updated_operacion.ot_id)
             
             if todas_finalizadas:

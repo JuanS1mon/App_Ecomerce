@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 # =============================
 # CONFIGURACIÓN DE CONSTANTES
 # =============================
-from sql_app.config import BASE_URL, SECRET, ALGORITHM  # Usar la configuración global
+from config import BASE_URL, SECRET, ALGORITHM  # Usar la configuración global
 
 ACTIVATION_TOKEN_EXPIRE_MINUTES = 1440  # 24 horas
 PASSWORD_RESET_EXPIRE_MINUTES = 60      # 1 hora
@@ -48,17 +48,17 @@ reset_attempts = {}
 max_reset_attempts = 5  # Limitar a 5 intentos por hora por IP
 
 # Project-specific imports
-from ..db.database import get_db
-from ..db.models.config.usuarios import Usuarios as UsuariosModel
-from ..db.schemas.config.Usuarios import (UserDB, UserRegistration, UserUpdate, PasswordChange,SecurePasswordResetRequest, ConfirmPasswordReset)
+from db.database import get_db
+from db.models.config.usuarios import Usuarios as UsuariosModel
+from db.schemas.config.Usuarios import (UserDB, UserRegistration, UserUpdate, PasswordChange,SecurePasswordResetRequest, ConfirmPasswordReset)
 
-from ..db.crud.config.Usuarios import (get_usuario,create_usuario,update_usuario,delete_usuario,gets_usuarios)
+from db.crud.config.Usuarios import (get_usuario,create_usuario,update_usuario,delete_usuario,gets_usuarios)
 
-from ..Services.security.security import (crear_access_token,get_current_user_secure,get_current_user,get_current_user_for_admin,encriptar_clave,sanitize_for_log,log_security_event,verify_password)
+from security.security import (crear_access_token,get_current_user_secure,get_current_user,get_current_user_for_admin,encriptar_clave,sanitize_for_log,log_security_event,verify_password)
 
-from ..Services.mail.mail import validar_email, enviar_email_simple
-from ..Services.security.get_optional_user import get_optional_user
-from ..Services.security.hybrid_validation import validate_password
+from Services.mail.mail import validar_email, enviar_email_simple
+from security.get_optional_user import get_optional_user
+from security.hybrid_validation import validate_password
 
 # Helper function to get client info for logging
 def get_client_info(request: Request = None) -> dict:
@@ -137,8 +137,8 @@ async def get_current_user_from_request(request: Request, db: Session = Depends(
     
     try:
         # Decodificar token usando la función existente
-        from ..Services.security.security import decodifica_token
-        from ..db.models.config.usuarios import Usuarios
+        from security.security import decodifica_token
+        from db.models.config.usuarios import Usuarios
         
         payload = decodifica_token(token)
         username = payload.get("sub")

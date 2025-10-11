@@ -5,10 +5,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import FileResponse, HTMLResponse
 from sqlalchemy.orm import Session
 
-from sql_app.db.database import get_db
-from sql_app.Services.app_stock.depositos_tipos.model_depositos_tipos import Depositos_tipos as Depositos_tiposModel
-from sql_app.Services.app_stock.depositos_tipos.schema_depositos_tipos import Depositos_tiposCreate, Depositos_tiposRead, Depositos_tiposUpdate
-from sql_app.Services.app_stock.depositos_tipos.service_depositos_tipos import (
+from db.database import get_db
+from Services.app_stock.depositos_tipos.model_depositos_tipos import Depositos_tipos as Depositos_tiposModel
+from Services.app_stock.depositos_tipos.schema_depositos_tipos import Depositos_tiposCreate, Depositos_tiposRead, Depositos_tiposUpdate
+from Services.app_stock.depositos_tipos.service_depositos_tipos import (
     create_depositos_tipos,
     delete_depositos_tipos,
     get_depositos_tipos,
@@ -16,7 +16,7 @@ from sql_app.Services.app_stock.depositos_tipos.service_depositos_tipos import (
     update_depositos_tipos
 )
 
-from sql_app.db.database import get_db
+from db.database import get_db
 
 logger = logging.getLogger(__name__)
 

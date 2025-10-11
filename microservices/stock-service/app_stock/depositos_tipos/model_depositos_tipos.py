@@ -3,7 +3,7 @@ from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integ
 from sqlalchemy.sql import func
 
 # Imports del proyecto
-from sql_app.db.database import Base
+from db.database import Base
 
 class Depositos_tipos(Base):
     __tablename__ = 'depositos_tipos'

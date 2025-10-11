@@ -1,4 +1,4 @@
-from sql_app.db.database import get_db
+from db.database import get_db
 from sqlalchemy import text
 
 def add_columns_manually():

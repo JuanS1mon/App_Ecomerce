@@ -1,6 +1,6 @@
 # Imports de bibliotecas estándar
-from sql_app.Services.app_stock.stock.model_stock import Stock  # Corregida la importación
-from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
+from Services.app_stock.stock.model_stock import Stock  # Corregida la importación
+from Services.app_stock.stock.model_stock import Stock as StockModel
 from datetime import date
 from typing import List, Optional, Dict, Any
 import logging

@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from sql_app.routers import frontend_pages
+from routers import frontend_pages
 import logging
 import os
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Inicializar base de datos (necesario para el explorador de tablas)
 try:
-    from sql_app.db.database import engine, create_tables, create_database
+    from db.database import engine, create_tables, create_database
     # Crear base de datos y tablas si no existen
     create_database()
     create_tables()
@@ -41,7 +41,7 @@ app.include_router(frontend_pages.router)
 
 # Importar y registrar el router de Generar
 try:
-    from sql_app.routers.config import Generar
+    from routers.config import Generar
     app.include_router(Generar.router)
     logger.info("✅ Router de Generar registrado (con Explorador de Tablas)")
 except Exception as e:

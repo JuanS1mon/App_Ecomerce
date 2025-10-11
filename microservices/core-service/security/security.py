@@ -7,19 +7,19 @@ La validación de contraseñas se realiza en hybrid_validation.py
 from passlib.context import CryptContext
 from fastapi import Request, Depends, HTTPException, status, Cookie
 from sqlalchemy.orm import Session
-from sql_app.db.schemas.config.Usuarios import UserDB, TokenData
-from sql_app.db.database import get_db
+from db.schemas.config.Usuarios import UserDB, TokenData
+from db.database import get_db
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
-from sql_app.config import SECRET_KEY, ALGORITHM
+from config import SECRET_KEY, ALGORITHM
 import logging
 import hashlib
 import secrets
 import string
 from typing import Optional, List
 from datetime import datetime, timedelta, timezone
-from sql_app.db.models.config.usuarios import Usuarios
-from sql_app.db.models.config.roles import Roles, usuario_roles
+from db.models.config.usuarios import Usuarios
+from db.models.config.roles import Roles, usuario_roles
 from fastapi.exceptions import HTTPException
 
 # Inicializar logger
@@ -305,7 +305,7 @@ def get_current_user_secure(token: str, db = None):
     try:
         payload = decodifica_token(token)
         # Debug solo en desarrollo
-        from sql_app.config import ENVIRONMENT
+        from config import ENVIRONMENT
         if ENVIRONMENT == "development":
             logger.debug(f"Token payload decodificado para usuario: {payload.get('sub', 'unknown')}")
         
@@ -319,12 +319,12 @@ def get_current_user_secure(token: str, db = None):
         
         # Si no se proporciona una sesión de base de datos, utiliza get_db
         if db is None:
-            from sql_app.db.database import get_db
+            from db.database import get_db
             db_generator = get_db()
             db = next(db_generator)
         
         # Buscar el usuario en la base de datos
-        from sql_app.db.models.config.usuarios import Usuarios as UsuariosModel
+        from db.models.config.usuarios import Usuarios as UsuariosModel
         user = db.query(UsuariosModel).filter(UsuariosModel.usuario == username).first()
         
         if ENVIRONMENT == "development":
@@ -346,7 +346,7 @@ def get_current_user_secure(token: str, db = None):
         
         # Cargar roles del usuario
         from sqlalchemy import text
-        from sql_app.db.schemas.config.Usuarios import Role
+        from db.schemas.config.Usuarios import Role
         
         # Acumular roles de ambas tablas
         roles = []

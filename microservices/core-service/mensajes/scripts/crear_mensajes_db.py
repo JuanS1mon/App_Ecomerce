@@ -16,9 +16,9 @@ project_root = os.path.dirname(sql_app_dir)  # raíz del proyecto
 sys.path.insert(0, project_root)
 
 from sqlalchemy.orm import Session
-from sql_app.db.database import get_db, engine
-from sql_app.db.models.config.mensajes import Mensajes
-from sql_app.db.models.config.usuarios import Usuarios
+from db.database import get_db, engine
+from db.models.config.mensajes import Mensajes
+from db.models.config.usuarios import Usuarios
 from datetime import datetime
 import json
 

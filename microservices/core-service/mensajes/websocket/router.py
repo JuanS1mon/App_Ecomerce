@@ -9,8 +9,8 @@ import json
 import logging
 from typing import Optional
 
-from sql_app.db.database import get_db
-from sql_app.db.models.config.usuarios import Usuarios
+from db.database import get_db
+from db.models.config.usuarios import Usuarios
 from .connection_manager import connection_manager
 from ..schema_mensajes import NotificacionMensaje
 

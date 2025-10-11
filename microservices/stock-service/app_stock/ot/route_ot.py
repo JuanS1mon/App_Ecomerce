@@ -12,9 +12,9 @@ from fastapi.responses import FileResponse, HTMLResponse
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.db.database import get_db
-from sql_app.Services.app_stock.ot.model_ot import OT as OtModel, Operacion as OperacionModel, ReporteTiempo as ReporteTiempoModel, OTMaterial as OTMaterialModel
-from sql_app.Services.app_stock.ot.schema_ot import (
+from db.database import get_db
+from Services.app_stock.ot.model_ot import OT as OtModel, Operacion as OperacionModel, ReporteTiempo as ReporteTiempoModel, OTMaterial as OTMaterialModel
+from Services.app_stock.ot.schema_ot import (
     OT as OtRead,
     OTCreate,
     OTUpdate,
@@ -29,7 +29,7 @@ from sql_app.Services.app_stock.ot.schema_ot import (
     OTMaterialUpdate,
     OTMaterialConsumo
 )
-from sql_app.Services.app_stock.ot.service_ot import (
+from Services.app_stock.ot.service_ot import (
     create_ot,
     delete_ot,
     finalizar_ot,
@@ -41,7 +41,7 @@ from sql_app.Services.app_stock.ot.service_ot import (
     actualizar_estado_ot_automatico,
     puede_modificar_ot
 )
-from sql_app.Services.app_stock.ot.service_operaciones import (
+from Services.app_stock.ot.service_operaciones import (
     calcular_horas_totales_operacion,
     create_operacion,
     create_reporte_tiempo,
@@ -55,7 +55,7 @@ from sql_app.Services.app_stock.ot.service_operaciones import (
     update_operacion,
     update_reporte_tiempo
 )
-from sql_app.Services.app_stock.ot.service_materiales import (
+from Services.app_stock.ot.service_materiales import (
     create_ot_material,
     get_ot_material,
     get_materiales_by_ot,

@@ -85,7 +85,7 @@ async def get_optional_user(request: Request, db: Session = Depends(get_db)):
                 # Convertir roles a objetos Role si son diccionarios
                 for role_data in roles_data:
                     if isinstance(role_data, dict):
-                        from sql_app.db.schemas.config.Usuarios import Role
+                        from db.schemas.config.Usuarios import Role
                         roles.append(Role(**role_data))
                     else:
                         roles.append(role_data)

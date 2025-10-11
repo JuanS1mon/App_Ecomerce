@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
-from sql_app.db.database import get_db
+from db.database import get_db
 from .service_detalle_orden_4096 import detalle_orden_4096_service
 from .schema_detalle_orden_4096 import Detalle_Orden_4096, Detalle_Orden_4096Create, Detalle_Orden_4096Update
 

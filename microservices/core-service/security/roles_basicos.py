@@ -2,7 +2,7 @@
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.db.database import engine
+from db.database import engine
 
 def init_roles():
     """Inicializa roles básicos en la base de datos"""

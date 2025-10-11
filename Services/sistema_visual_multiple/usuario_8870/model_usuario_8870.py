@@ -8,7 +8,7 @@ Módulo usuario_8870 generado desde Editor Visual
 """
 
 from sqlalchemy import Column, Integer, String, Boolean
-from sql_app.db.database import Base
+from db.database import Base
 
 class Usuario8870(Base):
     """

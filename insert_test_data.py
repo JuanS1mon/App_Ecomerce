@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql_app'))
 
 from sqlalchemy import text
-from sql_app.db.database import engine
+from db.database import engine
 
 def insert_test_data():
     """Insertar datos de prueba en algunas tablas"""

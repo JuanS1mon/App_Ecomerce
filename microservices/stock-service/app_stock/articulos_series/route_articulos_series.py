@@ -9,10 +9,10 @@ from fastapi.responses import FileResponse, HTMLResponse
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.db.database import get_db
-from sql_app.Services.app_stock.articulos_series.model_articulos_series import Articulos_series as Articulos_seriesModel
-from sql_app.Services.app_stock.articulos_series.schema_articulos_series import Articulos_seriesCreate, Articulos_seriesRead, Articulos_seriesUpdate
-from sql_app.Services.app_stock.articulos_series.service_articulos_series import (
+from db.database import get_db
+from Services.app_stock.articulos_series.model_articulos_series import Articulos_series as Articulos_seriesModel
+from Services.app_stock.articulos_series.schema_articulos_series import Articulos_seriesCreate, Articulos_seriesRead, Articulos_seriesUpdate
+from Services.app_stock.articulos_series.service_articulos_series import (
     create_articulos_series,
     delete_articulos_series,
     get_articulos_series,

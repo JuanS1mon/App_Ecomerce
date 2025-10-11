@@ -9,10 +9,10 @@ from fastapi.responses import FileResponse, HTMLResponse
 from sqlalchemy.orm import Session
 
 # Imports del proyecto
-from sql_app.db.database import get_db
-from sql_app.Services.app_stock.articulos_tipos.model_articulos_tipos import Articulos_tipos as Articulos_tiposModel
-from sql_app.Services.app_stock.articulos_tipos.schema_articulos_tipos import Articulos_tiposCreate, Articulos_tiposRead, Articulos_tiposUpdate
-from sql_app.Services.app_stock.articulos_tipos.service_articulos_tipos import (
+from db.database import get_db
+from Services.app_stock.articulos_tipos.model_articulos_tipos import Articulos_tipos as Articulos_tiposModel
+from Services.app_stock.articulos_tipos.schema_articulos_tipos import Articulos_tiposCreate, Articulos_tiposRead, Articulos_tiposUpdate
+from Services.app_stock.articulos_tipos.service_articulos_tipos import (
     create_articulos_tipos,
     delete_articulos_tipos,
     get_articulos_tipos,
@@ -20,7 +20,7 @@ from sql_app.Services.app_stock.articulos_tipos.service_articulos_tipos import (
     update_articulos_tipos
 )
 
-from sql_app.db.database import get_db
+from db.database import get_db
 
 logger = logging.getLogger(__name__)
 

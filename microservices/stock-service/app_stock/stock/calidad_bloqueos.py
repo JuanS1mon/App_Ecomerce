@@ -1,5 +1,5 @@
 # Imports de bibliotecas estándar
-from sql_app.Services.app_stock.articulos.model_calidad import CalidadBloqueo
+from Services.app_stock.articulos.model_calidad import CalidadBloqueo
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 import logging

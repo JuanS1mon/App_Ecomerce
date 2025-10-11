@@ -6,7 +6,7 @@ from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, St
 from sqlalchemy.orm import relationship
 
 # Imports del proyecto
-from sql_app.db.database import Base
+from db.database import Base
 
 class OT(Base):
     """

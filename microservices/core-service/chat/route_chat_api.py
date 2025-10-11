@@ -9,7 +9,7 @@ from typing import List, Dict, Any
 from pydantic import BaseModel
 from datetime import datetime
 
-from sql_app.db.database import get_db
+from db.database import get_db
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 

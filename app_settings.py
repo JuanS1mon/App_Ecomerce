@@ -5,7 +5,7 @@
 # así como las URLs de la documentación interactiva de FastAPI (Swagger y ReDoc).
 # =============================
 
-from sql_app.config import ORIGINS, ENVIRONMENT
+from config import ORIGINS, ENVIRONMENT
 
 # CORS_CONFIG:
 # Diccionario con la configuración de CORS (Cross-Origin Resource Sharing).

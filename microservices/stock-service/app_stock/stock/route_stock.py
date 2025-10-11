@@ -6,12 +6,12 @@ from fastapi.responses import FileResponse, HTMLResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from sql_app.db.database import get_db
-from sql_app.Services.app_stock.articulos.model_articulos import Articulos as ArticulosModel
-from sql_app.Services.app_stock.articulos.schema_articulos import ArticulosRead
-from sql_app.Services.app_stock.stock.model_stock import Stock as StockModel
-from sql_app.Services.app_stock.stock.schema_stock import StockCreate, StockRead, StockUpdate
-from sql_app.Services.app_stock.stock.service_stock import (
+from db.database import get_db
+from Services.app_stock.articulos.model_articulos import Articulos as ArticulosModel
+from Services.app_stock.articulos.schema_articulos import ArticulosRead
+from Services.app_stock.stock.model_stock import Stock as StockModel
+from Services.app_stock.stock.schema_stock import StockCreate, StockRead, StockUpdate
+from Services.app_stock.stock.service_stock import (
     anular_movimiento,
     create_stock,
     delete_stock,

@@ -3,7 +3,7 @@ from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integ
 from sqlalchemy.sql import func
 
 # Imports del proyecto
-from sql_app.db.database import Base
+from db.database import Base
 
 class Stock(Base):
     __tablename__ = 'stock'

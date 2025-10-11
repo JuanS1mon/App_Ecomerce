@@ -10,10 +10,10 @@ import os
 # Agregar el directorio raíz al path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from sql_app.routers.config.generator_config import (
+from routers.config.generator_config import (
     MultiTableServiceConfig, TableConfig, FieldConfig, RelationshipConfig
 )
-from sql_app.routers.config.generador_async_optimizado import (
+from routers.config.generador_async_optimizado import (
     generar_estructura_completa_optimizada, AsyncDecisionEngine, AsyncRouterGenerator
 )
 

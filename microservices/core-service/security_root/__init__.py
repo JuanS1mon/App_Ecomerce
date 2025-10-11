@@ -1,7 +1,7 @@
 # Este archivo indica que security es un paquete Python
 
-# Cambiar todos los imports de 'from sql_app.Services.security.' a 'from sql_app.security.'
-# Cambiar todos los imports relativos de '..Services.security.' y '...Services.security.' a 'from sql_app.security.'
+# Cambiar todos los imports de 'from Services.security.' a 'from security.'
+# Cambiar todos los imports relativos de '..Services.security.' y '...Services.security.' a 'from security.'
 
 # Mejoras de seguridad implementadas:
 # 1. Centralización de configuración sensible (SECRET, ALGORITHM, duración) en config.py y .env

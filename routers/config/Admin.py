@@ -5,12 +5,12 @@ from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request, s
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from sql_app.Services.security.utils import encriptar_clave
-from sql_app.Services.security.jwt_auth import get_current_user, require_admin
-from sql_app.Services.security.auth_middleware import require_admin_for_template, get_authenticated_user
-from sql_app.db.database import get_db
-from sql_app.db.models.config.usuarios import Usuarios
-from sql_app.db.schemas.config.Usuarios import UserDB
+from Services.security.utils import encriptar_clave
+from Services.security.jwt_auth import get_current_user, require_admin
+from Services.security.auth_middleware import require_admin_for_template, get_authenticated_user
+from db.database import get_db
+from db.models.config.usuarios import Usuarios
+from db.schemas.config.Usuarios import UserDB
 
 
 # Definir la instancia de Jinja2Templates

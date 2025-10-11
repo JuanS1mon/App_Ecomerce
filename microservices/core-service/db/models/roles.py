@@ -2,7 +2,7 @@
 from sqlalchemy import Column, Integer, String
 
 # Imports del proyecto
-from sql_app.db.database import Base
+from db.database import Base
 
 class Roles(Base):
     __tablename__ = "Roles"
