@@ -36,24 +36,24 @@ from middleware.jwt_middleware import JWTMiddleware
 # =============================
 # IMPORTACIONES DE DB Y ROUTERS
 # =============================
-from sql_app.db.database import get_db, create_database, create_tables, run_alembic_upgrade
-from sql_app.init_app import create_all_tables, ensure_directories
-from sql_app.routers import usuarios as aut_usuario
-from sql_app.routers import auth as auth_router
-from sql_app.routers import Blog
-from sql_app.routers.config import Generar, configDB, Migraciones, Analisis, Scraping, usuarios_admin
-from sql_app.routers.config import AdminNew as admin_router
-from sql_app.routers.config.Admin import router as admin_router
-from sql_app.routers import frontend_pages
-from sql_app.Services.security.admin_roles import router as roles_router
-from sql_app.Services.mail.mail import MAIL_CONFIG_OK, router as mail_router
-from sql_app.Services.tickets import route_ticket
-from sql_app.Services.app_stock.route_config_stock import configure_stock_routes
-from sql_app.Services.app_obras.route_config_obras import configure_obras_routes
+from db.database import get_db, create_database, create_tables, run_alembic_upgrade
+from init_app import create_all_tables, ensure_directories
+from routers import usuarios as aut_usuario
+from routers import auth as auth_router
+from routers import Blog
+from routers.config import Generar, configDB, Migraciones, Analisis, Scraping, usuarios_admin
+from routers.config import AdminNew as admin_router
+from routers.config.Admin import router as admin_router
+from routers import frontend_pages
+from Services.security.admin_roles import router as roles_router
+from Services.mail.mail import MAIL_CONFIG_OK, router as mail_router
+from Services.tickets import route_ticket
+from Services.app_stock.route_config_stock import configure_stock_routes
+from Services.app_obras.route_config_obras import configure_obras_routes
 
-from sql_app.routers.static_pages import router as static_pages_router
-from sql_app.logging_config import LOG_CONFIG
-from sql_app.app_settings import CORS_CONFIG, DOCS_URL, REDOC_URL
+from routers.static_pages import router as static_pages_router
+from logging_config import LOG_CONFIG
+from app_settings import CORS_CONFIG, DOCS_URL, REDOC_URL
 
 # =============================
 # INICIALIZACIÓN DE LA APP
@@ -185,7 +185,7 @@ app.include_router(Generar.router)
 
 # CONFIGURADOR AUTO DE RUTAS MULTI-TABLA - BIBLIOTECA SISTEMA
 try:
-    from sql_app.Services.biblioteca_sistema.route_config_biblioteca_sistema import configure_biblioteca_sistema_routes
+    from Services.biblioteca_sistema.route_config_biblioteca_sistema import configure_biblioteca_sistema_routes
     configure_biblioteca_sistema_routes(app)
     print("✅ Sistema biblioteca_sistema configurado exitosamente")
     print("🔗 Accede a: http://localhost:8000/static/html/forms/biblioteca_sistema/index.html")
@@ -194,7 +194,7 @@ except Exception as e:
 
 # ROUTER TEMPORAL PARA PROBAR GENERADOR OPTIMIZADO
 try:
-    from sql_app.routers.config.generador_test_optimizado import router as generador_optimizado_router
+    from routers.config.generador_test_optimizado import router as generador_optimizado_router
     app.include_router(generador_optimizado_router)
     print("✅ Router de generador optimizado agregado exitosamente")
 except Exception as e:
@@ -211,13 +211,13 @@ app.include_router(Scraping.router)
 app.include_router(route_ticket.router)
 app.include_router(roles_router)
 app.include_router(static_pages_router)
-from sql_app.routers.usuarios import usuarios_router
+from routers.usuarios import usuarios_router
 app.include_router(usuarios_router)
 configure_stock_routes(app)
 configure_obras_routes(app)
 
 # Importar y registrar el router de restablecimiento de contraseña
-from sql_app.routers.password_reset import router as password_reset_router
+from routers.password_reset import router as password_reset_router
 app.include_router(password_reset_router)
 
 # ENDPOINT DE PRUEBA PARA PROFILE

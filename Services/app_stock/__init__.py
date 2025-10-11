@@ -1,0 +1,1 @@
+# App stock services package
