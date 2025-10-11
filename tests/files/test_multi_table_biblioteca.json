@@ -1,0 +1,243 @@
+{
+  "service_name": "biblioteca_sistema",
+  "description": "Sistema completo de gestión de biblioteca con autores, libros y préstamos",
+  "version": "1.0.0",
+  "tables": [
+    {
+      "name": "autores",
+      "description": "Información de autores de libros",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true,
+          "nullable": false
+        },
+        {
+          "name": "nombre",
+          "field_type": "string",
+          "max_length": 100,
+          "nullable": false,
+          "description": "Nombre completo del autor"
+        },
+        {
+          "name": "email",
+          "field_type": "email",
+          "max_length": 150,
+          "nullable": true,
+          "description": "Email de contacto del autor"
+        },
+        {
+          "name": "fecha_nacimiento",
+          "field_type": "date",
+          "nullable": true,
+          "description": "Fecha de nacimiento del autor"
+        },
+        {
+          "name": "biografia",
+          "field_type": "text",
+          "nullable": true,
+          "description": "Biografía del autor"
+        }
+      ]
+    },
+    {
+      "name": "libros",
+      "description": "Catálogo de libros de la biblioteca",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true,
+          "nullable": false
+        },
+        {
+          "name": "titulo",
+          "field_type": "string",
+          "max_length": 200,
+          "nullable": false,
+          "description": "Título del libro"
+        },
+        {
+          "name": "isbn",
+          "field_type": "string",
+          "max_length": 20,
+          "unique": true,
+          "nullable": false,
+          "description": "Código ISBN del libro"
+        },
+        {
+          "name": "autor_id",
+          "field_type": "integer",
+          "foreign_key": "autores.id",
+          "nullable": false,
+          "description": "ID del autor del libro"
+        },
+        {
+          "name": "año_publicacion",
+          "field_type": "integer",
+          "nullable": true,
+          "description": "Año de publicación"
+        },
+        {
+          "name": "genero",
+          "field_type": "string",
+          "max_length": 50,
+          "nullable": true,
+          "description": "Género literario"
+        },
+        {
+          "name": "disponible",
+          "field_type": "boolean",
+          "nullable": false,
+          "default_value": "true",
+          "description": "Indica si el libro está disponible"
+        },
+        {
+          "name": "precio",
+          "field_type": "decimal",
+          "nullable": true,
+          "description": "Precio del libro"
+        }
+      ]
+    },
+    {
+      "name": "usuarios",
+      "description": "Usuarios registrados en la biblioteca",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true,
+          "nullable": false
+        },
+        {
+          "name": "nombre",
+          "field_type": "string",
+          "max_length": 100,
+          "nullable": false,
+          "description": "Nombre completo del usuario"
+        },
+        {
+          "name": "email",
+          "field_type": "email",
+          "max_length": 150,
+          "unique": true,
+          "nullable": false,
+          "description": "Email del usuario"
+        },
+        {
+          "name": "telefono",
+          "field_type": "phone",
+          "max_length": 20,
+          "nullable": true,
+          "description": "Teléfono de contacto"
+        },
+        {
+          "name": "fecha_registro",
+          "field_type": "datetime",
+          "nullable": false,
+          "description": "Fecha de registro en el sistema"
+        },
+        {
+          "name": "activo",
+          "field_type": "boolean",
+          "nullable": false,
+          "default_value": "true",
+          "description": "Indica si el usuario está activo"
+        }
+      ]
+    },
+    {
+      "name": "prestamos",
+      "description": "Registro de préstamos de libros",
+      "fields": [
+        {
+          "name": "id",
+          "field_type": "integer",
+          "primary_key": true,
+          "auto_increment": true,
+          "nullable": false
+        },
+        {
+          "name": "usuario_id",
+          "field_type": "integer",
+          "foreign_key": "usuarios.id",
+          "nullable": false,
+          "description": "ID del usuario que solicita el préstamo"
+        },
+        {
+          "name": "libro_id",
+          "field_type": "integer",
+          "foreign_key": "libros.id",
+          "nullable": false,
+          "description": "ID del libro prestado"
+        },
+        {
+          "name": "fecha_prestamo",
+          "field_type": "datetime",
+          "nullable": false,
+          "description": "Fecha y hora del préstamo"
+        },
+        {
+          "name": "fecha_devolucion_esperada",
+          "field_type": "date",
+          "nullable": false,
+          "description": "Fecha esperada de devolución"
+        },
+        {
+          "name": "fecha_devolucion_real",
+          "field_type": "datetime",
+          "nullable": true,
+          "description": "Fecha real de devolución (null si no se ha devuelto)"
+        },
+        {
+          "name": "estado",
+          "field_type": "string",
+          "max_length": 20,
+          "nullable": false,
+          "default_value": "activo",
+          "description": "Estado del préstamo: activo, devuelto, vencido"
+        },
+        {
+          "name": "observaciones",
+          "field_type": "text",
+          "nullable": true,
+          "description": "Observaciones adicionales del préstamo"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "relationship_type": "one_to_many",
+      "from_table": "autores",
+      "from_field": "id",
+      "to_table": "libros",
+      "to_field": "autor_id",
+      "relationship_name": "libros",
+      "back_populates": "autor"
+    },
+    {
+      "relationship_type": "one_to_many",
+      "from_table": "usuarios",
+      "from_field": "id",
+      "to_table": "prestamos",
+      "to_field": "usuario_id",
+      "relationship_name": "prestamos",
+      "back_populates": "usuario"
+    },
+    {
+      "relationship_type": "one_to_many",
+      "from_table": "libros",
+      "from_field": "id",
+      "to_table": "prestamos",
+      "to_field": "libro_id",
+      "relationship_name": "prestamos",
+      "back_populates": "libro"
+    }
+  ]
+}

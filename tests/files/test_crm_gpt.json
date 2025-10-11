@@ -1,0 +1,113 @@
+{
+  "service_name": "crm_empresarial",
+  "description": "Aplicación CRM para gestión de clientes, empresas, contactos, oportunidades y tareas.",
+  "tables": [
+    {
+      "name": "empresas",
+      "description": "Información de las empresas clientes",
+      "position": {"x": 400, "y": 80},
+      "fields": [
+        {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false},
+        {"name": "nombre", "field_type": "string", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "sector", "field_type": "string", "primary_key": false, "auto_increment": false, "nullable": true},
+        {"name": "telefono", "field_type": "string", "primary_key": false, "auto_increment": false, "nullable": true},
+        {"name": "email", "field_type": "email", "primary_key": false, "auto_increment": false, "nullable": true},
+        {"name": "created_at", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "updated_at", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "active", "field_type": "boolean", "primary_key": false, "auto_increment": false, "nullable": false}
+      ]
+    },
+    {
+      "name": "clientes",
+      "description": "Datos de clientes asociados a empresas",
+      "position": {"x": 150, "y": 250},
+      "fields": [
+        {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false},
+        {"name": "id_empresa", "field_type": "integer", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "nombre", "field_type": "string", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "email", "field_type": "email", "primary_key": false, "auto_increment": false, "nullable": true},
+        {"name": "telefono", "field_type": "string", "primary_key": false, "auto_increment": false, "nullable": true},
+        {"name": "direccion", "field_type": "string", "primary_key": false, "auto_increment": false, "nullable": true},
+        {"name": "created_at", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "updated_at", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "active", "field_type": "boolean", "primary_key": false, "auto_increment": false, "nullable": false}
+      ]
+    },
+    {
+      "name": "contactos",
+      "description": "Historial y medios de contacto con clientes",
+      "position": {"x": 650, "y": 250},
+      "fields": [
+        {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false},
+        {"name": "id_cliente", "field_type": "integer", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "tipo", "field_type": "string", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "detalle", "field_type": "string", "primary_key": false, "auto_increment": false, "nullable": true},
+        {"name": "fecha_contacto", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "created_at", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "updated_at", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "active", "field_type": "boolean", "primary_key": false, "auto_increment": false, "nullable": false}
+      ]
+    },
+    {
+      "name": "oportunidades",
+      "description": "Oportunidades de ventas y negocios",
+      "position": {"x": 400, "y": 250},
+      "fields": [
+        {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false},
+        {"name": "id_cliente", "field_type": "integer", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "titulo", "field_type": "string", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "valor_estimado", "field_type": "integer", "primary_key": false, "auto_increment": false, "nullable": true},
+        {"name": "estado", "field_type": "string", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "fecha_cierre", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": true},
+        {"name": "created_at", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "updated_at", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "active", "field_type": "boolean", "primary_key": false, "auto_increment": false, "nullable": false}
+      ]
+    },
+    {
+      "name": "tareas",
+      "description": "Tareas asignadas para seguimiento",
+      "position": {"x": 400, "y": 420},
+      "fields": [
+        {"name": "id", "field_type": "integer", "primary_key": true, "auto_increment": true, "nullable": false},
+        {"name": "id_oportunidad", "field_type": "integer", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "descripcion", "field_type": "string", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "fecha_limite", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "completada", "field_type": "boolean", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "created_at", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "updated_at", "field_type": "datetime", "primary_key": false, "auto_increment": false, "nullable": false},
+        {"name": "active", "field_type": "boolean", "primary_key": false, "auto_increment": false, "nullable": false}
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from_table": "empresas",
+      "to_table": "clientes",
+      "relationship_type": "one_to_many",
+      "from_field": "id",
+      "to_field": "id_empresa"
+    },
+    {
+      "from_table": "clientes",
+      "to_table": "contactos",
+      "relationship_type": "one_to_many",
+      "from_field": "id",
+      "to_field": "id_cliente"
+    },
+    {
+      "from_table": "clientes",
+      "to_table": "oportunidades",
+      "relationship_type": "one_to_many",
+      "from_field": "id",
+      "to_field": "id_cliente"
+    },
+    {
+      "from_table": "oportunidades",
+      "to_table": "tareas",
+      "relationship_type": "one_to_many",
+      "from_field": "id",
+      "to_field": "id_oportunidad"
+    }
+  ]
+}
