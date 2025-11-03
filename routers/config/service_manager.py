@@ -33,7 +33,7 @@ router = APIRouter(
         500: {"model": ServiceResponse, "description": "Error interno del servidor"}
     },
 )
-templates = Jinja2Templates(directory="sql_app/static")
+templates = Jinja2Templates(directory="static")
 
 
 

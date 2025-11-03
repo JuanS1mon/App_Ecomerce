@@ -7,6 +7,7 @@ La validación de contraseñas se realiza en hybrid_validation.py
 from passlib.context import CryptContext
 from fastapi import Request, Depends, HTTPException, status, Cookie
 from sqlalchemy.orm import Session
+from db.models.config.roles import Roles
 from db.schemas.config.Usuarios import UserDB, TokenData
 from db.database import get_db
 from fastapi.security import OAuth2PasswordBearer
@@ -19,7 +20,7 @@ import string
 from typing import Optional, List
 from datetime import datetime, timedelta, timezone
 from db.models.config.usuarios import Usuarios
-from db.models.config.roles import Roles, usuario_roles
+from db.models.config.usuarios_rol import UsuariosRol
 from fastapi.exceptions import HTTPException
 
 # Inicializar logger
@@ -63,7 +64,7 @@ def get_current_user_for_admin(
             raise credentials_exception
 
         # Cargar roles del usuario
-        roles_query = db.query(Roles.nombre).join(usuario_roles, usuario_roles.c.rol_id == Roles.id).filter(usuario_roles.c.usuario_id == user.codigo).all()
+        roles_query = db.query(Roles.nombre).join(UsuariosRol, UsuariosRol.rol_id == Roles.id).filter(UsuariosRol.usuario_id == user.codigo).all()
         user.roles = [role[0].lower() for role in roles_query]
         logger.debug(f"✅ Roles cargados para el usuario {username}: {user.roles}")
 
@@ -102,6 +103,16 @@ def encriptar_clave(clave: str) -> str:
     if not clave:
         raise ValueError("La contraseña no puede estar vacía")
     
+    # Truncar contraseña a 72 bytes máximo (limitación de bcrypt)
+    try:
+        clave_bytes = clave.encode('utf-8')
+        if len(clave_bytes) > 72:
+            # Truncar a 72 bytes y decodificar de forma segura
+            clave = clave_bytes[:72].decode('utf-8', errors='ignore')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        # Si hay problemas de encoding, truncar a nivel de string
+        clave = clave[:72] if len(clave) > 72 else clave
+    
     try:
         hashed = pwd_context.hash(clave)
         logger.info("Contraseña encriptada exitosamente")
@@ -115,6 +126,17 @@ def verificar_clave(password: str, hashed_password: str) -> bool:
     if not password or not hashed_password:
         logger.warning("Password o hash vacío proporcionado")
         return False
+    
+    # Truncar contraseña a 72 bytes máximo (limitación de bcrypt)
+    # Usar encode/decode seguro para evitar problemas con UTF-8
+    try:
+        password_bytes = password.encode('utf-8')
+        if len(password_bytes) > 72:
+            # Truncar a 72 bytes y decodificar de forma segura
+            password = password_bytes[:72].decode('utf-8', errors='ignore')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        # Si hay problemas de encoding, truncar a nivel de string
+        password = password[:72] if len(password) > 72 else password
     
     try:
         is_valid = pwd_context.verify(password, hashed_password)
@@ -408,6 +430,16 @@ def user_pass(db: Session, username: str, password: str):
             stored_hash = result[0]
             print(f"DIAGNÓSTICO USER_PASS - Hash almacenado: {stored_hash}")
             
+            # Truncar contraseña a 72 bytes máximo (limitación de bcrypt)
+            try:
+                password_bytes = password.encode('utf-8')
+                if len(password_bytes) > 72:
+                    # Truncar a 72 bytes y decodificar de forma segura
+                    password = password_bytes[:72].decode('utf-8', errors='ignore')
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                # Si hay problemas de encoding, truncar a nivel de string
+                password = password[:72] if len(password) > 72 else password
+            
             is_valid = verificar_clave(password, stored_hash)
             print(f"DIAGNÓSTICO USER_PASS - Verificación de contraseña: {'exitosa' if is_valid else 'fallida'}")
             
@@ -434,9 +466,10 @@ def authenticate_user(db: Session, username: str, password: str, request: Reques
             logger.warning(f"Intento de inicio de sesión fallido para usuario inexistente: {sanitize_for_log(username)}")
             return None
         
-        if not verificar_clave(password, hashed_password):
-            logger.warning(f"Contraseña incorrecta para usuario: {sanitize_for_log(username)}")
-            return None
+        # La verificación ya se hizo en user_pass, no es necesario repetirla
+        # if not verificar_clave(password, hashed_password):
+        #     logger.warning(f"Contraseña incorrecta para usuario: {sanitize_for_log(username)}")
+        #     return None
             
         # Obtener información completa del usuario usando SQL directo (evita problemas de ORM)
         from sqlalchemy import text

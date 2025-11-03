@@ -8,19 +8,21 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status, Form
 from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 # Project-specific imports
 from db.database import get_db
 from db.schemas.config.Usuarios import Token, UserDB
+from db.models.security.token_blacklist import TokenBlacklist
 from security.jwt_auth import (
     create_access_token,
     get_current_user,
     get_optional_user,
     authenticate_user_jwt,
     log_auth_event,
+    verify_token,
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
 
@@ -103,7 +105,8 @@ async def login(
     # DEBUG: Log detallado de datos recibidos
     logger.debug(f"🔍 LOGIN DEBUG:")
     logger.debug(f"  Username recibido: '{username}'")
-    logger.debug(f"  Password recibido: {'*' * len(password) if password else 'None'}")
+    logger.debug(f"  Password recibido: {'*' * len(password) if password else 'None'} (longitud: {len(password) if password else 0})")
+    logger.debug(f"  Password bytes: {password.encode('utf-8') if password else 'None'}")
     logger.debug(f"  Next recibido: '{next}'")
     logger.debug(f"  Request query params: {dict(request.query_params) if request else 'None'}")    
     try:
@@ -144,7 +147,7 @@ async def login(
                 )
             else:
                 from fastapi.responses import HTMLResponse
-                with open("sql_app/static/login_error.html", "r", encoding="utf-8") as f:
+                with open("static/login_error.html", "r", encoding="utf-8") as f:
                     html = f.read()
                 return HTMLResponse(content=html, status_code=400)
         
@@ -165,7 +168,7 @@ async def login(
                 )
             else:
                 from fastapi.responses import HTMLResponse
-                with open("sql_app/static/html/error_login.html", "r", encoding="utf-8") as f:
+                with open("static/login_error.html", "r", encoding="utf-8") as f:
                     html = f.read()
                 return HTMLResponse(content=html, status_code=401)
         
@@ -208,7 +211,15 @@ async def login(
             )
 
         # Si es formulario HTML, establecer el token como cookie HttpOnly y redirigir
-        response = RedirectResponse(url=next_url or "/", status_code=303)
+        # Determinar la URL de redirección por defecto basada en roles
+        default_redirect = "/"
+        if user.get("roles"):
+            # Verificar si el usuario tiene rol de admin
+            admin_role = any(role.lower() == "admin" for role in user["roles"])
+            if admin_role:
+                default_redirect = "/admin"
+        
+        response = RedirectResponse(url=next_url or default_redirect, status_code=303)
         response.set_cookie(
             key="access_token",
             value=access_token,
@@ -233,21 +244,59 @@ async def login(
 @router.post("/logout")
 async def logout(
     request: Request,
-    user: Optional[UserDB] = Depends(get_optional_user)
+    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
+    user: Optional[UserDB] = Depends(get_optional_user),
+    db: Session = Depends(get_db)
 ):
     """
-    Cierra sesión del usuario
-    Elimina la cookie de autenticación y redirige al login
+    Cierra sesión del usuario (método POST para APIs)
+    Invalida el token agregándolo a la lista negra
     """
+    from fastapi.security import HTTPBearer
+    from datetime import datetime, timezone
+    from jose import jwt
+    
     client_info = get_client_info(request)
     
     try:
-        if user:
-            log_auth_event(
-                "LOGOUT_SUCCESS",
-                {"username": user.usuario, **client_info},
-                "INFO"
-            )
+        # Extraer el token del header Authorization
+        token = None
+        if credentials and credentials.credentials:
+            token = credentials.credentials
+        
+        if token and user:
+            # Decodificar el token para obtener la fecha de expiración
+            try:
+                payload = jwt.decode(token, options={"verify_signature": False})
+                exp_timestamp = payload.get("exp")
+                if exp_timestamp:
+                    fecha_expiracion = datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
+                else:
+                    # Si no tiene exp, usar 1 hora desde ahora
+                    from datetime import timedelta
+                    fecha_expiracion = datetime.now(timezone.utc) + timedelta(hours=1)
+                
+                # Agregar el token a la lista negra
+                TokenBlacklist.add_to_blacklist(
+                    db=db,
+                    token=token,
+                    usuario_codigo=user.codigo,
+                    fecha_expiracion=fecha_expiracion,
+                    razon='logout',
+                    user_agent=client_info.get('user_agent'),
+                    ip_address=client_info.get('client_ip')
+                )
+                
+                log_auth_event(
+                    "LOGOUT_SUCCESS",
+                    {"username": user.usuario, "token_invalidado": True, **client_info},
+                    "INFO"
+                )
+                
+                logger.info(f"✅ Token invalidado para usuario: {user.usuario}")
+                
+            except Exception as e:
+                logger.error(f"Error al invalidar token: {str(e)}")
         
         # Detectar si es petición API
         is_api_request = False
@@ -260,7 +309,8 @@ async def logout(
             return JSONResponse(
                 content={
                     "message": "Sesión cerrada exitosamente",
-                    "instruction": "Elimine el token del almacenamiento local"
+                    "token_invalidado": True,
+                    "instruction": "El token ha sido invalidado en el servidor"
                 },
                 status_code=status.HTTP_200_OK
             )
@@ -272,6 +322,73 @@ async def logout(
         
     except Exception as e:
         logger.error(f"Error en logout: {str(e)}")
+        
+        # En caso de error, también limpiar cookie y redirigir
+        response = RedirectResponse(url="/loginpage", status_code=status.HTTP_303_SEE_OTHER)
+        response.delete_cookie(key="access_token")
+        return response
+
+@router.get("/logout")
+async def logout_get(
+    request: Request,
+    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
+    user: Optional[UserDB] = Depends(get_optional_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Cierra sesión del usuario (método GET para navegador)
+    Invalida el token y redirige al login
+    """
+    from datetime import datetime, timezone, timedelta
+    from jose import jwt
+    
+    client_info = get_client_info(request)
+    
+    try:
+        # Extraer el token del header Authorization
+        token = None
+        if credentials and credentials.credentials:
+            token = credentials.credentials
+        
+        if token and user:
+            # Decodificar el token para obtener la fecha de expiración
+            try:
+                payload = jwt.decode(token, options={"verify_signature": False})
+                exp_timestamp = payload.get("exp")
+                if exp_timestamp:
+                    fecha_expiracion = datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
+                else:
+                    fecha_expiracion = datetime.now(timezone.utc) + timedelta(hours=1)
+                
+                # Agregar el token a la lista negra
+                TokenBlacklist.add_to_blacklist(
+                    db=db,
+                    token=token,
+                    usuario_codigo=user.codigo,
+                    fecha_expiracion=fecha_expiracion,
+                    razon='logout',
+                    user_agent=client_info.get('user_agent'),
+                    ip_address=client_info.get('client_ip')
+                )
+                
+                log_auth_event(
+                    "LOGOUT_SUCCESS",
+                    {"username": user.usuario, "token_invalidado": True, **client_info},
+                    "INFO"
+                )
+                
+                logger.info(f"✅ Token invalidado para usuario: {user.usuario}")
+                
+            except Exception as e:
+                logger.error(f"Error al invalidar token: {str(e)}")
+        
+        # Limpiar cookie y redirigir
+        response = RedirectResponse(url="/loginpage", status_code=status.HTTP_303_SEE_OTHER)
+        response.delete_cookie(key="access_token")
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error en logout GET: {str(e)}")
         
         # En caso de error, también limpiar cookie y redirigir
         response = RedirectResponse(url="/loginpage", status_code=status.HTTP_303_SEE_OTHER)
@@ -389,6 +506,61 @@ async def login_debug(username: str, request: Request, db: Session = Depends(get
     )
     
     return response
+
+@router.post("/debug-password")
+async def debug_password_endpoint(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...)
+):
+    """
+    Endpoint temporal para debug de contraseñas - SOLO PARA DESARROLLO
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    logger.error("🚨 DEBUG PASSWORD ENDPOINT ACTIVADO")
+    logger.error(f"Username recibido: '{username}'")
+    logger.error(f"Password recibido: '{password}'")
+    logger.error(f"Password repr: {repr(password)}")
+    logger.error(f"Password bytes: {password.encode('utf-8')}")
+    logger.error(f"Password length: {len(password)}")
+    logger.error(f"Password bytes length: {len(password.encode('utf-8'))}")
+    
+    # Verificar si la contraseña tiene caracteres especiales
+    has_special_chars = any(ord(c) > 127 for c in password)
+    logger.error(f"Has non-ASCII chars: {has_special_chars}")
+    
+    # Mostrar caracteres uno por uno
+    char_info = []
+    for i, c in enumerate(password):
+        char_info.append(f"[{i}]: '{c}' (ord: {ord(c)})")
+    logger.error(f"Character analysis: {' | '.join(char_info[:20])}")  # Solo primeros 20
+    
+    # Intentar autenticar para ver qué pasa
+    from db.database import get_db
+    from security.jwt_auth import authenticate_user_jwt
+    from sqlalchemy.orm import Session
+    
+    db_gen = get_db()
+    db = next(db_gen)
+    
+    try:
+        result = authenticate_user_jwt(db, username, password)
+        logger.error(f"Authentication result: {result is not None}")
+        if result:
+            logger.error(f"User authenticated: {result['username']}")
+        else:
+            logger.error("Authentication failed")
+    except Exception as e:
+        logger.error(f"Authentication error: {str(e)}")
+    
+    return {
+        "debug": "Check server logs for detailed password analysis",
+        "username": username,
+        "password_length": len(password),
+        "has_special_chars": has_special_chars
+    }
 
 # NOTA IMPORTANTE PARA RUTAS PROTEGIDAS:
 # Todas las rutas que requieran autenticación deben usar Depends(get_current_user) y esperar el token en el header Authorization: Bearer <token>.

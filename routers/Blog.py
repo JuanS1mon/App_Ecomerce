@@ -11,8 +11,8 @@
 
 
 
-from db.models.Blog import BlogPost as BlogPostModel
-from db.schemas.Blog import BlogPost, BlogPostCreate, BlogPostUpdate
+from db.models.config.blog_posts import BlogPost as BlogPostModel
+from db.schemas.Blog import BlogPostSchema, BlogPostCreate, BlogPostUpdate
 from starlette.responses import HTMLResponse, RedirectResponse
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
@@ -27,7 +27,7 @@ router = APIRouter(
     responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
 )
 
-@router.post("/blog/", response_model=BlogPost)
+@router.post("/blog/", response_model=BlogPostSchema)
 def create_blog_post(blog_post: BlogPostCreate, db: Session = Depends(get_db)):
     db_blog_post = BlogPostModel(**blog_post.dict())
     db.add(db_blog_post)
@@ -35,14 +35,14 @@ def create_blog_post(blog_post: BlogPostCreate, db: Session = Depends(get_db)):
     db.refresh(db_blog_post)
     return db_blog_post
 
-@router.get("/blog/{post_id}", response_model=BlogPost)
+@router.get("/blog/{post_id}", response_model=BlogPostSchema)
 def read_blog_post(post_id: int, db: Session = Depends(get_db)):
     db_blog_post = db.query(BlogPostModel).filter(BlogPostModel.id == post_id).first()
     if db_blog_post is None:
         raise HTTPException(status_code=404, detail="Blog post not found")
     return db_blog_post
 
-@router.put("/blog/{post_id}", response_model=BlogPost)
+@router.put("/blog/{post_id}", response_model=BlogPostSchema)
 def update_blog_post(post_id: int, blog_post: BlogPostUpdate, db: Session = Depends(get_db)):
     db_blog_post = db.query(BlogPostModel).filter(BlogPostModel.id == post_id).first()
     if db_blog_post is None:
@@ -67,7 +67,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
 # Configurar Jinja2Templates para buscar en el directorio "static/html"
-templates = Jinja2Templates(directory="sql_app/static/html")
+templates = Jinja2Templates(directory="static/html")
 
 
 # Ejemplo de ruta para renderizar la plantilla

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Carrito con localStorage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">Prueba Carrito con localStorage</h1>
+
+        <!-- Contador del carrito -->
+        <div class="mb-4">
+            <span class="text-lg">Items en carrito: <span id="cart-count" class="font-bold">0</span></span>
+        </div>
+
+        <!-- Productos de prueba -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-2">Producto 1</h3>
+                <p class="text-gray-600 mb-4">Precio: $10.00</p>
+                <button onclick="addToCart(1, 1, 10.00)" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Agregar al Carrito
+                </button>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-2">Producto 2</h3>
+                <p class="text-gray-600 mb-4">Precio: $15.00</p>
+                <button onclick="addToCart(2, 1, 15.00)" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Agregar al Carrito
+                </button>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-2">Producto 3</h3>
+                <p class="text-gray-600 mb-4">Precio: $20.00</p>
+                <button onclick="addToCart(3, 1, 20.00)" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Agregar al Carrito
+                </button>
+            </div>
+        </div>
+
+        <!-- Botón para ver carrito -->
+        <button onclick="toggleCart()" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 mb-4">
+            Ver Carrito
+        </button>
+
+        <!-- Botón para recargar página (simular navegación) -->
+        <button onclick="location.reload()" class="bg-yellow-500 text-white px-6 py-3 rounded-lg hover:bg-yellow-600 mb-4 ml-4">
+            Recargar Página (Simular Navegación)
+        </button>
+
+        <!-- Información de debug -->
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold mb-2">Debug Info</h3>
+            <button onclick="debugCart()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                Mostrar Estado del Carrito
+            </button>
+            <button onclick="clearLocalStorage()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-2">
+                Limpiar localStorage
+            </button>
+
+            <!-- Simulación de login -->
+            <div class="mt-4 p-4 border-t">
+                <h4 class="font-semibold mb-2">Simular Login (para probar sincronización)</h4>
+                <button onclick="simulateLogin()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                    Simular Login y Sincronización
+                </button>
+                <p class="text-sm text-gray-600 mt-2">Esto simulará que un usuario se autentica y sincronizará el carrito local con el servidor.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar del carrito -->
+    <div id="cart-sidebar" class="fixed right-0 top-0 h-full w-96 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <div class="p-4 border-b">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold">Carrito de Compras</h2>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="cart-items" class="flex-1 p-4 overflow-y-auto">
+            <!-- Items del carrito se renderizan aquí -->
+        </div>
+
+        <div id="cart-footer" class="border-t p-4">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-lg font-semibold">Total:</span>
+                <span id="cart-total" class="text-lg font-bold">$0.00</span>
+            </div>
+            <button class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+                Proceder al Pago
+            </button>
+        </div>
+
+        <div id="empty-cart" class="hidden p-8 text-center">
+            <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500">Tu carrito está vacío</p>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40" onclick="toggleCart()"></div>
+
+    <!-- Scripts -->
+    <script src="/static/ecomerce/carrito.js"></script>
+    <script>
+        // Función para limpiar localStorage (para testing)
+        function clearLocalStorage() {
+            localStorage.removeItem('ecommerce_cart_local');
+            location.reload();
+        }
+
+        // Función para simular login y sincronización
+        async function simulateLogin() {
+            // Simular que obtenemos un token (en la realidad vendría del login)
+            const fakeToken = 'fake_jwt_token_for_testing';
+
+            // Guardar token en sessionStorage y cookies (simulando login exitoso)
+            sessionStorage.setItem('ecommerce_token', fakeToken);
+            document.cookie = `ecommerce_token=${fakeToken}; path=/; max-age=86400`;
+
+            // Simular que obtenemos userId
+            sessionStorage.setItem('ecommerce_user_id', '1');
+            document.cookie = `ecommerce_user_id=1; path=/; max-age=86400`;
+
+            alert('Login simulado completado. Ahora probando sincronización del carrito local...');
+
+            // Llamar a la función de sincronización del carrito
+            if (window.cart && window.cart.syncLocalCartWithServer) {
+                await window.cart.syncLocalCartWithServer();
+                alert('Sincronización completada. El carrito local debería haberse enviado al servidor.');
+            }
+
+            // Recargar el carrito para mostrar items del servidor
+            if (window.cart && window.cart.loadCart) {
+                window.cart.loadCart(true);
+            }
+        }
+
+        // Inicializar carrito cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar carrito
+            if (window.cart && window.cart.initCart) {
+                window.cart.initCart();
+            }
+        });
+    </script>
+</body>
+</html>

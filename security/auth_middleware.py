@@ -29,7 +29,8 @@ from sqlalchemy import func
 
 from db.database import get_db
 from db.models.config.usuarios import Usuarios
-from db.models.config.roles import Roles, usuario_roles
+from db.models.config.usuarios_rol import UsuariosRol
+from db.models.config.roles import Roles
 from db.schemas.config.Usuarios import UserDB
 from security.jwt_auth import verify_token, JWTAuthError
 
@@ -70,10 +71,15 @@ def extract_token_from_request(request: Request) -> Optional[str]:
         logger.debug("Token encontrado en Authorization header")
         return token
     
-    # 3. Intentar desde cookies (fallback)
+    # 3. Intentar desde cookies (primero ecommerce_token, luego access_token)
+    token = request.cookies.get("ecommerce_token")
+    if token:
+        logger.debug("Token encontrado en cookie ecommerce_token")
+        return token
+    
     token = request.cookies.get("access_token")
     if token:
-        logger.debug("Token encontrado en cookies")
+        logger.debug("Token encontrado en cookie access_token")
         return token
 
     logger.debug("No se encontró token en la petición")
@@ -94,8 +100,11 @@ def get_user_from_token(token: str, db: Session) -> UserDB:
         AuthenticationError: Si el token es inválido o el usuario no existe
     """
     try:
+        logger.debug(f"🔍 Verificando token para autenticación...")
+        
         # Verificar token
         token_data = verify_token(token)
+        logger.debug(f"🔑 Token válido para usuario: {token_data.username}")
         
         # Buscar usuario
         user = db.query(Usuarios).filter(
@@ -107,33 +116,40 @@ def get_user_from_token(token: str, db: Session) -> UserDB:
         
         if not user.activo:
             raise AuthenticationError(f"Usuario inactivo: {token_data.username}")
+            
+        logger.debug(f"👤 Usuario encontrado: {user.usuario} (código: {user.codigo})")
           # Cargar roles - con manejo de errores para compatibilidad
         try:
             roles_query = db.query(Roles.nombre).join(
-                usuario_roles, 
-                usuario_roles.c.rol_id == Roles.id
+                UsuariosRol, 
+                UsuariosRol.rol_id == Roles.id
             ).filter(
-                usuario_roles.c.usuario_id == user.codigo
+                UsuariosRol.usuario_id == user.codigo
             ).all()
             
             user.roles = [role[0].lower() for role in roles_query]
+            logger.debug(f"🎭 Roles cargados desde BD: {user.roles}")
             
             # Si no tiene roles asignados, usar rol por defecto basado en el usuario
             if not user.roles:
                 if user.usuario.lower() in ['admin', 'administrador']:
                     user.roles = ['admin']
+                    logger.debug(f"🔧 Rol por defecto asignado (admin): {user.roles}")
                 else:
                     user.roles = ['usuario']
+                    logger.debug(f"🔧 Rol por defecto asignado (usuario): {user.roles}")
                     
         except Exception as e:
             logger.warning(f"Error cargando roles para {user.usuario}: {str(e)}")
             # Usar rol por defecto basado en el nombre del usuario
             if user.usuario.lower() in ['admin', 'administrador']:
                 user.roles = ['admin']
+                logger.debug(f"🔧 Rol de emergencia asignado (admin): {user.roles}")
             else:
                 user.roles = ['usuario']
+                logger.debug(f"🔧 Rol de emergencia asignado (usuario): {user.roles}")
         
-        logger.info(f"Usuario autenticado exitosamente: {user.usuario}")
+        logger.info(f"✅ Usuario autenticado exitosamente: {user.usuario} con roles {user.roles}")
         return user
         
     except JWTAuthError as e:
@@ -154,6 +170,9 @@ def get_dashboard_data(user: UserDB, db: Session) -> Dict[str, Any]:
         Diccionario con datos del dashboard
     """
     try:
+        logger.debug(f"📊 Obteniendo datos del dashboard para: {user.usuario}")
+        logger.debug(f"🎭 Roles del usuario: {user.roles}")
+        
         # Contar usuarios totales
         user_count = db.query(func.count(Usuarios.codigo)).scalar() or 0
         
@@ -171,7 +190,11 @@ def get_dashboard_data(user: UserDB, db: Session) -> Dict[str, Any]:
                 "timestamp": "hace 2 horas"  # Aquí podrías usar una fecha real
             })
         
-        return {
+        # Calcular is_admin
+        is_admin = "admin" in user.roles
+        logger.debug(f"🔐 Calculando is_admin: 'admin' in {user.roles} = {is_admin}")
+        
+        dashboard_data = {
             "user": {
                 "codigo": user.codigo,
                 "usuario": user.usuario,
@@ -183,13 +206,19 @@ def get_dashboard_data(user: UserDB, db: Session) -> Dict[str, Any]:
             "user_count": user_count,
             "activity_count": len(activities),
             "activities": activities,
-            "is_admin": "admin" in user.roles,
+            "is_admin": is_admin,
             "is_authenticated": True
         }
+        
+        logger.debug(f"📋 Dashboard data generado - is_admin: {dashboard_data['is_admin']}")
+        return dashboard_data
         
     except Exception as e:
         logger.error(f"Error obteniendo datos del dashboard: {str(e)}")
         # Devolver datos mínimos en caso de error
+        is_admin_fallback = "admin" in user.roles
+        logger.debug(f"🔧 Fallback - is_admin: {is_admin_fallback}")
+        
         return {
             "user": {
                 "codigo": user.codigo,
@@ -202,7 +231,7 @@ def get_dashboard_data(user: UserDB, db: Session) -> Dict[str, Any]:
             "user_count": 0,
             "activity_count": 0,
             "activities": [],
-            "is_admin": "admin" in user.roles,
+            "is_admin": is_admin_fallback,
             "is_authenticated": True
         }
 
@@ -286,18 +315,26 @@ async def require_admin_for_template(
     Raises:
         HTTPException: Redirige a login o muestra error 403 si no es admin
     """
+    logger.debug(f"🚪 require_admin_for_template iniciado para: {request.url.path}")
+    
     # Primero verificar autenticación
     user_data = await require_auth_for_template(request, db)
     
+    logger.debug(f"👤 Usuario autenticado: {user_data['user']['usuario']}")
+    logger.debug(f"🎭 Roles del usuario: {user_data['user'].get('roles', [])}")
+    logger.debug(f"🔐 is_admin en user_data: {user_data.get('is_admin', False)}")
+    
     # Verificar rol de admin
     if not user_data.get("is_admin", False):
-        logger.warning(f"Usuario {user_data['user']['usuario']} intentó acceder a área de admin sin permisos")
+        logger.warning(f"❌ Usuario {user_data['user']['usuario']} intentó acceder a área de admin sin permisos")
+        logger.warning(f"   Roles actuales: {user_data['user'].get('roles', [])}")
+        logger.warning(f"   is_admin: {user_data.get('is_admin', False)}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Acceso de administrador requerido"
         )
     
-    logger.info(f"Acceso de admin autorizado para: {user_data['user']['usuario']}")
+    logger.info(f"✅ Acceso de admin autorizado para: {user_data['user']['usuario']}")
     return user_data
 
 # Función de utilidad para verificar roles específicos

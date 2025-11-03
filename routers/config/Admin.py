@@ -3,18 +3,18 @@ from datetime import date, timedelta, timezone
 from typing import Optional, Dict, Any
 from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request, status
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
-from Services.security.utils import encriptar_clave
-from Services.security.jwt_auth import get_current_user, require_admin
-from Services.security.auth_middleware import require_admin_for_template, get_authenticated_user
+from security.security import encriptar_clave
+from security.jwt_auth import get_current_user, require_admin
+from security.auth_middleware import require_admin_for_template, get_authenticated_user
 from db.database import get_db
 from db.models.config.usuarios import Usuarios
 from db.schemas.config.Usuarios import UserDB
 
 
 # Definir la instancia de Jinja2Templates
-templates = Jinja2Templates(directory="sql_app/static")
+templates = Jinja2Templates(directory="static")
 
 # Definir el router directamente
 router = APIRouter(
@@ -27,42 +27,20 @@ router = APIRouter(
 @router.get("")
 async def admin_page(
     request: Request, 
-    db: Session = Depends(get_db)
+    user_data: Dict[str, Any] = Depends(require_admin_for_template)
 ):
     """
     Página de admin - Versión simplificada para debug
     """
     try:
-        # Verificar si el middleware ya validó la autenticación
-        is_authenticated = getattr(request.state, 'authenticated', False)
-        token_data = getattr(request.state, 'token_data', None)
+        print(f"🔍 ADMIN DEBUG: Usuario autenticado: {user_data['user']['usuario']}")
+        print(f"🔍 ADMIN DEBUG: Roles: {user_data['user'].get('roles', [])}")
+        print(f"🔍 ADMIN DEBUG: is_admin: {user_data.get('is_admin', False)}")
         
-        print(f"🔍 ADMIN DEBUG: is_authenticated = {is_authenticated}")
-        print(f"🔍 ADMIN DEBUG: token_data = {token_data}")
-        print(f"🔍 ADMIN DEBUG: request.state = {request.state.__dict__}")
-        
-        if not is_authenticated:
-            print("❌ Usuario no autenticado, redirigiendo...")
-            return RedirectResponse(url="/loginpage", status_code=303)
-        
-        username = getattr(token_data, 'username', 'Unknown') if token_data else 'Unknown'
-        print(f"✅ Usuario autenticado: {username}")
-        
-        # Datos mínimos para la template
+        # Usar los datos del middleware
         template_data = {
             "request": request,
-            "user": {
-                "usuario": username,
-                "nombre": username,
-                "mail": f"{username}@example.com",
-                "roles": ["admin"],
-                "activo": True
-            },
-            "user_count": 1,
-            "activity_count": 0,
-            "activities": [],
-            "is_admin": True,
-            "is_authenticated": True
+            **user_data
         }
         
         print(f"🔍 Renderizando template con datos: {template_data.keys()}")
@@ -105,11 +83,11 @@ async def user_perfil(
     request: Request,
     user_data: Dict[str, Any] = Depends(require_admin_for_template)
 ):
-    """Página de perfil de usuario - AUTENTICACIÓN BACKEND"""
+    """Página de perfil de cliente - AUTENTICACIÓN BACKEND"""
     return templates.TemplateResponse(
-        "/usuarios/usuario_admin.html",
+        "/clientes/cliente_admin.html",
         {
-            "request": request, 
+            "request": request,
             **user_data
         }
     )
@@ -126,10 +104,10 @@ async def update_perfil(
     db: Session = Depends(get_db),
     user: UserDB = Depends(get_authenticated_user)
 ):
-    """Actualización del perfil de usuario - AUTENTICACIÓN BACKEND"""
+    """Actualización del perfil de cliente - AUTENTICACIÓN BACKEND"""
     db_user = db.query(Usuarios).filter(Usuarios.codigo == user.codigo).first()
     if not db_user:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
 
     db_user.nombre = nombre
     db_user.telefono = telefono
@@ -149,7 +127,7 @@ async def update_perfil(
         raise HTTPException(status_code=500, detail=f"Error al actualizar el perfil: {str(e)}")
 
     return templates.TemplateResponse(
-        "/usuarios/usuario_admin.html",
+        "/clientes/cliente_admin.html",
         {
             "request": request, 
             "user": user, 
@@ -244,3 +222,122 @@ async def simple_admin_debug(request: Request):
         "cookies": dict(request.cookies),
         "has_access_token": "access_token" in request.cookies
     }
+
+# ============================================================================
+# GESTIÓN DE CLIENTES
+# ============================================================================
+
+@router.get("/clientes")
+async def clientes_page(
+    request: Request,
+    user_data: Dict[str, Any] = Depends(require_admin_for_template),
+    db: Session = Depends(get_db)
+):
+    """Página de gestión de clientes"""
+    try:
+        # Obtener lista de clientes (todos los usuarios que no son admin)
+        from sqlalchemy import text
+
+        # Consulta para obtener clientes (usuarios que no tienen rol admin)
+        clientes_query = text("""
+            SELECT u.codigo, u.usuario, u.nombre, u.mail, u.activo, u.fecha_creacion
+            FROM Usuarios u
+            LEFT JOIN UsuariosRol ur ON u.codigo = ur.usuario_id
+            LEFT JOIN Roles r ON ur.rol_id = r.id
+            WHERE u.activo = 1 AND (r.nombre IS NULL OR r.nombre != 'admin')
+            GROUP BY u.codigo, u.usuario, u.nombre, u.mail, u.activo, u.fecha_creacion
+            ORDER BY u.fecha_creacion DESC
+        """)
+
+        clientes_result = db.execute(clientes_query).fetchall()
+
+        clientes = []
+        for row in clientes_result:
+            clientes.append({
+                "codigo": row[0],
+                "usuario": row[1],
+                "nombre": row[2],
+                "email": row[3],
+                "activo": row[4],
+                "fecha_creacion": row[5]
+            })
+
+        template_data = {
+            "request": request,
+            **user_data,
+            "clientes": clientes,
+            "total_clientes": len(clientes)
+        }
+
+        return templates.TemplateResponse("clientes.html", template_data)
+
+    except Exception as e:
+        print(f"❌ Error en página de clientes: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error en gestión de clientes: {str(e)}"
+        )
+
+@router.get("/clientes/{cliente_id}")
+async def cliente_detalle(
+    cliente_id: int,
+    request: Request,
+    user_data: Dict[str, Any] = Depends(require_admin_for_template),
+    db: Session = Depends(get_db)
+):
+    """Página de detalle de cliente"""
+    try:
+        # Obtener datos del cliente
+        cliente = db.query(Usuarios).filter(Usuarios.codigo == cliente_id).first()
+        if not cliente:
+            raise HTTPException(status_code=404, detail="Cliente no encontrado")
+
+        cliente_data = {
+            "codigo": cliente.codigo,
+            "usuario": cliente.usuario,
+            "nombre": cliente.nombre,
+            "email": cliente.mail,
+            "telefono": getattr(cliente, 'telefono', ''),
+            "direccion": getattr(cliente, 'direccion', ''),
+            "fecha_nacimiento": getattr(cliente, 'fecha_nacimiento', None),
+            "activo": cliente.activo,
+            "fecha_creacion": getattr(cliente, 'fecha_creacion', None)
+        }
+
+        template_data = {
+            "request": request,
+            **user_data,
+            "cliente": cliente_data
+        }
+
+        return templates.TemplateResponse("cliente_detalle.html", template_data)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error en detalle de cliente: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error obteniendo detalle del cliente: {str(e)}"
+        )
+
+@router.get("/loginpage", response_class=HTMLResponse)
+async def admin_login_page():
+    """Página de login para administradores"""
+    try:
+        # Usar la página de login existente pero con contexto de admin
+        with open("static/login.html", "r", encoding="utf-8") as file:
+            content = file.read()
+            # Agregar un indicador de que es login de admin
+            content = content.replace(
+                "<title>",
+                "<title>Login Administrador - "
+            ).replace(
+                "Iniciar Sesión",
+                "Iniciar Sesión (Admin)"
+            )
+            return HTMLResponse(content=content, status_code=200)
+    except FileNotFoundError:
+        return HTMLResponse(content="<h1>Error: Página de login de admin no encontrada</h1>", status_code=404)

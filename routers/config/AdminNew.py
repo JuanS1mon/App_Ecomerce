@@ -15,11 +15,11 @@ from sqlalchemy import text, func
 from db.database import get_db
 from db.models.config.usuarios import Usuarios
 from db.schemas.config.Usuarios import UserDB
-from Services.security.security import get_current_user_secure
+from security.security import get_current_user_secure
 
 # Configuración de templates
 try:
-    templates = Jinja2Templates(directory="sql_app/static")
+    templates = Jinja2Templates(directory="static")
 except Exception as e:
     print(f"⚠️ Error cargando templates desde sql_app/static: {e}")
     try:

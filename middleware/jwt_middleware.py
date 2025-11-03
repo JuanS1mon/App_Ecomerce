@@ -44,6 +44,8 @@ class JWTMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.protected_paths = protected_paths or [
             "/admin",              # Panel admin HTML
+            "/analisis/admin",     # Página de análisis admin
+            "/generar",            # Generador de código
             "/usuarios_admin",     # Gestión usuarios HTML
             "/admin/data",         # API de datos admin protegida
             "/analisis/admin/data",  # API de datos análisis admin protegida
@@ -53,7 +55,8 @@ class JWTMiddleware(BaseHTTPMiddleware):
             "/api/protected"
         ]
         self.public_paths = [
-            "/", "/auth/login", "/auth/logout", "/docs", "/redoc", "/openapi.json", "/static", "/favicon.ico", "/loginpage"
+            "/", "/auth", "/auth/login", "/auth/logout", "/auth/me", "/auth/verify-token", "/auth/test-user", "/login", "/logout", "/docs", "/redoc", "/openapi.json", "/static", "/favicon.ico", "/loginpage",
+            "/ecomerce", "/ecommerce"  # Agregar rutas de ecommerce como públicas
         ]
 
     def is_protected_path(self, path: str) -> bool:

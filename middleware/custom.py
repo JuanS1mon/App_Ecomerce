@@ -64,6 +64,9 @@ class CustomErrorMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
         excluded_paths = ["/docs", "/redoc", "/openapi.json"]
+        # No interceptar errores en rutas de API
+        if request.url.path.startswith("/auth/") or request.url.path.startswith("/ecomerce/") or request.url.path.startswith("/ecommerce/") or request.url.path.startswith("/api/"):
+            return response
         if any(request.url.path.startswith(path) for path in excluded_paths):
             return response
         static_dir = os.path.join(os.path.dirname(__file__), "..", "static")

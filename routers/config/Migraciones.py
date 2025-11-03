@@ -3,10 +3,12 @@
 # Imports de bibliotecas estándar
 import asyncio
 import concurrent.futures
+import io
 import json
 import logging
 import multiprocessing
 import os
+import re
 from datetime import datetime, timedelta
 from io import BytesIO
 
@@ -19,6 +21,7 @@ from fastapi import (
     BackgroundTasks,
     Depends,
     File,
+    Form,
     HTTPException,
     Request,
     UploadFile,
@@ -40,13 +43,766 @@ def clean_data(data):
     """Función temporal stub para clean_data"""
     return data
 
-def procesar_archivo(*args, **kwargs):
-    """Función temporal stub para procesar_archivo"""
-    pass
+def procesar_archivo(json_path, result_path, db, current_user, table_name):
+    """
+    Procesa un archivo JSON y crea una tabla dinámica en la base de datos con los datos migrados.
+    Incluye inferencia de tipos de datos, creación de tabla, inserción por lotes y metadata.
+    """
+    start_time = datetime.now()
+    total_records = 0
+    error_message = None
+
+    try:
+        logging.info(f"Iniciando procesamiento de archivo JSON: {json_path}")
+
+        # Leer el archivo JSON
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        if not data:
+            raise ValueError("El archivo JSON está vacío")
+
+        total_records = len(data)
+        logging.info(f"Archivo JSON contiene {total_records} registros")
+
+        # Tomar una muestra para inferir tipos de datos
+        sample_size = min(1000, len(data))  # Máximo 1000 registros para inferencia
+        sample_data = data[:sample_size]
+
+        # Inferir tipos de datos y crear esquema de tabla
+        column_types = infer_column_types(sample_data)
+        logging.info(f"Tipos de columnas inferidos: {column_types}")
+
+        # Crear la tabla dinámica
+        create_dynamic_table(db, table_name, column_types)
+
+        # Validar esquema de la tabla creada
+        validation_result = validate_table_schema(table_name, column_types, db)
+
+        # Registrar resultados de validación
+        if not validation_result["valid"]:
+            logging.error(f"Errores de validación en tabla {table_name}: {validation_result['errors']}")
+            # No fallar el proceso por errores de validación, solo registrar
+        elif validation_result["warnings"]:
+            logging.warning(f"Advertencias de validación en tabla {table_name}: {len(validation_result['warnings'])} advertencias")
+
+        # Insertar datos por lotes
+        batch_size = 1000
+        inserted_count = 0
+
+        for i in range(0, len(data), batch_size):
+            batch = data[i:i + batch_size]
+            # Convertir tipos de datos según el esquema inferido
+            converted_batch = convert_data_types(batch, column_types)
+            # Insertar lote
+            insert_batch(db, table_name, converted_batch, column_types)
+            inserted_count += len(converted_batch)
+            logging.info(f"Insertados {inserted_count}/{total_records} registros")
+
+        # Crear metadata de la migración
+        processing_time = (datetime.now() - start_time).total_seconds()
+
+        metadata = MigracionMetadata(
+            usuario_id=current_user.codigo,
+            nombre_tabla=table_name,
+            nombre_original_archivo=None,  # Se puede agregar después si es necesario
+            tipo_archivo="json",
+            total_registros=total_records,
+            estado="completado",
+            fecha_creacion=datetime.now(),
+            tiempo_procesamiento_segundos=processing_time,
+            mensaje_error=None,
+            tamanio_bytes=os.path.getsize(json_path) if os.path.exists(json_path) else 0,
+            validacion_errores=validation_result.get("errors", []),
+            validacion_advertencias=validation_result.get("warnings", []),
+            validacion_resumen=validation_result.get("summary", {})
+        )
+
+        db.add(metadata)
+        db.commit()
+
+        # Crear archivo de resultado
+        result_data = {
+            "status": "success",
+            "table_name": table_name,
+            "total_records": total_records,
+            "processing_time_seconds": processing_time,
+            "column_types": column_types,
+            "timestamp": datetime.now().isoformat()
+        }
+
+        with open(result_path, 'w', encoding='utf-8') as f:
+            json.dump(result_data, f, ensure_ascii=False, indent=2)
+
+        logging.info(f"Procesamiento completado exitosamente: {table_name} con {total_records} registros")
+
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"Error procesando archivo JSON: {error_message}")
+
+        # Actualizar metadata con error si ya existe
+        try:
+            processing_time = (datetime.now() - start_time).total_seconds()
+            metadata = MigracionMetadata(
+                usuario_id=current_user.codigo,
+                nombre_tabla=table_name,
+                tipo_archivo="json",
+                total_registros=total_records,
+                estado="error",
+                fecha_creacion=datetime.now(),
+                tiempo_procesamiento_segundos=processing_time,
+                mensaje_error=error_message,
+                tamanio_bytes=os.path.getsize(json_path) if os.path.exists(json_path) else 0
+            )
+            db.add(metadata)
+            db.commit()
+        except Exception as meta_error:
+            logging.error(f"Error guardando metadata de error: {meta_error}")
+            db.rollback()
+
+        # Crear archivo de resultado con error
+        result_data = {
+            "status": "error",
+            "error": error_message,
+            "table_name": table_name,
+            "total_records": total_records,
+            "timestamp": datetime.now().isoformat()
+        }
+
+        try:
+            with open(result_path, 'w', encoding='utf-8') as f:
+                json.dump(result_data, f, ensure_ascii=False, indent=2)
+        except Exception as file_error:
+            logging.error(f"Error creando archivo de resultado: {file_error}")
+
+        raise  # Re-lanzar la excepción para que sea manejada por el llamador
+
+def infer_column_types(sample_data):
+    """
+    Infiera los tipos de datos de las columnas basándose en una muestra de datos.
+    """
+    if not sample_data:
+        return {}
+
+    column_types = {}
+
+    # Obtener todas las claves posibles
+    all_keys = set()
+    for record in sample_data:
+        if isinstance(record, dict):
+            all_keys.update(record.keys())
+
+    for key in all_keys:
+        values = []
+        for record in sample_data:
+            if isinstance(record, dict) and key in record:
+                value = record[key]
+                if value is not None and value != "":
+                    values.append(value)
+
+        if not values:
+            column_types[key] = "NVARCHAR(255)"  # Default para columnas vacías
+            continue
+
+        # Inferir tipo basado en los valores
+        inferred_type = infer_single_column_type(values)
+        column_types[key] = inferred_type
+
+    return column_types
+
+def infer_single_column_type(values):
+    """
+    Infiera el tipo de una sola columna basándose en sus valores.
+    Estrategia mejorada para manejar tipos mixtos y rangos numéricos.
+    """
+    # Contadores para diferentes tipos
+    int_count = 0
+    bigint_count = 0
+    float_count = 0
+    date_count = 0
+    bool_count = 0
+    string_count = 0
+    null_count = 0
+
+    # Rangos para tipos numéricos en SQL Server
+    INT_MIN = -2147483648
+    INT_MAX = 2147483647
+    BIGINT_MIN = -9223372036854775808
+    BIGINT_MAX = 9223372036854775807
+
+    # Analizar valores no nulos
+    non_null_values = []
+    for value in values[:500]:  # Aumentar la muestra para mejor precisión
+        if value is None or value == "":
+            null_count += 1
+            continue
+        non_null_values.append(value)
+
+        if isinstance(value, bool):
+            bool_count += 1
+        elif isinstance(value, int):
+            # Verificar si cabe en INT o necesita BIGINT
+            if INT_MIN <= value <= INT_MAX:
+                int_count += 1
+            elif BIGINT_MIN <= value <= BIGINT_MAX:
+                bigint_count += 1
+            else:
+                # Valor demasiado grande incluso para BIGINT - usar NVARCHAR
+                string_count += 1
+        elif isinstance(value, float):
+            float_count += 1
+        elif isinstance(value, str):
+            # Intentar convertir a fecha
+            if is_date_string(value):
+                date_count += 1
+            else:
+                string_count += 1
+        else:
+            string_count += 1
+
+    total_non_null = len(non_null_values)
+
+    if total_non_null == 0:
+        return "NVARCHAR(255)"  # Default para columnas vacías
+
+    # Lógica de decisión mejorada con manejo de rangos y tipos mixtos
+    if bool_count == total_non_null:
+        return "BIT"
+    elif date_count == total_non_null:
+        return "DATETIME"
+    elif int_count == total_non_null:
+        return "INT"
+    elif bigint_count == total_non_null:
+        return "BIGINT"
+    elif (int_count + bigint_count) == total_non_null:
+        # Si hay mezcla de INT y BIGINT, usar BIGINT para ser seguro
+        return "BIGINT"
+    elif float_count == total_non_null or (int_count + float_count + bigint_count) == total_non_null:
+        return "FLOAT"
+    elif bool_count > total_non_null * 0.9:
+        return "BIT"  # Mayoría clara de booleanos
+    elif date_count > total_non_null * 0.9:
+        return "DATETIME"  # Mayoría clara de fechas
+    elif (int_count + bigint_count) > total_non_null * 0.9:
+        # Mayoría de números enteros - usar BIGINT si hay algún valor grande
+        if bigint_count > 0:
+            return "BIGINT"
+        else:
+            return "INT"
+    elif (int_count + float_count + bigint_count) > total_non_null * 0.9:
+        return "FLOAT"  # Mayoría clara de números
+    else:
+        # Tipos mixtos - determinar el mejor tipo contenedor
+        # IMPORTANTE: Si hay mezcla de números y texto, usar NVARCHAR
+        has_numbers = (int_count + float_count + bigint_count) > 0
+        has_dates = date_count > 0
+        has_strings = string_count > 0
+        has_bools = bool_count > 0
+
+        # Calcular longitud máxima para strings ANTES de usarla
+        max_length = 50  # Mínimo
+        has_very_long_text = False
+        for value in non_null_values:
+            if isinstance(value, str):
+                value_len = len(value)
+                max_length = max(max_length, value_len)
+                if value_len > 500:  # Si hay texto muy largo, usar MAX
+                    has_very_long_text = True
+            elif has_numbers or has_bools:
+                # Convertir otros tipos a string para medir longitud
+                max_length = max(max_length, len(str(value)))
+
+        # Si hay números Y texto (datos mixtos), usar NVARCHAR
+        if has_numbers and has_strings:
+            # Usar NVARCHAR(MAX) para textos muy largos o tipos mixtos complejos
+            if max_length > 1000 or has_very_long_text:
+                return "NVARCHAR(MAX)"
+            else:
+                # Limitar a 4000 caracteres para NVARCHAR normal
+                max_length = min(max_length, 4000)
+                return f"NVARCHAR({max_length})"
+
+        # Otros casos de tipos mixtos
+        if has_dates and (has_strings or has_numbers):
+            # Fechas mezcladas con otros tipos - usar NVARCHAR largo
+            max_length = max(max_length, 25)  # Fechas necesitan al menos 25 caracteres
+        elif has_bools and (has_strings or has_numbers):
+            # Booleanos con otros tipos - usar NVARCHAR
+            pass
+        elif (int_count + bigint_count) > 0 and float_count > 0 and not has_strings and not has_dates:
+            # Solo números mixtos (int/bigint y float) - usar FLOAT
+            return "FLOAT"
+        elif (int_count + bigint_count) > 0 and not has_strings and not has_dates and not has_bools:
+            # Solo números enteros - usar BIGINT si hay algún valor grande
+            if bigint_count > 0:
+                return "BIGINT"
+            else:
+                return "INT"
+
+        # Usar NVARCHAR(MAX) para textos muy largos o tipos mixtos complejos
+        if max_length > 1000 or has_very_long_text or (has_dates and (has_strings or has_numbers)):
+            return "NVARCHAR(MAX)"
+        else:
+            # Limitar a 4000 caracteres para NVARCHAR normal
+            max_length = min(max_length, 4000)
+            return f"NVARCHAR({max_length})"
+
+def is_date_string(value):
+    """
+    Verifica si una cadena representa una fecha.
+    """
+    if not isinstance(value, str):
+        return False
+
+    # Patrones comunes de fecha
+    date_patterns = [
+        r'^\d{4}-\d{2}-\d{2}$',  # YYYY-MM-DD
+        r'^\d{2}-\d{2}-\d{4}$',  # DD-MM-YYYY
+        r'^\d{4}/\d{2}/\d{2}$',  # YYYY/MM/DD
+        r'^\d{2}/\d{2}/\d{4}$',  # DD/MM/YYYY
+        r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$',  # YYYY-MM-DD HH:MM:SS
+    ]
+
+    import re
+    for pattern in date_patterns:
+        if re.match(pattern, value):
+            return True
+
+    # Intentar parsear con pandas
+    try:
+        pd.to_datetime(value, errors='raise')
+        return True
+    except:
+        return False
+
+def sanitize_column_name(col_name):
+    """
+    Sanitiza un nombre de columna para que sea compatible con SQL Server.
+    Reemplaza espacios, guiones y caracteres especiales con guiones bajos.
+    """
+    if not col_name:
+        return col_name
+    # Reemplazar espacios y guiones con guiones bajos
+    safe_col = col_name.replace(' ', '_').replace('-', '_')
+    # Reemplazar cualquier caracter que no sea alfanumérico o guion bajo con guion bajo
+    safe_col = re.sub(r'[^\w]', '_', safe_col)
+    return safe_col
+
+def types_compatible(expected_type, actual_type):
+    """
+    Verifica si dos tipos de datos son compatibles.
+    Maneja las diferencias entre tipos esperados (nuestra lógica) y tipos reales (SQL Server).
+    """
+    # Normalizar tipos para comparación
+    expected_lower = expected_type.upper()
+    actual_lower = actual_type.upper()
+
+    # Mapeos de compatibilidad
+    type_mappings = {
+        'NVARCHAR': ['NVARCHAR', 'VARCHAR', 'TEXT', 'NTEXT'],
+        'VARCHAR': ['NVARCHAR', 'VARCHAR', 'TEXT', 'NTEXT'],
+        'INT': ['INT', 'INTEGER', 'BIGINT', 'SMALLINT', 'TINYINT'],
+        'BIGINT': ['BIGINT', 'INT', 'INTEGER'],
+        'FLOAT': ['FLOAT', 'REAL', 'DOUBLE', 'DECIMAL', 'NUMERIC'],
+        'BIT': ['BIT', 'TINYINT'],
+        'DATETIME': ['DATETIME', 'DATETIME2', 'SMALLDATETIME', 'DATE', 'TIME'],
+        'DATE': ['DATETIME', 'DATETIME2', 'SMALLDATETIME', 'DATE']
+    }
+
+    # Verificar compatibilidad directa
+    if expected_lower == actual_lower:
+        return True
+
+    # Verificar compatibilidad por familia de tipos
+    for base_type, compatible_types in type_mappings.items():
+        if expected_lower.startswith(base_type) and actual_lower in compatible_types:
+            return True
+        if actual_lower.startswith(base_type) and expected_lower in compatible_types:
+            return True
+
+    # Manejo especial para NVARCHAR con longitud
+    if expected_lower.startswith('NVARCHAR(') and actual_lower.startswith('NVARCHAR('):
+        # Extraer longitudes
+        try:
+            expected_part = expected_lower.split('(')[1].rstrip(')')
+            actual_part = actual_lower.split('(')[1].rstrip(')')
+
+            # NVARCHAR(MAX) es compatible con cualquier longitud
+            if actual_part.upper() == 'MAX' or expected_part.upper() == 'MAX':
+                return True
+
+            # Ambos son longitudes numéricas
+            expected_len = int(expected_part)
+            actual_len = int(actual_part)
+            # Verificar que la longitud real sea al menos la esperada
+            return actual_len >= expected_len
+        except (ValueError, IndexError):
+            pass
+
+    # NVARCHAR(MAX) es compatible con cualquier NVARCHAR
+    if (expected_lower == 'NVARCHAR(MAX)' and actual_lower.startswith('NVARCHAR(')) or \
+       (actual_lower == 'NVARCHAR(MAX)' and expected_lower.startswith('NVARCHAR(')):
+        return True
+
+    return False
+
+def validate_table_schema(table_name, expected_types, db):
+    """
+    Valida que el esquema de la tabla creada coincida con los tipos esperados.
+    Registra advertencias si hay discrepancias entre tipos esperados y reales.
+    """
+    try:
+        logging.info(f"Validando esquema de tabla: {table_name}")
+
+        # Inspeccionar la tabla creada
+        inspector = inspect(db.get_bind())
+
+        # Verificar que la tabla existe
+        if table_name not in inspector.get_table_names():
+            error_msg = f"La tabla '{table_name}' no fue encontrada después de la creación"
+            logging.error(error_msg)
+            return {"valid": False, "errors": [error_msg], "warnings": []}
+
+        # Obtener columnas reales de la tabla
+        actual_columns = inspector.get_columns(table_name)
+
+        # Crear diccionario de tipos reales (normalizando nombres)
+        actual_types = {}
+        for col in actual_columns:
+            col_name = col['name']
+            # Remover corchetes si existen y sanitizar
+            clean_name = col_name.replace('[', '').replace(']', '')
+            normalized_name = sanitize_column_name(clean_name)
+            actual_types[normalized_name] = str(col['type'])
+
+        errors = []
+        warnings = []
+
+        # Comparar tipos esperados vs reales
+        for expected_col, expected_type in expected_types.items():
+            # Normalizar nombre esperado usando la misma función de sanitización
+            normalized_expected = sanitize_column_name(expected_col)
+
+            if normalized_expected not in actual_types:
+                # Columna esperada no encontrada en la tabla
+                errors.append(f"Columna '{expected_col}' no encontrada en la tabla creada")
+                continue
+
+            actual_type = actual_types[normalized_expected]
+
+            # Comparar tipos (con lógica de compatibilidad)
+            if not types_compatible(expected_type, actual_type):
+                warnings.append({
+                    "column": expected_col,
+                    "expected": expected_type,
+                    "actual": actual_type,
+                    "message": f"Tipo incompatible: esperado '{expected_type}', actual '{actual_type}'"
+                })
+
+        # Verificar columnas extras en la tabla que no estaban en expected_types
+        expected_normalized = {sanitize_column_name(col) for col in expected_types.keys()}
+        for actual_col in actual_types.keys():
+            if actual_col not in expected_normalized and actual_col not in ['id_sys', 'date_sys']:
+                warnings.append({
+                    "column": actual_col,
+                    "expected": "N/A",
+                    "actual": actual_types[actual_col],
+                    "message": f"Columna extra encontrada: '{actual_col}' ({actual_types[actual_col]})"
+                })
+
+        # Loggear resultados
+        if errors:
+            for error in errors:
+                logging.error(f"Error de validación: {error}")
+
+        if warnings:
+            for warning in warnings:
+                logging.warning(f"Advertencia de validación: {warning['message']}")
+
+        # Crear resumen de validación
+        validation_result = {
+            "valid": len(errors) == 0,
+            "errors": errors,
+            "warnings": warnings,
+            "summary": {
+                "total_columns_expected": len(expected_types),
+                "total_columns_actual": len(actual_types),
+                "errors_count": len(errors),
+                "warnings_count": len(warnings)
+            }
+        }
+
+        if validation_result["valid"]:
+            logging.info(f"Validación exitosa: {table_name} - {len(actual_types)} columnas, {len(warnings)} advertencias")
+        else:
+            logging.error(f"Validación fallida: {table_name} - {len(errors)} errores, {len(warnings)} advertencias")
+
+        return validation_result
+
+    except Exception as e:
+        error_msg = f"Error durante validación del esquema: {str(e)}"
+        logging.error(error_msg)
+        return {"valid": False, "errors": [error_msg], "warnings": []}
+
+def create_dynamic_table(db, table_name, column_types):
+    """
+    Crea una tabla dinámica en la base de datos con el esquema especificado.
+    Siempre incluye campos id_sys (autoincremental) y date_sys (fecha actual).
+    """
+    # Construir la consulta CREATE TABLE
+    columns_sql = []
+
+    # Agregar campos predeterminados del sistema
+    columns_sql.append("id_sys INT IDENTITY(1,1) PRIMARY KEY")
+    columns_sql.append("date_sys DATETIME DEFAULT GETDATE()")
+
+    # Verificar si hay una columna 'id' en los datos (case-insensitive)
+    id_column_names = [col_name for col_name in column_types.keys() if col_name.lower() == 'id']
+    has_id_column = len(id_column_names) > 0
+
+    # Si hay columna 'id' en los datos, no crear IDENTITY adicional (ya tenemos id_sys)
+    # Pero procesar las otras columnas normalmente
+
+    for col_name, col_type in column_types.items():
+        # Sanitizar nombre de columna
+        safe_col_name = sanitize_column_name(col_name)
+
+        # Si esta columna es 'id' y ya tenemos IDENTITY, omitirla para evitar duplicados
+        if has_id_column and safe_col_name.lower() == 'id':
+            # Para columna 'id' de los datos, hacerla NOT NULL (sin PRIMARY KEY ya que id_sys es PK)
+            if col_type in ['INT', 'BIGINT']:
+                columns_sql.append(f"[{safe_col_name}] {col_type} NOT NULL")
+            else:
+                columns_sql.append(f"[{safe_col_name}] {col_type} NULL")
+        else:
+            # Columnas normales que no son 'id'
+            columns_sql.append(f"[{safe_col_name}] {col_type} NULL")
+
+    create_table_sql = f"""
+    CREATE TABLE [{table_name}] (
+        {', '.join(columns_sql)}
+    )
+    """
+
+    try:
+        db.execute(text(create_table_sql))
+        db.commit()
+        logging.info(f"Tabla creada exitosamente: {table_name}")
+    except Exception as e:
+        db.rollback()
+        logging.error(f"Error creando tabla {table_name}: {e}")
+        raise
+
+def convert_data_types(batch, column_types):
+    """
+    Convierte los tipos de datos en un lote de registros según el esquema.
+    Versión mejorada con manejo robusto de tipos mixtos y fechas.
+    """
+    converted_batch = []
+
+    for record in batch:
+        converted_record = {}
+        for col_name, col_type in column_types.items():
+            value = record.get(col_name)
+
+            # Sanitizar nombre de columna
+            safe_col_name = sanitize_column_name(col_name)
+
+            if value is None or value == "":
+                converted_record[safe_col_name] = None
+            elif col_type == "BIT":
+                # Manejo flexible de booleanos
+                if isinstance(value, bool):
+                    converted_record[safe_col_name] = value
+                elif isinstance(value, str):
+                    # Convertir strings comunes a booleanos
+                    lower_val = value.lower().strip()
+                    if lower_val in ('true', '1', 'yes', 'si', 'sí', 'y', 't'):
+                        converted_record[safe_col_name] = True
+                    elif lower_val in ('false', '0', 'no', 'n', 'f'):
+                        converted_record[safe_col_name] = False
+                    else:
+                        converted_record[safe_col_name] = None
+                elif isinstance(value, (int, float)):
+                    converted_record[safe_col_name] = bool(value)
+                else:
+                    converted_record[safe_col_name] = None
+            elif col_type == "INT":
+                try:
+                    if isinstance(value, str):
+                        # Limpiar string: remover comas, espacios y caracteres no numéricos
+                        clean_value = value.strip().replace(',', '').replace(' ', '')
+                        if not clean_value or clean_value.lower() in ('none', 'null', 'nan', '', 'n/a'):
+                            converted_record[safe_col_name] = None
+                        else:
+                            # Intentar conversión a número
+                            converted_record[safe_col_name] = int(float(clean_value))
+                    elif isinstance(value, float) and value.is_integer():
+                        converted_record[safe_col_name] = int(value)
+                    else:
+                        converted_record[safe_col_name] = int(float(value))
+                except (ValueError, TypeError, OverflowError):
+                    converted_record[safe_col_name] = None
+            elif col_type == "BIGINT":
+                try:
+                    if isinstance(value, str):
+                        # Limpiar string: remover comas, espacios y caracteres no numéricos
+                        clean_value = value.strip().replace(',', '').replace(' ', '')
+                        if not clean_value or clean_value.lower() in ('none', 'null', 'nan', '', 'n/a'):
+                            converted_record[safe_col_name] = None
+                        else:
+                            # Intentar conversión a número
+                            converted_record[safe_col_name] = int(float(clean_value))
+                    elif isinstance(value, float):
+                        if value.is_integer() or abs(value - round(value)) < 1e-10:
+                            converted_record[safe_col_name] = int(value)
+                        else:
+                            # Float no entero - no válido para BIGINT
+                            converted_record[safe_col_name] = None
+                    else:
+                        converted_record[safe_col_name] = int(float(value))
+                except (ValueError, TypeError, OverflowError):
+                    converted_record[safe_col_name] = None
+            elif col_type == "FLOAT":
+                try:
+                    if isinstance(value, str):
+                        # Limpiar string: remover comas, espacios y caracteres no numéricos
+                        clean_value = value.strip().replace(',', '').replace(' ', '')
+                        if not clean_value or clean_value.lower() in ('none', 'null', 'nan', '', 'n/a'):
+                            converted_record[safe_col_name] = None
+                        else:
+                            converted_record[safe_col_name] = float(clean_value)
+                    else:
+                        converted_record[safe_col_name] = float(value)
+                except (ValueError, TypeError, OverflowError):
+                    converted_record[safe_col_name] = None
+            elif col_type == "DATETIME":
+                try:
+                    # Múltiples estrategias para conversión de fechas
+                    if isinstance(value, str):
+                        # Limpiar string de fecha
+                        clean_value = value.strip()
+                        if not clean_value:
+                            converted_record[safe_col_name] = None
+                            continue
+
+                        # Intentar conversión directa con pandas
+                        try:
+                            dt = pd.to_datetime(clean_value, errors='raise')
+                            converted_record[safe_col_name] = dt.strftime('%Y-%m-%d %H:%M:%S')
+                        except (ValueError, TypeError):
+                            # Intentar formatos específicos comunes
+                            date_formats = [
+                                '%d-%m-%Y', '%d/%m/%Y', '%Y-%m-%d', '%Y/%m/%d',
+                                '%d-%m-%Y %H:%M:%S', '%d/%m/%Y %H:%M:%S',
+                                '%Y-%m-%d %H:%M:%S', '%Y/%m/%d %H:%M:%S',
+                                '%m-%d-%Y', '%m/%d/%Y'
+                            ]
+
+                            converted = False
+                            for fmt in date_formats:
+                                try:
+                                    dt = datetime.strptime(clean_value, fmt)
+                                    converted_record[safe_col_name] = dt.strftime('%Y-%m-%d %H:%M:%S')
+                                    converted = True
+                                    break
+                                except ValueError:
+                                    continue
+
+                            if not converted:
+                                converted_record[safe_col_name] = None
+                    elif isinstance(value, (int, float)):
+                        # Convertir números a fechas (asumiendo timestamps Unix o años)
+                        try:
+                            if value > 1000000000:  # Probablemente timestamp Unix
+                                dt = pd.to_datetime(value, unit='s')
+                            elif 1900 <= value <= 2100:  # Probablemente año
+                                dt = pd.Timestamp(year=int(value), month=1, day=1)
+                            else:
+                                dt = pd.to_datetime(value)
+                            converted_record[safe_col_name] = dt.strftime('%Y-%m-%d %H:%M:%S')
+                        except (ValueError, TypeError, OverflowError):
+                            converted_record[safe_col_name] = None
+                    else:
+                        # Otros tipos - intentar conversión genérica
+                        try:
+                            dt = pd.to_datetime(value)
+                            converted_record[safe_col_name] = dt.strftime('%Y-%m-%d %H:%M:%S')
+                        except (ValueError, TypeError):
+                            converted_record[safe_col_name] = None
+                except Exception:
+                    # Fallback seguro
+                    converted_record[safe_col_name] = None
+            else:  # NVARCHAR
+                # Convertir cualquier valor a string de forma segura
+                try:
+                    if isinstance(value, (list, dict)):
+                        # Convertir estructuras complejas a JSON string
+                        converted_record[safe_col_name] = json.dumps(value, ensure_ascii=False)
+                    else:
+                        converted_record[safe_col_name] = str(value)
+                except Exception:
+                    converted_record[safe_col_name] = None
+
+        converted_batch.append(converted_record)
+
+    return converted_batch
+
+def insert_batch(db, table_name, batch, column_types):
+    """
+    Inserta un lote de registros en la tabla.
+    """
+    if not batch:
+        return
+
+    # Obtener nombres de columnas seguros y parámetros nombrados
+    safe_columns = []
+    param_names = []
+    for col_name in column_types.keys():
+        safe_col = sanitize_column_name(col_name)
+        safe_columns.append(f"[{safe_col}]")
+        param_names.append(f":{safe_col}")
+
+    # Crear consulta INSERT con parámetros nombrados
+    columns_str = ", ".join(safe_columns)
+    placeholders = ", ".join(param_names)
+    insert_sql = f"INSERT INTO [{table_name}] ({columns_str}) VALUES ({placeholders})"
+
+    try:
+        # Insertar cada registro individualmente
+        for record in batch:
+            params = {}
+            for col_name in column_types.keys():
+                safe_col = sanitize_column_name(col_name)
+                value = record.get(safe_col)
+
+                # Convertir tipos de datos problemáticos
+                if isinstance(value, float) and value.is_integer():
+                    value = int(value)  # Convertir float entero a int
+                elif isinstance(value, str) and value.strip() == '':
+                    value = None  # Convertir string vacío a None
+                elif column_types[col_name] == "DATETIME" and isinstance(value, str):
+                    # Convertir strings de fecha a objetos datetime de Python para evitar conversiones automáticas
+                    try:
+                        value = pd.to_datetime(value).to_pydatetime()
+                    except (ValueError, TypeError):
+                        value = None
+
+                params[safe_col] = value
+
+            # Ejecutar inserción individual con parámetros nombrados
+            db.execute(text(insert_sql), params)
+
+        db.commit()
+
+    except Exception as e:
+        db.rollback()
+        logging.error(f"Error insertando lote en {table_name}: {e}")
+        raise
 from security.auth_middleware import require_role_api
 from db.crud.tablas import get_tables
 from db.database import get_db
-from db.models.config.activityLog import ActivityLog
+from db.models.config.migraciones import MigracionMetadata
 from db.schemas.config.Usuarios import UserDB
 
 ALLOWED_EXTENSIONS = {
@@ -60,6 +816,41 @@ ALLOWED_EXTENSIONS = {
         "text/plain"  # Algunos navegadores envían CSV como text/plain
     ]
 }
+
+def is_file_locked(file_path):
+    """Verifica si un archivo está siendo utilizado por otro proceso"""
+    try:
+        # Intentar abrir el archivo en modo exclusivo
+        with open(file_path, 'rb'):
+            pass
+        return False
+    except IOError:
+        return True
+
+async def safe_read_excel(file_path, engine='openpyxl'):
+    """Lee un archivo Excel con verificación de bloqueo de archivo"""
+    try:
+        # Verificar si el archivo está bloqueado
+        if is_file_locked(file_path):
+            raise PermissionError(f"El archivo '{os.path.basename(file_path)}' está siendo utilizado por otro proceso (posiblemente Excel). "
+                                "Cierre el archivo en Excel u otra aplicación antes de procesarlo.")
+
+        # Intentar leer el archivo Excel
+        return pd.ExcelFile(file_path, engine=engine)
+
+    except PermissionError:
+        raise  # Re-lanzar errores de permiso
+    except Exception as e:
+        # Mejorar mensajes de error para casos comunes
+        error_msg = str(e)
+        if "No module named" in error_msg:
+            raise Exception("Faltan dependencias para procesar archivos Excel. Instale openpyxl con: pip install openpyxl")
+        elif "Unsupported format" in error_msg or "not a valid" in error_msg.lower():
+            raise Exception(f"El archivo '{os.path.basename(file_path)}' no es un archivo Excel válido o está corrupto")
+        elif "File is not a zip file" in error_msg:
+            raise Exception(f"El archivo '{os.path.basename(file_path)}' parece estar corrupto o no es un archivo Excel válido")
+        else:
+            raise Exception(f"Error al leer archivo Excel: {error_msg}")
 
 # Configuración para procesamiento paralelo
 MAX_WORKERS = min(multiprocessing.cpu_count(), 8)  # Máximo 8 procesos
@@ -217,6 +1008,11 @@ def process_chunk_worker(chunk_data, chunk_index, table_name, db_config):
                 except:
                     pass
         
+        # Convertir columnas datetime a string para compatibilidad
+        datetime_columns = df.select_dtypes(include=['datetime64[ns]', 'datetime']).columns
+        for column in datetime_columns:
+            df[column] = df[column].dt.strftime('%Y-%m-%d %H:%M:%S')
+        
         # Insertar en base de datos por chunks más pequeños
         batch_size = 1000
         total_inserted = 0
@@ -249,7 +1045,7 @@ def process_chunk_worker(chunk_data, chunk_index, table_name, db_config):
         }
 
 async def read_excel_in_chunks(file_path: str, chunk_size: int):
-    """Lee archivo Excel por chunks"""
+    """Lee archivo Excel por chunks, combinando todas las hojas en una sola secuencia de chunks"""
     chunks = []
     
     try:
@@ -455,7 +1251,7 @@ async def process_excel_file_in_background(
     timestamp: str,
     user_results_dir: str, 
     db: Session,
-    current_user,
+    current_user: UserDB,
     progress: MigracionProgress
 ):
     """
@@ -555,996 +1351,17 @@ async def process_excel_file_in_background(
     finally:
         logging.info(f"Proceso de migración completado con estado: {progress.status}")
 
-# Configuración de logging
-logging.basicConfig(
-    filename='logs/migraciones.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
 
-# Configuración de rutas
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
-RESULTS_DIR = os.path.join(BASE_DIR, "results")
+# =============================
+# CONFIGURACIÓN DEL ROUTER Y TEMPLATES
+# =============================
+router = APIRouter()
+templates = Jinja2Templates(directory="static")
 
-# Crear directorios si no existen
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-os.makedirs(RESULTS_DIR, exist_ok=True)
-os.makedirs('logs', exist_ok=True)
-
-# Ajustar el directorio de las plantillas
-templates = Jinja2Templates(directory="sql_app/static")
-
-
-router = APIRouter(
-    include_in_schema=False,  # Oculta todas las rutas de este router en la documentación
-    prefix="/migraciones",
-    tags=["Migraciones"],
-    responses={status.HTTP_404_NOT_FOUND: {"message": "ruta no encontrada"}}
-)
-
-@router.get("/check_progress")
-async def check_progress(
-    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
-):
-    """Verifica el progreso de la migración del usuario actual"""
-    try:
-        # Obtener el nombre de usuario
-        user_name = current_user.usuario
-        
-        if not user_name:
-            raise HTTPException(status_code=400, detail="Usuario no válido")
-        
-        user_progress = progress_storage.get(user_name, MigracionProgress())
-        return JSONResponse(content=user_progress.to_dict())
-    except Exception as e:
-        logging.error(f"Error al verificar progreso: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error al verificar progreso: {str(e)}")
-
-@router.get("/nueva_migracion")
-async def migraciones_page(
-    request: Request,
-    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
-):
-    """Página para crear una nueva migración"""
-    try:
-        return templates.TemplateResponse(
-            "html/migraciones/migraciones_nueva.html", 
-            {"request": request, "user": current_user}
-        )
-    except Exception as e:
-        logging.error(f"Error al cargar página nueva migración: {str(e)}")
-        raise HTTPException(status_code=500, detail="Error al cargar la página")
-@router.post("/upload")
-async def upload_migracion_file(
-    request: Request,
-    background_tasks: BackgroundTasks,
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
-):
-    """Sube y procesa archivos de migración con procesamiento paralelo para archivos grandes"""
-    try:
-        # Obtener información del usuario
-        user_id = current_user.codigo
-        user_name = current_user.usuario
-        
-        if not user_id or not user_name:
-            raise HTTPException(status_code=400, detail="Usuario no válido")
-        
-        # Validar tamaño del archivo (aumentamos el límite para archivos grandes)
-        max_size = 50 * 1024 * 1024 * 1024  # 50GB máximo
-        if file.size and file.size > max_size:
-            raise HTTPException(status_code=400, detail="El archivo es demasiado grande (máximo 50GB)")
-        
-        # Validar extensión del archivo
-        if not file.filename or not any(file.filename.lower().endswith(ext) for ext in ['.xlsx', '.xls', '.csv']):
-            raise HTTPException(status_code=400, detail="Tipo de archivo no soportado")
-        
-        # Determinar tamaño si el cliente lo envía; UploadFile.size puede ser None
-        total_size_bytes = 0
-        try:
-            total_size_bytes = int(file.size or 0)
-        except Exception:
-            total_size_bytes = 0
-        # Usar progreso paralelo para archivos grandes
-        file_size_gb = (total_size_bytes or 0) / (1024**3)
-        use_parallel = file_size_gb > 1.0  # Usar paralelo para archivos > 1GB
-        
-        if use_parallel:
-            progress = ParallelMigracionProgress()
-            logging.info(f"Archivo grande detectado ({file_size_gb:.1f}GB), usando procesamiento paralelo")
-        else:
-            progress = MigracionProgress()
-            logging.info(f"Archivo pequeño ({file_size_gb:.1f}GB), usando procesamiento secuencial")
-
-        progress_storage[user_name] = progress
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        
-        # Configuración inicial
-        user_results_dir = os.path.join(RESULTS_DIR, user_name)
-        os.makedirs(user_results_dir, exist_ok=True)
-        form = await request.form()
-        nombre_migracion = form.get('migration_name', 'default_name')
-        
-        # Sanitizar nombre de migración
-        nombre_migracion = "".join(c for c in nombre_migracion if c.isalnum() or c in ['_', '-']).lower()
-        
-        # Guardar archivo temporalmente
-        temp_file_path = os.path.join(user_results_dir, f"temp_{timestamp}_{file.filename}")
-
-        # Usar chunks más grandes para archivos grandes
-        UPLOAD_CHUNK_SIZE = 10 * 1024 * 1024 if use_parallel else 1024 * 1024  # 10MB o 1MB
-        
-        try:
-            progress.stage = "uploading"
-            progress.total_size_bytes = total_size_bytes
-            upload_start = datetime.now()
-            with open(temp_file_path, 'wb') as f:
-                while True:
-                    chunk = await file.read(UPLOAD_CHUNK_SIZE)
-                    if not chunk:
-                        break
-                    f.write(chunk)
-                    # Actualizar progreso de subida
-                    progress.update_upload(bytes_read=len(chunk), total_bytes=total_size_bytes, start_time=upload_start)
-            # Marcar fin de subida
-            progress.stage = "processing"
-            progress.status = "archivo cargado, iniciando procesamiento"
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error al guardar archivo: {str(e)}")
-        
-        # Determinar tipo de archivo y procesar
-        file_type = 'excel' if file.filename.lower().endswith(('.xlsx', '.xls')) else 'csv'
-        
-        if use_parallel:
-            # Procesamiento paralelo para archivos grandes
-            background_tasks.add_task(
-                process_large_file_parallel,
-                temp_file_path,
-                nombre_migracion,
-                timestamp,
-                user_results_dir,
-                db,
-                current_user,
-                progress,
-                file_type
-            )
-        else:
-            # Procesamiento secuencial para archivos pequeños
-            if file_type == 'excel':
-                background_tasks.add_task(
-                    process_excel_file_in_background,
-                    temp_file_path,
-                    nombre_migracion,
-                    timestamp,
-                    user_results_dir,
-                    db,
-                    current_user,
-                    progress
-                )
-            else:  # CSV
-                # El stream ya fue consumido para guardar en temp_file_path; leer desde disco
-                with open(temp_file_path, 'rb') as temp_f:
-                    contents = temp_f.read()
-                result = await process_csv_file(
-                    contents,
-                    nombre_migracion,
-                    user_results_dir,
-                    current_user,
-                    db,
-                    background_tasks,
-                    progress
-                )
-                return JSONResponse(content=result)
-
-        return JSONResponse(content={
-            "message": f"Archivo recibido ({file_size_gb:.1f}GB). Procesamiento {'paralelo' if use_parallel else 'secuencial'} iniciado.",
-            "processing_type": "parallel" if use_parallel else "sequential",
-            "estimated_chunks": int(file_size_gb * 1000) if use_parallel else 1,
-            "max_workers": MAX_WORKERS if use_parallel else 1,
-            "chunk_size": CHUNK_SIZE if use_parallel else "N/A",
-            "result_url": "/migraciones/control_migraciones",
-            "progress": progress.to_dict()
-        })
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        error_msg = f"Error en el proceso de migración: {str(e)}"
-        logging.error(error_msg)
-        raise HTTPException(status_code=500, detail=error_msg)
-    
-@router.get("/control_migraciones")
-async def get_all_results(
-    request: Request,
-    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
-):
-    """Página de control y resultados de migraciones"""
-    try:
-        # Obtener el nombre de usuario
-        user_name = current_user.usuario
-        
-        if not user_name:
-            raise HTTPException(status_code=400, detail="Usuario no válido")
-        
-        user_results_dir = os.path.join(RESULTS_DIR, user_name)
-        
-        # Verificar si existe el directorio de resultados
-        if not os.path.exists(user_results_dir):
-            return templates.TemplateResponse(
-                "html/migraciones/migraciones_results.html",
-                {
-                    "request": request,
-                    "user": current_user,
-                    "message": "No se encontraron resultados para este usuario.",
-                    "results": []
-                }
-            )
-
-        # Obtener los archivos de resultados y ordenarlos por fecha de modificación (más reciente primero)
-        try:
-            result_files = sorted(
-                [f for f in os.listdir(user_results_dir) if f.startswith("result_") and f.endswith(".json")],
-                key=lambda x: os.path.getmtime(os.path.join(user_results_dir, x)),
-                reverse=True
-            )
-        except Exception as e:
-            logging.error(f"Error al listar archivos de resultados: {str(e)}")
-            result_files = []
-
-        results = []
-        for result_file in result_files:
-            try:
-                result_path = os.path.join(user_results_dir, result_file)
-                with open(result_path, 'r', encoding='utf-8') as f:
-                    result = json.load(f)
-                    # Agregar información adicional
-                    result['filename'] = result_file
-                    result['file_size'] = os.path.getsize(result_path)
-                    result['modified_time'] = datetime.fromtimestamp(
-                        os.path.getmtime(result_path)
-                    ).strftime('%Y-%m-%d %H:%M:%S')
-                    results.append(result)
-            except Exception as e:
-                logging.error(f"Error al leer archivo {result_file}: {str(e)}")
-                continue
-
-        # Obtener progreso actual
-        user_progress = progress_storage.get(user_name, MigracionProgress())
-
-        return templates.TemplateResponse(
-            "html/migraciones/migraciones_results.html",
-            {
-                "request": request,
-                "user": current_user,
-                "results": results,
-                "progress": user_progress.to_dict()
-            }
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        error_msg = f"Error al obtener los resultados: {str(e)}"
-        logging.error(error_msg)
-        raise HTTPException(status_code=500, detail=error_msg)
-@router.get("/admin_migraciones")
-async def admin_migraciones_page(
-    request: Request,
-    db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
-):
-    """Página principal de administración de migraciones con estadísticas y tablas"""
-    try:
-        # Obtener el ID del usuario
-        user_id = current_user.codigo
-        user_name = current_user.usuario
-        
-        if not user_id:
-            raise HTTPException(status_code=400, detail="Usuario no válido")
-        
-        # Obtener las últimas actividades del usuario relacionadas con migraciones
-        try:
-            actividades = db.query(ActivityLog).filter(
-                ActivityLog.user_id == user_id,  # Usar user_id consistentemente
-                ActivityLog.action.ilike('%migración%')
-            ).order_by(ActivityLog.timestamp.desc()).limit(10).all()
-        except Exception as e:
-            logging.warning(f"Error al obtener actividades: {str(e)}")
-            actividades = []
-
-        # Contar el número total de migraciones realizadas por el usuario
-        try:
-            total_migraciones = db.query(ActivityLog).filter(
-                ActivityLog.user_id == user_id,
-                ActivityLog.action.ilike('%migración%')
-            ).count()
-        except Exception as e:
-            logging.warning(f"Error al contar migraciones: {str(e)}")
-            total_migraciones = 0
-
-        # Preparar datos para el gráfico (migraciones por día)
-        try:
-            fecha_column = cast(ActivityLog.timestamp, Date)
-            migraciones_por_dia = db.query(
-                fecha_column.label('fecha'),
-                func.count().label('cantidad')
-            ).filter(
-                ActivityLog.user_id == user_id,
-                ActivityLog.action.ilike('%migración%')
-            ).group_by(
-                fecha_column
-            ).order_by(
-                fecha_column
-            ).limit(30).all()  # Limitar a últimos 30 días
-        except Exception as e:
-            logging.warning(f"Error al obtener datos del gráfico: {str(e)}")
-            migraciones_por_dia = []
-
-        labels = [str(record.fecha) for record in migraciones_por_dia]
-        data = [record.cantidad for record in migraciones_por_dia]
-
-        # Obtener los nombres de las tablas
-        try:
-            tables1, tables2 = get_tables(db)
-        except Exception as e:
-            logging.error(f"Error al obtener tablas: {str(e)}")
-            tables1, tables2 = [], []
-
-        # Obtener progreso actual del usuario
-        user_progress = progress_storage.get(user_name, MigracionProgress())
-
-        # Renderizar la plantilla
-        return templates.TemplateResponse(
-            "html/migraciones/migraciones_admin.html",
-            {
-                "request": request,
-                "user": current_user,
-                "actividades": [actividad.action for actividad in actividades],
-                "labels": labels,
-                "data": data,
-                "total_migraciones": total_migraciones,
-                "tables1": tables1,
-                "tables2": tables2,
-                "progress": user_progress.to_dict()
-            }
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        error_msg = f"Error al cargar página de administración: {str(e)}"
-        logging.error(error_msg)
-        raise HTTPException(status_code=500, detail=error_msg)
-
-
-@router.get("/tablas_migraciones")
-async def migraciones_tablas(
-    request: Request,
-    db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
-):
-    """Página para visualizar y gestionar tablas de migraciones"""
-    try:
-        tables1, tables2 = get_tables(db)
-        
-        # Obtener información adicional sobre las tablas
-        inspector = inspect(db.get_bind())
-        tables_info = []
-        
-        for table_name in tables1 + tables2:
-            try:
-                columns = inspector.get_columns(table_name)
-                row_count_result = db.execute(text(f"SELECT COUNT(*) FROM [{table_name}]")).scalar()
-                
-                tables_info.append({
-                    'name': table_name,
-                    'column_count': len(columns),
-                    'row_count': row_count_result or 0,
-                    'is_migration_table': table_name.startswith('migracion_')
-                })
-            except Exception as e:
-                logging.warning(f"Error al obtener info de tabla {table_name}: {str(e)}")
-                tables_info.append({
-                    'name': table_name,
-                    'column_count': 0,
-                    'row_count': 0,
-                    'is_migration_table': table_name.startswith('migracion_'),
-                    'error': str(e)
-                })
-
-        return templates.TemplateResponse(
-            "html/migraciones/migraciones_tablas.html",
-            {
-                "request": request,
-                "user": current_user,
-                "tables1": tables1,
-                "tables2": tables2,
-                "tables_info": tables_info
-            }
-        )
-    except Exception as e:
-        error_msg = f"Error al cargar tablas: {str(e)}"
-        logging.error(error_msg)
-        raise HTTPException(status_code=500, detail=error_msg)
-
-@router.get("/get_table_fields/{table_name}")
-async def get_table_fields(
-    table_name: str,
-    db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
-):
-    """Obtiene los campos de una tabla específica"""
-    try:
-        # Validar nombre de tabla
-        if not table_name or not table_name.replace('_', '').replace('-', '').isalnum():
-            raise HTTPException(status_code=400, detail="Nombre de tabla no válido")
-        
-        # Obtener los nombres de las columnas y sus tipos de datos
-        inspector = inspect(db.get_bind())
-        
-        # Verificar que la tabla existe
-        if table_name not in inspector.get_table_names():
-            raise HTTPException(status_code=404, detail=f"La tabla '{table_name}' no existe")
-        
-        columns = inspector.get_columns(table_name)
-        fields = [
-            {
-                "name": column["name"], 
-                "type": str(column["type"]),
-                "nullable": column.get("nullable", True),
-                "default": column.get("default", None)
-            } 
-            for column in columns
-        ]
-
-        return {"fields": fields, "table_name": table_name}
-    except HTTPException:
-        raise
-    except Exception as e:
-        error_msg = f"Error al obtener campos de la tabla: {str(e)}"
-        logging.error(error_msg)
-        raise HTTPException(status_code=500, detail=error_msg)
-
-@router.get("/get_table_records/{table_name}")
-async def get_table_records(
-    table_name: str,
-    db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
-):
-    # Asegurarse de que el nombre de la tabla es una cadena
-    if isinstance(table_name, list):
-        table_name = table_name[0]
-
-    # Obtener los primeros 5 registros de la tabla
-    metadata = MetaData()
-    table = Table(table_name, metadata, autoload_with=db.get_bind())
-    #query = db.query(table).limit(5).all()
-    query = db.query(table).all()
-    records = [dict(row._mapping) for row in query]
-
-    return {"records": records}
-
-
-
-@router.post("/migrate_data")
-async def migrate_data(
-    migration_data: dict,
-    db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
-):
-    source_table_name = migration_data.get('source_table')
-    target_table_name = migration_data.get('target_table')
-    mappings = migration_data.get('mappings')  # Lista de diccionarios con "from" y "to"
-
-    if not source_table_name or not target_table_name or not mappings:
-        raise HTTPException(status_code=400, detail="Datos de migración incompletos.")
-
-    try:
-        # Asegurarse de que los nombres de las tablas son cadenas
-        if isinstance(source_table_name, list):
-            source_table_name = source_table_name[0]
-        if isinstance(target_table_name, list):
-            target_table_name = target_table_name[0]
-
-        # Cargar las tablas reflejadas
-        metadata = MetaData()
-        source_table = Table(source_table_name, metadata, autoload_with=db.get_bind())
-        target_table = Table(target_table_name, metadata, autoload_with=db.get_bind())
-
-        # Obtener todos los registros de la tabla de origen
-        source_query = db.query(source_table).all()
-        source_data = [dict(row._mapping) for row in source_query]
-
-        # Preparar los datos para insertar en la tabla de destino
-        target_data = []
-        for row in source_data:
-            new_row = {}
-            for mapping in mappings:
-                source_field = mapping['from']
-                target_field = mapping['to']
-                if source_field in row:
-                    new_row[target_field] = row[source_field]
-            if new_row:
-                target_data.append(new_row)
-
-        # Limpiar datos duplicados
-        target_data = clean_data(target_data)
-
-        # Insertar los datos en la tabla de destino
-        db.execute(target_table.insert(), target_data)
-        db.commit()
-
-        return {"message": "Migración completada exitosamente."}
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error al migrar datos: {str(e)}")
-    
-# Función para procesar archivos CSV
-async def process_csv_file(
-    contents: bytes,
-    nombre_migracion: str,
-    user_results_dir: str,
-    current_user: UserDB,
-    db: Session,
-    background_tasks: BackgroundTasks,
-    progress: MigracionProgress
-) -> dict:
-    try:
-        # Leer el archivo CSV
-        df = pd.read_csv(
-            BytesIO(contents),
-            sep=",",
-            quotechar='"',
-            encoding="utf-8-sig",
-            engine="python",
-            on_bad_lines='skip'  # o 'warn' para mostrar advertencias
-        )
-        # Verificar nombres de columnas para depuración
-        column_names = list(df.columns)
-        logging.info(f"Columnas leídas del CSV: {column_names}")
-
-        progress.total_sheets = 1
-        progress.update("csv_data", "procesando")
-        
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        table_name = f"migracion_{nombre_migracion}_csv_{timestamp}"
-        
-        # Convertir a JSON
-        json_path = os.path.join(user_results_dir, f"datos_csv_{timestamp}.json")
-        df.to_json(json_path, orient='records', date_format='iso')
-
-        # Configurar tarea en segundo plano
-        result_filename = f"result_csv_{timestamp}.json"
-        result_path = os.path.join(user_results_dir, result_filename)
-        
-        background_tasks.add_task(
-            procesar_archivo,
-            json_path,
-            result_path,
-            db,
-            current_user,
-            table_name
-        )
-
-        progress.update("csv_data", "completado")
-        return {
-            "status": "success",
-            "message": "Archivo CSV procesado correctamente",
-            "progress": progress.to_dict()
-        }
-    except Exception as e:
-        error_msg = f"Error procesando CSV: {str(e)}"
-        progress.update("csv_data", "error", error_msg)
-        logging.error(error_msg)
-        raise
-    
-
-# Crear un modelo para la solicitud de renombrar tabla
-class RenameTableRequest(BaseModel):
-    current_name: str
-    new_name: str
-@router.post("/rename_table")
-async def rename_table(
-    request: RenameTableRequest,
-    db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
-):
-    try:
-        # Verificar que la tabla actual existe
-        inspector = inspect(db.get_bind())
-        if request.current_name not in inspector.get_table_names():
-            return JSONResponse(
-                content={"success": False, "message": f"La tabla '{request.current_name}' no existe"},
-                status_code=400
-            )
-        
-        # Verificar que el nuevo nombre no existe
-        if request.new_name in inspector.get_table_names():
-            return JSONResponse(
-                content={"success": False, "message": f"Ya existe una tabla con el nombre '{request.new_name}'"},
-                status_code=400
-            )
-        
-        # Cerrar la sesión actual para liberar cualquier conexión activa
-        db.close()
-        
-        # Crear una nueva conexión para ejecutar el SQL directamente
-        engine = db.get_bind()
-        
-        # Ejecutar SQL para renombrar la tabla - usar la sintaxis correcta para SQL Server
-        with engine.begin() as conn:
-            # SQL Server usa sp_rename para renombrar tablas
-            conn.execute(text(f"EXEC sp_rename '{request.current_name}', '{request.new_name}'"))
-        
-        # Registrar la actividad
-        log_entry = ActivityLog(
-            user_id=current_user.codigo,
-            action=f"Renombró tabla de '{request.current_name}' a '{request.new_name}'",
-            timestamp=datetime.now()
-        )
-        db.add(log_entry)
-        db.commit()
-        
-        return JSONResponse(
-            content={"success": True, "message": f"Tabla renombrada exitosamente a '{request.new_name}'"}
-        )
-        
-    except Exception as e:
-        db.rollback()
-        error_msg = f"Error al renombrar la tabla: {str(e)}"
-        logging.error(error_msg)
-        
-        return JSONResponse(
-            content={"success": False, "message": error_msg},
-            status_code=500
-        )
-
-class ChangeFieldTypeRequest(BaseModel):
-    table_name: str
-    field_name: str
-    current_type: str
-    new_type: str
-
-@router.post("/change_field_type")
-async def change_field_type(
-    request: ChangeFieldTypeRequest,
-    db: Session = Depends(get_db),
-    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
-):
-    """Cambia el tipo de un campo en una tabla con validaciones y manejo seguro de conversiones."""
-    try:
-        # 1. Verificaciones iniciales
-        inspector = inspect(db.get_bind())
-        
-        # Verificar existencia de tabla y campo
-        if request.table_name not in inspector.get_table_names():
-            return JSONResponse(
-                content={"success": False, "message": f"La tabla '{request.table_name}' no existe"},
-                status_code=400
-            )
-        
-        columns = inspector.get_columns(request.table_name)
-        if not any(col["name"] == request.field_name for col in columns):
-            return JSONResponse(
-                content={"success": False, "message": f"El campo '{request.field_name}' no existe en la tabla '{request.table_name}'"},
-                status_code=400
-            )
-        
-        # Validar conversión de tipos permitida
-        if request.current_type == 'VARCHAR' and request.new_type == 'INT':
-            return JSONResponse(
-                content={"success": False, "message": "No se puede convertir VARCHAR a INT"},
-                status_code=400
-            )
-        
-        # Mapeo de tipos de datos simplificado
-        type_mapping = {'VARCHAR': 'VARCHAR(255)', 'INT': 'INT', 'DATE': 'DATE'}
-        sql_type = type_mapping.get(request.new_type, 'VARCHAR(255)')
-        
-        # 2. Manejo específico para conversión a DATE
-        if request.new_type == 'DATE':
-            return await _handle_date_conversion(request, db, current_user)
-        
-        # 3. Manejo para otros tipos de conversión
-        db.close()  # Cerrar la sesión antes de operaciones ALTER TABLE
-        
-        with db.get_bind().begin() as conn:
-            conn.execute(text(f"ALTER TABLE [{request.table_name}] ALTER COLUMN [{request.field_name}] {sql_type}"))
-        
-        # Registrar la actividad
-        log_entry = ActivityLog(
-            user_id=current_user.codigo,
-            action=f"Cambió el tipo de campo '{request.field_name}' en la tabla '{request.table_name}' de '{request.current_type}' a '{request.new_type}'",
-            timestamp=datetime.now()
-        )
-        db.add(log_entry)
-        db.commit()
-        
-        return JSONResponse(
-            content={"success": True, "message": f"Tipo de campo actualizado correctamente a '{request.new_type}'"}
-        )
-        
-    except Exception as e:
-        db.rollback()
-        error_msg = f"Error al cambiar el tipo de campo: {str(e)}"
-        logging.error(error_msg)
-        
-        # Mejorar mensaje para error de conversión de fechas
-        if "convertir una cadena de caracteres en fecha" in str(e):
-            return JSONResponse(
-                content={
-                    "success": False, 
-                    "message": "La columna contiene valores que no son fechas válidas. "
-                              "Formatos aceptados: 'YYYY-MM-DD', 'YYYY/MM/DD', 'DD-MM-YYYY', etc. "
-                              "Se recomienda limpiar los datos antes de cambiar el tipo."
-                },
-                            status_code=400
-            )
-        
-        return JSONResponse(
-            content={"success": False, "message": error_msg},
-            status_code=500
-        )
-
-
-async def _handle_date_conversion(request: ChangeFieldTypeRequest, db: Session, current_user):
-    """Función auxiliar para manejar específicamente la conversión a tipo DATE con limpieza de datos."""
-    try:
-        # Obtener el ID del usuario
-        user_id = current_user.codigo
-        
-        # Primero cerramos la sesión existente para evitar conflictos
-        db.close()
-        
-        # Usamos una transacción explícita con begin() para garantizar que todo se ejecute o nada
-        with db.get_bind().begin() as conn:
-            # El resto del código de conversión permanece igual...
-            
-            # Verificar si la columna temporal existe y eliminarla si es el caso
-            conn.execute(text(f"""
-                IF EXISTS (
-                    SELECT 1 FROM sys.columns 
-                    WHERE object_id = OBJECT_ID('{request.table_name}') 
-                    AND name = '{request.field_name}_temp'
-                )
-                BEGIN
-                    ALTER TABLE [{request.table_name}] DROP COLUMN [{request.field_name}_temp]
-                END
-            """))
-            
-            # Obtener el tipo de datos de la columna
-            column_info = conn.execute(text(f"""
-                SELECT DATA_TYPE 
-                FROM INFORMATION_SCHEMA.COLUMNS 
-                WHERE TABLE_NAME = '{request.table_name}' 
-                AND COLUMN_NAME = '{request.field_name}'
-            """)).scalar()
-            
-            is_numeric = column_info in ('bigint', 'int', 'smallint', 'tinyint', 'numeric', 'decimal')
-            
-            # Crear la columna temporal
-            conn.execute(text(f"ALTER TABLE [{request.table_name}] ADD [{request.field_name}_temp] DATE NULL"))
-            
-            if is_numeric:
-                # Para campos numéricos, convertimos directamente a fecha
-                conn.execute(text(f"""
-                    UPDATE [{request.table_name}]
-                    SET [{request.field_name}_temp] = 
-                        CASE 
-                            -- Si es un año de 4 dígitos
-                            WHEN [{request.field_name}] BETWEEN 1000 AND 9999
-                                THEN DATEFROMPARTS([{request.field_name}], 1, 1)
-                            
-                            -- Si es un año de 2 dígitos
-                            WHEN [{request.field_name}] BETWEEN 0 AND 99
-                                THEN DATEFROMPARTS(
-                                    CASE WHEN [{request.field_name}] > 50 THEN 1900 ELSE 2000 END + [{request.field_name}], 
-                                    1, 1)
-                            
-                            -- Otros valores numéricos no se pueden convertir
-                            ELSE NULL
-                        END
-                    WHERE [{request.field_name}] IS NOT NULL
-                """))
-            else:
-                # Para campos de texto, realizamos limpieza y conversión
-                # Similar al código existente...
-                
-                # 3. Intentar conversión directa a fecha con TRY_CONVERT
-                conn.execute(text(f"""
-                    UPDATE [{request.table_name}] 
-                    SET [{request.field_name}_temp] = TRY_CONVERT(DATE, [{request.field_name}])
-                    WHERE [{request.field_name}] IS NOT NULL
-                """))
-                
-                # 4. Intentar conversión para formatos específicos donde TRY_CONVERT falló
-                conn.execute(text(f"""
-                    UPDATE t
-                    SET t.[{request.field_name}_temp] = 
-                        CASE 
-                            -- Formato DD-MM-YYYY a YYYY-MM-DD
-                            WHEN LEN(t.[{request.field_name}]) = 10 
-                                AND SUBSTRING(t.[{request.field_name}], 3, 1) = '-' 
-                                AND SUBSTRING(t.[{request.field_name}], 6, 1) = '-'
-                            THEN TRY_CONVERT(DATE, 
-                                SUBSTRING(t.[{request.field_name}], 7, 4) + '-' + 
-                                SUBSTRING(t.[{request.field_name}], 4, 2) + '-' + 
-                                SUBSTRING(t.[{request.field_name}], 1, 2))
-                                
-                            -- Formato DD/MM/YYYY a YYYY-MM-DD
-                            WHEN LEN(t.[{request.field_name}]) = 10 
-                                AND SUBSTRING(t.[{request.field_name}], 3, 1) = '/' 
-                                AND SUBSTRING(t.[{request.field_name}], 6, 1) = '/'
-                            THEN TRY_CONVERT(DATE,
-                                SUBSTRING(t.[{request.field_name}], 7, 4) + '-' + 
-                                SUBSTRING(t.[{request.field_name}], 4, 2) + '-' + 
-                                SUBSTRING(t.[{request.field_name}], 1, 2))
-                                
-                            ELSE t.[{request.field_name}_temp]
-                        END
-                    FROM [{request.table_name}] t
-                    WHERE t.[{request.field_name}] IS NOT NULL 
-                    AND t.[{request.field_name}_temp] IS NULL
-                """))
-            
-            # El resto del código de conversión permanece igual...
-        
-        # La transacción se ha completado exitosamente, ahora podemos registrar la actividad
-        # Crear una nueva sesión para el registro
-        log_entry = ActivityLog(
-            user_id=user_id,  # Usar user_id consistentemente
-            action=f"Cambió el tipo de campo '{request.field_name}' en la tabla '{request.table_name}' de '{request.current_type}' a 'DATE'",
-            timestamp=datetime.now()
-        )
-        db.add(log_entry)
-        db.commit()
-        
-        return JSONResponse(
-            content={"success": True, "message": f"Tipo de campo actualizado correctamente a DATE"}
-        )
-    except Exception as e:
-        # Asegurarse de que se revierta la transacción
-        db.rollback()
-        error_msg = f"Error durante la conversión a DATE: {str(e)}"
-        logging.error(error_msg)
-        
-        return JSONResponse(
-            content={"success": False, "message": error_msg},
-            status_code=500
-        )
-    
-async def process_excel_file_in_background(
-    file_path: str,
-    nombre_migracion: str,
-    timestamp: str,
-    user_results_dir: str,
-    db: Session,
-    current_user: UserDB,
-    progress: MigracionProgress
-):
-    try:
-        # Determinar el motor Excel adecuado según la extensión del archivo
-        file_ext = os.path.splitext(file_path)[1].lower()
-        if file_ext == '.xls':
-            excel_engine = 'xlrd'  # Motor para archivos .xls
-        else:
-            excel_engine = 'openpyxl'  # Motor para archivos .xlsx
-            
-        # Usar ExcelFile para leer las hojas bajo demanda
-        with pd.ExcelFile(file_path, engine=excel_engine) as xls:
-            sheet_names = xls.sheet_names
-            progress.total_sheets = len(sheet_names)
-            
-            # Procesar cada hoja individualmente
-            for sheet_name in sheet_names:
-                progress.update(sheet_name, "procesando")
-                table_name = f"migracion_{nombre_migracion}_{sheet_name}_{timestamp}"
-                
-                try:
-                    # Leer solo esta hoja y liberar memoria después
-                    df = pd.read_excel(
-                        file_path, 
-                        sheet_name=sheet_name, 
-                        engine=excel_engine, 
-                        # Optimizaciones para archivos grandes
-                        dtype='object',  # Usa tipos inferidos más tarde en smaller chunks
-                        na_filter=False,  # Desactivar el filtro NA para aumentar velocidad
-                    )
-                    
-                    # Convertir columnas datetime de manera más eficiente
-                    datetime_columns = df.select_dtypes(include=['datetime64[ns]', 'datetime']).columns
-                    for column in datetime_columns:
-                        df[column] = df[column].dt.strftime('%Y-%m-%d %H:%M:%S')
-                    
-                    # Guardar directamente a JSON en disco
-                    sheet_json_path = os.path.join(user_results_dir, f"{sheet_name}_datos.json")
-                    
-                    # Dividir el DataFrame en chunks para procesar archivos grandes
-                    ROWS_PER_CHUNK = 10000
-                    total_rows = len(df)
-                    
-                    # Si es un archivo pequeño, procesarlo directamente
-                    if total_rows <= ROWS_PER_CHUNK:
-                        df.to_json(sheet_json_path, orient='records', date_format='iso')
-                        
-                        # Limpiar formato de fechas (procesar archivo JSON ya generado)
-                        with open(sheet_json_path, 'r', encoding='utf-8') as f:
-                            sample_data = json.load(f)
-                            for record in sample_data:
-                                for key, value in record.items():
-                                    if isinstance(value, str) and 'T' in value:
-                                        record[key] = value.replace('T', ' ').split('.')[0]
-                                        
-                        with open(sheet_json_path, 'w', encoding='utf-8') as f:
-                            json.dump(sample_data, f, ensure_ascii=False, indent=4)
-                    else:
-                        # Para archivos grandes, procesar por chunks
-                        with open(sheet_json_path, 'w', encoding='utf-8') as f:
-                            # Escribir inicio del array JSON
-                            f.write('[\n')
-                            
-                            for chunk_start in range(0, total_rows, ROWS_PER_CHUNK):
-                                chunk_end = min(chunk_start + ROWS_PER_CHUNK, total_rows)
-                                chunk = df.iloc[chunk_start:chunk_end]
-                                
-                                # Convertir chunk a JSON y limpiar
-                                chunk_json = chunk.to_json(orient='records', date_format='iso')
-                                chunk_data = json.loads(chunk_json)
-                                
-                                # Limpiar formato de fechas
-                                for record in chunk_data:
-                                    for key, value in record.items():
-                                        if isinstance(value, str) and 'T' in value:
-                                            record[key] = value.replace('T', ' ').split('.')[0]
-                                
-                                # Escribir cada registro con formato apropiado
-                                for i, record in enumerate(chunk_data):
-                                    json_str = json.dumps(record, ensure_ascii=False)
-                                    # Añadir coma si no es el último chunk y no es el último registro
-                                    if chunk_end < total_rows or i < len(chunk_data) - 1:
-                                        f.write(f"  {json_str},\n")
-                                    else:
-                                        f.write(f"  {json_str}\n")
-                            
-                            # Cerrar el array JSON
-                            f.write(']')
-                    
-                    # Configurar tarea de procesamiento para este JSON
-                    result_filename = f"result_{sheet_name}_{timestamp}.json"
-                    result_path = os.path.join(user_results_dir, result_filename)
-                    
-                    # Aquí usamos run_in_threadpool para no bloquear mientras se procesa
-                    from fastapi.concurrency import run_in_threadpool
-                    await run_in_threadpool(
-                        procesar_archivo,
-                        sheet_json_path,
-                        result_path,
-                        db,
-                        current_user,
-                        table_name
-                    )
-                    
-                    progress.update(sheet_name, "completado")
-                    
-                    # Limpiar memoria explícitamente
-                    del df
-                    import gc
-                    gc.collect()
-                    
-                except Exception as e:
-                    error_msg = f"Error en hoja {sheet_name}: {str(e)}"
-                    progress.update(sheet_name, "error", error_msg)
-                    logging.error(error_msg)
-                    continue
-            
-        # Eliminar archivo temporal
-        os.remove(file_path)
-        
-    except Exception as e:
-        error_msg = f"Error procesando archivo Excel: {str(e)}"
-        logging.error(error_msg)
-        progress.status = "error"
-        progress.errors.append({"sheet": "general", "error": error_msg})
+# =============================
+# CONSTANTES Y CONFIGURACIÓN
+# =============================
+RESULTS_DIR = os.path.join(os.getcwd(), "results")
 
 # Agregar ruta principal para breadcrumb
 @router.get("/")
@@ -1554,6 +1371,26 @@ async def migraciones_index(
 ):
     """Página índice de migraciones - redirige a admin_migraciones"""
     return RedirectResponse(url="/migraciones/admin_migraciones", status_code=302)
+
+# Endpoint para la página de administración de migraciones
+@router.get("/admin_migraciones")
+async def admin_migraciones(
+    request: Request,
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
+):
+    """Página de administración de migraciones"""
+    try:
+        return templates.TemplateResponse(
+            "html/migraciones/migraciones_admin.html",
+            {
+                "request": request,
+                "current_user": current_user,
+                "title": "Administración de Migraciones"
+            }
+        )
+    except Exception as e:
+        logging.error(f"Error al cargar página de administración de migraciones: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error al cargar página de administración")
 
 # Agregar endpoint para estadísticas de migraciones
 @router.get("/api/stats")
@@ -1568,22 +1405,21 @@ async def get_migration_stats(
         if not user_id:
             raise HTTPException(status_code=400, detail="Usuario no válido")
         
-        # Estadísticas básicas
-        total_migrations = db.query(ActivityLog).filter(
-            ActivityLog.user_id == user_id,
-            ActivityLog.action.ilike('%migración%')
+        # Estadísticas básicas usando MigracionMetadata en lugar de ActivityLog
+        total_migraciones = db.query(MigracionMetadata).filter(
+            MigracionMetadata.usuario_id == user_id
         ).count()
-        
-        # Migraciones por mes
-        monthly_migrations = db.query(
-            func.strftime('%Y-%m', ActivityLog.timestamp).label('month'),
-            func.count().label('count')
-        ).filter(
-            ActivityLog.user_id == user_id,
-            ActivityLog.action.ilike('%migración%')
-        ).group_by(
-            func.strftime('%Y-%m', ActivityLog.timestamp)
-        ).order_by('month').all()
+
+        # Migraciones por mes usando SQL directo para compatibilidad con SQL Server
+        monthly_result = db.execute(text("""
+            SELECT FORMAT(fecha_creacion, 'yyyy-MM') as month, COUNT(*) as count
+            FROM migraciones_metadata
+            WHERE usuario_id = :user_id AND fecha_creacion IS NOT NULL
+            GROUP BY FORMAT(fecha_creacion, 'yyyy-MM')
+            ORDER BY month
+        """), {'user_id': user_id}).fetchall()
+
+        monthly_migrations = [{'month': row[0], 'count': row[1]} for row in monthly_result]
         
         # Tablas de migración existentes
         inspector = inspect(db.get_bind())
@@ -1593,7 +1429,7 @@ async def get_migration_stats(
         ]
         
         return {
-            "total_migrations": total_migrations,
+            "total_migraciones": total_migraciones,
             "monthly_data": [{"month": m.month, "count": m.count} for m in monthly_migrations],
             "migration_tables_count": len(migration_tables),
             "migration_tables": migration_tables[:10]  # Últimas 10 tablas
@@ -1663,3 +1499,389 @@ async def get_system_resources(
     except Exception as e:
         logging.error(f"Error obteniendo recursos del sistema: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# Endpoint para estadísticas del dashboard (formato esperado por el frontend)
+@router.get("/dashboard/stats")
+async def get_dashboard_stats(
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
+):
+    """API para obtener estadísticas del dashboard de migraciones"""
+    try:
+        user_id = current_user.codigo
+
+        if not user_id:
+            raise HTTPException(status_code=400, detail="Usuario no válido")
+
+        # Estadísticas básicas
+        total_migraciones = db.query(MigracionMetadata).filter(
+            MigracionMetadata.usuario_id == user_id
+        ).count()
+
+        # Total de registros (suma de todos los registros procesados)
+        total_registros_result = db.query(func.sum(MigracionMetadata.total_registros)).filter(
+            MigracionMetadata.usuario_id == user_id
+        ).scalar()
+        total_registros = total_registros_result or 0
+
+        # Espacio usado (aproximado basado en registros)
+        espacio_usado_mb = (total_registros * 0.1)  # Aproximadamente 100 bytes por registro
+
+        # Migraciones en el último mes
+        last_month = datetime.now() - timedelta(days=30)
+        migraciones_mes = db.query(MigracionMetadata).filter(
+            MigracionMetadata.usuario_id == user_id,
+            MigracionMetadata.fecha_creacion >= last_month
+        ).count()
+
+        return {
+            "total_migraciones": total_migraciones,
+            "total_registros": total_registros,
+            "espacio_usado_mb": round(espacio_usado_mb, 2),
+            "migraciones_mes": migraciones_mes
+        }
+    except Exception as e:
+        logging.error(f"Error al obtener estadísticas del dashboard: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al cargar estadísticas")
+
+# Endpoint para lista de migraciones (para DataTables)
+@router.get("/api/lista")
+async def get_migrations_list(
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
+):
+    """API para obtener lista de migraciones para DataTables"""
+    try:
+        user_id = current_user.codigo
+
+        if not user_id:
+            raise HTTPException(status_code=400, detail="Usuario no válido")
+
+        # Obtener migraciones del usuario
+        migraciones = db.query(MigracionMetadata).filter(
+            MigracionMetadata.usuario_id == user_id
+        ).order_by(
+            MigracionMetadata.fecha_creacion.desc()
+        ).all()
+
+        # Convertir a formato para DataTables
+        migrations_list = []
+        for migracion in migraciones:
+            migrations_list.append({
+                "id": migracion.id,
+                "nombre_tabla": migracion.nombre_tabla or f"migracion_{migracion.id}",
+                "tipo_archivo": migracion.tipo_archivo or "excel",
+                "total_registros": migracion.total_registros or 0,
+                "estado": migracion.estado or "completado",
+                "fecha_creacion": migracion.fecha_creacion.strftime('%Y-%m-%d %H:%M:%S') if migracion.fecha_creacion else None
+            })
+
+        return {
+            "migraciones": migrations_list
+        }
+    except Exception as e:
+        logging.error(f"Error al obtener lista de migraciones: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al obtener lista de migraciones")
+
+# Endpoint para servir la página del dashboard de migración
+@router.get("/dashboard_migracion")
+async def dashboard_migracion(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
+):
+    """Página del dashboard de migración"""
+    try:
+        return templates.TemplateResponse(
+            "html/migraciones/migraciones_dashboard.html",
+            {
+                "request": request,
+                "current_user": current_user,
+                "title": "Dashboard de Migración"
+            }
+        )
+    except Exception as e:
+        logging.error(f"Error al cargar dashboard de migración: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error al cargar dashboard")
+
+# Endpoint para servir la página de nueva migración
+@router.get("/nueva_migracion")
+async def nueva_migracion(
+    request: Request,
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
+):
+    """Página para crear una nueva migración"""
+    try:
+        return templates.TemplateResponse(
+            "html/migraciones/migraciones_nueva.html",
+            {
+                "request": request,
+                "current_user": current_user,
+                "title": "Nueva Migración"
+            }
+        )
+    except Exception as e:
+        logging.error(f"Error al cargar página de nueva migración: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error al cargar página de nueva migración")
+
+# Endpoint para subir y procesar archivos de migración
+@router.post("/upload")
+async def upload_migration_file(
+    migration_name: str = Form(...),
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
+):
+    """Endpoint para subir y procesar archivos de migración"""
+    try:
+        # Validar nombre de migración
+        if not migration_name or not migration_name.strip():
+            raise HTTPException(status_code=400, detail="El nombre de la migración es requerido")
+
+        migration_name = migration_name.strip()
+        if len(migration_name) < 3:
+            raise HTTPException(status_code=400, detail="El nombre de la migración debe tener al menos 3 caracteres")
+
+        # Validar archivo
+        if not file:
+            raise HTTPException(status_code=400, detail="No se recibió ningún archivo")
+
+        # Validar tipo de archivo
+        allowed_extensions = ['.xlsx', '.xls', '.csv', '.txt']
+        file_extension = '.' + file.filename.split('.')[-1].lower() if '.' in file.filename else ''
+
+        if file_extension not in allowed_extensions:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Tipo de archivo no permitido. Solo se permiten: {', '.join(allowed_extensions)}"
+            )
+
+        # Validar tamaño del archivo (máximo 50MB)
+        max_size = 50 * 1024 * 1024  # 50MB
+        file_content = await file.read()
+        file_size = len(file_content)
+
+        if file_size > max_size:
+            raise HTTPException(
+                status_code=400,
+                detail=f"El archivo es demasiado grande. Tamaño máximo permitido: 50MB. Tamaño del archivo: {file_size / (1024*1024):.1f}MB"
+            )
+
+        # Crear directorio de resultados para el usuario
+        user_name = current_user.usuario
+        user_results_dir = os.path.join(RESULTS_DIR, user_name)
+        os.makedirs(user_results_dir, exist_ok=True)
+
+        # Generar timestamp y nombres de archivos
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        temp_filename = f"temp_{timestamp}_{file.filename}"
+        temp_file_path = os.path.join(user_results_dir, temp_filename)
+
+        # Guardar archivo temporal
+        with open(temp_file_path, 'wb') as f:
+            f.write(file_content)
+
+        logging.info(f"Archivo guardado temporalmente: {temp_file_path}")
+
+        # Procesar archivo según el tipo
+        if file_extension in ['.xlsx', '.xls']:
+            # Procesar Excel
+            progress = MigracionProgress()
+            await process_excel_file_in_background(
+                temp_file_path, migration_name, timestamp, user_results_dir, db, current_user, progress
+            )
+
+            # Verificar si hubo errores
+            if progress.errors:
+                error_details = "; ".join([f"{err.get('sheet', 'General')}: {err.get('error', 'Error desconocido')}" for err in progress.errors])
+                raise HTTPException(status_code=500, detail=f"Error procesando archivo Excel: {error_details}")
+
+            # Redirigir automáticamente al dashboard después del procesamiento exitoso
+            return RedirectResponse(url="/migraciones/dashboard_migracion", status_code=302)
+
+        elif file_extension == '.csv':
+            # Procesar CSV
+            try:
+                # Leer CSV con pandas
+                df = pd.read_csv(io.BytesIO(file_content), encoding='utf-8-sig')
+
+                # Procesar DataFrame
+                df.dropna(how='all', inplace=True)
+                df.dropna(axis=1, how='all', inplace=True)
+
+                if df.empty:
+                    raise HTTPException(status_code=400, detail="El archivo CSV está vacío o no contiene datos válidos")
+
+                # Convertir a JSON
+                json_filename = f"csv_{timestamp}.json"
+                json_path = os.path.join(user_results_dir, json_filename)
+                df.to_json(json_path, orient='records', date_format='iso')
+
+                # Crear tabla
+                table_name = f"migracion_{migration_name}_{timestamp}".replace(" ", "_").replace("-", "_").lower()
+
+                # Procesar archivo JSON
+                result_filename = f"result_csv_{timestamp}.json"
+                result_path = os.path.join(user_results_dir, result_filename)
+                procesar_archivo(json_path, result_path, db, current_user, table_name)
+
+                # Redirigir automáticamente al dashboard después del procesamiento exitoso
+                return RedirectResponse(url="/migraciones/dashboard_migracion", status_code=302)
+
+            except pd.errors.EmptyDataError:
+                raise HTTPException(status_code=400, detail="El archivo CSV está vacío")
+            except pd.errors.ParserError as e:
+                raise HTTPException(status_code=400, detail=f"Error al parsear CSV: {str(e)}")
+            except Exception as e:
+                logging.error(f"Error procesando CSV: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Error procesando archivo CSV: {str(e)}")
+
+        elif file_extension == '.txt':
+            # Procesar TXT (asumiendo delimitado por comas o tabs)
+            try:
+                # Intentar detectar delimitador
+                content_str = file_content.decode('utf-8-sig')
+
+                # Detectar delimitador (prioridad: tab, luego coma, luego punto y coma)
+                if '\t' in content_str:
+                    delimiter = '\t'
+                elif ';' in content_str:
+                    delimiter = ';'
+                else:
+                    delimiter = ','
+
+                # Leer con pandas
+                df = pd.read_csv(io.StringIO(content_str), delimiter=delimiter, encoding='utf-8')
+
+                # Procesar DataFrame
+                df.dropna(how='all', inplace=True)
+                df.dropna(axis=1, how='all', inplace=True)
+
+                if df.empty:
+                    raise HTTPException(status_code=400, detail="El archivo TXT está vacío o no contiene datos válidos")
+
+                # Convertir a JSON
+                json_filename = f"txt_{timestamp}.json"
+                json_path = os.path.join(user_results_dir, json_filename)
+                df.to_json(json_path, orient='records', date_format='iso')
+
+                # Crear tabla
+                table_name = f"migracion_{migration_name}_{timestamp}".replace(" ", "_").replace("-", "_").lower()
+
+                # Procesar archivo JSON
+                result_filename = f"result_txt_{timestamp}.json"
+                result_path = os.path.join(user_results_dir, result_filename)
+                procesar_archivo(json_path, result_path, db, current_user, table_name)
+
+                # Redirigir automáticamente al dashboard después del procesamiento exitoso
+                return RedirectResponse(url="/migraciones/dashboard_migracion", status_code=302)
+
+            except Exception as e:
+                logging.error(f"Error procesando TXT: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Error procesando archivo TXT: {str(e)}")
+
+        else:
+            raise HTTPException(status_code=400, detail=f"Tipo de archivo no soportado: {file_extension}")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error general en upload: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+# Endpoint API para obtener datos del dashboard de la migración más reciente
+@router.api_route("/api/dashboard_data", methods=["GET", "HEAD"])
+async def get_dashboard_data(
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(require_role_api(["admin", "usuario"]))
+):
+    """API para obtener datos del dashboard de la migración más reciente"""
+    try:
+        user_id = current_user.codigo
+
+        if not user_id:
+            raise HTTPException(status_code=400, detail="Usuario no válido")
+
+        # Obtener la migración más reciente del usuario
+        latest_migration = db.query(MigracionMetadata).filter(
+            MigracionMetadata.usuario_id == user_id
+        ).order_by(
+            MigracionMetadata.fecha_creacion.desc()
+        ).first()
+
+        if not latest_migration:
+            return {
+                "migration_name": None,
+                "file_name": None,
+                "file_type": None,
+                "file_size": None,
+                "migration_date": None,
+                "status": "no_data",
+                "processing_type": None,
+                "chunks_processed": None,
+                "total_errors": 0,
+                "tables": [],
+                "total_records": 0,
+                "processing_time": 0,
+                "avg_speed": 0
+            }
+
+        # Obtener información de las tablas creadas por esta migración
+        # Buscar tablas que contengan el nombre de la migración
+        migration_name_pattern = f"%{latest_migration.nombre_tabla}%"
+        inspector = inspect(db.bind)
+
+        # Obtener todas las tablas del usuario
+        all_tables = inspector.get_table_names()
+
+        # Filtrar tablas relacionadas con esta migración
+        migration_tables = []
+        total_records = 0
+
+        for table_name in all_tables:
+            if latest_migration.nombre_tabla.lower() in table_name.lower():
+                try:
+                    # Obtener conteo de registros
+                    result = db.execute(text(f"SELECT COUNT(*) FROM {table_name}")).scalar()
+                    record_count = result or 0
+                    total_records += record_count;
+
+                    migration_tables.append({
+                        "name": table_name,
+                        "record_count": record_count,
+                        "created_date": latest_migration.fecha_creacion.strftime('%Y-%m-%d %H:%M:%S') if latest_migration.fecha_creacion else None
+                    })
+                except Exception as e:
+                    logging.warning(f"Error al obtener información de tabla {table_name}: {str(e)}")
+                    migration_tables.append({
+                        "name": table_name,
+                        "record_count": 0,
+                        "created_date": latest_migration.fecha_creacion.strftime('%Y-%m-%d %H:%M:%S') if latest_migration.fecha_creacion else None
+                    })
+
+        # Calcular velocidad promedio
+        processing_time = latest_migration.tiempo_procesamiento_segundos or 0
+        avg_speed = total_records / processing_time if processing_time > 0 else 0
+
+        return {
+            "migration_name": latest_migration.nombre_tabla,
+            "file_name": getattr(latest_migration, 'nombre_original_archivo', latest_migration.nombre_tabla),
+            "file_type": latest_migration.tipo_archivo,
+            "file_size": getattr(latest_migration, 'tamanio_bytes', None),
+            "migration_date": latest_migration.fecha_creacion.strftime('%Y-%m-%d %H:%M:%S') if latest_migration.fecha_creacion else None,
+            "status": latest_migration.estado,
+            "processing_type": getattr(latest_migration, 'tipo_procesamiento', 'background'),
+            "chunks_processed": getattr(latest_migration, 'chunks_procesados', None),
+            "total_errors": getattr(latest_migration, 'total_errores', 0),
+            "tables": migration_tables,
+            "total_records": total_records,
+            "processing_time": processing_time,
+            "avg_speed": round(avg_speed, 2) if avg_speed > 0 else 0,
+            "validation_errors": getattr(latest_migration, 'validacion_errores', []),
+            "validation_warnings": getattr(latest_migration, 'validacion_advertencias', []),
+            "validation_summary": getattr(latest_migration, 'validacion_resumen', {})
+        }
+
+    except Exception as e:
+        logging.error(f"Error al obtener datos del dashboard: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al obtener datos del dashboard")

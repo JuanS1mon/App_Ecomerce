@@ -14,11 +14,11 @@ from jose import jwt, JWTError
 from config import SECRET_KEY, ALGORITHM
 from db.database import get_db
 from db.models.config.usuarios import Usuarios
-from db.models.config.roles import Roles, usuario_roles
+from db.models.config.usuarios_rol import UsuariosRol
+from db.models.config.roles import Roles
+from db.models.security.token_blacklist import TokenBlacklist
 from db.schemas.config.Usuarios import UserDB, TokenData
-from security.security import verificar_clave
-
-# Configurar logger
+from security.security import verificar_clave# Configurar logger
 logger = logging.getLogger("jwt_auth")
 
 # Configurar HTTPBearer para extraer token del header Authorization
@@ -116,8 +116,15 @@ def get_current_user(
         logger.warning("No se proporcionó token de autorización")
         raise JWTAuthError("Token de acceso requerido")
     
+    token = credentials.credentials
+    
+    # VERIFICAR SI EL TOKEN ESTÁ EN LA LISTA NEGRA
+    if TokenBlacklist.is_token_blacklisted(db, token):
+        logger.warning(f"Token en lista negra intentó ser usado")
+        raise JWTAuthError("Token inválido - sesión cerrada")
+    
     # Verificar token
-    token_data = verify_token(credentials.credentials)
+    token_data = verify_token(token)
     
     # Buscar usuario en base de datos
     user = db.query(Usuarios).filter(Usuarios.usuario == token_data.username).first()
@@ -132,10 +139,10 @@ def get_current_user(
     
     # Cargar roles del usuario
     roles_query = db.query(Roles.nombre).join(
-        usuario_roles, 
-        usuario_roles.c.rol_id == Roles.id
+        UsuariosRol, 
+        UsuariosRol.rol_id == Roles.id
     ).filter(
-        usuario_roles.c.usuario_id == user.codigo
+        UsuariosRol.usuario_id == user.codigo
     ).all()
     
     user.roles = [role[0].lower() for role in roles_query]
@@ -218,6 +225,8 @@ def authenticate_user_jwt(db: Session, username: str, password: str) -> Optional
         logger.debug(f"🔐 AUTHENTICATE_USER_JWT DEBUG:")
         logger.debug(f"  Username recibido: '{username}'")
         logger.debug(f"  Password recibido: {'*' * len(password) if password else 'None'} (longitud: {len(password) if password else 0})")
+        logger.debug(f"  Password bytes: {password.encode('utf-8') if password else 'None'}")
+        logger.debug(f"  Password repr: {repr(password) if password else 'None'}")
         
         # Buscar usuario
         user = db.query(Usuarios).filter(Usuarios.usuario == username).first()
@@ -247,10 +256,10 @@ def authenticate_user_jwt(db: Session, username: str, password: str) -> Optional
 
         # Cargar roles
         roles_query = db.query(Roles.nombre).join(
-            usuario_roles, 
-            usuario_roles.c.rol_id == Roles.id
+            UsuariosRol, 
+            UsuariosRol.rol_id == Roles.id
         ).filter(
-            usuario_roles.c.usuario_id == user.codigo
+            UsuariosRol.usuario_id == user.codigo
         ).all()
         
         roles = [role[0] for role in roles_query]

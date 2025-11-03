@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-store-title="Iniciar Sesión">Iniciar Sesión - Ecommerce Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="/static/config.js"></script>
+    <style>
+        :root {
+            --ecommerce-blue: #00bfff;
+            --ecommerce-dark: #1a1a1a;
+            --ecommerce-gray: #f8f9fa;
+            --ecommerce-light: #ffffff;
+            --ecommerce-text: #333333;
+            --ecommerce-text-light: #666666;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--ecommerce-text);
+            line-height: 1.6;
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-card {
+            background: var(--ecommerce-light);
+            border-radius: 20px;
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.1),
+                0 8px 16px rgba(0, 0, 0, 0.06),
+                0 2px 8px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            max-width: 1000px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+        }
+
+        .login-left {
+            background: linear-gradient(135deg, var(--ecommerce-blue) 0%, #0099cc 100%);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-left::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .login-right {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .brand-logo i {
+            font-size: 2.5rem;
+            color: var(--ecommerce-blue);
+        }
+
+        .brand-logo span {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, white 0%, rgba(255,255,255,0.9) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, white 0%, rgba(255,255,255,0.9) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.125rem;
+            color: var(--ecommerce-text-light);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-item i {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .feature-item span {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .login-form {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--ecommerce-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-subtitle {
+            color: var(--ecommerce-text-light);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--ecommerce-text);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--ecommerce-blue);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .password-input {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: var(--ecommerce-blue);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-input {
+            width: 1rem;
+            height: 1rem;
+            accent-color: var(--ecommerce-blue);
+        }
+
+        .checkbox-label {
+            font-size: 0.875rem;
+            color: var(--ecommerce-text-light);
+        }
+
+        .forgot-link {
+            font-size: 0.875rem;
+            color: var(--ecommerce-blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-link:hover {
+            color: #0099cc;
+            text-decoration: underline;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--ecommerce-blue) 0%, #0099cc 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 191, 255, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .register-text {
+            color: var(--ecommerce-text-light);
+            margin-bottom: 1rem;
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #f3f4f6;
+            color: var(--ecommerce-text);
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            border-color: #d1d5db;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .message-success {
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .message-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .message-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-card {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+
+            .login-left {
+                display: none;
+            }
+
+            .login-right {
+                padding: 2rem;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .form-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1rem;
+            }
+
+            .login-right {
+                padding: 1.5rem;
+            }
+
+            .welcome-title {
+                font-size: 1.75rem;
+            }
+
+            .form-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="flex items-center space-x-2 text-gray-800 hover:text-blue-600 transition-colors">
+                        <img alt="Logo" class="h-8 w-auto" src="/static/img/logo.png" onerror="this.onerror=null; this.src='/static/img/logo.png'"/>
+                        <span class="font-bold text-lg">Tienda Online</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/ecomerce/productos/tienda" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-2">
+                        <i class="fas fa-store"></i>
+                        <span>Productos</span>
+                    </a>
+                    <a href="/ecommerce/register" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Registrarse</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Container -->
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Left Panel -->
+            <div class="login-left">
+                <div class="relative z-10">
+                    <div class="brand-logo">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Tienda Online</span>
+                    </div>
+
+                    <h1 class="welcome-title">¡Bienvenido de vuelta!</h1>
+                    <p class="welcome-subtitle">
+                        Accede a tu cuenta para continuar con tus compras y disfrutar de una experiencia personalizada.
+                    </p>
+
+                    <div class="features-list">
+                        <div class="feature-item">
+                            <i class="fas fa-truck"></i>
+                            <span>Envíos rápidos y seguros</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Compras 100% seguras</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-headset"></i>
+                            <span>Soporte 24/7</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-star"></i>
+                            <span>Productos de calidad</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="login-right">
+                <div class="login-form">
+                    <h2 class="form-title">Iniciar Sesión</h2>
+                    <p class="form-subtitle">Ingresa tus credenciales para continuar</p>
+
+                    <!-- Messages -->
+                    <div id="message" class="message hidden"></div>
+
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope mr-2"></i>Correo electrónico
+                            </label>
+                            <input id="email" name="email" type="email" required
+                                   class="form-input"
+                                   placeholder="tu@email.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock mr-2"></i>Contraseña
+                            </label>
+                            <div class="password-input">
+                                <input id="password" name="password" type="password" required
+                                       class="form-input"
+                                       placeholder="••••••••">
+                                <button type="button" id="togglePassword" class="password-toggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-options">
+                            <div class="checkbox-group">
+                                <input id="remember" name="remember" type="checkbox" class="checkbox-input">
+                                <label for="remember" class="checkbox-label">Recordarme</label>
+                            </div>
+                            <a href="/password-reset" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="btn-primary">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span id="btnText">Iniciar Sesión</span>
+                        </button>
+                    </form>
+
+                    <div class="register-link">
+                        <p class="register-text">¿No tienes cuenta aún?</p>
+                        <a href="/ecommerce/register" class="btn-secondary">
+                            <i class="fas fa-user-plus"></i>
+                            Crear cuenta gratuita
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const password = document.getElementById('password');
+            const icon = this.querySelector('i');
+
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const messageDiv = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const originalText = btnText.innerHTML;
+
+            // Loading state
+            submitBtn.disabled = true;
+            btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Iniciando sesión...';
+
+            try {
+                const formData = new FormData();
+                formData.append('email', document.getElementById('email').value.trim());
+                formData.append('password', document.getElementById('password').value);
+
+                // Send login request (let browser follow redirects automatically)
+                const response = await fetch('/ecommerce/auth/login', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                console.log('Login response status:', response.status);
+                console.log('Login response headers:', Object.fromEntries(response.headers.entries()));
+                console.log('Login response type:', response.type);
+                console.log('Response URL:', response.url);
+
+                // Check if browser followed redirect to store automatically
+                if (response.url.includes('/ecomerce/productos/tienda') || response.url.includes('token=')) {
+                    console.log('Browser followed redirect automatically to store');
+                    // Success - redirected to store
+                    messageDiv.className = 'message message-success';
+                    messageDiv.innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h3 class="font-semibold">¡Bienvenido!</h3>
+                            <p class="text-sm">Te estamos llevando a tu tienda personal...</p>
+                        </div>
+                    `;
+                    messageDiv.classList.remove('hidden');
+
+                    // Redirect after short delay
+                    setTimeout(() => {
+                        window.location.href = response.url;
+                    }, 1500);
+                } else if (response.ok) {
+                    // Check if response is HTML (successful redirect that browser followed)
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('text/html')) {
+                        console.log('Response is HTML, assuming successful redirect');
+                        // Success - redirected to store
+                        messageDiv.className = 'message message-success';
+                        messageDiv.innerHTML = `
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h3 class="font-semibold">¡Bienvenido!</h3>
+                                <p class="text-sm">Te estamos llevando a tu tienda personal...</p>
+                            </div>
+                        `;
+                        messageDiv.classList.remove('hidden');
+
+                        // Redirect after short delay
+                        setTimeout(() => {
+                            window.location.href = '/ecomerce/productos/tienda';
+                        }, 1500);
+                    } else {
+                        // Try to parse as JSON success
+                        try {
+                            const data = await response.json();
+                            console.log('JSON response:', data);
+                            // If we get here, it's unexpected - redirect anyway
+                            window.location.href = '/ecomerce/productos/tienda';
+                        } catch (jsonError) {
+                            console.log('Could not parse response as JSON');
+                            // Assume success and redirect
+                            messageDiv.className = 'message message-success';
+                            messageDiv.innerHTML = `
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <h3 class="font-semibold">¡Bienvenido!</h3>
+                                    <p class="text-sm">Te estamos llevando a tu tienda personal...</p>
+                                </div>
+                            `;
+                            messageDiv.classList.remove('hidden');
+
+                            setTimeout(() => {
+                                window.location.href = '/ecomerce/productos/tienda';
+                            }, 1500);
+                        }
+                    }
+                } else {
+                    console.log('Response not OK, trying to parse JSON error...');
+                    // Try to parse as JSON error
+                    try {
+                        const data = await response.json();
+                        console.log('Error response:', data);
+
+                        // Error handling
+                        let errorMessage = 'Credenciales incorrectas';
+                        if (data.detail) {
+                            if (data.detail.includes('email')) {
+                                errorMessage = 'Correo electrónico no encontrado';
+                            } else if (data.detail.includes('password')) {
+                                errorMessage = 'Contraseña incorrecta';
+                            } else {
+                                errorMessage = data.detail;
+                            }
+                        }
+
+                        throw new Error(errorMessage);
+                    } catch (jsonError) {
+                        console.log('JSON parsing failed:', jsonError);
+                        // If JSON parsing fails, it's likely an HTML error page
+                        throw new Error('Error en el servidor. Inténtalo nuevamente.');
+                    }
+                }
+
+            } catch (error) {
+                console.log('Login error caught:', error.message);
+                console.log('Error object:', error);
+                // Error display
+                messageDiv.className = 'message message-error';
+                messageDiv.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <h3 class="font-semibold">Error al iniciar sesión</h3>
+                        <p class="text-sm">${error.message}</p>
+                    </div>
+                `;
+                messageDiv.classList.remove('hidden');
+
+                // Shake animation
+                messageDiv.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    messageDiv.style.animation = '';
+                }, 500);
+            } finally {
+                // Restore button
+                submitBtn.disabled = false;
+                btnText.innerHTML = originalText;
+            }
+        });
+
+        // Check for URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        const error = urlParams.get('error');
+
+        if (message) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = 'message message-info';
+            messageDiv.innerHTML = `
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <p>${message}</p>
+                </div>
+            `;
+            messageDiv.classList.remove('hidden');
+        }
+
+        if (error) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = 'message message-error';
+            messageDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <p>${error}</p>
+                </div>
+            `;
+            messageDiv.classList.remove('hidden');
+        }
+
+        // Check if user is already logged in
+        const token = getCookie('ecommerce_token') || sessionStorage.getItem('ecommerce_token');
+        if (token) {
+            // Verify token validity
+            fetch('/ecommerce/auth/verify', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }).then(response => {
+                if (response.status === 200) {
+                    // Valid token - redirect to store
+                    window.location.href = '/ecomerce/productos/tienda';
+                } else {
+                    // Invalid token - clean up
+                    sessionStorage.removeItem('ecommerce_token');
+                    document.cookie = 'ecommerce_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                }
+            }).catch(() => {
+                // Verification error - continue normally
+            });
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+    </script>
+</body>
+</html>

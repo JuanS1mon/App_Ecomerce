@@ -50,7 +50,7 @@ def extract_with_selenium(config):
     """Función temporal stub para extract_with_selenium"""
     return []
 from db.database import get_db
-from db.models.config.activityLog import ActivityLog
+from db.models.logs.activity_log import ActivityLog
 from db.schemas.config.Usuarios import UserDB
 
 # Configuración de logging
@@ -61,7 +61,7 @@ logging.basicConfig(
 )
 
 # Ajustar el directorio de las plantillas
-templates = Jinja2Templates(directory="sql_app/static")
+templates = Jinja2Templates(directory="static")
 
 # Router configuration
 router = APIRouter(

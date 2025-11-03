@@ -41,19 +41,24 @@ LOGGING_CONFIG = {
         }
     },
     "loggers": {
-        # Capturar TODO con nivel DEBUG
-        "uvicorn": {"handlers": ["default", "file"], "level": "DEBUG"},
-        "uvicorn.error": {"handlers": ["default", "file"], "level": "DEBUG"},
-        "uvicorn.access": {"handlers": ["access", "file"], "level": "DEBUG", "propagate": False},
-        "main": {"handlers": ["default", "file"], "level": "DEBUG"},
-        "fastapi": {"handlers": ["default", "file"], "level": "DEBUG"},
-        "generator": {"handlers": ["default", "file"], "level": "DEBUG"},
-        "sql_app": {"handlers": ["default", "file"], "level": "DEBUG"},
-        "sqlalchemy": {"handlers": ["default", "file"], "level": "DEBUG"},
-        "sqlalchemy.engine": {"handlers": ["default", "file"], "level": "DEBUG"},
+        # Capturar con nivel INFO (menos verboso)
+        "uvicorn": {"handlers": ["default", "file"], "level": "INFO"},
+        "uvicorn.error": {"handlers": ["default", "file"], "level": "INFO"},
+        "uvicorn.access": {"handlers": ["access", "file"], "level": "INFO", "propagate": False},
+        "main": {"handlers": ["default", "file"], "level": "INFO"},
+        "fastapi": {"handlers": ["default", "file"], "level": "INFO"},
+        "generator": {"handlers": ["default", "file"], "level": "INFO"},
+        "sql_app": {"handlers": ["default", "file"], "level": "INFO"},
+        "Services": {"handlers": ["default", "file"], "level": "DEBUG"},  # DEBUG para servicios generados
+        "Services": {"handlers": ["default", "file"], "level": "DEBUG"},  # DEBUG para servicios generados
+        "sqlalchemy": {"handlers": ["default", "file"], "level": "WARNING"},  # Menos verboso
+        "sqlalchemy.engine": {"handlers": ["default", "file"], "level": "WARNING"},  # Menos verboso
+        "sqlalchemy.pool": {"handlers": ["default", "file"], "level": "WARNING"},  # Menos verboso
+        "sqlalchemy.orm": {"handlers": ["default", "file"], "level": "WARNING"},  # Menos verboso
+        "passlib": {"handlers": ["default", "file"], "level": "WARNING"},  # Menos verboso
     },
     "root": {
-        "level": "DEBUG",
+        "level": "INFO",
         "handlers": ["default", "file"]
     }
 }
@@ -71,6 +76,7 @@ def setup_logging():
 
     logging.config.dictConfig(LOGGING_CONFIG)
     
-    # FORZAR NIVEL DEBUG EN TODOS LOS LOGGERS
-    logging.getLogger().setLevel(logging.DEBUG)
-    print("🔍 LOGGING ULTRA VERBOSO ACTIVADO - Todos los mensajes aparecerán en consola")
+    # NIVEL INFO PARA PRODUCCIÓN (menos verboso que DEBUG)
+    logging.getLogger().setLevel(logging.INFO)
+    print("[OK] Logging inicializado correctamente")
+#Force reload

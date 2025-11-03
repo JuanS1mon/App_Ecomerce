@@ -96,7 +96,7 @@ def get_client_info(request: Request = None) -> dict:
 
 # Configuración de Jinja2Templates para plantillas HTML
 try:
-    templates = Jinja2Templates(directory="sql_app/static")
+    templates = Jinja2Templates(directory="static")
 except Exception as e:
     logger.error(f"Error al inicializar templates: {str(e)}")
     templates = None

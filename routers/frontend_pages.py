@@ -8,16 +8,15 @@ router = APIRouter(
 )
 
 @router.get("/login", response_class=HTMLResponse)
-@router.get("/loginpage", response_class=HTMLResponse)
 async def login_page():
     """Página de login simplificada sin interferencias JS"""
     try:
-        with open("sql_app/static/login_simple.html", "r", encoding="utf-8") as f:
+        with open("static/login_simple.html", "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
     except FileNotFoundError:
         # Fallback al login original si no existe el simplificado
         try:
-            with open("sql_app/static/login.html", "r", encoding="utf-8") as f:
+            with open("static/login.html", "r", encoding="utf-8") as f:
                 return HTMLResponse(content=f.read())
         except FileNotFoundError:
             return HTMLResponse("""
@@ -56,16 +55,91 @@ async def test_auth_direct():
         </body></html>
         """, status_code=404)
 
-@router.get("/test-auth-complete.html", response_class=HTMLResponse)
-async def test_auth_complete():
-    """Página de test completo del flujo de autenticación"""
+@router.get("/ejemplo-cart", response_class=HTMLResponse)
+async def ejemplo_cart_page():
+    """Página de ejemplo para probar botones de carrito"""
     try:
-        with open("test-auth-complete-ui.html", "r", encoding="utf-8") as f:
+        with open("static/ejemplo_cart_buttons.html", "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
     except FileNotFoundError:
         return HTMLResponse("""
         <html><body>
         <h1>Error</h1>
-        <p>La página de test completo no está disponible</p>
+        <p>La página de ejemplo no está disponible</p>
+        </body></html>
+        """, status_code=404)
+
+@router.get("/ecomerce/carrito", response_class=HTMLResponse)
+async def carrito_page():
+    """Página completa del carrito de compras"""
+    try:
+        with open("Projects/ecomerce/templates/carrito.html", "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse("""
+        <html><body>
+        <h1>Error</h1>
+        <p>La página del carrito no está disponible</p>
+        <a href="/ecomerce/productos/publicos">Ir a la tienda</a>
+        </body></html>
+        """, status_code=404)
+
+@router.get("/static/servicio_al_cliente.html", response_class=HTMLResponse)
+async def servicio_al_cliente_page():
+    """Página de Servicio al Cliente"""
+    try:
+        with open("static/servicio_al_cliente.html", "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse("""
+        <html><body>
+        <h1>Error</h1>
+        <p>La página de Servicio al Cliente no está disponible</p>
+        <a href="/">Volver al inicio</a>
+        </body></html>
+        """, status_code=404)
+
+@router.get("/static/centro_de_ayuda.html", response_class=HTMLResponse)
+async def centro_de_ayuda_page():
+    """Página del Centro de Ayuda"""
+    try:
+        with open("static/centro_de_ayuda.html", "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse("""
+        <html><body>
+        <h1>Error</h1>
+        <p>La página del Centro de Ayuda no está disponible</p>
+        <a href="/">Volver al inicio</a>
+        </body></html>
+        """, status_code=404)
+
+@router.get("/static/envios_devoluciones.html", response_class=HTMLResponse)
+async def envios_devoluciones_page():
+    """Página de Envíos y Devoluciones"""
+    try:
+        with open("static/envios_devoluciones.html", "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse("""
+        <html><body>
+        <h1>Error</h1>
+        <p>La página de Envíos y Devoluciones no está disponible</p>
+        <a href="/">Volver al inicio</a>
+        </body></html>
+        """, status_code=404)
+
+@router.get("/static/politica_privacidad.html", response_class=HTMLResponse)
+async def politica_privacidad_page():
+    """Página de Política de Privacidad"""
+    try:
+        with open("static/politica_privacidad.html", "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse("""
+        <html><body>
+        <h1>Error</h1>
+        <p>La página de Política de Privacidad no está disponible</p>
+        <a href="/">Volver al inicio</a>
         </body></html>
         """, status_code=404)

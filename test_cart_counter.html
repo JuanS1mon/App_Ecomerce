@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Contador Carrito</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Prueba del Contador del Carrito</h1>
+
+        <!-- Navbar con contador -->
+        <nav class="bg-white shadow-sm border-b border-gray-100 mb-8">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center space-x-8">
+                        <span class="text-gray-900 font-bold text-lg">Tienda de Prueba</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button id="cart-button" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm transition-colors font-medium relative flex items-center" onclick="toggleCart()">
+                                <i class="fas fa-shopping-cart mr-1"></i>
+                                <span class="ml-1 hidden md:inline">Carrito</span>
+                                <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="cart-count">0</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Productos de prueba -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-2">Producto 1</h3>
+                <p class="text-gray-600 mb-4">Precio: $10.00</p>
+                <button onclick="addToCart(1, 1, 10.00)" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Agregar al Carrito
+                </button>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-2">Producto 2</h3>
+                <p class="text-gray-600 mb-4">Precio: $15.00</p>
+                <button onclick="addToCart(2, 1, 15.00)" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Agregar al Carrito
+                </button>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-2">Producto 3</h3>
+                <p class="text-gray-600 mb-4">Precio: $20.00</p>
+                <button onclick="addToCart(3, 1, 20.00)" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Agregar al Carrito
+                </button>
+            </div>
+        </div>
+
+        <!-- Información de debug -->
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold mb-2">Debug Info</h3>
+            <button onclick="debugCart()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                Mostrar Estado del Carrito
+            </button>
+            <button onclick="clearLocalStorage()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-2">
+                Limpiar localStorage
+            </button>
+            <button onclick="location.reload()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 ml-2">
+                Recargar Página
+            </button>
+        </div>
+    </div>
+
+    <!-- Sidebar del carrito -->
+    <div class="cart-sidebar fixed top-0 right-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out z-50" id="cart-sidebar">
+        <div class="flex flex-col h-full">
+            <!-- Header del carrito -->
+            <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+                <h2 class="text-lg font-semibold flex items-center">
+                    <i class="fas fa-shopping-cart mr-2"></i>
+                    Mi Carrito
+                </h2>
+                <button class="text-white hover:text-blue-200 transition-colors" onclick="toggleCart()">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Contenido del carrito -->
+            <div class="flex-1 overflow-y-auto p-4" id="cart-items">
+                <div class="text-center text-gray-500 py-8" id="empty-cart">
+                    <i class="fas fa-shopping-cart text-4xl mb-4"></i>
+                    <p>Tu carrito está vacío</p>
+                </div>
+            </div>
+
+            <!-- Footer del carrito -->
+            <div class="border-t bg-gray-50 p-4" id="cart-footer" style="display: none;">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-semibold">Total:</span>
+                    <span class="text-lg font-bold text-blue-600" id="cart-total">$0</span>
+                </div>
+                <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                    <i class="fas fa-credit-card mr-2"></i>
+                    Proceder al Pago
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay para cerrar el carrito -->
+    <div class="cart-overlay fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="cart-overlay" onclick="toggleCart()"></div>
+
+    <!-- Scripts -->
+    <script src="/static/ecomerce/carrito.js"></script>
+    <script>
+        // Función para limpiar localStorage (para testing)
+        function clearLocalStorage() {
+            localStorage.removeItem('ecommerce_cart_local');
+            location.reload();
+        }
+
+        // Inicializar carrito cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM cargado, inicializando carrito...');
+            // Inicializar carrito
+            if (window.cart && typeof window.cart.initCart === 'function') {
+                window.cart.initCart();
+            } else {
+                console.error('Función cart.initCart no disponible');
+            }
+        });
+    </script>
+</body>
+</html>

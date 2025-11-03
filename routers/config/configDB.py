@@ -13,7 +13,7 @@ from security.security import get_current_user
 
 logger = logging.getLogger(__name__)
 
-templates = Jinja2Templates(directory="sql_app/static")
+templates = Jinja2Templates(directory="static")
 
 router = APIRouter(
     include_in_schema=False,  # Oculta todas las rutas de este router en la documentación

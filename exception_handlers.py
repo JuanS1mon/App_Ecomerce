@@ -11,19 +11,19 @@ def register_exception_handlers(app, templates=None):
     async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
         static_dir = os.path.join(os.path.dirname(__file__), "static")
         if exc.status_code == 404:
-            return FileResponse(os.path.join(static_dir, '404.html'), status_code=404)
+            return FileResponse(os.path.join(static_dir, '404.html'), status_code=404, media_type="text/html; charset=utf-8")
         elif exc.status_code == 401:
-            return FileResponse(os.path.join(static_dir, '401.html'), status_code=401)
+            return FileResponse(os.path.join(static_dir, '401.html'), status_code=401, media_type="text/html; charset=utf-8")
         elif exc.status_code == 403:
-            return FileResponse(os.path.join(static_dir, '403.html'), status_code=403)
+            return FileResponse(os.path.join(static_dir, '403.html'), status_code=403, media_type="text/html; charset=utf-8")
         elif exc.status_code == 405:
-            return FileResponse(os.path.join(static_dir, '405.html'), status_code=405)
+            return FileResponse(os.path.join(static_dir, '405.html'), status_code=405, media_type="text/html; charset=utf-8")
         elif exc.status_code == 500:
-            return FileResponse(os.path.join(static_dir, '500.html'), status_code=500)
+            return FileResponse(os.path.join(static_dir, '500.html'), status_code=500, media_type="text/html; charset=utf-8")
         elif exc.status_code == 503:
-            return FileResponse(os.path.join(static_dir, '503.html'), status_code=503)
+            return FileResponse(os.path.join(static_dir, '503.html'), status_code=503, media_type="text/html; charset=utf-8")
         elif exc.status_code == 505:
-            return FileResponse(os.path.join(static_dir, '505.html'), status_code=505)
+            return FileResponse(os.path.join(static_dir, '505.html'), status_code=505, media_type="text/html; charset=utf-8")
         return JSONResponse(status_code=exc.status_code, content=jsonable_encoder({"detail": exc.detail}))
 
     @app.exception_handler(RequestValidationError)
@@ -45,6 +45,8 @@ def register_exception_handlers(app, templates=None):
                 "application/json" in accept_header or
                 "application/x-www-form-urlencoded" in content_type or
                 request.url.path.startswith("/api/") or
+                request.url.path.startswith("/auth/") or
+                request.url.path.startswith("/ecomerce/") or
                 request.url.path.startswith("/admin") or
                 (request.url.path.startswith("/usuarios_admin/") and request.url.path != "/usuarios_admin/" and not request.url.path.endswith(".html")) or
                 request.url.path in ["/login", "/logout", "/usuarios/login"]
