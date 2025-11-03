@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras - E-commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .hover-raise:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            min-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .toast-success {
+            background-color: #10b981;
+        }
+        .toast-error {
+            background-color: #ef4444;
+        }
+        .fade-out {
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+        }
+        .cart-item {
+            transition: all 0.2s ease;
+        }
+        .cart-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-8">
+                    <a class="flex items-center space-x-3" href="/ecomerce/productos/tienda">
+                        <img alt="Logo" class="h-8 w-auto" src="/static/img/logo.png" onerror="this.onerror=null; this.src='/static/img/logo.png'"/>
+                        <span class="text-gray-900 font-bold text-lg hidden md:block">
+                            Tienda Online
+                        </span>
+                    </a>
+                    <div class="hidden md:flex items-center space-x-2 text-sm text-gray-600">
+                        <a class="text-gray-600 hover:text-blue-600 transition-colors" href="/ecomerce/productos/tienda">
+                            <i class="fas fa-home"></i>
+                            <span class="ml-1">Inicio</span>
+                        </a>
+                        <span class="text-gray-400">/</span>
+                        <a class="text-gray-600 hover:text-blue-600 transition-colors" href="/ecomerce/productos/tienda">
+                            <i class="fas fa-store"></i>
+                            <span class="ml-1">Productos</span>
+                        </a>
+                        <span class="text-gray-400">/</span>
+                        <span class="text-blue-600 font-medium">Carrito</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Usuario autenticado -->
+                    <div id="user-info" class="flex items-center space-x-3 relative">
+                        <div class="relative">
+                            <button id="user-dropdown-btn" class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm transition-colors font-medium">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="user-greeting">Hola, Usuario</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div id="user-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 hidden border border-gray-200">
+                                <div class="py-1">
+                                    <a href="/ecomerce/usuarios/perfil" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-user mr-2"></i>
+                                        Mi Perfil
+                                    </a>
+                                    <button onclick="logout()" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>
+                                        Salir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <a href="/ecomerce/carrito" id="cart-button" class="text-blue-600 hover:text-blue-700 px-3 py-2 rounded-md text-sm transition-colors font-medium relative flex items-center">
+                            <i class="fas fa-shopping-cart mr-1"></i>
+                            <span class="ml-1 hidden md:inline">Carrito</span>
+                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="cart-count">0</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="fas fa-shopping-cart mr-3 text-blue-600"></i>
+                Mi Carrito de Compras
+            </h1>
+            <p class="text-gray-600">
+                Revisa y modifica los productos en tu carrito antes de proceder al pago.
+            </p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="flex justify-center items-center py-12">
+            <div class="text-center">
+                <i class="fas fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
+                <p class="text-gray-600">Cargando tu carrito...</p>
+            </div>
+        </div>
+
+        <!-- Empty Cart State -->
+        <div id="empty-cart" class="hidden bg-white rounded-lg shadow p-8 text-center">
+            <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Tu carrito está vacío</h2>
+            <p class="text-gray-600 mb-6">¡Agrega algunos productos para comenzar tu compra!</p>
+            <a href="/ecomerce/productos/tienda" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <i class="fas fa-store mr-2"></i>Ir a la tienda
+            </a>
+        </div>
+
+        <!-- Cart Content -->
+        <div id="cart-content" class="hidden">
+            <!-- Cart Items -->
+            <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">
+                        <i class="fas fa-list mr-2 text-blue-600"></i>
+                        Productos en tu carrito
+                    </h2>
+                </div>
+
+                <div id="cart-items" class="divide-y divide-gray-200">
+                    <!-- Cart items will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">
+                        <i class="fas fa-calculator mr-2 text-green-600"></i>
+                        Resumen del pedido
+                    </h2>
+                    <span id="cart-item-count" class="text-sm text-gray-600">0 productos</span>
+                </div>
+
+                <div class="space-y-3 mb-6">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Subtotal:</span>
+                        <span id="cart-subtotal">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Envío:</span>
+                        <span id="cart-shipping">Calculado en checkout</span>
+                    </div>
+                    <div class="border-t pt-3">
+                        <div class="flex justify-between text-lg font-semibold text-gray-900">
+                            <span>Total:</span>
+                            <span id="cart-total">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="/ecomerce/productos/tienda" class="flex-1 bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors text-center font-medium">
+                        <i class="fas fa-arrow-left mr-2"></i>Continuar comprando
+                    </a>
+                    <button id="checkout-btn" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-credit-card mr-2"></i>Proceder al pago
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+    <!-- Scripts -->
+    <script src="/static/ecomerce/carrito.js"></script>
+    <script>
+        // ============================================================================
+        // CARRITO.JS - PÁGINA COMPLETA DEL CARRITO
+        // ============================================================================
+
+        // Configuración de API
+        const API_BASE = '/ecomerce';
+
+        // ============================================================================
+        // UTILIDADES
+        // ============================================================================
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type} slide-in`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>
+                ${message}
+            `;
+            document.getElementById('toast-container').appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ============================================================================
+        // AUTENTICACIÓN
+        // ============================================================================
+
+        function getToken() {
+            return sessionStorage.getItem('ecommerce_token') || getCookie('ecommerce_token');
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        async function getCurrentUserId() {
+            // Primero intentar obtener del sessionStorage (cache)
+            const storedUserId = sessionStorage.getItem('ecommerce_user_id');
+            if (storedUserId) {
+                return parseInt(storedUserId);
+            }
+
+            // Si no está en sessionStorage, hacer petición al backend para obtener usuario actual
+            const token = getToken();
+
+            if (!token) {
+                console.warn('No se encontró token ecommerce');
+                return null;
+            }
+
+            try {
+                // Hacer petición a /ecommerce/auth/me para obtener información del usuario
+                const response = await fetch('/ecommerce/auth/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+
+                    // Guardar el userId en sessionStorage y cookies para futuras peticiones
+                    if (userData.id) {
+                        sessionStorage.setItem('ecommerce_user_id', userData.id.toString());
+                        // También guardar en cookies para consistencia cross-tab
+                        document.cookie = `ecommerce_user_id=${userData.id}; path=/; max-age=86400`; // 24 horas
+                        return userData.id;
+                    } else {
+                        console.error('Respuesta de /ecommerce/auth/me no contiene campo "id"');
+                        return null;
+                    }
+                } else if (response.status === 401) {
+                    console.warn('Token ecommerce inválido o expirado');
+                    // Limpiar token inválido de ambos storage
+                    sessionStorage.removeItem('ecommerce_token');
+                    sessionStorage.removeItem('ecommerce_user_id');
+                    document.cookie = 'ecommerce_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    document.cookie = 'ecommerce_user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    return null;
+                } else {
+                    console.error(`Error en petición a /ecommerce/auth/me: ${response.status}`);
+                    return null;
+                }
+
+            } catch (error) {
+                console.error('Error obteniendo usuario ecommerce actual:', error);
+                return null;
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('ecommerce_token');
+            sessionStorage.removeItem('ecommerce_user_id');
+            document.cookie = 'ecommerce_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'ecommerce_user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            window.location.href = '/ecommerce/login';
+        }
+
+        // ============================================================================
+        // CARRITO - FUNCIONES PARA LA PÁGINA COMPLETA
+        // ============================================================================
+
+        let currentCart = null;
+        let cartItems = [];
+
+        async function loadUserProfile() {
+            try {
+                const token = getToken();
+                if (!token) {
+                    window.location.href = '/ecommerce/login';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/usuarios/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        logout();
+                        return;
+                    }
+                    throw new Error('Error al cargar el perfil');
+                }
+
+                const data = await response.json();
+                const user = data.user || data;
+
+                // Actualizar navbar
+                const displayName = user.nombre || 'Usuario';
+                document.getElementById('user-greeting').textContent = `Hola, ${displayName}`;
+
+            } catch (error) {
+                console.error('Error cargando perfil:', error);
+                showToast('Error al cargar la información del usuario', 'error');
+            }
+        }
+
+        async function loadCart() {
+            try {
+                document.getElementById('loading-state').classList.remove('hidden');
+
+                const token = getToken();
+                if (!token) {
+                    window.location.href = '/ecommerce/login';
+                    return;
+                }
+
+                // Primero obtener el user_id del usuario ecommerce
+                const userId = await getCurrentUserId();
+                if (!userId) {
+                    window.location.href = '/ecommerce/login';
+                    return;
+                }
+
+                // Obtener carrito activo
+                const cartResponse = await fetch(`${API_BASE}/carritos/activo/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (cartResponse.ok) {
+                    currentCart = await cartResponse.json();
+
+                    // Obtener items del carrito
+                    const itemsResponse = await fetch(`${API_BASE}/carrito_items/carrito/${currentCart.id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (itemsResponse.ok) {
+                        cartItems = await itemsResponse.json();
+
+                        // Cargar información completa de los productos
+                        await loadProductDetails();
+
+                        renderCart();
+                    } else {
+                        throw new Error('Error al cargar los items del carrito');
+                    }
+                } else if (cartResponse.status === 404) {
+                    // No hay carrito activo
+                    currentCart = null;
+                    cartItems = [];
+                    renderEmptyCart();
+                } else {
+                    throw new Error('Error al cargar el carrito');
+                }
+            } catch (error) {
+                console.error('Error cargando carrito:', error);
+                showToast('Error al cargar el carrito', 'error');
+                renderEmptyCart();
+            } finally {
+                document.getElementById('loading-state').classList.add('hidden');
+            }
+        }
+
+        async function loadProductDetails() {
+            if (!cartItems || cartItems.length === 0) return;
+
+            try {
+                const productPromises = cartItems.map(async (item) => {
+                    try {
+                        const response = await fetch(`${API_BASE}/productos/publico/${item.id_producto}`);
+                        if (response.ok) {
+                            const product = await response.json();
+                            item.product_name = product.nombre || `Producto ${item.id_producto}`;
+                            item.product_image = product.imagen_url || '/static/img/logo.png';
+                            item.product_codigo = product.codigo || '';
+                            item.product_descripcion = product.descripcion || '';
+
+                            // Cargar información de variantes si existe
+                            item.variant_info = null;
+                            if (item.variant_data && typeof item.variant_data === 'object') {
+                                item.variant_info = item.variant_data;
+                            } else if (product.variants && product.variants.length > 0) {
+                                // Si no hay variant_data pero el producto tiene variantes,
+                                // intentar encontrar la variante por defecto o la primera disponible
+                                const defaultVariant = product.variants.find(v => v.stock > 0) || product.variants[0];
+                                if (defaultVariant) {
+                                    item.variant_info = {
+                                        color: defaultVariant.color,
+                                        tipo: defaultVariant.tipo,
+                                        precio_adicional: defaultVariant.precio_adicional || 0
+                                    };
+                                }
+                            }
+                        } else {
+                            item.product_name = `Producto ${item.id_producto}`;
+                            item.product_image = '/static/img/logo.png';
+                            item.product_codigo = '';
+                            item.product_descripcion = '';
+                            item.variant_info = null;
+                        }
+                    } catch (error) {
+                        console.warn(`Error cargando producto ${item.id_producto}:`, error);
+                        item.product_name = `Producto ${item.id_producto}`;
+                        item.product_image = '/static/img/logo.png';
+                        item.product_codigo = '';
+                        item.product_descripcion = '';
+                        item.variant_info = null;
+                    }
+                });
+
+                await Promise.all(productPromises);
+            } catch (error) {
+                console.error('Error cargando detalles de productos:', error);
+            }
+        }
+
+        function renderCart() {
+            if (!cartItems || cartItems.length === 0) {
+                renderEmptyCart();
+                return;
+            }
+
+            // Mostrar contenido del carrito
+            document.getElementById('empty-cart').classList.add('hidden');
+            document.getElementById('cart-content').classList.remove('hidden');
+
+            // Renderizar items
+            const cartItemsContainer = document.getElementById('cart-items');
+            let total = 0;
+            let itemCount = 0;
+
+            cartItemsContainer.innerHTML = cartItems.map(item => {
+                const itemTotal = item.cantidad * item.precio_unitario;
+                total += itemTotal;
+                itemCount += item.cantidad;
+
+                // Construir información de variante
+                let variantDisplay = '';
+                if (item.variant_info) {
+                    const variantParts = [];
+                    if (item.variant_info.color) variantParts.push(`Color: ${item.variant_info.color}`);
+                    if (item.variant_info.tipo) variantParts.push(`Tipo: ${item.variant_info.tipo}`);
+                    if (variantParts.length > 0) {
+                        variantDisplay = `<p class="text-sm text-blue-600 font-medium">${variantParts.join(' • ')}</p>`;
+                    }
+                }
+
+                return `
+                    <div class="cart-item p-6 flex items-center space-x-4">
+                        <img src="${item.product_image}" alt="${item.product_name}"
+                             class="w-20 h-20 object-cover rounded-lg" onerror="this.src='/static/img/logo.png'">
+
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-1">${item.product_name}</h3>
+                            ${variantDisplay}
+                            <p class="text-sm text-gray-600 mb-2">${item.product_codigo}</p>
+                            <p class="text-sm text-gray-500 line-clamp-2">${item.product_descripcion || ''}</p>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center space-x-2">
+                                <button onclick="updateQuantity(${item.id}, ${item.cantidad - 1})"
+                                        class="bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded-md text-gray-700 transition-colors">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" value="${item.cantidad}" min="1"
+                                       onchange="updateQuantity(${item.id}, parseInt(this.value))"
+                                       class="quantity-input px-2 py-1 border border-gray-300 rounded-md text-center">
+                                <button onclick="updateQuantity(${item.id}, ${item.cantidad + 1})"
+                                        class="bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded-md text-gray-700 transition-colors">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Precio unitario</p>
+                                <p class="font-semibold text-gray-900">$${formatPrice(item.precio_unitario)}</p>
+                            </div>
+
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Total</p>
+                                <p class="text-lg font-bold text-gray-900">$${formatPrice(itemTotal)}</p>
+                            </div>
+
+                            <button onclick="removeItem(${item.id})"
+                                    class="text-red-500 hover:text-red-700 p-2 transition-colors">
+                                <i class="fas fa-trash text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Actualizar resumen
+            document.getElementById('cart-item-count').textContent = `${itemCount} producto${itemCount !== 1 ? 's' : ''}`;
+            document.getElementById('cart-subtotal').textContent = `$${formatPrice(total)}`;
+            document.getElementById('cart-total').textContent = `$${formatPrice(total)}`;
+
+            // Actualizar contador global
+            updateGlobalCartCount(itemCount);
+        }
+
+        function renderEmptyCart() {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('cart-content').classList.add('hidden');
+            document.getElementById('empty-cart').classList.remove('hidden');
+            updateGlobalCartCount(0);
+        }
+
+        async function updateQuantity(itemId, newQuantity) {
+            try {
+                if (newQuantity <= 0) {
+                    await removeItem(itemId);
+                    return;
+                }
+
+                const token = getToken();
+                const response = await fetch(`${API_BASE}/carrito_items/id/${itemId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        cantidad: newQuantity
+                    })
+                });
+
+                if (response.ok) {
+                    // Actualizar localmente
+                    const itemIndex = cartItems.findIndex(item => item.id === itemId);
+                    if (itemIndex !== -1) {
+                        cartItems[itemIndex].cantidad = newQuantity;
+                        renderCart();
+                    }
+                    showToast('Cantidad actualizada', 'success');
+                } else {
+                    throw new Error('Error al actualizar cantidad');
+                }
+            } catch (error) {
+                console.error('Error updating quantity:', error);
+                showToast('Error al actualizar cantidad', 'error');
+            }
+        }
+
+        async function removeItem(itemId) {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE}/carrito_items/id/${itemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    // Remover localmente
+                    cartItems = cartItems.filter(item => item.id !== itemId);
+                    renderCart();
+                    showToast('Producto removido del carrito', 'success');
+                } else {
+                    throw new Error('Error al remover producto');
+                }
+            } catch (error) {
+                console.error('Error removing item:', error);
+                showToast('Error al remover producto', 'error');
+            }
+        }
+
+        function updateGlobalCartCount(count) {
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = count;
+            }
+        }
+
+        function formatPrice(price) {
+            return parseFloat(price).toFixed(2);
+        }
+
+        // ============================================================================
+        // DROPDOWN DE USUARIO
+        // ============================================================================
+
+        const dropdownBtn = document.getElementById('user-dropdown-btn');
+        const dropdown = document.getElementById('user-dropdown');
+
+        if (dropdownBtn && dropdown) {
+            dropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', () => {
+                dropdown.classList.add('hidden');
+            });
+        }
+
+        // ============================================================================
+        // CHECKOUT (POR IMPLEMENTAR)
+        // ============================================================================
+
+        document.getElementById('checkout-btn').addEventListener('click', () => {
+            showToast('Funcionalidad de checkout próximamente', 'error');
+            // TODO: Implementar checkout
+        });
+
+        // ============================================================================
+        // INICIALIZACIÓN
+        // ============================================================================
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadUserProfile();
+            await loadCart();
+        });
+    </script>
+</body>
+</html>

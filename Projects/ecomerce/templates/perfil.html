@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - E-commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .hover-raise:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            min-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .toast-success {
+            background-color: #10b981;
+        }
+        .toast-error {
+            background-color: #ef4444;
+        }
+        .fade-out {
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+        .tab-active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .tab-inactive {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+        .tab-inactive:hover {
+            background-color: #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-8">
+                    <a class="flex items-center space-x-3" href="/ecomerce/productos/tienda">
+                        <img alt="Logo" class="h-8 w-auto" src="/static/img/logo.png" onerror="this.onerror=null; this.src='/static/img/logo.png'"/>
+                        <span class="text-gray-900 font-bold text-lg hidden md:block">
+                            Tienda Online
+                        </span>
+                    </a>
+                    <div class="hidden md:flex items-center space-x-2 text-sm text-gray-600">
+                        <a class="text-gray-600 hover:text-blue-600 transition-colors" href="/ecomerce/productos/tienda">
+                            <i class="fas fa-home"></i>
+                            <span class="ml-1">Inicio</span>
+                        </a>
+                        <span class="text-gray-400">/</span>
+                        <a class="text-gray-600 hover:text-blue-600 transition-colors" href="/ecomerce/productos/tienda">
+                            <i class="fas fa-store"></i>
+                            <span class="ml-1">Productos</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Usuario autenticado -->
+                    <div id="user-info" class="flex items-center space-x-3 relative">
+                        <div class="relative">
+                            <button id="user-dropdown-btn" class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm transition-colors font-medium">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="user-greeting">Hola, Usuario</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div id="user-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 hidden border border-gray-200">
+                                <div class="py-1">
+                                    <a href="/ecomerce/usuarios/perfil" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-user mr-2"></i>
+                                        Mi Perfil
+                                    </a>
+                                    <button onclick="logout()" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>
+                                        Salir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <a href="/ecomerce/carrito" id="cart-button" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm transition-colors font-medium relative flex items-center">
+                            <i class="fas fa-shopping-cart mr-1"></i>
+                            <span class="ml-1 hidden md:inline">Carrito</span>
+                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="cart-count">0</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="fas fa-user-circle mr-3 text-blue-600"></i>
+                Mi Perfil
+            </h1>
+            <p class="text-gray-600">
+                Gestiona tu información personal, pedidos y configuración de cuenta.
+            </p>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="mb-6">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button id="tab-perfil" class="tab-inactive py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-user mr-2"></i>Perfil Personal
+                    </button>
+                    <button id="tab-password" class="tab-inactive py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-key mr-2"></i>Cambiar Contraseña
+                    </button>
+                    <button id="tab-pedidos" class="tab-inactive py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-shopping-bag mr-2"></i>Mis Pedidos
+                    </button>
+                    <button id="tab-carrito" class="tab-active py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-shopping-cart mr-2"></i>Mi Carrito
+                    </button>
+                    <button id="tab-presupuestos" class="tab-inactive py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-file-invoice-dollar mr-2"></i>Mis Presupuestos
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <!-- Perfil Personal Tab -->
+            <div id="content-perfil" class="tab-content p-6 hidden">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-id-card mr-2 text-blue-600"></i>
+                        Información Personal
+                    </h2>
+                </div>
+
+                <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                        <input type="text" id="nombre" name="nombre" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    <div>
+                        <label for="apellido" class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+                        <input type="text" id="apellido" name="apellido" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent" readonly>
+                        <p class="text-xs text-gray-500 mt-1">El email no se puede modificar</p>
+                    </div>
+                    <div>
+                        <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                        <input type="text" id="telefono" name="telefono" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="direccion" class="block text-sm font-medium text-gray-700 mb-1">
+                            <i class="fas fa-home mr-2 text-blue-600"></i>Dirección
+                        </label>
+                        <input type="text" id="direccion" name="direccion" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ej: Calle Mayor 123, Madrid, España">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="google_maps_link" class="block text-sm font-medium text-gray-700 mb-1">
+                            <i class="fas fa-map-marked-alt mr-2 text-red-500"></i>Link de Google Maps (Opcional)
+                        </label>
+                        <div class="flex space-x-2">
+                            <input type="url" id="google_maps_link" name="google_maps_link" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="https://maps.google.com/... o https://goo.gl/maps/...">
+                            <button type="button" id="open-google-maps-btn" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors" title="Abrir Google Maps Argentina - Buenos Aires">
+                                <i class="fas fa-external-link-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="ciudad" class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+                        <input type="text" id="ciudad" name="ciudad" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="provincia" class="block text-sm font-medium text-gray-700 mb-1">Provincia</label>
+                        <input type="text" id="provincia" name="provincia" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="pais" class="block text-sm font-medium text-gray-700 mb-1">País</label>
+                        <input type="text" id="pais" name="pais" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div class="md:col-span-2 flex justify-end">
+                        <button type="submit" id="update-profile-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-save mr-2"></i>Actualizar Perfil
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Cambiar Contraseña Tab -->
+            <div id="content-password" class="tab-content p-6 hidden">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-key mr-2 text-green-600"></i>
+                        Cambiar Contraseña
+                    </h2>
+                    <p class="text-gray-600">Mantén tu cuenta segura cambiando tu contraseña regularmente.</p>
+                </div>
+
+                <form id="password-form" class="max-w-md">
+                    <div class="mb-4">
+                        <label for="current-password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña Actual</label>
+                        <input type="password" id="current-password" name="current_password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="new-password" class="block text-sm font-medium text-gray-700 mb-1">Nueva Contraseña</label>
+                        <input type="password" id="new-password" name="new_password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent" required minlength="8">
+                        <p class="text-xs text-gray-500 mt-1">Mínimo 8 caracteres</p>
+                    </div>
+                    <div class="mb-6">
+                        <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirmar Nueva Contraseña</label>
+                        <input type="password" id="confirm-password" name="confirm_password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent" required minlength="8">
+                    </div>
+                    <button type="submit" id="change-password-btn" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-key mr-2"></i>Cambiar Contraseña
+                    </button>
+                </form>
+            </div>
+
+            <!-- Pedidos Tab -->
+            <div id="content-pedidos" class="tab-content p-6 hidden">
+                <div class="mb-6 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-900">
+                        <i class="fas fa-shopping-bag mr-2 text-purple-600"></i>
+                        Mis Pedidos
+                    </h2>
+                    <span id="pedidos-count" class="text-sm text-gray-600">0 pedidos</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Pedido</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pedidos-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Pedidos will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Carrito Tab -->
+            <div id="content-carrito" class="tab-content p-6">
+                <div class="mb-6 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-900">
+                        <i class="fas fa-shopping-cart mr-2 text-orange-600"></i>
+                        Mi Carrito Actual
+                    </h2>
+                    <a href="/ecomerce/carrito" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                        <i class="fas fa-eye mr-2"></i>Ver Carrito Completo
+                    </a>
+                </div>
+
+                <div id="carrito-content" class="bg-gray-50 rounded-lg p-6">
+                    <!-- Carrito content will be loaded here -->
+                    <div class="text-center text-gray-500">
+                        <i class="fas fa-spinner fa-spin text-3xl mb-2"></i>
+                        <p>Cargando carrito...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Presupuestos Tab -->
+            <div id="content-presupuestos" class="tab-content p-6 hidden">
+                <div class="mb-6 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-900">
+                        <i class="fas fa-file-invoice-dollar mr-2 text-indigo-600"></i>
+                        Mis Presupuestos
+                    </h2>
+                    <span id="presupuestos-count" class="text-sm text-gray-600">0 presupuestos</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mensaje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="presupuestos-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Presupuestos will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+    <script>
+        // ============================================================================
+        // PERFIL.JS - GESTIÓN DE PERFIL DE USUARIO
+        // ============================================================================
+        
+        // Configuración de API
+        const API_BASE = '/ecomerce';
+
+        // ============================================================================
+        // UTILIDADES
+        // ============================================================================
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type} slide-in`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>
+                ${message}
+            `;
+            document.getElementById('toast-container').appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ============================================================================
+        // AUTENTICACIÓN
+        // ============================================================================
+        
+        function getToken() {
+            return sessionStorage.getItem('ecommerce_token');
+        }
+
+        function logout() {
+            sessionStorage.removeItem('ecommerce_token');
+            window.location.href = '/ecommerce/login';
+        }
+
+        // ============================================================================
+        // TABS
+        // ============================================================================
+        
+        const tabs = ['perfil', 'password', 'pedidos', 'carrito', 'presupuestos'];
+        
+        tabs.forEach(tab => {
+            document.getElementById(`tab-${tab}`).addEventListener('click', () => {
+                // Actualizar botones
+                tabs.forEach(t => {
+                    const btn = document.getElementById(`tab-${t}`);
+                    const content = document.getElementById(`content-${t}`);
+                    
+                    if (t === tab) {
+                        btn.className = 'tab-active py-2 px-1 border-b-2 font-medium text-sm';
+                        content.classList.remove('hidden');
+                    } else {
+                        btn.className = 'tab-inactive py-2 px-1 border-b-2 font-medium text-sm';
+                        content.classList.add('hidden');
+                    }
+                });
+                
+                // Cargar contenido específico del tab
+                if (tab === 'pedidos') loadPedidos();
+                if (tab === 'carrito') loadCarrito();
+                if (tab === 'presupuestos') loadPresupuestos();
+            });
+        });
+
+        // ============================================================================
+        // INICIALIZACIÓN
+        // ============================================================================
+        
+        async function loadUserProfile() {
+            try {
+                const token = getToken();
+                if (!token) {
+                    window.location.href = '/ecommerce/login';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/usuarios/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        logout();
+                        return;
+                    }
+                    throw new Error('Error al cargar el perfil');
+                }
+
+                const data = await response.json();
+                
+                // El backend devuelve { user: {...}, orders: [...], ... }
+                const user = data.user || data;
+                
+                // Actualizar navbar - solo mostrar el nombre
+                const displayName = user.nombre || 'Usuario';
+                document.getElementById('user-greeting').textContent = `Hola, ${displayName}`;
+                
+                // Llenar formulario
+                document.getElementById('nombre').value = user.nombre || '';
+                document.getElementById('apellido').value = user.apellido || '';
+                document.getElementById('email').value = user.email || '';
+                document.getElementById('telefono').value = user.telefono || '';
+                document.getElementById('direccion').value = user.direccion || '';
+                document.getElementById('google_maps_link').value = user.google_maps_link || '';
+
+                // Inicializar el carrito después de cargar el perfil
+                if (window.cart && typeof window.cart.initCart === 'function') {
+                    window.cart.initCart();
+                }
+
+            } catch (error) {
+                console.error('Error cargando perfil:', error);
+                showToast('Error al cargar la información del perfil', 'error');
+            }
+        }
+
+        // Actualizar perfil
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const token = getToken();
+            if (!token) {
+                logout();
+                return;
+            }
+
+            const formData = {
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                telefono: document.getElementById('telefono').value || null,
+                direccion: document.getElementById('direccion').value || null,
+                google_maps_link: document.getElementById('google_maps_link').value || null
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/usuarios/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al actualizar el perfil');
+                }
+
+                showToast('Perfil actualizado exitosamente', 'success');
+                await loadUserProfile(); // Recargar datos
+
+            } catch (error) {
+                console.error('Error actualizando perfil:', error);
+                showToast(error.message || 'Error al actualizar el perfil', 'error');
+            }
+        });
+
+        // ============================================================================
+        // CAMBIO DE CONTRASEÑA
+        // ============================================================================
+        
+        document.getElementById('password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const token = getToken();
+            if (!token) {
+                logout();
+                return;
+            }
+
+            const currentPassword = document.getElementById('current_password').value;
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            if (newPassword !== confirmPassword) {
+                showToast('Las contraseñas nuevas no coinciden', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showToast('La nueva contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/usuarios/change-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al cambiar la contraseña');
+                }
+
+                showToast('Contraseña cambiada exitosamente', 'success');
+                
+                // Limpiar formulario
+                document.getElementById('current_password').value = '';
+                document.getElementById('new_password').value = '';
+                document.getElementById('confirm_password').value = '';
+
+            } catch (error) {
+                console.error('Error cambiando contraseña:', error);
+                showToast(error.message || 'Error al cambiar la contraseña', 'error');
+            }
+        });
+        
+        function viewPedidoDetails(pedidoId) {
+            // Por ahora solo mostrar un mensaje, se puede implementar navegación a página de detalles
+            showToast(`Ver detalles del pedido #${pedidoId}`, 'info');
+        }
+        
+        async function loadPedidos() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE}/usuarios/pedidos/user`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error al cargar pedidos');
+
+                const pedidos = await response.json();
+                const tbody = document.getElementById('pedidos-table-body');
+                document.getElementById('pedidos-count').textContent = `${pedidos.length} pedidos`;
+
+                if (pedidos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay pedidos</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = pedidos.map(pedido => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#${pedido.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(pedido.fecha).toLocaleDateString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${pedido.total?.toFixed(2) || '0.00'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs rounded-full ${pedido.estado === 'completado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                                ${pedido.estado || 'pendiente'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${pedido.items?.length || 0} items</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                            <button onclick="viewPedidoDetails(${pedido.id})" class="text-blue-600 hover:text-blue-900">Ver detalles</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error cargando pedidos:', error);
+                showToast('Error al cargar pedidos', 'error');
+            }
+        }
+
+        // ============================================================================
+        // CARRITO
+        // ============================================================================
+        
+        async function loadCarrito() {
+            try {
+                const token = getToken();
+                console.log('Token obtenido:', token ? 'Presente' : 'No presente');
+                
+                const response = await fetch(`${API_BASE}/usuarios/carritos/active`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('Respuesta del servidor:', response.status, response.statusText);
+
+                if (!response.ok) throw new Error('Error al cargar carrito');
+
+                const carrito = await response.json();
+                console.log('Datos del carrito:', carrito);
+                
+                const container = document.getElementById('carrito-content');
+                console.log('Container encontrado:', container ? 'Sí' : 'No');
+
+                if (!carrito || carrito.message) {
+                    console.log('Mostrando mensaje de carrito vacío');
+                    container.innerHTML = `
+                        <div class="text-center py-12">
+                            <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500 text-lg mb-4">No tienes productos en tu carrito</p>
+                            <a href="/ecomerce/carrito" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-store mr-2"></i>Ir a la tienda
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Calcular cantidad total de items
+                const totalItems = carrito.items?.reduce((sum, item) => sum + item.cantidad, 0) || 0;
+                console.log('Total de items calculado:', totalItems);
+
+                // Construir HTML de los items
+                const itemsHtml = carrito.items?.map(item => {
+                    console.log('Procesando item:', item);
+                    const imagenUrl = item.producto?.imagen_url || '/static/img/logo.png';
+
+                    // Construir información de variante
+                    let variantDisplay = '';
+                    if (item.variant_data && typeof item.variant_data === 'object') {
+                        const variantParts = [];
+                        if (item.variant_data.color) variantParts.push(`Color: ${item.variant_data.color}`);
+                        if (item.variant_data.tipo) variantParts.push(`Tipo: ${item.variant_data.tipo}`);
+                        if (variantParts.length > 0) {
+                            variantDisplay = `<p class="text-xs text-blue-600 font-medium mt-1">${variantParts.join(' • ')}</p>`;
+                        }
+                    }
+
+                    return `
+                    <div class="flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                        <img src="${imagenUrl}"
+                             alt="${item.producto?.nombre || 'Producto'}"
+                             class="w-16 h-16 object-cover rounded-md">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900">${item.producto?.nombre || 'Producto'}</h4>
+                            ${variantDisplay}
+                            <p class="text-sm text-gray-500">Cantidad: ${item.cantidad}</p>
+                            <p class="text-sm text-gray-600">Precio unitario: $${item.precio_unitario?.toFixed(2) || '0.00'}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-lg text-gray-900">$${item.total?.toFixed(2) || '0.00'}</p>
+                        </div>
+                    </div>
+                `}).join('') || '<p class="text-gray-500 text-center py-4">No hay items en el carrito</p>';
+
+                console.log('HTML de items generado:', itemsHtml.substring(0, 100) + '...');
+
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <!-- Resumen superior -->
+                        <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+                            <div class="flex justify-between items-center mb-4">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">
+                                        <i class="fas fa-shopping-cart text-orange-600 mr-2"></i>
+                                        Carrito #${carrito.id}
+                                    </h3>
+                                    <p class="text-sm text-gray-500 mt-1">Estado: <span class="font-medium text-green-600">${carrito.estado || 'activo'}</span></p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-600">Total de items</p>
+                                    <p class="text-3xl font-bold text-blue-600">${totalItems}</p>
+                                </div>
+                            </div>
+                            <div class="border-t pt-4 flex justify-between items-center">
+                                <span class="text-gray-700 font-medium">Total:</span>
+                                <span class="text-2xl font-bold text-gray-900">$${carrito.total?.toFixed(2) || '0.00'}</span>
+                            </div>
+                        </div>
+
+                        <!-- Lista de items -->
+                        <div>
+                            <h4 class="text-md font-semibold text-gray-900 mb-3">
+                                <i class="fas fa-list mr-2"></i>
+                                Productos en el carrito
+                            </h4>
+                            <div class="space-y-3 max-h-96 overflow-y-auto">
+                                ${itemsHtml}
+                            </div>
+                        </div>
+
+                        <!-- Botón de acción -->
+                        <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                            <p class="text-sm text-gray-700 mb-3">
+                                <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                                Para modificar cantidades o finalizar tu compra, visita el carrito completo.
+                            </p>
+                            <a href="/ecomerce/carrito" class="block w-full bg-blue-600 text-white text-center px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                                <i class="fas fa-arrow-right mr-2"></i>Ir al Carrito Completo
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                console.log('HTML del carrito establecido correctamente');
+
+            } catch (error) {
+                console.error('Error cargando carrito:', error);
+                console.log('Mostrando mensaje de error');
+                const container = document.getElementById('carrito-content');
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                        <p class="text-gray-600">Error al cargar el carrito</p>
+                        <p class="text-sm text-gray-500 mt-2">${error.message}</p>
+                    </div>
+                `;
+                showToast('Error al cargar el carrito', 'error');
+            }
+        }
+
+        // ============================================================================
+        // PRESUPUESTOS
+        // ============================================================================
+        
+        async function loadPresupuestos() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE}/usuarios/presupuestos/user`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error al cargar presupuestos');
+
+                const presupuestos = await response.json();
+                const tbody = document.getElementById('presupuestos-table-body');
+                document.getElementById('presupuestos-count').textContent = `${presupuestos.length} presupuestos`;
+
+                if (presupuestos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay presupuestos</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = presupuestos.map(pres => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#${pres.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${pres.nombre || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${pres.email || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${pres.telefono || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs rounded-full ${pres.estado === 'aprobado' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                ${pres.estado || 'pendiente'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${pres.fecha ? new Date(pres.fecha).toLocaleDateString() : '-'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">${pres.mensaje || '-'}</td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error cargando presupuestos:', error);
+                showToast('Error al cargar presupuestos', 'error');
+            }
+        }
+
+        // ============================================================================
+        // GOOGLE MAPS
+        // ============================================================================
+        
+        document.getElementById('open-google-maps-btn').addEventListener('click', () => {
+            // Abrir Google Maps con la ubicación de Buenos Aires, Argentina
+            const googleMapsUrl = 'https://www.google.com/maps/place/Buenos+Aires,+Argentina';
+            window.open(googleMapsUrl, '_blank');
+        });
+        
+        const dropdownBtn = document.getElementById('user-dropdown-btn');
+        const dropdown = document.getElementById('user-dropdown');
+
+        if (dropdownBtn && dropdown) {
+            dropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', () => {
+                dropdown.classList.add('hidden');
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar autenticación antes de cargar la página
+            const token = getToken();
+            if (!token) {
+                // Si no hay token, redirigir al home
+                window.location.href = '/ecomerce/productos/tienda';
+                return;
+            }
+
+            // Si hay token, cargar el perfil
+            loadUserProfile();
+            
+            // Cargar el carrito por defecto (ya que es el tab más común)
+            loadCarrito();
+        });
+    </script>
+</body>
+</html>

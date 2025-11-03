@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="es">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title data-store-title="Tienda de Productos">Tienda de Productos - Ecommerce Store</title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <link href="/static/css/cart_buttons.css" rel="stylesheet">
+  <script src="/static/config.js"></script>
+  <style>
+   /* Estilos para ecommerce - Diseño moderno y limpio */
+   :root {
+     --ecommerce-blue: #00bfff;
+     --ecommerce-dark: #1a1a1a;
+     --ecommerce-gray: #f8f9fa;
+     --ecommerce-light: #ffffff;
+     --ecommerce-text: #333333;
+     --ecommerce-text-light: #666666;
+   }
+
+   body {
+     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+     background-color: var(--ecommerce-gray);
+     color: var(--ecommerce-text);
+     line-height: 1.6;
+   }
+
+   /* Navegación mejorada - Solo para elementos específicos */
+   nav.navbar-dark {
+     background: linear-gradient(135deg, var(--ecommerce-dark) 0%, #2d2d2d 100%);
+     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+   }
+
+   /* Header principal */
+   header {
+     background: var(--ecommerce-light);
+     border-bottom: 1px solid #e9ecef;
+   }
+
+   /* Contenedor de filtros */
+   .filters-container {
+     background: var(--ecommerce-light);
+     border: 1px solid #e9ecef;
+     border-radius: 8px;
+     padding: 1.5rem;
+     margin-bottom: 2rem;
+     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+   }
+
+   /* Inputs y selects mejorados */
+   .form-input, .form-select {
+     border: 1px solid #d1d5db;
+     border-radius: 6px;
+     padding: 0.75rem 1rem;
+     font-size: 0.875rem;
+     transition: all 0.2s ease;
+     background: var(--ecommerce-light);
+   }
+
+   .form-input:focus, .form-select:focus {
+     outline: none;
+     border-color: var(--ecommerce-blue);
+     box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.1);
+   }
+
+   /* Botones */
+   .btn-primary {
+     background: var(--ecommerce-blue);
+     color: white;
+     border: none;
+     border-radius: 6px;
+     padding: 0.75rem 1.5rem;
+     font-weight: 500;
+     transition: all 0.2s ease;
+     cursor: pointer;
+   }
+
+   .btn-primary:hover {
+     background: #0099cc;
+     transform: translateY(-1px);
+     box-shadow: 0 4px 12px rgba(0, 191, 255, 0.3);
+   }
+
+   .btn-secondary {
+     background: #f8f9fa;
+     color: var(--ecommerce-text);
+     border: 1px solid #d1d5db;
+     border-radius: 6px;
+     padding: 0.75rem 1.5rem;
+     font-weight: 500;
+     transition: all 0.2s ease;
+     cursor: pointer;
+   }
+
+   .btn-secondary:hover {
+     background: #e9ecef;
+     border-color: #adb5bd;
+   }
+
+   /* Grid de productos */
+   .products-section {
+     background: var(--ecommerce-light);
+     border-radius: 8px;
+     overflow: hidden;
+     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+   }
+
+   .products-header {
+     background: #f8f9fa;
+     border-bottom: 1px solid #e9ecef;
+     padding: 1.5rem;
+   }
+
+   .products-grid {
+     padding: 2rem;
+   }
+
+   /* Tarjetas de producto para ecommerce */
+   .product-card {
+     background: var(--ecommerce-light);
+     border: 1px solid #e9ecef;
+     border-radius: 8px;
+     overflow: hidden;
+     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+     position: relative;
+     height: 100%;
+     display: flex;
+     flex-direction: column;
+   }
+
+   .product-card:hover {
+     transform: translateY(-4px);
+     box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+     border-color: var(--ecommerce-blue);
+   }
+
+   .product-image-container {
+     position: relative;
+     overflow: hidden;
+     background: #f8f9fa;
+     aspect-ratio: 4/3;
+   }
+
+   .product-image {
+     width: 100%;
+     height: 100%;
+     object-fit: contain;
+     padding: 1rem;
+     transition: transform 0.3s ease;
+   }
+
+   .product-card:hover .product-image {
+     transform: scale(1.05);
+   }
+
+   .product-info {
+     padding: 1.5rem;
+     flex-grow: 1;
+     display: flex;
+     flex-direction: column;
+   }
+
+   .product-title {
+     font-size: 1.125rem;
+     font-weight: 600;
+     color: var(--ecommerce-text);
+     margin-bottom: 0.5rem;
+     line-height: 1.4;
+     display: -webkit-box;
+     -webkit-line-clamp: 2;
+     line-clamp: 2;
+     -webkit-box-orient: vertical;
+     overflow: hidden;
+   }
+
+   .product-description {
+     color: var(--ecommerce-text-light);
+     font-size: 0.875rem;
+     line-height: 1.5;
+     margin-bottom: 1rem;
+     display: -webkit-box;
+     -webkit-line-clamp: 3;
+     line-clamp: 3;
+     -webkit-box-orient: vertical;
+     overflow: hidden;
+     flex-grow: 1;
+   }
+
+   .product-price {
+     font-size: 1.5rem;
+     font-weight: 700;
+     color: var(--ecommerce-blue);
+     margin-bottom: 1rem;
+   }
+
+   .product-code {
+     font-size: 0.75rem;
+     color: var(--ecommerce-text-light);
+     margin-bottom: 1rem;
+   }
+
+   .product-actions {
+     display: flex;
+     gap: 0.5rem;
+     margin-top: auto;
+   }
+
+   .action-btn {
+     flex: 1;
+     padding: 0.75rem;
+     border: none;
+     border-radius: 6px;
+     font-size: 0.875rem;
+     font-weight: 500;
+     cursor: pointer;
+     transition: all 0.2s ease;
+     text-align: center;
+   }
+
+   .action-btn-primary {
+     background: var(--ecommerce-blue);
+     color: white;
+   }
+
+   .action-btn-primary:hover {
+     background: #0099cc;
+     transform: translateY(-1px);
+   }
+
+   .action-btn-secondary {
+     background: #f8f9fa;
+     color: var(--ecommerce-text);
+     border: 1px solid #d1d5db;
+   }
+
+   .action-btn-secondary:hover {
+     background: #e9ecef;
+     border-color: #adb5bd;
+   }
+
+   /* Estados de carga */
+   .loading-state {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     padding: 4rem 2rem;
+     color: var(--ecommerce-text-light);
+   }
+
+   .loading-spinner {
+     width: 3rem;
+     height: 3rem;
+     border: 3px solid #e9ecef;
+     border-top: 3px solid var(--ecommerce-blue);
+     border-radius: 50%;
+     animation: spin 1s linear infinite;
+     margin-bottom: 1rem;
+   }
+
+   @keyframes spin {
+     0% { transform: rotate(0deg); }
+     100% { transform: rotate(360deg); }
+   }
+
+   /* Estado vacío */
+   .empty-state {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     padding: 4rem 2rem;
+     color: var(--ecommerce-text-light);
+   }
+
+   .empty-icon {
+     font-size: 3rem;
+     margin-bottom: 1rem;
+     opacity: 0.5;
+   }
+
+   /* Animaciones */
+   .fade-in {
+     animation: fadeIn 0.4s ease-out;
+   }
+
+   @keyframes fadeIn {
+     from {
+       opacity: 0;
+       transform: translateY(20px);
+     }
+     to {
+       opacity: 1;
+       transform: translateY(0);
+     }
+   }
+
+   .slide-in {
+     animation: slideIn 0.3s ease-out;
+   }
+   @keyframes slideIn {
+     from { transform: translateX(100%); opacity: 0; }
+     to { transform: translateX(0); opacity: 1; }
+   }
+   .fade-out {
+     opacity: 0;
+     transition: opacity 0.3s ease-out;
+   }
+
+   /* Responsive */
+   @media (max-width: 768px) {
+     .products-grid {
+       padding: 1rem;
+     }
+
+     .filters-container {
+       padding: 1rem;
+     }
+
+     .product-info {
+       padding: 1rem;
+     }
+   }
+
+   /* Estilos para Toast Notifications */
+   .toast {
+       position: fixed;
+       top: 20px;
+       right: 20px;
+       padding: 12px 16px;
+       border-radius: 8px;
+       color: white;
+       font-weight: 500;
+       z-index: 1000;
+       min-width: 300px;
+       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+   }
+   .toast-success {
+       background-color: #10b981;
+   }
+   .toast-error {
+       background-color: #ef4444;
+   }
+   .toast-warning {
+       background-color: #f59e0b;
+   }
+
+   /* Card de descripción de categoría - Diseño Moderno Tecnológico */
+   .category-description-card {
+     position: relative;
+     background: linear-gradient(135deg,
+       rgba(255, 255, 255, 0.95) 0%,
+       rgba(248, 250, 252, 0.9) 50%,
+       rgba(241, 245, 249, 0.95) 100%);
+     backdrop-filter: blur(20px);
+     -webkit-backdrop-filter: blur(20px);
+     border: 1px solid rgba(148, 163, 184, 0.2);
+     border-radius: 20px;
+     box-shadow:
+       0 8px 32px rgba(0, 0, 0, 0.1),
+       0 2px 8px rgba(0, 0, 0, 0.05),
+       inset 0 1px 0 rgba(255, 255, 255, 0.8);
+     overflow: hidden;
+     animation: cardSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+   }
+
+   .category-description-card:hover {
+     transform: translateY(-2px);
+     box-shadow:
+       0 16px 48px rgba(0, 0, 0, 0.15),
+       0 4px 16px rgba(0, 0, 0, 0.1),
+       inset 0 1px 0 rgba(255, 255, 255, 0.9);
+   }
+
+   .category-description-card::before {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     height: 2px;
+     background: linear-gradient(90deg,
+       #3b82f6 0%,
+       #06b6d4 25%,
+       #8b5cf6 50%,
+       #ec4899 75%,
+       #3b82f6 100%);
+     background-size: 200% 100%;
+     animation: gradientShift 3s ease-in-out infinite;
+   }
+
+   @keyframes cardSlideIn {
+     from {
+       opacity: 0;
+       transform: translateY(30px) scale(0.95);
+     }
+     to {
+       opacity: 1;
+       transform: translateY(0) scale(1);
+     }
+   }
+
+   @keyframes gradientShift {
+     0%, 100% { background-position: 0% 50%; }
+     50% { background-position: 100% 50%; }
+   }
+
+   .card-content {
+     padding: 2rem;
+     position: relative;
+   }
+
+   .category-header {
+     display: flex;
+     align-items: center;
+     gap: 1.5rem;
+     margin-bottom: 1.5rem;
+   }
+
+   .category-icon {
+     width: 60px;
+     height: 60px;
+     background: linear-gradient(135deg, #3b82f6, #06b6d4);
+     border-radius: 16px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     color: white;
+     font-size: 1.5rem;
+     box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+     position: relative;
+     overflow: hidden;
+   }
+
+   .category-icon::before {
+     content: '';
+     position: absolute;
+     top: -50%;
+     left: -50%;
+     width: 200%;
+     height: 200%;
+     background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+     transform: rotate(45deg);
+     animation: shine 3s ease-in-out infinite;
+   }
+
+   @keyframes shine {
+     0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+     100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+   }
+
+   .category-info {
+     flex: 1;
+   }
+
+   .category-title {
+     font-size: 2rem;
+     font-weight: 800;
+     background: linear-gradient(135deg, #1e293b, #334155);
+     -webkit-background-clip: text;
+     -webkit-text-fill-color: transparent;
+     background-clip: text;
+     margin-bottom: 0.5rem;
+     letter-spacing: -0.025em;
+   }
+
+   .category-stats {
+     display: flex;
+     gap: 1rem;
+   }
+
+   .stat-item {
+     display: flex;
+     align-items: center;
+     gap: 0.5rem;
+     font-size: 0.875rem;
+     font-weight: 600;
+     color: #64748b;
+     background: rgba(148, 163, 184, 0.1);
+     padding: 0.5rem 1rem;
+     border-radius: 12px;
+     border: 1px solid rgba(148, 163, 184, 0.2);
+   }
+
+   .stat-item i {
+     color: #3b82f6;
+   }
+
+   .category-description-container {
+     margin-bottom: 1.5rem;
+   }
+
+   .category-description {
+     font-size: 1.125rem;
+     line-height: 1.7;
+     color: #475569;
+     font-weight: 400;
+     max-width: 800px;
+   }
+
+   .tech-elements {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     margin-top: 1.5rem;
+     padding-top: 1.5rem;
+     border-top: 1px solid rgba(148, 163, 184, 0.2);
+   }
+
+   .tech-line {
+     flex: 1;
+     height: 1px;
+     background: linear-gradient(90deg,
+       transparent 0%,
+       rgba(59, 130, 246, 0.3) 20%,
+       rgba(6, 182, 212, 0.3) 50%,
+       rgba(139, 92, 246, 0.3) 80%,
+       transparent 100%);
+     position: relative;
+   }
+
+   .tech-line::before {
+     content: '';
+     position: absolute;
+     top: -1px;
+     left: 0;
+     right: 0;
+     height: 3px;
+     background: linear-gradient(90deg,
+       transparent 0%,
+       #3b82f6 20%,
+       #06b6d4 50%,
+       #8b5cf6 80%,
+       transparent 100%);
+     background-size: 200% 100%;
+     animation: techFlow 4s ease-in-out infinite;
+   }
+
+   @keyframes techFlow {
+     0%, 100% { background-position: 0% 50%; }
+     50% { background-position: 100% 50%; }
+   }
+
+   .tech-dots {
+     display: flex;
+     gap: 0.5rem;
+   }
+
+   .tech-dots span {
+     width: 8px;
+     height: 8px;
+     border-radius: 50%;
+     background: linear-gradient(135deg, #3b82f6, #06b6d4);
+     animation: techPulse 2s ease-in-out infinite;
+   }
+
+   .tech-dots span:nth-child(2) {
+     animation-delay: 0.3s;
+   }
+
+   .tech-dots span:nth-child(3) {
+     animation-delay: 0.6s;
+   }
+
+   @keyframes techPulse {
+     0%, 100% {
+       opacity: 0.4;
+       transform: scale(1);
+     }
+     50% {
+       opacity: 1;
+       transform: scale(1.2);
+     }
+   }
+
+   /* Responsive Design */
+   @media (max-width: 768px) {
+     .category-description-card {
+       margin: 0 1rem;
+     }
+
+     .card-content {
+       padding: 1.5rem;
+     }
+
+     .category-header {
+       flex-direction: column;
+       text-align: center;
+       gap: 1rem;
+     }
+
+     .category-title {
+       font-size: 1.75rem;
+     }
+
+     .category-description {
+       font-size: 1rem;
+       text-align: center;
+     }
+
+     .category-stats {
+       justify-content: center;
+     }
+
+     .tech-elements {
+       flex-direction: column;
+       gap: 1rem;
+     }
+
+     .tech-line {
+       width: 100%;
+       height: 2px;
+     }
+   }
+  </style>
+  <script defer="True" src="/static/ecomerce/productos/productos_tienda.js">
+  </script>
+  <script defer="True" src="/static/ecomerce/carrito.js">
+  </script>
+  <script defer="True" src="/static/ecomerce/cart_button.js">
+  </script>
+  <script>
+    // Función para mostrar notificaciones toast
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type} slide-in`;
+        toast.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>
+            ${message}
+        `;
+        document.getElementById('toast-container').appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('fade-out');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Función para esperar a que las funciones estén disponibles
+    function waitForFunctions(callback, maxAttempts = 50) {
+      let attempts = 0;
+      const checkFunctions = () => {
+        attempts++;
+        if (typeof window.initUnauthenticatedStore === 'function' &&
+            typeof window.initAuthenticatedStore === 'function') {
+          callback();
+        } else if (attempts < maxAttempts) {
+          setTimeout(checkFunctions, 100);
+        } else {
+          console.error('Functions not available after', maxAttempts, 'attempts');
+          // Fallback: intentar cargar datos directamente después de un timeout
+          setTimeout(() => {
+            console.log('Intentando fallback...');
+            loadDataDirectly();
+          }, 1000);
+        }
+      };
+      checkFunctions();
+    }
+
+    // Variable global para almacenar productos actuales
+    let currentProducts = [];
+
+    // Función de fallback para cargar datos directamente
+    function loadDataDirectly() {
+      console.log('Cargando datos directamente...');
+      // Cargar categorías
+      fetch('/ecomerce/api/categorias/publicas')
+        .then(response => response.json())
+        .then(categories => {
+          console.log('Categorías cargadas:', categories);
+          const categoryFilter = document.getElementById('category-filter');
+          if (categoryFilter) {
+            categoryFilter.innerHTML = '<option value="">Todas las categorías</option>';
+            categories.forEach(category => {
+              const option = document.createElement('option');
+              option.value = category.id;
+              option.textContent = category.nombre;
+              categoryFilter.appendChild(option);
+            });
+          }
+        })
+        .catch(error => console.error('Error cargando categorías:', error));
+
+      // Cargar productos
+      fetch('/ecomerce/api/productos/publicos')
+        .then(response => response.json())
+        .then(data => {
+          console.log('Productos cargados:', data);
+          currentProducts = data; // Guardar productos globalmente
+          updateProductsGrid(data);
+          updateRecordCount(data.length);
+        })
+        .catch(error => {
+          console.error('Error cargando productos:', error);
+          const grid = document.getElementById('products-grid');
+          if (grid) {
+            grid.innerHTML = `
+              <div class="col-span-full text-center py-12">
+                <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+                <p class="text-red-500 text-lg">Error al cargar productos. Recarga la página.</p>
+              </div>
+            `;
+          }
+        });
+    }
+
+    // Función para actualizar el grid de productos
+    function updateProductsGrid(data) {
+      const grid = document.getElementById('products-grid');
+      if (!grid) return;
+
+      grid.innerHTML = '';
+
+      if (data.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full empty-state">
+            <i class="fas fa-box-open empty-icon"></i>
+            <p class="text-lg">No se encontraron productos disponibles</p>
+          </div>
+        `;
+        return;
+      }
+
+      data.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'product-card fade-in';
+
+        const imageUrl = item.imagen_url || '/static/img/logo.png';
+        const basePrice = item.precio ? item.precio : 0;
+        const hasVariants = item.variants && item.variants.length > 0;
+
+        let priceDisplay = `$${basePrice.toLocaleString()}`;
+        let variantSelector = '';
+
+        if (hasVariants) {
+          // Encontrar precios mínimo y máximo
+          const prices = item.variants.map(v => basePrice + (v.precio_adicional || 0));
+          const minPrice = Math.min(...prices);
+          const maxPrice = Math.max(...prices);
+
+          if (minPrice === maxPrice) {
+            priceDisplay = `$${minPrice.toLocaleString()}`;
+          } else {
+            priceDisplay = `$${minPrice.toLocaleString()} - $${maxPrice.toLocaleString()}`;
+          }
+
+          // Crear selector de variantes
+          const colorOptions = [...new Set(item.variants.map(v => v.color).filter(c => c))];
+          const tipoOptions = [...new Set(item.variants.map(v => v.tipo).filter(t => t))];
+
+          variantSelector = `
+            <div class="variant-selector mt-3">
+              ${colorOptions.length > 0 ? `
+                <div class="mb-2">
+                  <label class="text-sm font-medium text-gray-700">Color:</label>
+                  <select class="variant-select form-select text-sm mt-1" data-variant-type="color">
+                    <option value="">Seleccionar color</option>
+                    ${colorOptions.map(color => `<option value="${color}">${color}</option>`).join('')}
+                  </select>
+                </div>
+              ` : ''}
+              ${tipoOptions.length > 0 ? `
+                <div class="mb-2">
+                  <label class="text-sm font-medium text-gray-700">Tipo:</label>
+                  <select class="variant-select form-select text-sm mt-1" data-variant-type="tipo">
+                    <option value="">Seleccionar tipo</option>
+                    ${tipoOptions.map(tipo => `<option value="${tipo}">${tipo}</option>`).join('')}
+                  </select>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="product-image-container">
+            <img src="${imageUrl}" alt="${item.nombre}" class="product-image" onerror="this.onerror=null; this.src='/static/img/logo.png'">
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">${item.nombre}</h3>
+            <p class="product-description">${item.descripcion || 'Sin descripción'}</p>
+            <div class="product-price">${priceDisplay}</div>
+            <div class="product-code">Código: ${item.codigo}</div>
+            ${variantSelector}
+            <div class="product-actions">
+              <button class="action-btn action-btn-primary" onclick="viewProduct(${item.id})">
+                <i class="fas fa-eye mr-1"></i> Ver Detalles
+              </button>
+              <button class="action-btn action-btn-secondary" onclick="addToCartWithVariant(${item.id}, 1, ${basePrice}, ${hasVariants ? 'true' : 'false'})">
+                <i class="fas fa-cart-plus mr-1"></i> Agregar al Carrito
+              </button>
+            </div>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Función para agregar al carrito considerando variantes
+    function addToCartWithVariant(productId, quantity, basePrice, hasVariants) {
+      if (hasVariants) {
+        // Encontrar la tarjeta del producto
+        const card = event.target.closest('.product-card');
+        const colorSelect = card.querySelector('select[data-variant-type="color"]');
+        const tipoSelect = card.querySelector('select[data-variant-type="tipo"]');
+
+        const selectedColor = colorSelect ? colorSelect.value : null;
+        const selectedTipo = tipoSelect ? tipoSelect.value : null;
+
+        if ((colorSelect && !selectedColor) || (tipoSelect && !selectedTipo)) {
+          return;
+        }
+
+        // Calcular precio con variante
+        let finalPrice = basePrice;
+        const product = currentProducts.find(p => p.id === productId);
+        if (product && product.variants) {
+          const variant = product.variants.find(v =>
+            (!selectedColor || v.color === selectedColor) &&
+            (!selectedTipo || v.tipo === selectedTipo)
+          );
+          if (variant) {
+            finalPrice = basePrice + (variant.precio_adicional || 0);
+          }
+        }
+
+        // Llamar a addToCart con información de variante
+        if (typeof addToCart === 'function') {
+          addToCart(productId, quantity, finalPrice, { color: selectedColor, tipo: selectedTipo });
+        } else {
+          console.error('Función addToCart no encontrada');
+        }
+      } else {
+        // Producto sin variantes
+        if (typeof addToCart === 'function') {
+          addToCart(productId, quantity, basePrice);
+        } else {
+          console.error('Función addToCart no encontrada');
+        }
+      }
+    }
+
+    // Función para obtener el valor de una cookie
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
+    // Función para establecer una cookie
+    function setCookie(name, value, minutes = 60) {
+      const expires = new Date();
+      expires.setTime(expires.getTime() + minutes * 60 * 1000);
+      document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+    }
+
+    // Función para obtener token (prioriza cookies para compartir entre pestañas)
+    function getToken() {
+      return getCookie('ecommerce_token') || sessionStorage.getItem('ecommerce_token');
+    }
+
+    // Función para guardar token (en cookies para compartir entre pestañas)
+    function saveToken(token) {
+      setCookie('ecommerce_token', token, 60); // 60 minutos
+      sessionStorage.setItem('ecommerce_token', token); // Backup
+    }
+
+    // Función para verificar autenticación ecommerce
+    async function checkEcommerceAuth() {
+      // Primero verificar si hay token en URL y guardarlo
+      const urlParams = new URLSearchParams(window.location.search);
+      const tokenFromUrl = urlParams.get('token');
+
+      if (tokenFromUrl) {
+        console.log('Token encontrado en URL, guardándolo...');
+        saveToken(tokenFromUrl);
+        // Limpiar la URL
+        const url = new URL(window.location);
+        url.searchParams.delete('token');
+        window.history.replaceState({}, document.title, url.pathname + url.hash);
+      }
+
+      const token = getToken();
+
+      if (!token) {
+        showUnauthenticatedUI();
+        return;
+      }
+
+      try {
+        const response = await fetch('/ecommerce/auth/verify', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+
+          if (data.valid && data.user) {
+            showAuthenticatedUI(data.user);
+          } else {
+            showUnauthenticatedUI();
+          }
+        } else {
+          showUnauthenticatedUI();
+        }
+      } catch (error) {
+        console.error('Error verificando autenticación:', error);
+        showUnauthenticatedUI();
+      }
+    }
+
+    // Mostrar UI para usuario no autenticado
+    function showUnauthenticatedUI() {
+      const authButtons = document.getElementById('auth-buttons');
+      const userInfo = document.getElementById('user-info');
+
+      if (authButtons) {
+        authButtons.classList.remove('hidden');
+      }
+
+      if (userInfo) {
+        userInfo.classList.add('hidden');
+      }
+
+      // Cargar datos públicos
+      setTimeout(() => {
+        loadDataDirectly();
+      }, 500);
+    }
+
+    // Mostrar UI para usuario autenticado
+    function showAuthenticatedUI(user) {
+      const authButtons = document.getElementById('auth-buttons');
+      const userInfo = document.getElementById('user-info');
+      const userGreeting = document.getElementById('user-greeting');
+
+      if (authButtons) {
+        authButtons.classList.add('hidden');
+      }
+
+      if (userInfo) {
+        userInfo.classList.remove('hidden');
+      }
+
+      if (userGreeting) {
+        userGreeting.textContent = `Hola, ${user.nombre}`;
+      }
+
+      // Cargar datos de productos para usuario autenticado
+      setTimeout(() => {
+        loadDataDirectly();
+      }, 500);
+    }
+
+    // Función de logout
+    function logout() {
+      // Limpiar token de cookies y sessionStorage
+      document.cookie = 'ecommerce_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      sessionStorage.removeItem('ecommerce_token');
+      sessionStorage.removeItem('ecommerce_user_id');
+
+      // Limpiar carrito
+      if (window.cart) {
+        window.cart.userId = null;
+        window.cart.cartItems = [];
+        window.cart.renderEmptyCart();
+      }
+
+      // Mostrar UI no autenticada
+      showUnauthenticatedUI();
+    }
+
+    // Toggle dropdown
+    function toggleUserDropdown() {
+      const dropdown = document.getElementById('user-dropdown');
+      if (dropdown) dropdown.classList.toggle('hidden');
+    }
+
+    // Cerrar dropdown al hacer clic fuera
+    document.addEventListener('click', function(event) {
+      const userDropdown = document.getElementById('user-dropdown');
+      const userButton = document.getElementById('user-dropdown-btn');
+
+      if (userButton && !userButton.contains(event.target) && userDropdown && !userDropdown.contains(event.target)) {
+        if (userDropdown) userDropdown.classList.add('hidden');
+      }
+    });
+
+    // Event listener para el botón del dropdown
+    document.addEventListener('DOMContentLoaded', function() {
+      const dropdownBtn = document.getElementById('user-dropdown-btn');
+      if (dropdownBtn) {
+        dropdownBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          toggleUserDropdown();
+        });
+      }
+    });
+
+    // Verificar autenticación cuando se carga la página
+    document.addEventListener('DOMContentLoaded', function() {
+      // Inicializar el carrito solo si hay posibilidad de autenticación
+      if (window.cart && typeof window.cart.initCart === 'function') {
+        window.cart.initCart();
+      }
+
+      // Esperar un poco para asegurar que todo esté listo
+      setTimeout(() => {
+        checkEcommerceAuth();
+      }, 100);
+    });
+
+    // También verificar cuando la página esté completamente cargada
+    window.addEventListener('load', function() {
+      // Verificar nuevamente por si acaso
+      setTimeout(() => {
+        checkEcommerceAuth();
+      }, 500);
+    });
+  </script>
+ </head>
+ <body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+   <div class="container mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+     <div class="flex items-center space-x-8">
+      <a class="flex items-center space-x-3" href="/">
+       <img alt="Logo" class="h-8 w-auto" src="/static/img/logo.png" onerror="this.onerror=null; this.src='/static/img/logo.png'"/>
+       <span class="text-gray-900 font-bold text-lg hidden md:block">
+        Tienda Online
+       </span>
+      </a>
+      <div class="hidden md:flex items-center space-x-2 text-sm text-gray-600">
+       <a class="text-gray-600 hover:text-blue-600 transition-colors" href="/">
+        <i class="fas fa-home"></i>
+        <span class="ml-1">Inicio</span>
+       </a>
+       <span class="text-gray-400">/</span>
+       <span class="text-blue-600 font-medium">
+        <i class="fas fa-store"></i>
+        <span class="ml-1">Productos</span>
+       </span>
+      </div>
+     </div>
+     <div class="flex items-center space-x-4">
+      <!-- Usuario no autenticado -->
+      <div id="auth-buttons" class="flex items-center space-x-3">
+       <a class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm transition-colors font-medium" href="/ecommerce/login">
+        <i class="fas fa-sign-in-alt mr-1"></i>
+        <span class="hidden md:inline">Iniciar Sesión</span>
+       </a>
+       <a class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm transition-colors font-medium" href="/ecommerce/register">
+        <i class="fas fa-user-plus mr-1"></i>
+        <span class="hidden md:inline">Registrarse</span>
+       </a>
+      </div>
+
+      <!-- Usuario autenticado -->
+      <div id="user-info" class="flex items-center space-x-3 hidden relative">
+       <div class="relative">
+        <button id="user-dropdown-btn" class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm transition-colors font-medium">
+         <i class="fas fa-user-circle"></i>
+         <span id="user-greeting">Hola, Usuario</span>
+         <i class="fas fa-chevron-down text-xs"></i>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="user-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 hidden border border-gray-200">
+         <div class="py-1">
+          <a href="/ecomerce/usuarios/perfil" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+           <i class="fas fa-user mr-2"></i>
+           Mi Perfil
+          </a>
+          <button onclick="logout()" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+           <i class="fas fa-sign-out-alt mr-2"></i>
+           Salir
+          </button>
+         </div>
+        </div>
+       </div>
+      </div>
+
+      <div class="relative">
+       <button id="cart-button" class="bg-blue-100 hover:bg-blue-200 text-blue-600 px-4 py-2 rounded-lg text-sm transition-colors font-medium relative flex items-center border border-blue-200" onclick="toggleCart()">
+        <i class="fas fa-shopping-cart mr-2"></i>
+        <span class="ml-1 hidden md:inline">Carrito</span>
+        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse" id="cart-count">0</span>
+       </button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </nav>
+  <header class="bg-white shadow-sm mb-6">
+   <div class="container mx-auto px-4 py-8">
+    <div class="text-center">
+     <h1 class="text-3xl font-bold text-gray-800 mb-2">
+       Nuestra Tienda
+     </h1>
+     <p class="text-gray-600 text-lg">
+       Descubre nuestra colección de productos de calidad
+     </p>
+    </div>
+   </div>
+  </header>
+  <!-- Card de descripción de categoría -->
+  <div class="container mx-auto px-4 mb-8">
+   <div class="category-description-card hidden" id="category-description-card">
+    <div class="card-content">
+     <div class="category-header">
+      <div class="category-icon">
+       <i class="fas fa-microchip"></i>
+      </div>
+      <div class="category-info">
+       <h2 class="category-title" id="category-title">Categoría</h2>
+       <div class="category-stats">
+        <div class="stat-item">
+         <i class="fas fa-boxes"></i>
+         <span id="category-product-count">Mostrando productos</span>
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="category-description-container">
+      <p class="category-description" id="category-description">Descripción de la categoría</p>
+     </div>
+     <div class="tech-elements">
+      <div class="tech-line"></div>
+      <div class="tech-dots">
+       <span></span>
+       <span></span>
+       <span></span>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="container mx-auto px-4">
+   <div class="filters-container mb-8">
+    <div class="flex flex-wrap items-center gap-4">
+     <div class="relative flex-grow max-w-md">
+      <input class="form-input w-full pl-10 pr-4 py-3" id="search-input" placeholder="Buscar productos..." type="text"/>
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+       <i class="fas fa-search text-gray-400">
+       </i>
+      </div>
+     </div>
+     <div class="relative min-w-[220px]">
+      <select class="form-select w-full pl-10 pr-4 py-3 appearance-none" id="category-filter">
+       <option value="">Todas las categorías</option>
+       <!-- Categories will be loaded here -->
+      </select>
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+       <i class="fas fa-tags text-gray-400">
+       </i>
+      </div>
+      <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+       <i class="fas fa-chevron-down text-gray-400">
+       </i>
+      </div>
+     </div>
+     <div class="flex gap-2">
+      <button class="btn-secondary" id="reset-search">
+       <i class="fas fa-redo-alt mr-2">
+       </i>
+       Restablecer
+      </button>
+     </div>
+    </div>
+   </div>
+   <div class="products-section">
+    <div class="products-header flex justify-between items-center">
+     <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+      <i class="fas fa-th text-blue-600 mr-2">
+      </i>
+      Productos Disponibles
+     </h2>
+     <div class="text-sm text-gray-500" id="record-count">
+      Cargando productos...
+     </div>
+    </div>
+    <div id="products-grid" class="products-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+     <div class="col-span-full loading-state">
+      <div class="loading-spinner"></div>
+      <p class="text-lg">Cargando productos...</p>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- Sidebar del Carrito -->
+  <div class="cart-sidebar fixed top-0 right-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out z-50" id="cart-sidebar">
+   <div class="flex flex-col h-full">
+    <!-- Header del carrito -->
+    <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+     <h2 class="text-lg font-semibold flex items-center">
+      <i class="fas fa-shopping-cart mr-2"></i>
+      Mi Carrito
+     </h2>
+     <button class="text-white hover:text-blue-200 transition-colors" onclick="toggleCart()">
+      <i class="fas fa-times text-xl"></i>
+     </button>
+    </div>
+
+    <!-- Contenido del carrito -->
+    <div class="flex-1 overflow-y-auto p-4" id="cart-items">
+     <div class="text-center text-gray-500 py-8" id="empty-cart">
+      <i class="fas fa-shopping-cart text-4xl mb-4"></i>
+      <p>Tu carrito está vacío</p>
+     </div>
+    </div>
+
+    <!-- Footer del carrito -->
+    <div class="border-t bg-gray-50 p-4" id="cart-footer" style="display: none;">
+     <div class="flex justify-between items-center mb-4">
+      <span class="text-lg font-semibold">Total:</span>
+      <span class="text-lg font-bold text-blue-600" id="cart-total">$0</span>
+     </div>
+     <div class="flex gap-2 mb-4">
+      <a href="/ecomerce/carrito" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors text-center font-medium">
+       <i class="fas fa-shopping-bag mr-2"></i>
+       Ver Carrito Completo
+      </a>
+     </div>
+     <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+      <i class="fas fa-credit-card mr-2"></i>
+      Proceder al Pago
+     </button>
+    </div>
+   </div>
+  </div>
+
+  <!-- Overlay para cerrar el carrito -->
+  <div class="cart-overlay fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="cart-overlay" onclick="toggleCart()"></div>
+
+  <!-- Contenedor de Toast Notifications -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+ </body>
+</html>

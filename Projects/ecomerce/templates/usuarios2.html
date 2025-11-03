@@ -1,0 +1,1164 @@
+<!DOCTYPE html><!DOCTYPE html>
+<html lang="es">
+<head><html lang="es">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gestion de Usuarios - Administracion</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>    <meta charset="UTF-8">ñ ñ ñ<ñmñeñtñañ ñcñhñañrñsñeñtñ=ñ"ñuñtñfñ-ñ8ñ"ñ/ñ>ñ
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>    <meta name="viewport" content="width=device-width, initial-scale=1.0">ñ ñ ñ<ñmñeñtñañ ñcñoñnñtñeñnñtñ=ñ"ñwñiñdñtñhñ=ñdñeñvñiñcñeñ-ñwñiñdñtñhñ,ñ ñiñnñiñtñiñañlñ-ñsñcñañlñeñ=ñ1ñ.ñ0ñ"ñ ñnñañmñeñ=ñ"ñvñiñeñwñpñoñrñtñ"ñ/ñ>ñ
+
+        .fade-in {
+
+            animation: fadeIn 0.3s ease-in;    <title>Gestión de Usuarios</title>ñ ñ ñ<ñtñiñtñlñeñ>ñ
+
+        }
+
+        @keyframes fadeIn {    <script src="https://cdn.tailwindcss.com"></script>ñ ñ ñ ñGñeñsñtñiñóñnñ ñdñeñ ñUñsñuñañrñiñoñsñ
+
+            from { opacity: 0; }
+
+            to { opacity: 1; }    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">ñ ñ ñ<ñ/ñtñiñtñlñeñ>ñ
+
+        }
+
+        .slide-in {    <style>ñ ñ ñ<ñsñcñrñiñpñtñ ñsñrñcñ=ñ"ñhñtñtñpñsñ:ñ/ñ/ñcñdñnñ.ñtñañiñlñwñiñnñdñcñsñsñ.ñcñoñmñ"ñ>ñ
+
+            animation: slideIn 0.3s ease-out;
+
+        }        .fade-in {ñ ñ ñ<ñ/ñsñcñrñiñpñtñ>ñ
+
+        @keyframes slideIn {
+
+            from { transform: translateX(100%); opacity: 0; }            animation: fadeIn 0.3s ease-in;ñ ñ ñ<ñlñiñnñkñ ñhñrñeñfñ=ñ"ñhñtñtñpñsñ:ñ/ñ/ñcñdñnñjñsñ.ñcñlñoñuñdñfñlñañrñeñ.ñcñoñmñ/ñañjñañxñ/ñlñiñbñsñ/ñfñoñnñtñ-ñañwñeñsñoñmñeñ/ñ6ñ.ñ0ñ.ñ0ñ-ñbñeñtñañ3ñ/ñcñsñsñ/ñañlñlñ.ñmñiñnñ.ñcñsñsñ"ñ ñrñeñlñ=ñ"ñsñtñyñlñeñsñhñeñeñtñ"ñ/ñ>ñ
+
+            to { transform: translateX(0); opacity: 1; }
+
+        }        }ñ ñ ñ<ñsñtñyñlñeñ>ñ
+
+        .hover-raise:hover {
+
+            transform: translateY(-1px);        @keyframes fadeIn {ñ ñ ñ ñ.ñfñañdñeñ-ñiñnñ ñ{ñ
+
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        }            from { opacity: 0; }ñ ñ ñ ñ ñ ñ ñ ñ ñañnñiñmñañtñiñoñnñ:ñ ñfñañdñeñIñnñ ñ0ñ.ñ3ñsñ ñeñañsñeñ-ñiñnñ;ñ
+
+        .toast {
+
+            position: fixed;            to { opacity: 1; }ñ ñ ñ ñ ñ}ñ
+
+            top: 20px;
+
+            right: 20px;        }ñ ñ ñ ñ ñ@ñkñeñyñfñrñañmñeñsñ ñfñañdñeñIñnñ ñ{ñ
+
+            padding: 12px 16px;
+
+            border-radius: 8px;        .slide-in {ñ ñ ñ ñ ñ ñ ñ ñ ñfñrñoñmñ ñ{ñ ñoñpñañcñiñtñyñ:ñ ñ0ñ;ñ ñ}ñ
+
+            color: white;
+
+            font-weight: 500;            animation: slideIn 0.3s ease-out;ñ ñ ñ ñ ñ ñ ñ ñ ñtñoñ ñ{ñ ñoñpñañcñiñtñyñ:ñ ñ1ñ;ñ ñ}ñ
+
+            z-index: 1000;
+
+            min-width: 300px;        }ñ ñ ñ ñ ñ}ñ
+
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+        }        @keyframes slideIn {ñ ñ ñ ñ ñ.ñsñlñiñdñeñ-ñiñnñ ñ{ñ
+
+        .toast-success {
+
+            background-color: #10b981;            from { transform: translateX(100%); opacity: 0; }ñ ñ ñ ñ ñ ñ ñ ñ ñañnñiñmñañtñiñoñnñ:ñ ñsñlñiñdñeñIñnñ ñ0ñ.ñ3ñsñ ñeñañsñeñ-ñoñuñtñ;ñ
+
+        }
+
+        .toast-error {            to { transform: translateX(0); opacity: 1; }ñ ñ ñ ñ ñ}ñ
+
+            background-color: #ef4444;
+
+        }        }ñ ñ ñ ñ ñ@ñkñeñyñfñrñañmñeñsñ ñsñlñiñdñeñIñnñ ñ{ñ
+
+        .fade-out {
+
+            opacity: 0;        .hover-raise:hover {ñ ñ ñ ñ ñ ñ ñ ñ ñfñrñoñmñ ñ{ñ ñtñrñañnñsñfñoñrñmñ:ñ ñtñrñañnñsñlñañtñeñYñ(ñ-ñ2ñ0ñpñxñ)ñ;ñ ñoñpñañcñiñtñyñ:ñ ñ0ñ;ñ ñ}ñ
+
+            transition: opacity 0.3s ease-out;
+
+        }            transform: translateY(-1px);ñ ñ ñ ñ ñ ñ ñ ñ ñtñoñ ñ{ñ ñtñrñañnñsñfñoñrñmñ:ñ ñtñrñañnñsñlñañtñeñYñ(ñ0ñ)ñ;ñ ñoñpñañcñiñtñyñ:ñ ñ1ñ;ñ ñ}ñ
+
+    </style>
+
+</head>            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);ñ ñ ñ ñ ñ}ñ
+
+<body class="bg-gray-50 min-h-screen">
+
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">        }ñ ñ ñ ñ ñ.ñtñoñañsñtñ ñ{ñ
+
+        <!-- Header -->
+
+        <div class="mb-8">        .toast {ñ ñ ñ ñ ñ ñ ñ ñ ñpñoñsñiñtñiñoñnñ:ñ ñfñiñxñeñdñ;ñ
+
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+
+                <i class="fas fa-users-cog mr-3 text-blue-600"></i>            position: fixed;ñ ñ ñ ñ ñ ñ ñ ñ ñtñoñpñ:ñ ñ2ñ0ñpñxñ;ñ
+
+                Gestion de Usuarios - Panel Administrativo
+
+            </h1>            top: 20px;ñ ñ ñ ñ ñ ñ ñ ñ ñrñiñgñhñtñ:ñ ñ2ñ0ñpñxñ;ñ
+
+            <p class="text-gray-600">
+
+                Administra y controla todos los usuarios del sistema de e-commerce.            right: 20px;ñ ñ ñ ñ ñ ñ ñ ñ ñpñañdñdñiñnñgñ:ñ ñ1ñ2ñpñxñ ñ2ñ4ñpñxñ;ñ
+
+            </p>
+
+        </div>            padding: 12px 16px;ñ ñ ñ ñ ñ ñ ñ ñ ñbñoñrñdñeñrñ-ñrñañdñiñuñsñ:ñ ñ8ñpñxñ;ñ
+
+
+
+        <!-- Stats Cards -->            border-radius: 8px;ñ ñ ñ ñ ñ ñ ñ ñ ñzñ-ñiñnñdñeñxñ:ñ ñ9ñ9ñ9ñ9ñ;ñ
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+            <div class="bg-white rounded-lg shadow p-6">            color: white;ñ ñ ñ ñ ñ ñ ñ ñ ñbñoñxñ-ñsñhñañdñoñwñ:ñ ñ0ñ ñ4ñpñxñ ñ6ñpñxñ ñrñgñbñañ(ñ0ñ,ñ ñ0ñ,ñ ñ0ñ,ñ ñ0ñ.ñ1ñ)ñ;ñ
+
+                <div class="flex items-center">
+
+                    <div class="p-2 bg-blue-100 rounded-lg">            font-weight: 500;ñ ñ ñ ñ ñ ñ ñ ñ ñtñrñañnñsñiñtñiñoñnñ:ñ ñañlñlñ ñ0ñ.ñ3ñsñ ñeñañsñeñ;ñ
+
+                        <i class="fas fa-user-plus text-blue-600 text-xl"></i>
+
+                    </div>            z-index: 1000;ñ ñ ñ ñ ñ}ñ
+
+                    <div class="ml-4">
+
+                        <p class="text-sm font-medium text-gray-600">Total Usuarios</p>            min-width: 300px;ñ ñ ñ ñ ñ.ñtñoñañsñtñ-ñsñuñcñcñeñsñsñ ñ{ñ
+
+                        <p class="text-2xl font-bold text-gray-900" id="total-users">0</p>
+
+                    </div>            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);ñ ñ ñ ñ ñ ñ ñ ñ ñbñañcñkñgñrñoñuñnñdñ-ñcñoñlñoñrñ:ñ ñ#ñ1ñ0ñBñ9ñ8ñ1ñ;ñ
+
+                </div>
+
+            </div>        }ñ ñ ñ ñ ñ ñ ñ ñ ñcñoñlñoñrñ:ñ ñwñhñiñtñeñ;ñ
+
+            <div class="bg-white rounded-lg shadow p-6">
+
+                <div class="flex items-center">        .toast-success {ñ ñ ñ ñ ñ}ñ
+
+                    <div class="p-2 bg-green-100 rounded-lg">
+
+                        <i class="fas fa-user-check text-green-600 text-xl"></i>            background-color: #10b981;ñ ñ ñ ñ ñ.ñtñoñañsñtñ-ñeñrñrñoñrñ ñ{ñ
+
+                    </div>
+
+                    <div class="ml-4">        }ñ ñ ñ ñ ñ ñ ñ ñ ñbñañcñkñgñrñoñuñnñdñ-ñcñoñlñoñrñ:ñ ñ#ñEñFñ4ñ4ñ4ñ4ñ;ñ
+
+                        <p class="text-sm font-medium text-gray-600">Usuarios Activos</p>
+
+                        <p class="text-2xl font-bold text-gray-900" id="active-users">0</p>        .toast-error {ñ ñ ñ ñ ñ ñ ñ ñ ñcñoñlñoñrñ:ñ ñwñhñiñtñeñ;ñ
+
+                    </div>
+
+                </div>            background-color: #ef4444;ñ ñ ñ ñ ñ}ñ
+
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">        }ñ ñ ñ ñ ñ.ñiñnñpñuñtñ-ñfñiñeñlñdñ:ñfñoñcñuñsñ ñ{ñ
+
+                <div class="flex items-center">
+
+                    <div class="p-2 bg-red-100 rounded-lg">        .fade-out {ñ ñ ñ ñ ñ ñ ñ ñ ñbñoñxñ-ñsñhñañdñoñwñ:ñ ñ0ñ ñ0ñ ñ0ñ ñ2ñpñxñ ñrñgñbñañ(ñ5ñ9ñ,ñ ñ1ñ3ñ0ñ,ñ ñ2ñ4ñ6ñ,ñ ñ0ñ.ñ5ñ)ñ;ñ
+
+                        <i class="fas fa-user-times text-red-600 text-xl"></i>
+
+                    </div>            opacity: 0;ñ ñ ñ ñ ñ ñ ñ ñ ñoñuñtñlñiñnñeñ:ñ ñnñoñnñeñ;ñ
+
+                    <div class="ml-4">
+
+                        <p class="text-sm font-medium text-gray-600">Usuarios Inactivos</p>            transition: opacity 0.3s ease-out;ñ ñ ñ ñ ñ}ñ
+
+                        <p class="text-2xl font-bold text-gray-900" id="inactive-users">0</p>
+
+                    </div>        }ñ ñ ñ ñ ñ.ñhñoñvñeñrñ-ñrñañiñsñeñ ñ{ñ
+
+                </div>
+
+            </div>    </style>ñ ñ ñ ñ ñ ñ ñ ñ ñtñrñañnñsñiñtñiñoñnñ:ñ ñtñrñañnñsñfñoñrñmñ ñ0ñ.ñ2ñsñ ñeñañsñeñ,ñ ñbñoñxñ-ñsñhñañdñoñwñ ñ0ñ.ñ2ñsñ ñeñañsñeñ;ñ
+
+        </div>
+
+</head>ñ ñ ñ ñ ñ}ñ
+
+        <!-- Search and Actions -->
+
+        <div class="bg-white rounded-lg shadow mb-6"><body class="bg-gray-50 min-h-screen">ñ ñ ñ ñ ñ.ñhñoñvñeñrñ-ñrñañiñsñeñ:ñhñoñvñeñrñ ñ{ñ
+
+            <div class="px-6 py-4 border-b border-gray-200">
+
+                <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">ñ ñ ñ ñ ñ ñ ñ ñ ñtñrñañnñsñfñoñrñmñ:ñ ñtñrñañnñsñlñañtñeñYñ(ñ-ñ2ñpñxñ)ñ;ñ
+
+                    <div class="flex-1 max-w-md">
+
+                        <div class="relative">        <!-- Header -->ñ ñ ñ ñ ñ ñ ñ ñ ñbñoñxñ-ñsñhñañdñoñwñ:ñ ñ0ñ ñ4ñpñxñ ñ6ñpñxñ ñrñgñbñañ(ñ0ñ,ñ ñ0ñ,ñ ñ0ñ,ñ ñ0ñ.ñ1ñ)ñ;ñ
+
+                            <input type="text" id="search-input" placeholder="Buscar usuarios..."
+
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">        <div class="mb-8">ñ ñ ñ ñ ñ}ñ
+
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+
+                                <i class="fas fa-search text-gray-400"></i>            <h1 class="text-3xl font-bold text-gray-900 mb-2">ñ ñ ñ ñ ñ.ñtñañbñlñeñ-ñcñoñnñtñañiñnñeñrñ ñ{ñ
+
+                            </div>
+
+                        </div>                <i class="fas fa-users mr-3 text-blue-600"></i>ñ ñ ñ ñ ñ ñ ñ ñ ñoñvñeñrñfñlñoñwñ-ñxñ:ñ ñañuñtñoñ;ñ
+
+                    </div>
+
+                    <div class="flex space-x-3">                Gestión de Usuariosñ ñ ñ ñ ñ ñ ñ ñ ñmñañxñ-ñhñeñiñgñhñtñ:ñ ñ6ñ0ñ0ñpñxñ;ñ
+
+                        <button id="reset-search" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+
+                            <i class="fas fa-times mr-2"></i>Limpiar            </h1>ñ ñ ñ ñ ñ ñ ñ ñ ñoñvñeñrñfñlñoñwñ-ñyñ:ñ ñañuñtñoñ;ñ
+
+                        </button>
+
+                        <button onclick="toggleDescription()" class="px-4 py-2 text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors">            <p class="text-gray-600">ñ ñ ñ ñ ñ}ñ
+
+                            <i class="fas fa-info-circle mr-2"></i>Info
+
+                        </button>                Administra y controla todos los usuarios del sistema de e-commerce.ñ ñ ñ ñ ñ/ñÍñ ñEñsñtñiñlñiñzñañnñdñoñ ñsñcñrñoñlñlñbñañrñ ñÍñ/ñ
+
+                    </div>
+
+                </div>            </p>ñ ñ ñ ñ ñ.ñtñañbñlñeñ-ñcñoñnñtñañiñnñeñrñ:ñ:ñ-ñwñeñbñkñiñtñ-ñsñcñrñoñlñlñbñañrñ ñ{ñ
+
+            </div>
+
+        </div>ñ ñ ñ ñ ñ ñ ñ ñ ñwñiñdñtñhñ:ñ ñ6ñpñxñ;ñ
+
+            <!-- Description -->
+
+            <div id="description" class="hidden px-6 py-4 bg-blue-50 border-b border-blue-200">ñ ñ ñ ñ ñ ñ ñ ñ ñhñeñiñgñhñtñ:ñ ñ6ñpñxñ;ñ
+
+                <p class="text-blue-800">
+
+                    <strong>Panel de administracion de usuarios.</strong> Desde aqui puedes gestionar todos los usuarios del sistema.        <!-- Stats Cards -->ñ ñ ñ ñ ñ}ñ
+
+                    Utiliza el formulario de abajo para agregar nuevos usuarios o edita los existentes haciendo clic en los botones de accion.
+
+                </p>        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">ñ ñ ñ ñ ñ.ñtñañbñlñeñ-ñcñoñnñtñañiñnñeñrñ:ñ:ñ-ñwñeñbñkñiñtñ-ñsñcñrñoñlñlñbñañrñ-ñtñrñañcñkñ ñ{ñ
+
+            </div>
+
+        </div>            <div class="bg-white rounded-lg shadow p-6">ñ ñ ñ ñ ñ ñ ñ ñ ñbñañcñkñgñrñoñuñnñdñ:ñ ñ#ñfñ1ñfñ1ñfñ1ñ;ñ
+
+
+
+        <!-- Add Form -->                <div class="flex items-center">ñ ñ ñ ñ ñ ñ ñ ñ ñbñoñrñdñeñrñ-ñrñañdñiñuñsñ:ñ ñ1ñ0ñpñxñ;ñ
+
+        <div class="bg-white rounded-lg shadow mb-6">
+
+            <div class="px-6 py-4 border-b border-gray-200">                    <div class="p-2 bg-blue-100 rounded-lg">ñ ñ ñ ñ ñ}ñ
+
+                <h2 class="text-lg font-medium text-gray-900">
+
+                    <i class="fas fa-plus-circle mr-2 text-green-600"></i>                        <i class="fas fa-user-plus text-blue-600"></i>ñ ñ ñ ñ ñ.ñtñañbñlñeñ-ñcñoñnñtñañiñnñeñrñ:ñ:ñ-ñwñeñbñkñiñtñ-ñsñcñrñoñlñlñbñañrñ-ñtñhñuñmñbñ ñ{ñ
+
+                    Agregar Nuevo Usuario
+
+                </h2>                    </div>ñ ñ ñ ñ ñ ñ ñ ñ ñbñañcñkñgñrñoñuñnñdñ:ñ ñ#ñcñ1ñcñ1ñcñ1ñ;ñ
+
+            </div>
+
+            <div class="px-6 py-4">                    <div class="ml-4">ñ ñ ñ ñ ñ ñ ñ ñ ñbñoñrñdñeñrñ-ñrñañdñiñuñsñ:ñ ñ1ñ0ñpñxñ;ñ
+
+                <form id="data-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                    <div>                        <p class="text-sm font-medium text-gray-600">Total Usuarios</p>ñ ñ ñ ñ ñ}ñ
+
+                        <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+
+                        <input type="text" id="nombre" name="nombre" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>                        <p class="text-2xl font-bold text-gray-900" id="total-users">0</p>ñ ñ ñ ñ ñ.ñtñañbñlñeñ-ñcñoñnñtñañiñnñeñrñ:ñ:ñ-ñwñeñbñkñiñtñ-ñsñcñrñoñlñlñbñañrñ-ñtñhñuñmñbñ:ñhñoñvñeñrñ ñ{ñ
+
+                    </div>
+
+                    <div>                    </div>ñ ñ ñ ñ ñ ñ ñ ñ ñbñañcñkñgñrñoñuñnñdñ:ñ ñ#ñañ1ñañ1ñañ1ñ;ñ
+
+                        <label for="apellido" class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+
+                        <input type="text" id="apellido" name="apellido" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>                </div>ñ ñ ñ ñ ñ}ñ
+
+                    </div>
+
+                    <div>            </div>ñ ñ ñ<ñ/ñsñtñyñlñeñ>ñ
+
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+
+                        <input type="email" id="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>            <div class="bg-white rounded-lg shadow p-6">ñ ñ ñ<ñsñcñrñiñpñtñ ñdñeñfñeñrñ=ñ"ñTñrñuñeñ"ñ ñsñrñcñ=ñ"ñ/ñsñtñañtñiñcñ/ñuñsñuñañrñiñoñsñ/ñuñsñuñañrñiñoñsñ_ñsñeñrñvñiñcñeñ.ñjñsñ"ñ>ñ
+
+                    </div>
+
+                    <div>                <div class="flex items-center">ñ ñ ñ<ñ/ñsñcñrñiñpñtñ>ñ
+
+                        <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">Telefono</label>
+
+                        <input type="text" id="telefono" name="telefono" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">                    <div class="p-2 bg-green-100 rounded-lg">ñ ñ<ñ/ñhñeñañdñ>ñ
+
+                    </div>
+
+                    <div>                        <i class="fas fa-user-check text-green-600"></i>ñ ñ<ñbñoñdñyñ ñcñlñañsñsñ=ñ"ñbñgñ-ñgñrñañyñ-ñ5ñ0ñ ñmñiñnñ-ñhñ-ñsñcñrñeñeñnñ"ñ>ñ
+
+                        <label for="direccion" class="block text-sm font-medium text-gray-700 mb-1">Direccion</label>
+
+                        <input type="text" id="direccion" name="direccion" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">                    </div>ñ ñ ñ<ñnñañvñ ñcñlñañsñsñ=ñ"ñbñgñ-ñgñrñañdñiñeñnñtñ-ñtñoñ-ñrñ ñfñrñoñmñ-ñgñrñañyñ-ñ8ñ0ñ0ñ ñtñoñ-ñgñrñañyñ-ñ9ñ0ñ0ñ ñpñ-ñ4ñ ñsñtñiñcñkñyñ ñtñoñpñ-ñ0ñ ñzñ-ñ3ñ0ñ ñsñhñañdñoñwñ-ñmñdñ"ñ>ñ
+
+                    </div>
+
+                    <div>                    <div class="ml-4">ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñcñoñnñtñañiñnñeñrñ ñmñxñ-ñañuñtñoñ ñfñlñeñxñ ñjñuñsñtñiñfñyñ-ñbñeñtñwñeñeñnñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ>ñ
+
+                        <label for="ciudad" class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+
+                        <input type="text" id="ciudad" name="ciudad" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">                        <p class="text-sm font-medium text-gray-600">Usuarios Activos</p>ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ ñsñpñañcñeñ-ñxñ-ñ4ñ"ñ>ñ
+
+                    </div>
+
+                    <div>                        <p class="text-2xl font-bold text-gray-900" id="active-users">0</p>ñ ñ ñ ñ ñ ñ<ñañ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ ñsñpñañcñeñ-ñxñ-ñ2ñ"ñ ñhñrñeñfñ=ñ"ñ/ñ"ñ>ñ
+
+                        <label for="provincia" class="block text-sm font-medium text-gray-700 mb-1">Provincia</label>
+
+                        <input type="text" id="provincia" name="provincia" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">                    </div>ñ ñ ñ ñ ñ<ñiñmñgñ ñañlñtñ=ñ"ñLñoñgñoñ"ñ ñcñlñañsñsñ=ñ"ñhñ-ñ8ñ ñwñ-ñañuñtñoñ"ñ ñsñrñcñ=ñ"ñ/ñsñtñañtñiñcñ/ñiñmñgñ/ñlñoñgñoñ.ñpñnñgñ"ñ ñoñnñeñrñrñoñrñ=ñ"ñtñhñiñsñ.ñoñnñeñrñrñoñrñ=ñnñuñlñlñ;ñ ñtñhñiñsñ.ñsñrñcñ=ñ'ñ/ñsñtñañtñiñcñ/ñiñmñgñ/ñlñoñgñoñ.ñpñnñgñ'ñ"ñ/ñ>ñ
+
+                    </div>
+
+                    <div>                </div>ñ ñ ñ ñ ñ ñ ñ<ñsñpñañnñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñwñhñiñtñeñ ñfñoñnñtñ-ñbñoñlñdñ ñtñeñxñtñ-ñlñgñ ñhñiñdñdñeñnñ ñmñdñ:ñbñlñoñcñkñ"ñ>ñ
+
+                        <label for="pais" class="block text-sm font-medium text-gray-700 mb-1">Pais</label>
+
+                        <input type="text" id="pais" name="pais" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">            </div>ñ ñ ñ ñ ñ ñ ñ ñSñiñsñtñeñmñañ ñdñeñ ñSñtñoñcñkñ
+
+                    </div>
+
+                    <div>            <div class="bg-white rounded-lg shadow p-6">ñ ñ ñ ñ ñ ñ ñ<ñ/ñsñpñañnñ>ñ
+
+                        <label for="cuit" class="block text-sm font-medium text-gray-700 mb-1">CUIT</label>
+
+                        <input type="text" id="cuit" name="cuit" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">                <div class="flex items-center">ñ ñ ñ ñ ñ ñ<ñ/ñañ>ñ
+
+                    </div>
+
+                    <div class="flex items-center">                    <div class="p-2 bg-red-100 rounded-lg">ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ ñsñpñañcñeñ-ñxñ-ñ2ñ"ñ>ñ
+
+                        <input type="checkbox" id="active" name="active" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+
+                        <label for="active" class="ml-2 block text-sm text-gray-900">Usuario Activo</label>                        <i class="fas fa-user-times text-red-600"></i>ñ ñ ñ ñ ñ ñ ñ<ñañ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñwñhñiñtñeñ ñhñoñvñeñrñ:ñtñeñxñtñ-ñbñlñuñeñ-ñ2ñ0ñ0ñ ñtñrñañnñsñiñtñiñoñnñ-ñcñoñlñoñrñsñ"ñ ñhñrñeñfñ=ñ"ñ/ñ"ñ>ñ
+
+                    </div>
+
+                    <div class="md:col-span-2 lg:col-span-3">                    </div>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñhñoñmñeñ"ñ>ñ
+
+                        <button type="submit" id="submit-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+
+                            <i class="fas fa-save mr-2"></i>Guardar Usuario                    <div class="ml-4">ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                        </button>
+
+                    </div>                        <p class="text-sm font-medium text-gray-600">Usuarios Inactivos</p>ñ ñ ñ ñ ñ ñ ñ ñ<ñsñpñañnñ ñcñlñañsñsñ=ñ"ñmñlñ-ñ1ñ ñhñiñdñdñeñnñ ñmñdñ:ñiñnñlñiñnñeñ"ñ>ñ
+
+                </form>
+
+            </div>                        <p class="text-2xl font-bold text-gray-900" id="inactive-users">0</p>ñ ñ ñ ñ ñ ñ ñ ñ ñIñnñiñcñiñoñ
+
+        </div>
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñsñpñañnñ>ñ
+
+        <!-- Table -->
+
+        <div class="bg-white rounded-lg shadow overflow-hidden">                </div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñañ>ñ
+
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+
+                <h2 class="text-lg font-medium text-gray-900">            </div>ñ ñ ñ ñ ñ ñ ñ<ñsñpñañnñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñgñrñañyñ-ñ4ñ0ñ0ñ"ñ>ñ
+
+                    <i class="fas fa-table mr-2 text-gray-600"></i>
+
+                    Lista de Usuarios        </div>ñ ñ ñ ñ ñ ñ ñ ñ/ñ
+
+                </h2>
+
+                <span id="record-count" class="text-sm text-gray-600">0 registros encontrados</span>ñ ñ ñ ñ ñ ñ ñ<ñ/ñsñpñañnñ>ñ
+
+            </div>
+
+            <div class="overflow-x-auto">        <!-- Search and Actions -->ñ ñ ñ ñ ñ ñ ñ<ñsñpñañnñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñbñlñuñeñ-ñ2ñ0ñ0ñ ñfñoñnñtñ-ñmñeñdñiñuñmñ"ñ>ñ
+
+                <table class="min-w-full divide-y divide-gray-200">
+
+                    <thead class="bg-gray-50">        <div class="bg-white rounded-lg shadow mb-6">ñ ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñbñoñxñeñsñ"ñ>ñ
+
+                        <tr>
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>            <div class="px-6 py-4 border-b border-gray-200">ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido</th>                <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">ñ ñ ñ ñ ñ ñ ñ ñ<ñsñpñañnñ ñcñlñañsñsñ=ñ"ñmñlñ-ñ1ñ"ñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefono</th>                    <div class="flex-1 max-w-md">ñ ñ ñ ñ ñ ñ ñ ñ ñUñsñuñañrñiñoñsñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Direccion</th>
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ciudad</th>                        <div class="relative">ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñsñpñañnñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provincia</th>
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pais</th>                            <input type="text" id="search-input" placeholder="Buscar usuarios..."ñ ñ ñ ñ ñ ñ ñ<ñ/ñsñpñañnñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Creado</th>
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activo</th>                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CUIT</th>
+
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        </tr>
+
+                    </thead>                                <i class="fas fa-search text-gray-400"></i>ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ ñsñpñañcñeñ-ñxñ-ñ4ñ ñrñeñlñañtñiñvñeñ"ñ>ñ
+
+                    <tbody id="data-table-body" class="bg-white divide-y divide-gray-200">
+
+                        <!-- Data will be loaded here -->                            </div>ñ ñ ñ ñ ñ ñ<ñañ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñwñhñiñtñeñ ñhñoñvñeñrñ:ñbñgñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñpñxñ-ñ3ñ ñpñyñ-ñ1ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñtñeñxñtñ-ñsñmñ ñtñrñañnñsñiñtñiñoñnñ-ñcñoñlñoñrñsñ"ñ ñhñrñeñfñ=ñ"ñ/ñdñoñcñsñ"ñ>ñ
+
+                    </tbody>
+
+                </table>                        </div>ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñbñoñoñkñ ñmñrñ-ñ1ñ"ñ>ñ
+
+            </div>
+
+        </div>                    </div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+    </div>
+
+                    <div class="flex space-x-3">ñ ñ ñ ñ ñ ñ ñAñPñIñ
+
+    <!-- Edit Modal -->
+
+    <div id="edit-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">                        <button id="reset-search" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">ñ ñ ñ ñ ñ ñ<ñ/ñañ>ñ
+
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+
+            <div class="mt-3">                            <i class="fas fa-times mr-2"></i>Limpiarñ ñ ñ ñ ñ ñ<ñañ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñwñhñiñtñeñ ñhñoñvñeñrñ:ñbñgñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñpñxñ-ñ3ñ ñpñyñ-ñ1ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñtñeñxñtñ-ñsñmñ ñtñrñañnñsñiñtñiñoñnñ-ñcñoñlñoñrñsñ"ñ ñhñrñeñfñ=ñ"ñ/ñuñsñuñañrñiñoñsñ_ñañdñmñiñnñ/ñ"ñ>ñ
+
+                <div class="flex items-center justify-between mb-4">
+
+                    <h3 class="text-lg font-medium text-gray-900">                        </button>ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñuñsñeñrñsñ ñmñrñ-ñ1ñ"ñ>ñ
+
+                        <i class="fas fa-edit mr-2 text-blue-600"></i>
+
+                        Editar Usuario                        <button onclick="toggleDescription()" class="px-4 py-2 text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors">ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                    </h3>
+
+                    <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">                            <i class="fas fa-info-circle mr-2"></i>Infoñ ñ ñ ñ ñ ñ ñUñsñuñañrñiñoñsñ
+
+                        <i class="fas fa-times"></i>
+
+                    </button>                        </button>ñ ñ ñ ñ ñ ñ<ñ/ñañ>ñ
+
+                </div>
+
+                <form id="edit-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">                    </div>ñ ñ ñ ñ ñ ñ<ñañ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñwñhñiñtñeñ ñhñoñvñeñrñ:ñbñgñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñpñxñ-ñ3ñ ñpñyñ-ñ1ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñtñeñxñtñ-ñsñmñ ñtñrñañnñsñiñtñiñoñnñ-ñcñoñlñoñrñsñ"ñ ñhñrñeñfñ=ñ"ñ/ñsñeñrñvñiñcñiñoñsñ/ñ"ñ>ñ
+
+                    <input type="hidden" id="edit-id">
+
+                    <div>                </div>ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñcñoñgñsñ ñmñrñ-ñ1ñ"ñ>ñ
+
+                        <label for="edit-nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+
+                        <input type="text" id="edit-nombre" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">            </div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                    </div>
+
+                    <div>ñ ñ ñ ñ ñ ñ ñSñeñrñvñiñcñiñoñsñ
+
+                        <label for="edit-apellido" class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+
+                        <input type="text" id="edit-apellido" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">            <!-- Description -->ñ ñ ñ ñ ñ ñ<ñ/ñañ>ñ
+
+                    </div>
+
+                    <div>            <div id="description" class="hidden px-6 py-4 bg-blue-50 border-b border-blue-200">ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+
+                        <input type="email" id="edit-email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">                <p class="text-blue-800">ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    </div>
+
+                    <div>                    <strong>¿Está seguro de que desea eliminar este registro?</strong> Esta acción no se puede deshacer.ñ ñ ñ<ñ/ñnñañvñ>ñ
+
+                        <label for="edit-telefono" class="block text-sm font-medium text-gray-700 mb-1">Telefono</label>
+
+                        <input type="text" id="edit-telefono" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">                    Utilice el formulario de abajo para agregar nuevos usuarios o edite los existentes haciendo clic en los botones de acción.ñ ñ ñ<ñ!ñ-ñ-ñ ñNñoñtñiñfñiñcñañcñiñoñnñeñsñ ñTñoñañsñtñ ñ-ñ-ñ>ñ
+
+                    </div>
+
+                    <div>                </p>ñ ñ ñ<ñdñiñvñ ñiñdñ=ñ"ñtñoñañsñtñ-ñcñoñnñtñañiñnñeñrñ"ñ>ñ
+
+                        <label for="edit-direccion" class="block text-sm font-medium text-gray-700 mb-1">Direccion</label>
+
+                        <input type="text" id="edit-direccion" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">            </div>ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    </div>
+
+                    <div>        </div>ñ ñ ñ<ñhñeñañdñeñrñ ñcñlñañsñsñ=ñ"ñbñgñ-ñwñhñiñtñeñ ñsñhñañdñoñwñ-ñsñmñ ñmñbñ-ñ6ñ"ñ>ñ
+
+                        <label for="edit-ciudad" class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+
+                        <input type="text" id="edit-ciudad" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñcñoñnñtñañiñnñeñrñ ñmñxñ-ñañuñtñoñ ñpñxñ-ñ4ñ ñpñyñ-ñ6ñ"ñ>ñ
+
+                    </div>
+
+                    <div>        <!-- Add Form -->ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñfñlñeñxñ-ñcñoñlñ ñmñdñ:ñfñlñeñxñ-ñrñoñwñ ñjñuñsñtñiñfñyñ-ñbñeñtñwñeñeñnñ ñiñtñeñmñsñ-ñsñtñañrñtñ ñmñdñ:ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ>ñ
+
+                        <label for="edit-provincia" class="block text-sm font-medium text-gray-700 mb-1">Provincia</label>
+
+                        <input type="text" id="edit-provincia" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">        <div class="bg-white rounded-lg shadow mb-6">ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+                    </div>
+
+                    <div>            <div class="px-6 py-4 border-b border-gray-200">ñ ñ ñ ñ ñ ñ ñ<ñhñ1ñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñ2ñxñlñ ñfñoñnñtñ-ñbñoñlñdñ ñtñeñxñtñ-ñgñrñañyñ-ñ8ñ0ñ0ñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ>ñ
+
+                        <label for="edit-pais" class="block text-sm font-medium text-gray-700 mb-1">Pais</label>
+
+                        <input type="text" id="edit-pais" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">                <h2 class="text-lg font-medium text-gray-900">ñ ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñcñuñbñeñsñ ñtñeñxñtñ-ñbñlñuñeñ-ñ6ñ0ñ0ñ ñmñrñ-ñ3ñ"ñ>ñ
+
+                    </div>
+
+                    <div>                    <i class="fas fa-plus-circle mr-2 text-green-600"></i>ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                        <label for="edit-cuit" class="block text-sm font-medium text-gray-700 mb-1">CUIT</label>
+
+                        <input type="text" id="edit-cuit" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">                    Agregar Nuevo Usuarioñ ñ ñ ñ ñ ñ ñ ñGñeñsñtñiñóñnñ ñdñeñ ñUñsñuñañrñiñoñsñ
+
+                    </div>
+
+                    <div class="flex items-center md:col-span-2">                </h2>ñ ñ ñ ñ ñ ñ ñ<ñ/ñhñ1ñ>ñ
+
+                        <input type="checkbox" id="edit-active" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+
+                        <label for="edit-active" class="ml-2 block text-sm text-gray-900">Usuario Activo</label>            </div>ñ ñ ñ ñ ñ ñ ñ<ñpñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñgñrñañyñ-ñ6ñ0ñ0ñ ñmñtñ-ñ1ñ"ñ>ñ
+
+                    </div>
+
+                    <div class="md:col-span-2 flex justify-end space-x-3">            <div class="px-6 py-4">ñ ñ ñ ñ ñ ñ ñ ñAñdñmñiñnñiñsñtñrñañ,ñ ñañññañdñeñ ñyñ ñeñdñiñtñañ ñrñeñgñiñsñtñrñoñsñ ñeñnñ ñeñlñ ñsñiñsñtñeñmñañ
+
+                        <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+
+                            Cancelar                <form id="data-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">ñ ñ ñ ñ ñ ñ ñ<ñ/ñpñ>ñ
+
+                        </button>
+
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">                    <div>ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                            <i class="fas fa-save mr-2"></i>Actualizar
+
+                        </button>                        <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñmñtñ-ñ4ñ ñmñdñ:ñmñtñ-ñ0ñ"ñ>ñ
+
+                    </div>
+
+                </form>                        <input type="text" id="nombre" name="nombre" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ<ñbñuñtñtñoñnñ ñcñlñañsñsñ=ñ"ñbñgñ-ñbñlñuñeñ-ñ5ñ0ñ ñtñeñxñtñ-ñbñlñuñeñ-ñ7ñ0ñ0ñ ñpñxñ-ñ4ñ ñpñyñ-ñ2ñ ñrñoñuñnñdñeñdñ-ñlñgñ ñhñoñvñeñrñ:ñbñgñ-ñbñlñuñeñ-ñ1ñ0ñ0ñ ñtñrñañnñsñiñtñiñoñnñ-ñcñoñlñoñrñsñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ ñiñdñ=ñ"ñhñeñlñpñ-ñbñtñnñ"ñ ñoñnñcñlñiñcñkñ=ñ"ñtñoñgñgñlñeñDñeñsñcñrñiñpñtñiñoñnñ(ñ)ñ"ñ>ñ
+
+            </div>
+
+        </div>                    </div>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñiñnñfñoñ-ñcñiñrñcñlñeñ ñmñrñ-ñ2ñ"ñ>ñ
+
+    </div>
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+    <!-- Delete Modal -->
+
+    <div id="delete-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">                        <label for="apellido" class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>ñ ñ ñ ñ ñ ñ ñ ñAñyñuñdñañ
+
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+
+            <div class="mt-3 text-center">                        <input type="text" id="apellido" name="apellido" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ<ñ/ñbñuñtñtñoñnñ>ñ
+
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>                    </div>ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                </div>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Eliminar Usuario?</h3>                    <div>ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                <p class="text-sm text-gray-500 mb-4">
+
+                    Esta accion no se puede deshacer. Esta seguro de que desea eliminar este usuario?                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                </p>
+
+                <div class="flex justify-center space-x-3">                        <input type="email" id="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ<ñ/ñhñeñañdñeñrñ>ñ
+
+                    <button id="cancel-delete" onclick="closeDeleteModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+
+                        Cancelar                    </div>ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñhñiñdñdñeñnñ ñcñoñnñtñañiñnñeñrñ ñmñxñ-ñañuñtñoñ ñpñxñ-ñ4ñ ñmñbñ-ñ6ñ"ñ ñiñdñ=ñ"ñdñeñsñcñrñiñpñtñiñoñnñ"ñ>ñ
+
+                    </button>
+
+                    <button id="confirm-delete" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors">                    <div>ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñbñgñ-ñbñlñuñeñ-ñ5ñ0ñ ñbñoñrñdñeñrñ-ñlñ-ñ4ñ ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñpñ-ñ5ñ ñrñoñuñnñdñeñdñ-ñlñgñ ñsñhñañdñoñwñ-ñsñmñ ñsñlñiñdñeñ-ñiñnñ"ñ>ñ
+
+                        <i class="fas fa-trash-alt mr-2"></i>Eliminar
+
+                    </button>                        <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñjñuñsñtñiñfñyñ-ñbñeñtñwñeñeñnñ ñiñtñeñmñsñ-ñsñtñañrñtñ"ñ>ñ
+
+                </div>
+
+            </div>                        <input type="text" id="telefono" name="telefono" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ<ñhñ2ñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñlñgñ ñfñoñnñtñ-ñsñeñmñiñbñoñlñdñ ñtñeñxñtñ-ñbñlñuñeñ-ñ7ñ0ñ0ñ ñmñbñ-ñ3ñ"ñ>ñ
+
+        </div>
+
+    </div>                    </div>ñ ñ ñ ñ ñ ñ ñCñóñmñoñ ñuñtñiñlñiñzñañrñ ñeñsñtñeñ ñmñóñdñuñlñoñ
+
+
+
+    <!-- Toast Container -->                    <div>ñ ñ ñ ñ ñ ñ<ñ/ñhñ2ñ>ñ
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+                        <label for="direccion" class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>ñ ñ ñ ñ ñ ñ<ñbñuñtñtñoñnñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñgñrñañyñ-ñ4ñ0ñ0ñ ñhñoñvñeñrñ:ñtñeñxñtñ-ñgñrñañyñ-ñ6ñ0ñ0ñ"ñ ñoñnñcñlñiñcñkñ=ñ"ñtñoñgñgñlñeñDñeñsñcñrñiñpñtñiñoñnñ(ñ)ñ"ñ>ñ
+
+    <!-- Include the JavaScript file -->
+
+    <script src="/static/js/usuarios.js"></script>                        <input type="text" id="direccion" name="direccion" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñtñiñmñeñsñ"ñ>ñ
+
+</body>
+
+</html>                    </div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+
+                    <div>ñ ñ ñ ñ ñ ñ<ñ/ñbñuñtñtñoñnñ>ñ
+
+                        <label for="ciudad" class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        <input type="text" id="ciudad" name="ciudad" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñsñpñañcñeñ-ñyñ-ñ3ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñiñtñeñmñsñ-ñsñtñañrñtñ"ñ>ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñpñlñuñsñ-ñcñiñrñcñlñeñ ñtñeñxñtñ-ñgñrñeñeñnñ-ñ6ñ0ñ0ñ ñmñtñ-ñ1ñ ñmñrñ-ñ3ñ"ñ>ñ
+
+                        <label for="provincia" class="block text-sm font-medium text-gray-700 mb-1">Provincia</label>ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                        <input type="text" id="provincia" name="provincia" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ<ñpñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ ñUñsñañ ñeñlñ ñfñoñrñmñuñlñañrñiñoñ ñpñañrñañ ñañgñrñeñgñañrñ ñnñuñeñvñoñsñ ñrñeñgñiñsñtñrñoñsñ ñdñeñ ñUñsñuñañrñiñoñsñ.ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñpñ>ñ
+
+                        <label for="pais" class="block text-sm font-medium text-gray-700 mb-1">País</label>ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        <input type="text" id="pais" name="pais" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñiñtñeñmñsñ-ñsñtñañrñtñ"ñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñtñañbñlñeñ ñtñeñxñtñ-ñbñlñuñeñ-ñ6ñ0ñ0ñ ñmñtñ-ñ1ñ ñmñrñ-ñ3ñ"ñ>ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                        <label for="cuit" class="block text-sm font-medium text-gray-700 mb-1">CUIT</label>ñ ñ ñ ñ ñ ñ ñ<ñpñ>ñ
+
+                        <input type="text" id="cuit" name="cuit" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ ñLñañ ñtñañbñlñañ ñmñuñeñsñtñrñañ ñtñoñdñoñsñ ñlñoñsñ ñrñeñgñiñsñtñrñoñsñ ñyñ ñpñeñrñmñiñtñeñ ñfñiñlñtñrñañrñlñoñsñ ñuñsñañnñdñoñ ñlñañ ñbñañrñrñañ ñdñeñ ñbñúñsñqñuñeñdñañ.ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñpñ>ñ
+
+                    <div class="flex items-center">ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        <input type="checkbox" id="active" name="active" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñiñtñeñmñsñ-ñsñtñañrñtñ"ñ>ñ
+
+                        <label for="active" class="ml-2 block text-sm text-gray-900">Usuario Activo</label>ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñeñdñiñtñ ñtñeñxñtñ-ñyñeñlñlñoñwñ-ñ6ñ0ñ0ñ ñmñtñ-ñ1ñ ñmñrñ-ñ3ñ"ñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                    <div class="md:col-span-2 lg:col-span-3">ñ ñ ñ ñ ñ ñ ñ<ñpñ>ñ
+
+                        <button type="submit" id="submit-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">ñ ñ ñ ñ ñ ñ ñ ñPñuñeñdñeñsñ ñeñdñiñtñañrñ ñtñoñdñoñsñ ñlñoñsñ ñcñañmñpñoñsñ ñeñxñcñeñpñtñoñ ñeñlñ ñiñdñeñnñtñiñfñiñcñañdñoñrñ ñ(ñiñdñ)ñ.ñ
+
+                            <i class="fas fa-save mr-2"></i>Guardar Usuarioñ ñ ñ ñ ñ ñ ñ<ñ/ñpñ>ñ
+
+                        </button>ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñiñtñeñmñsñ-ñsñtñañrñtñ"ñ>ñ
+
+                </form>ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñtñrñañsñhñ-ñañlñtñ ñtñeñxñtñ-ñrñeñdñ-ñ6ñ0ñ0ñ ñmñtñ-ñ1ñ ñmñrñ-ñ3ñ"ñ>ñ
+
+            </div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+        </div>ñ ñ ñ ñ ñ ñ ñ<ñpñ>ñ
+
+ñ ñ ñ ñ ñ ñ ñ ñEñlñiñmñiñnñañ ñrñeñgñiñsñtñrñoñsñ ñcñuñañnñdñoñ ñyñañ ñnñoñ ñsñeñañnñ ñnñeñcñeñsñañrñiñoñsñ.ñ
+
+        <!-- Table -->ñ ñ ñ ñ ñ ñ ñ<ñ/ñpñ>ñ
+
+        <div class="bg-white rounded-lg shadow overflow-hidden">ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                <h2 class="text-lg font-medium text-gray-900">ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    <i class="fas fa-table mr-2 text-gray-600"></i>ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    Lista de Usuariosñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñcñoñnñtñañiñnñeñrñ ñmñxñ-ñañuñtñoñ ñpñxñ-ñ4ñ"ñ>ñ
+
+                </h2>ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñbñgñ-ñwñhñiñtñeñ ñrñoñuñnñdñeñdñ-ñlñgñ ñsñhñañdñoñwñ-ñsñmñ ñpñ-ñ6ñ ñmñbñ-ñ6ñ"ñ>ñ
+
+                <span id="record-count" class="text-sm text-gray-600">0 registros encontrados</span>ñ ñ ñ ñ ñ<ñhñ2ñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñlñgñ ñfñoñnñtñ-ñsñeñmñiñbñoñlñdñ ñtñeñxñtñ-ñgñrñañyñ-ñ8ñ0ñ0ñ ñmñbñ-ñ4ñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ>ñ
+
+            </div>ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñpñlñuñsñ-ñcñiñrñcñlñeñ ñtñeñxñtñ-ñgñrñeñeñnñ-ñ6ñ0ñ0ñ ñmñrñ-ñ2ñ"ñ>ñ
+
+            <div class="overflow-x-auto">ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                <table class="min-w-full divide-y divide-gray-200">ñ ñ ñ ñ ñ ñAñññañdñiñrñ ñNñuñeñvñoñ ñRñeñgñiñsñtñrñoñ
+
+                    <thead class="bg-gray-50">ñ ñ ñ ñ ñ<ñ/ñhñ2ñ>ñ
+
+                        <tr>ñ ñ ñ ñ ñ<ñfñoñrñmñ ñcñlñañsñsñ=ñ"ñmñbñ-ñ4ñ"ñ ñiñdñ=ñ"ñdñañtñañ-ñfñoñrñmñ"ñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñgñrñiñdñ ñgñrñiñdñ-ñcñoñlñsñ-ñ1ñ ñmñdñ:ñgñrñiñdñ-ñcñoñlñsñ-ñ2ñ ñlñgñ:ñgñrñiñdñ-ñcñoñlñsñ-ñ3ñ ñxñlñ:ñgñrñiñdñ-ñcñoñlñsñ-ñ4ñ ñgñañpñ-ñ4ñ"ñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido</th>ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>ñ ñ ñ ñ ñ ñ ñ ñ ñNñoñmñbñrñeñ:ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</th>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñnñoñmñbñrñeñ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñIñnñgñrñeñsñeñ ñnñoñmñbñrñeñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ciudad</th>ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provincia</th>ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">País</th>ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Creado</th>ñ ñ ñ ñ ñ ñ ñ ñ ñAñpñeñlñlñiñdñoñ:ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activo</th>ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CUIT</th>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñañpñeñlñlñiñdñoñ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñIñnñgñrñeñsñeñ ñañpñeñlñlñiñdñoñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        </tr>ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+                    </thead>ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+                    <tbody id="data-table-body" class="bg-white divide-y divide-gray-200">ñ ñ ñ ñ ñ ñ ñ ñ ñEñmñañiñlñ:ñ
+
+                        <!-- Data will be loaded here -->ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                    </tbody>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñmñañiñlñ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñIñnñgñrñeñsñeñ ñeñmñañiñlñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+                </table>ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+            </div>ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+        </div>ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+    </div>ñ ñ ñ ñ ñ ñ ñ ñ ñCñoñnñtñrñañsñeñññañ_ñhñañsñhñ:ñ
+
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+    <!-- Edit Modal -->ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñcñoñnñtñrñañsñeñññañ_ñhñañsñhñ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñIñnñgñrñeñsñeñ ñcñoñnñtñrñañsñeñññañ_ñhñañsñhñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+    <div id="edit-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+            <div class="mt-3">ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+                <div class="flex items-center justify-between mb-4">ñ ñ ñ ñ ñ ñ ñ ñ ñTñeñlñeñfñoñnñoñ:ñ
+
+                    <h3 class="text-lg font-medium text-gray-900">ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                        <i class="fas fa-edit mr-2 text-blue-600"></i>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñtñeñlñeñfñoñnñoñ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñIñnñgñrñeñsñeñ ñtñeñlñeñfñoñnñoñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+                        Editar Usuarioñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    </h3>ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+                    <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+                        <i class="fas fa-times"></i>ñ ñ ñ ñ ñ ñ ñ ñ ñDñiñrñeñcñcñiñoñnñ:ñ
+
+                    </button>ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                </div>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñdñiñrñeñcñcñiñoñnñ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñIñnñgñrñeñsñeñ ñdñiñrñeñcñcñiñoñnñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+                <form id="edit-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    <input type="hidden" id="edit-id">ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+                        <label for="edit-nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>ñ ñ ñ ñ ñ ñ ñ ñ ñCñiñuñdñañdñ:ñ
+
+                        <input type="text" id="edit-nombre" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñcñiñuñdñañdñ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñIñnñgñrñeñsñeñ ñcñiñuñdñañdñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        <label for="edit-apellido" class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+                        <input type="text" id="edit-apellido" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ ñ ñPñrñoñvñiñnñcñiñañ:ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                        <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñpñrñoñvñiñnñcñiñañ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñIñnñgñrñeñsñeñ ñpñrñoñvñiñnñcñiñañ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+                        <input type="email" id="edit-email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+                        <label for="edit-telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>ñ ñ ñ ñ ñ ñ ñ ñ ñPñañiñsñ:ñ
+
+                        <input type="text" id="edit-telefono" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñpñañiñsñ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñIñnñgñrñeñsñeñ ñpñañiñsñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        <label for="edit-direccion" class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+                        <input type="text" id="edit-direccion" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ ñ ñCñrñeñañtñeñdñ_ñañtñ:ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                        <label for="edit-ciudad" class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñcñrñeñañtñeñdñ_ñañtñ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñIñnñgñrñeñsñeñ ñcñrñeñañtñeñdñ_ñañtñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+                        <input type="text" id="edit-ciudad" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+                        <label for="edit-provincia" class="block text-sm font-medium text-gray-700 mb-1">Provincia</label>ñ ñ ñ ñ ñ ñ ñ ñ ñAñcñtñiñvñeñ:ñ
+
+                        <input type="text" id="edit-provincia" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ ñmñtñ-ñ1ñ"ñ>ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñwñ-ñ4ñ ñhñ-ñ4ñ ñtñeñxñtñ-ñbñlñuñeñ-ñ6ñ0ñ0ñ ñrñoñuñnñdñeñdñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñfñoñcñuñsñ:ñrñiñnñgñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñañcñtñiñvñeñ"ñ ñtñyñpñeñ=ñ"ñcñhñeñcñkñbñoñxñ"ñ/ñ>ñ
+
+                        <label for="edit-pais" class="block text-sm font-medium text-gray-700 mb-1">País</label>ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñmñlñ-ñ2ñ ñtñeñxñtñ-ñsñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñfñoñrñ=ñ"ñañcñtñiñvñeñ"ñ>ñ
+
+                        <input type="text" id="edit-pais" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ ñ ñ ñAñcñtñiñvñañdñoñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                    <div>ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        <label for="edit-cuit" class="block text-sm font-medium text-gray-700 mb-1">CUIT</label>ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        <input type="text" id="edit-cuit" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ>ñ
+
+                    <div class="flex items-center md:col-span-2">ñ ñ ñ ñ ñ ñ ñ ñ ñCñuñiñtñ:ñ
+
+                        <input type="checkbox" id="edit-active" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+
+                        <label for="edit-active" class="ml-2 block text-sm text-gray-900">Usuario Activo</label>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñcñuñiñtñ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñIñnñgñrñeñsñeñ ñcñuñiñtñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    <div class="md:col-span-2 flex justify-end space-x-3">ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñmñtñ-ñ6ñ"ñ>ñ
+
+                            Cancelarñ ñ ñ ñ ñ ñ ñ<ñbñuñtñtñoñnñ ñcñlñañsñsñ=ñ"ñbñgñ-ñgñrñañdñiñeñnñtñ-ñtñoñ-ñrñ ñfñrñoñmñ-ñgñrñeñeñnñ-ñ5ñ0ñ0ñ ñtñoñ-ñgñrñeñeñnñ-ñ6ñ0ñ0ñ ñtñeñxñtñ-ñwñhñiñtñeñ ñpñxñ-ñ5ñ ñpñyñ-ñ2ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñhñoñvñeñrñ:ñfñrñoñmñ-ñgñrñeñeñnñ-ñ6ñ0ñ0ñ ñhñoñvñeñrñ:ñtñoñ-ñgñrñeñeñnñ-ñ7ñ0ñ0ñ ñfñoñcñuñsñ:ñoñuñtñlñiñnñeñ-ñnñoñnñeñ ñfñoñcñuñsñ:ñrñiñnñgñ-ñ2ñ ñfñoñcñuñsñ:ñrñiñnñgñ-ñgñrñeñeñnñ-ñ5ñ0ñ0ñ ñfñoñcñuñsñ:ñrñiñnñgñ-ñoñpñañcñiñtñyñ-ñ5ñ0ñ ñtñrñañnñsñiñtñiñoñnñ-ñañlñlñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ ñiñdñ=ñ"ñsñuñbñmñiñtñ-ñbñtñnñ"ñ ñtñyñpñeñ=ñ"ñsñuñbñmñiñtñ"ñ>ñ
+
+                        </button>ñ ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñsñañvñeñ ñmñrñ-ñ2ñ"ñ>ñ
+
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                            <i class="fas fa-save mr-2"></i>Actualizarñ ñ ñ ñ ñ ñ ñ ñGñuñañrñdñañrñ
+
+                        </button>ñ ñ ñ ñ ñ ñ ñ<ñ/ñbñuñtñtñoñnñ>ñ
+
+                    </div>ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                </form>ñ ñ ñ ñ ñ<ñ/ñfñoñrñmñ>ñ
+
+            </div>ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+        </div>ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñbñgñ-ñwñhñiñtñeñ ñrñoñuñnñdñeñdñ-ñlñgñ ñsñhñañdñoñwñ-ñsñmñ ñpñ-ñ4ñ ñmñbñ-ñ6ñ"ñ>ñ
+
+    </div>ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñfñlñeñxñ-ñwñrñañpñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ>ñ
+
+ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñrñeñlñañtñiñvñeñ ñfñlñeñxñ-ñgñrñoñwñ"ñ>ñ
+
+    <!-- Delete Modal -->ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñwñ-ñfñuñlñlñ ñpñlñ-ñ1ñ0ñ ñpñrñ-ñ4ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñfñoñcñuñsñ:ñrñiñnñgñ-ñ1ñ ñfñoñcñuñsñ:ñrñiñnñgñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ"ñ ñiñdñ=ñ"ñsñeñañrñcñhñ-ñiñnñpñuñtñ"ñ ñpñlñañcñeñhñoñlñdñeñrñ=ñ"ñBñuñsñcñañrñ.ñ.ñ.ñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+
+    <div id="delete-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñañbñsñoñlñuñtñeñ ñiñnñsñeñtñ-ñyñ-ñ0ñ ñlñeñfñtñ-ñ0ñ ñpñlñ-ñ3ñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ ñpñoñiñnñtñeñrñ-ñeñvñeñnñtñsñ-ñnñoñnñeñ"ñ>ñ
+
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">ñ ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñsñeñañrñcñhñ ñtñeñxñtñ-ñgñrñañyñ-ñ4ñ0ñ0ñ"ñ>ñ
+
+            <div class="mt-3 text-center">ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    <i class="fas fa-exclamation-triangle text-red-600"></i>ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                </div>ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñmñtñ-ñ2ñ ñsñmñ:ñmñtñ-ñ0ñ ñsñmñ:ñmñlñ-ñ4ñ"ñ>ñ
+
+                <h3 class="text-lg font-medium text-gray-900 mb-2">¿Eliminar Usuario?</h3>ñ ñ ñ ñ ñ ñ ñ<ñbñuñtñtñoñnñ ñcñlñañsñsñ=ñ"ñbñgñ-ñgñrñañyñ-ñ1ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñpñxñ-ñ4ñ ñpñyñ-ñ2ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñhñoñvñeñrñ:ñbñgñ-ñgñrñañyñ-ñ2ñ0ñ0ñ ñtñrñañnñsñiñtñiñoñnñ-ñcñoñlñoñrñsñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ ñiñdñ=ñ"ñrñeñsñeñtñ-ñsñeñañrñcñhñ"ñ>ñ
+
+                <p class="text-sm text-gray-500 mb-4">ñ ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñrñeñdñoñ-ñañlñtñ ñmñrñ-ñ2ñ"ñ>ñ
+
+                    Esta acción no se puede deshacer. ¿Está seguro de que desea eliminar este usuario?ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+                </p>ñ ñ ñ ñ ñ ñ ñ ñRñeñsñtñañbñlñeñcñeñrñ
+
+                <div class="flex justify-center space-x-3">ñ ñ ñ ñ ñ ñ ñ<ñ/ñbñuñtñtñoñnñ>ñ
+
+                    <button id="cancel-delete" onclick="closeDeleteModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                        Cancelarñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    </button>ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+                    <button id="confirm-delete" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors">ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñbñgñ-ñwñhñiñtñeñ ñrñoñuñnñdñeñdñ-ñlñgñ ñsñhñañdñoñwñ-ñsñmñ ñoñvñeñrñfñlñoñwñ-ñhñiñdñdñeñnñ"ñ>ñ
+
+                        <i class="fas fa-trash-alt mr-2"></i>Eliminarñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñpñ-ñ4ñ ñbñoñrñdñeñrñ-ñbñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ2ñ0ñ0ñ ñbñgñ-ñgñrñañyñ-ñ5ñ0ñ ñfñlñeñxñ ñjñuñsñtñiñfñyñ-ñbñeñtñwñeñeñnñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ>ñ
+
+                    </button>ñ ñ ñ ñ ñ ñ<ñhñ2ñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñlñgñ ñfñoñnñtñ-ñsñeñmñiñbñoñlñdñ ñtñeñxñtñ-ñgñrñañyñ-ñ8ñ0ñ0ñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ>ñ
+
+                </div>ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñtñañbñlñeñ ñtñeñxñtñ-ñbñlñuñeñ-ñ6ñ0ñ0ñ ñmñrñ-ñ2ñ"ñ>ñ
+
+            </div>ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+
+        </div>ñ ñ ñ ñ ñ ñ ñRñeñgñiñsñtñrñoñsñ
+
+    </div>ñ ñ ñ ñ ñ ñ<ñ/ñhñ2ñ>ñ
+
+ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñsñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñrñeñcñoñrñdñ-ñcñoñuñnñtñ"ñ>ñ
+
+    <!-- Toast Container -->ñ ñ ñ ñ ñ ñ ñCñañrñgñañnñdñoñ ñrñeñgñiñsñtñrñoñsñ.ñ.ñ.ñ
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+
+    <!-- Include the JavaScript file -->ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñtñañbñlñeñ-ñcñoñnñtñañiñnñeñrñ"ñ>ñ
+
+    <script src="/static/js/usuarios.js"></script>ñ ñ ñ ñ ñ ñ<ñtñañbñlñeñ ñcñlñañsñsñ=ñ"ñmñiñnñ-ñwñ-ñfñuñlñlñ ñdñiñvñiñdñeñ-ñyñ ñdñiñvñiñdñeñ-ñgñrñañyñ-ñ2ñ0ñ0ñ"ñ>ñ
+
+</body>ñ ñ ñ ñ ñ ñ ñ<ñtñhñeñañdñ ñcñlñañsñsñ=ñ"ñbñgñ-ñgñrñañyñ-ñ5ñ0ñ"ñ>ñ
+
+</html>ñ ñ ñ ñ ñ ñ ñ ñ<ñtñrñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñIñdñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñNñoñmñbñrñeñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñAñpñeñlñlñiñdñoñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñEñmñañiñlñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñCñoñnñtñrñañsñeñññañ_ñhñañsñhñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñTñeñlñeñfñoñnñoñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñDñiñrñeñcñcñiñoñnñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñCñiñuñdñañdñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñPñrñoñvñiñnñcñiñañ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñPñañiñsñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñCñrñeñañtñeñdñ_ñañtñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñAñcñtñiñvñeñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñlñeñfñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñCñuñiñtñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñhñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ3ñ ñtñeñxñtñ-ñrñiñgñhñtñ ñtñeñxñtñ-ñxñsñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñuñpñpñeñrñcñañsñeñ ñtñrñañcñkñiñnñgñ-ñwñiñdñeñrñ"ñ ñsñcñoñpñeñ=ñ"ñcñoñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñAñcñcñiñoñnñeñsñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñrñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñhñeñañdñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñtñbñoñdñyñ ñcñlñañsñsñ=ñ"ñbñgñ-ñwñhñiñtñeñ ñdñiñvñiñdñeñ-ñyñ ñdñiñvñiñdñeñ-ñgñrñañyñ-ñ2ñ0ñ0ñ"ñ ñiñdñ=ñ"ñdñañtñañ-ñtñañbñlñeñ-ñbñoñdñyñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñtñrñ ñiñdñ=ñ"ñlñoñañdñiñnñgñ-ñrñoñwñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñtñdñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ1ñ0ñ ñtñeñxñtñ-ñcñeñnñtñeñrñ ñtñeñxñtñ-ñsñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ"ñ ñcñoñlñsñpñañnñ=ñ"ñ1ñ4ñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñsñpñiñnñnñeñrñ ñfñañ-ñsñpñiñnñ ñmñrñ-ñ2ñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ ñCñañrñgñañnñdñoñ ñdñañtñoñsñ.ñ.ñ.ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñdñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñrñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñtñbñoñdñyñ>ñ
+ñ ñ ñ ñ ñ ñ<ñ/ñtñañbñlñeñ>ñ
+ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñiñxñeñdñ ñiñnñsñeñtñ-ñ0ñ ñzñ-ñ5ñ0ñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ ñjñuñsñtñiñfñyñ-ñcñeñnñtñeñrñ ñbñgñ-ñbñlñañcñkñ ñbñgñ-ñoñpñañcñiñtñyñ-ñ5ñ0ñ ñhñiñdñdñeñnñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñmñoñdñañlñ"ñ>ñ
+ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñbñgñ-ñwñhñiñtñeñ ñrñoñuñnñdñeñdñ-ñlñgñ ñsñhñañdñoñwñ-ñxñlñ ñwñ-ñfñuñlñlñ ñmñañxñ-ñwñ-ñmñdñ ñmñxñ-ñ4ñ ñfñañdñeñ-ñiñnñ"ñ>ñ
+ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ4ñ ñbñoñrñdñeñrñ-ñbñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ2ñ0ñ0ñ ñfñlñeñxñ ñjñuñsñtñiñfñyñ-ñbñeñtñwñeñeñnñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ<ñhñ3ñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñlñgñ ñfñoñnñtñ-ñsñeñmñiñbñoñlñdñ ñtñeñxñtñ-ñgñrñañyñ-ñ8ñ0ñ0ñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñeñdñiñtñ ñtñeñxñtñ-ñbñlñuñeñ-ñ6ñ0ñ0ñ ñmñrñ-ñ2ñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+ñ ñ ñ ñ ñ ñ ñEñdñiñtñañrñ ñUñsñuñañrñiñoñsñ
+ñ ñ ñ ñ ñ ñ<ñ/ñhñ3ñ>ñ
+ñ ñ ñ ñ ñ ñ<ñbñuñtñtñoñnñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñgñrñañyñ-ñ4ñ0ñ0ñ ñhñoñvñeñrñ:ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñfñoñcñuñsñ:ñoñuñtñlñiñnñeñ-ñnñoñnñeñ"ñ ñoñnñcñlñiñcñkñ=ñ"ñcñlñoñsñeñEñdñiñtñMñoñdñañlñ(ñ)ñ"ñ ñtñyñpñeñ=ñ"ñbñuñtñtñoñnñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñtñiñmñeñsñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+ñ ñ ñ ñ ñ ñ<ñ/ñbñuñtñtñoñnñ>ñ
+ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ<ñfñoñrñmñ ñiñdñ=ñ"ñeñdñiñtñ-ñfñoñrñmñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñpñ-ñ6ñ ñsñpñañcñeñ-ñyñ-ñ4ñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñiñdñ=ñ"ñeñdñiñtñ-ñiñdñ"ñ ñtñyñpñeñ=ñ"ñhñiñdñdñeñnñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñnñoñmñbñrñeñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñNñoñmñbñrñeñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñnñoñmñbñrñeñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñañpñeñlñlñiñdñoñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñAñpñeñlñlñiñdñoñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñañpñeñlñlñiñdñoñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñeñmñañiñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñEñmñañiñlñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñeñmñañiñlñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñcñoñnñtñrñañsñeñññañ_ñhñañsñhñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñCñoñnñtñrñañsñeñññañ_ñhñañsñhñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñcñoñnñtñrñañsñeñññañ_ñhñañsñhñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñtñeñlñeñfñoñnñoñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñTñeñlñeñfñoñnñoñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñtñeñlñeñfñoñnñoñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñdñiñrñeñcñcñiñoñnñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñDñiñrñeñcñcñiñoñnñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñdñiñrñeñcñcñiñoñnñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñcñiñuñdñañdñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñCñiñuñdñañdñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñcñiñuñdñañdñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñpñrñoñvñiñnñcñiñañ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñPñrñoñvñiñnñcñiñañ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñpñrñoñvñiñnñcñiñañ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñpñañiñsñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñPñañiñsñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñpñañiñsñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñcñrñeñañtñeñdñ_ñañtñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñCñrñeñañtñeñdñ_ñañtñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñcñrñeñañtñeñdñ_ñañtñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñañcñtñiñvñeñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñAñcñtñiñvñeñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñañcñtñiñvñeñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñlñañbñeñlñ ñcñlñañsñsñ=ñ"ñbñlñoñcñkñ ñtñeñxñtñ-ñsñmñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñmñbñ-ñ1ñ"ñ ñfñoñrñ=ñ"ñeñdñiñtñ-ñcñuñiñtñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ ñCñuñiñtñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñlñañbñeñlñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñnñpñuñtñ ñcñlñañsñsñ=ñ"ñiñnñpñuñtñ-ñfñiñeñlñdñ ñwñ-ñfñuñlñlñ ñpñxñ-ñ3ñ ñpñyñ-ñ2ñ ñbñoñrñdñeñrñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ3ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñsñhñañdñoñwñ-ñsñmñ ñfñoñcñuñsñ:ñbñoñrñdñeñrñ-ñbñlñuñeñ-ñ5ñ0ñ0ñ"ñ ñiñdñ=ñ"ñeñdñiñtñ-ñcñuñiñtñ"ñ ñtñyñpñeñ=ñ"ñtñeñxñtñ"ñ/ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ6ñ ñpñyñ-ñ4ñ ñbñoñrñdñeñrñ-ñtñ ñbñoñrñdñeñrñ-ñgñrñañyñ-ñ2ñ0ñ0ñ ñfñlñeñxñ ñjñuñsñtñiñfñyñ-ñeñnñdñ ñsñpñañcñeñ-ñxñ-ñ3ñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñbñuñtñtñoñnñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ4ñ ñpñyñ-ñ2ñ ñbñgñ-ñgñrñañyñ-ñ1ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñhñoñvñeñrñ:ñbñgñ-ñgñrñañyñ-ñ2ñ0ñ0ñ ñtñrñañnñsñiñtñiñoñnñ-ñcñoñlñoñrñsñ"ñ ñoñnñcñlñiñcñkñ=ñ"ñcñlñoñsñeñEñdñiñtñMñoñdñañlñ(ñ)ñ"ñ ñtñyñpñeñ=ñ"ñbñuñtñtñoñnñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñCñañnñcñeñlñañrñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñbñuñtñtñoñnñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñbñuñtñtñoñnñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ4ñ ñpñyñ-ñ2ñ ñbñgñ-ñbñlñuñeñ-ñ6ñ0ñ0ñ ñtñeñxñtñ-ñwñhñiñtñeñ ñrñoñuñnñdñeñdñ-ñmñdñ ñhñoñvñeñrñ:ñbñgñ-ñbñlñuñeñ-ñ7ñ0ñ0ñ ñtñrñañnñsñiñtñiñoñnñ-ñcñoñlñoñrñsñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ ñtñyñpñeñ=ñ"ñsñuñbñmñiñtñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñsñañvñeñ ñmñrñ-ñ2ñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñGñuñañrñdñañrñ ñCñañmñbñiñoñsñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñbñuñtñtñoñnñ>ñ
+ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ<ñ/ñfñoñrñmñ>ñ
+ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñiñxñeñdñ ñiñnñsñeñtñ-ñ0ñ ñzñ-ñ5ñ0ñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ ñjñuñsñtñiñfñyñ-ñcñeñnñtñeñrñ ñbñgñ-ñbñlñañcñkñ ñbñgñ-ñoñpñañcñiñtñyñ-ñ5ñ0ñ ñhñiñdñdñeñnñ"ñ ñiñdñ=ñ"ñdñeñlñeñtñeñ-ñmñoñdñañlñ"ñ>ñ
+ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñbñgñ-ñwñhñiñtñeñ ñrñoñuñnñdñeñdñ-ñlñgñ ñsñhñañdñoñwñ-ñxñlñ ñwñ-ñfñuñlñlñ ñmñañxñ-ñwñ-ñmñdñ ñmñxñ-ñ4ñ ñfñañdñeñ-ñiñnñ"ñ>ñ
+ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñpñ-ñ6ñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ ñjñuñsñtñiñfñyñ-ñcñeñnñtñeñrñ ñwñ-ñ1ñ2ñ ñhñ-ñ1ñ2ñ ñrñoñuñnñdñeñdñ-ñfñuñlñlñ ñbñgñ-ñrñeñdñ-ñ1ñ0ñ0ñ ñmñxñ-ñañuñtñoñ ñmñbñ-ñ4ñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñeñxñcñlñañmñañtñiñoñnñ-ñtñrñiñañnñgñlñeñ ñtñeñxñtñ-ñrñeñdñ-ñ6ñ0ñ0ñ ñtñeñxñtñ-ñxñlñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ ñ<ñhñ3ñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñlñgñ ñfñoñnñtñ-ñmñeñdñiñuñmñ ñtñeñxñtñ-ñgñrñañyñ-ñ9ñ0ñ0ñ ñtñeñxñtñ-ñcñeñnñtñeñrñ ñmñbñ-ñ2ñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñCñoñnñfñiñrñmñañrñ ñeñlñiñmñiñnñañcñiñóñnñ
+ñ ñ ñ ñ ñ ñ<ñ/ñhñ3ñ>ñ
+ñ ñ ñ ñ ñ ñ<ñpñ ñcñlñañsñsñ=ñ"ñtñeñxñtñ-ñgñrñañyñ-ñ5ñ0ñ0ñ ñtñeñxñtñ-ñcñeñnñtñeñrñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ¿ñEñsñtñáñ ñsñeñgñuñrñoñ ñdñeñ ñqñuñeñ ñdñeñsñeñañ ñeñlñiñmñiñnñañrñ ñeñsñtñeñ ñrñeñgñiñsñtñrñoñ?ñ ñEñsñtñañ ñañcñcñiñóñnñ ñnñoñ ñsñeñ ñpñuñeñdñeñ ñdñeñsñhñañcñeñrñ.ñ
+ñ ñ ñ ñ ñ ñ<ñ/ñpñ>ñ
+ñ ñ ñ ñ ñ ñ<ñdñiñvñ ñcñlñañsñsñ=ñ"ñmñtñ-ñ6ñ ñfñlñeñxñ ñjñuñsñtñiñfñyñ-ñcñeñnñtñeñrñ ñsñpñañcñeñ-ñxñ-ñ4ñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñbñuñtñtñoñnñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ4ñ ñpñyñ-ñ2ñ ñbñgñ-ñgñrñañyñ-ñ1ñ0ñ0ñ ñtñeñxñtñ-ñgñrñañyñ-ñ7ñ0ñ0ñ ñrñoñuñnñdñeñdñ-ñmñdñ ñhñoñvñeñrñ:ñbñgñ-ñgñrñañyñ-ñ2ñ0ñ0ñ ñtñrñañnñsñiñtñiñoñnñ-ñcñoñlñoñrñsñ"ñ ñiñdñ=ñ"ñcñañnñcñeñlñ-ñdñeñlñeñtñeñ"ñ ñtñyñpñeñ=ñ"ñbñuñtñtñoñnñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñCñañnñcñeñlñañrñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñbñuñtñtñoñnñ>ñ
+ñ ñ ñ ñ ñ ñ ñ<ñbñuñtñtñoñnñ ñcñlñañsñsñ=ñ"ñpñxñ-ñ4ñ ñpñyñ-ñ2ñ ñbñgñ-ñrñeñdñ-ñ6ñ0ñ0ñ ñtñeñxñtñ-ñwñhñiñtñeñ ñrñoñuñnñdñeñdñ-ñmñdñ ñhñoñvñeñrñ:ñbñgñ-ñrñeñdñ-ñ7ñ0ñ0ñ ñtñrñañnñsñiñtñiñoñnñ-ñcñoñlñoñrñsñ ñfñlñeñxñ ñiñtñeñmñsñ-ñcñeñnñtñeñrñ"ñ ñiñdñ=ñ"ñcñoñnñfñiñrñmñ-ñdñeñlñeñtñeñ"ñ ñtñyñpñeñ=ñ"ñbñuñtñtñoñnñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñiñ ñcñlñañsñsñ=ñ"ñfñañsñ ñfñañ-ñtñrñañsñhñ-ñañlñtñ ñmñrñ-ñ2ñ"ñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñ<ñ/ñiñ>ñ
+ñ ñ ñ ñ ñ ñ ñ ñEñlñiñmñiñnñañrñ
+ñ ñ ñ ñ ñ ñ ñ<ñ/ñbñuñtñtñoñnñ>ñ
+ñ ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ ñ<ñ/ñdñiñvñ>ñ
+ñ ñ<ñ/ñbñoñdñyñ>ñ
+ñ<ñ/ñhñtñmñlñ>ñ
+ñ
