@@ -369,12 +369,25 @@
         // AUTENTICACIÓN
         // ============================================================================
         
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+        
         function getToken() {
-            return sessionStorage.getItem('ecommerce_token');
+            return localStorage.getItem('ecommerce_token') || getCookie('ecommerce_token') || sessionStorage.getItem('ecommerce_token');
         }
 
         function logout() {
+            // Limpiar token de localStorage y sessionStorage
+            localStorage.removeItem('ecommerce_token');
             sessionStorage.removeItem('ecommerce_token');
+            
+            // Limpiar cookie
+            document.cookie = 'ecommerce_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            
             window.location.href = '/ecommerce/login';
         }
 
@@ -832,6 +845,17 @@
                 // Si no hay token, redirigir al home
                 window.location.href = '/ecomerce/productos/tienda';
                 return;
+            }
+
+            // Extraer token de la URL si existe y guardarlo
+            const urlParams = new URLSearchParams(window.location.search);
+            const tokenFromUrl = urlParams.get('token');
+            if (tokenFromUrl) {
+                localStorage.setItem('ecommerce_token', tokenFromUrl);
+                document.cookie = `ecommerce_token=${tokenFromUrl}; path=/; max-age=86400`;
+                const url = new URL(window.location);
+                url.searchParams.delete('token');
+                window.history.replaceState({}, document.title, url.pathname + url.hash);
             }
 
             // Si hay token, cargar el perfil
