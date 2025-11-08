@@ -106,8 +106,7 @@ from contextlib import asynccontextmanager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup logic
-    # alembic_ok = run_alembic_upgrade()  # TEMPORALMENTE DESHABILITADO PARA PRUEBAS
-    alembic_ok = True  # Simular que las migraciones están OK
+    alembic_ok = run_alembic_upgrade()  # HABILITADO: Ejecutar migraciones de Alembic
     mail_ok = check_mail_config()
 
     # Inicializar usuario administrador
@@ -126,10 +125,15 @@ async def lifespan(app: FastAPI):
     tokens_cleaned = False
     try:
         from db.models.security.token_blacklist import TokenBlacklist
-        db = next(get_db())
-        deleted_count = TokenBlacklist.cleanup_expired_tokens(db)
-        logger.info(f"🧹 Tokens expirados eliminados del blacklist: {deleted_count}")
-        tokens_cleaned = True
+        # Crear sesión manualmente para el lifespan
+        from db.database import SessionLocal
+        db = SessionLocal()
+        try:
+            deleted_count = TokenBlacklist.cleanup_expired_tokens(db)
+            logger.info(f"🧹 Tokens expirados eliminados del blacklist: {deleted_count}")
+            tokens_cleaned = True
+        finally:
+            db.close()
     except Exception as e:
         logger.error(f"Error al limpiar tokens expirados: {e}")
         tokens_cleaned = False
@@ -226,8 +230,8 @@ app.include_router(frontend_pages.router)
 
 
 # Router de Migración entre Bases de Datos (MVP)
-from routers.config import MigracionesBD
-app.include_router(MigracionesBD.router)
+# from routers.config import MigracionesBD
+# app.include_router(MigracionesBD.router)
 app.include_router(Analisis.router)
 app.include_router(mail_router)
 app.include_router(static_pages_router)

@@ -93,3 +93,39 @@ async def get_ecommerce_login_page():
             return HTMLResponse(content=file.read(), status_code=200)
     except FileNotFoundError:
         return HTMLResponse(content="<h1>Error: Página de login no encontrada</h1>", status_code=404)
+
+@router.get("/checkout/mercadopago/test", response_class=HTMLResponse, include_in_schema=False)
+async def get_checkout_mercadopago_test():
+    """Página de checkout de prueba solo para MercadoPago"""
+    try:
+        with open("static/checkout_mercadopago_test.html", "r", encoding="utf-8") as file:
+            return HTMLResponse(content=file.read(), status_code=200)
+    except FileNotFoundError:
+        return HTMLResponse(content="<h1>Error: Página de checkout de prueba no encontrada</h1>", status_code=404)
+
+@router.get("/checkout/success", response_class=HTMLResponse, include_in_schema=False)
+async def get_checkout_success():
+    """Página de resultado exitoso del checkout de MercadoPago"""
+    try:
+        with open("static/checkout_success.html", "r", encoding="utf-8") as file:
+            return HTMLResponse(content=file.read(), status_code=200)
+    except FileNotFoundError:
+        return HTMLResponse(content="<h1>Error: Página de éxito no encontrada</h1>", status_code=404)
+
+@router.get("/checkout/failure", response_class=HTMLResponse, include_in_schema=False)
+async def get_checkout_failure():
+    """Página de resultado fallido del checkout de MercadoPago"""
+    try:
+        with open("static/checkout_failure.html", "r", encoding="utf-8") as file:
+            return HTMLResponse(content=file.read(), status_code=200)
+    except FileNotFoundError:
+        return HTMLResponse(content="<h1>Error: Página de error no encontrada</h1>", status_code=404)
+
+@router.get("/checkout/pending", response_class=HTMLResponse, include_in_schema=False)
+async def get_checkout_pending():
+    """Página de resultado pendiente del checkout de MercadoPago"""
+    try:
+        with open("static/checkout_pending.html", "r", encoding="utf-8") as file:
+            return HTMLResponse(content=file.read(), status_code=200)
+    except FileNotFoundError:
+        return HTMLResponse(content="<h1>Error: Página pendiente no encontrada</h1>", status_code=404)

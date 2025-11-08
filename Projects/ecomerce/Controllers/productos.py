@@ -104,7 +104,7 @@ def create_productos(db: Session, productos, user_data: dict = None, request: Re
                 variant_dict['product_id'] = new_productos.id
                 
                 variant_query = text("""
-                    INSERT INTO ecomerce_product_variants (product_id, color, tipo, precio_adicional, stock, imagen_url, active)
+                    INSERT INTO ecomerce_productos_variantes (product_id, color, tipo, precio_adicional, stock, imagen_url, active)
                     VALUES (:product_id, :color, :tipo, :precio_adicional, :stock, :imagen_url, :active)
                 """)
                 db.execute(variant_query, variant_dict)
@@ -162,7 +162,7 @@ def get_productos(db: Session, id: int) -> Optional[Productos]:
         
         # Obtener variantes del producto
         variants_result = db.execute(
-            text("SELECT id, product_id, color, tipo, precio_adicional, stock, imagen_url, active FROM ecomerce_product_variants WHERE product_id = :product_id"),
+            text("SELECT id, product_id, color, tipo, precio_adicional, stock, imagen_url, active FROM ecomerce_productos_variantes WHERE product_id = :product_id"),
             {"product_id": id}
         ).fetchall()
         
@@ -213,7 +213,7 @@ def gets_productos(db: Session) -> List[Productos]:
             
             # Obtener variantes del producto
             variants_result = db.execute(
-                text("SELECT id, product_id, color, tipo, precio_adicional, stock, imagen_url, active FROM ecomerce_product_variants WHERE product_id = :product_id"),
+                text("SELECT id, product_id, color, tipo, precio_adicional, stock, imagen_url, active FROM ecomerce_productos_variantes WHERE product_id = :product_id"),
                 {"product_id": productos.id}
             ).fetchall()
             
@@ -247,7 +247,7 @@ def delete_productos(db: Session, id: int, user_data: dict = None, request: Requ
     """
     try:
         # Primero eliminar las variantes
-        db.execute(text("DELETE FROM ecomerce_product_variants WHERE product_id = :product_id"), {"product_id": id})
+        db.execute(text("DELETE FROM ecomerce_productos_variantes WHERE product_id = :product_id"), {"product_id": id})
         
         # Obtener y eliminar el registro en una sola operación usando OUTPUT
         result = db.execute(
@@ -359,7 +359,7 @@ def update_productos(db: Session, id: int, productos_data: Dict[str, Any], user_
         if variants_data is not None:
             # Para simplicidad, eliminar todas las variantes existentes y crear nuevas
             # En una implementación completa, se haría merge inteligente
-            db.execute(text("DELETE FROM ecomerce_product_variants WHERE product_id = :product_id"), {"product_id": id})
+            db.execute(text("DELETE FROM ecomerce_productos_variantes WHERE product_id = :product_id"), {"product_id": id})
             
             for variant_data in variants_data:
                 if isinstance(variant_data, dict):
@@ -373,7 +373,7 @@ def update_productos(db: Session, id: int, productos_data: Dict[str, Any], user_
                 variant_dict['product_id'] = id
                 
                 variant_query = text("""
-                    INSERT INTO ecomerce_product_variants (product_id, color, tipo, precio_adicional, stock, imagen_url, active)
+                    INSERT INTO ecomerce_productos_variantes (product_id, color, tipo, precio_adicional, stock, imagen_url, active)
                     VALUES (:product_id, :color, :tipo, :precio_adicional, :stock, :imagen_url, :active)
                 """)
                 db.execute(variant_query, variant_dict)

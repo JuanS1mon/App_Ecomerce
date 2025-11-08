@@ -86,7 +86,7 @@ def authenticate_ecommerce_user(db: Session, email: str, password: str) -> Optio
             "provincia": user_result[8],
             "pais": user_result[9],
             "active": user_result[10],
-            "created_at": user_result[11],
+            "created_at": user_result[11].isoformat() if user_result[11] else None,
             "authenticated": True
         }
 
@@ -146,7 +146,7 @@ def get_current_ecommerce_user(token: str, db: Session) -> Optional[Dict[str, An
             "provincia": user_result[7],
             "pais": user_result[8],
             "active": user_result[9],
-            "created_at": user_result[10],
+            "created_at": user_result[10].isoformat() if user_result[10] else None,
             "authenticated": True
         }
 
@@ -259,7 +259,7 @@ def register_ecommerce_user(db: Session, user_data: Dict[str, Any]) -> Optional[
             "provincia": row[7],
             "pais": row[8],
             "active": row[9],
-            "created_at": row[10],
+            "created_at": row[10].isoformat() if row[10] else None,
             "authenticated": False  # Aún no está autenticado
         }
 

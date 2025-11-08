@@ -10,7 +10,9 @@ let allCategories = [];
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializar eventos
     document.getElementById('search-input').addEventListener('input', filterProducts);
-    document.getElementById('category-filter').addEventListener('change', filterProducts);
+    document.getElementById('category-filter').addEventListener('change', function() {
+        filterProducts();
+    });
     document.getElementById('reset-search').addEventListener('click', resetSearch);
 
     // Las funciones loadCategories y fetchData se llamarán desde el HTML inline después de verificar auth
@@ -20,8 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function initAuthenticatedStore() {
     if (typeof loadCategories === 'function') loadCategories();
     if (typeof fetchData === 'function') fetchData();
-    // Inicializar carrito para usuarios autenticados
-    if (window.cart && typeof window.cart.initCart === 'function') {
+    // Solo inicializar carrito si no está ya inicializado
+    if (window.cart && typeof window.cart.initCart === 'function' && !window.cart.isInitialized) {
         window.cart.initCart();
     }
 }
@@ -31,12 +33,6 @@ function initUnauthenticatedStore() {
     if (typeof loadCategories === 'function') loadCategories();
     if (typeof fetchData === 'function') fetchData();
 }
-
-// Hacer las funciones globales para que el HTML inline pueda llamarlas
-window.loadCategories = loadCategories;
-window.fetchData = fetchData;
-window.initAuthenticatedStore = initAuthenticatedStore;
-window.initUnauthenticatedStore = initUnauthenticatedStore;
 
 /**
  * Carga las categorías disponibles desde el servidor
@@ -71,8 +67,17 @@ async function loadCategories() {
             categoryFilter.appendChild(option);
         });
 
+        // Habilitar el select después de cargar
+        categoryFilter.disabled = false;
+
     } catch (error) {
         console.error("Error al cargar categorías:", error);
+        // En caso de error, mostrar opción por defecto y habilitar
+        const categoryFilter = document.getElementById('category-filter');
+        if (categoryFilter) {
+            categoryFilter.innerHTML = '<option value="">Todas las categorías</option>';
+            categoryFilter.disabled = false;
+        }
         // No mostrar toast para categorías, solo loggear el error
     }
 }
@@ -99,6 +104,13 @@ async function fetchData() {
         // Actualizar la UI
         updateProductsGrid(data);
         updateRecordCount(data.length);
+
+        // Si hay filtros activos, reaplicar después de cargar productos
+        const currentSearch = document.getElementById('search-input').value;
+        const currentCategory = document.getElementById('category-filter').value;
+        if (currentSearch || currentCategory) {
+            filterProducts();
+        }
 
     } catch (error) {
         console.error("Error al cargar productos:", error);
@@ -231,6 +243,11 @@ function filterProducts() {
     const searchTerm = document.getElementById('search-input').value.toLowerCase();
     const selectedCategoryId = document.getElementById('category-filter').value;
 
+    // Verificar si los datos están cargados
+    if (!allData || allData.length === 0) {
+        return;
+    }
+
     if (!searchTerm && !selectedCategoryId) {
         updateProductsGrid(allData);
         updateRecordCount(allData.length);
@@ -247,7 +264,7 @@ function filterProducts() {
 
         // Filtrar por categoría
         const matchesCategory = !selectedCategoryId ||
-            String(item.id_categoria) === selectedCategoryId;
+            (item.id_categoria !== null && item.id_categoria !== undefined && String(item.id_categoria) === selectedCategoryId);
 
         return matchesSearch && matchesCategory;
     });
@@ -323,3 +340,17 @@ function showToast(message, type = 'success') {
 
 // Hacer showToast global para que otros scripts puedan usarla
 window.showToast = showToast;
+
+// Hacer las funciones globales para que el HTML inline pueda llamarlas
+window.loadCategories = loadCategories;
+window.fetchData = fetchData;
+window.initAuthenticatedStore = initAuthenticatedStore;
+window.initUnauthenticatedStore = initUnauthenticatedStore;
+
+// Función de utilidad para verificar si las funciones están listas
+window.checkFunctionsReady = function() {
+  return typeof loadCategories === 'function' &&
+         typeof fetchData === 'function' &&
+         typeof updateProductsGrid === 'function' &&
+         typeof updateRecordCount === 'function';
+};

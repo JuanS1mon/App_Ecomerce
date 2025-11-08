@@ -323,9 +323,6 @@
         </div>
     </nav>
 
-    <!-- Toast Notifications -->
-    <div id="toast-container"></div>
-
     <!-- Product Detail -->
     <div class="product-detail-container">
         <!-- Loading State -->
@@ -444,7 +441,7 @@
                         Ver Carrito Completo
                     </a>
                 </div>
-                <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold" onclick="window.location.href='/ecomerce/checkout'">
                     <i class="fas fa-credit-card mr-2"></i>
                     Proceder al Pago
                 </button>
@@ -491,10 +488,6 @@
                     const data = await response.json();
                     if (data.valid && data.user) {
                         showAuthenticatedUI(data.user);
-                        // Inicializar carrito para usuarios autenticados
-                        if (window.cart && typeof window.cart.initCart === 'function') {
-                            window.cart.initCart();
-                        }
                     } else {
                         showUnauthenticatedUI();
                     }
@@ -502,7 +495,6 @@
                     showUnauthenticatedUI();
                 }
             } catch (error) {
-                console.error('Error verificando autenticación:', error);
                 showUnauthenticatedUI();
             }
         }
@@ -511,6 +503,11 @@
         function showUnauthenticatedUI() {
             document.getElementById('auth-buttons').classList.remove('hidden');
             document.getElementById('user-info').classList.add('hidden');
+
+            // Asegurar que el carrito local se renderice para usuarios no autenticados
+            if (window.cart && typeof window.cart.renderLocalCart === 'function') {
+                window.cart.renderLocalCart();
+            }
         }
 
         // Mostrar UI para usuario autenticado
@@ -518,6 +515,13 @@
             document.getElementById('auth-buttons').classList.add('hidden');
             document.getElementById('user-info').classList.remove('hidden');
             document.getElementById('user-greeting').textContent = `Hola, ${user.nombre}`;
+
+            // Sincronizar carrito local con servidor si existe
+            if (typeof syncCartAfterLogin === 'function') {
+                syncCartAfterLogin().then(() => {
+                }).catch(error => {
+                });
+            }
         }
 
         // Función de logout
@@ -538,9 +542,6 @@
 
             // Mostrar UI no autenticada
             showUnauthenticatedUI();
-
-            // Mostrar mensaje
-            showToast('Sesión cerrada exitosamente', 'success');
         }
 
         // Toggle dropdown
@@ -570,31 +571,6 @@
             }
         });
 
-        // Función para mostrar toast
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
-                type === 'success' ? 'bg-green-500 text-white' :
-                type === 'error' ? 'bg-red-500 text-white' :
-                'bg-blue-500 text-white'
-            }`;
-            toast.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas ${type === 'success' ? 'fa-check-circle' :
-                                   type === 'error' ? 'fa-exclamation-circle' :
-                                   'fa-info-circle'} mr-2"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-
-            document.body.appendChild(toast);
-
-            // Remover después de 3 segundos
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
-
         // Cargar producto
         async function loadProduct() {
             // Extraer ID del producto del path de la URL (/ecomerce/productos/detalle/{id})
@@ -602,7 +578,6 @@
             const productId = pathSegments[pathSegments.length - 1]; // Último segmento es el ID
 
             if (!productId || productId === 'detalle') {
-                showError('Producto no encontrado');
                 return;
             }
 
@@ -621,8 +596,7 @@
                 currentProduct = productData;
                 renderProduct();
             } catch (error) {
-                console.error('Error cargando producto:', error);
-                showError('Error al cargar el producto. <button onclick="loadProduct()">Reintentar</button>');
+                // Error silencioso - no mostrar notificaciones
             }
         }
 
@@ -762,15 +736,27 @@
             }
         }
 
+        // Cambiar cantidad con botones + y -
+        function changeQuantity(delta) {
+            const input = document.getElementById('quantity-input');
+            const currentValue = parseInt(input.value) || 1;
+            const newValue = currentValue + delta;
+
+            // Validar límites
+            if (newValue >= 1 && newValue <= 99) {
+                input.value = newValue;
+                currentQuantity = newValue;
+                updateQuantity(); // Validar y actualizar
+            }
+        }
+
         // Agregar al carrito
         async function addProductToCart() {
             if (!currentProduct) {
-                showToast('Producto no cargado aún. Por favor espere...', 'error');
                 return;
             }
 
             if (!currentProduct.id || currentProduct.id === null || currentProduct.id === undefined) {
-                showToast('ID de producto no disponible. Reintentando cargar producto...', 'error');
                 await loadProduct();
                 return;
             }
@@ -782,7 +768,6 @@
                 const tipoSelect = document.getElementById('variant-tipo');
 
                 if ((colorSelect && !selectedVariants.color) || (tipoSelect && !selectedVariants.tipo)) {
-                    showToast('Por favor selecciona todas las opciones del producto', 'warning');
                     return;
                 }
             }
@@ -806,17 +791,14 @@
 
             // Validar que los valores sean válidos
             if (isNaN(productId) || productId <= 0) {
-                showToast('ID de producto inválido', 'error');
                 return;
             }
 
             if (isNaN(quantity) || quantity <= 0) {
-                showToast('Cantidad inválida', 'error');
                 return;
             }
 
             if (isNaN(finalPrice) || finalPrice < 0) {
-                showToast('Precio inválido', 'error');
                 return;
             }
 
@@ -830,7 +812,8 @@
             const success = await window.cart.addProduct(productId, quantity, finalPrice, variantInfo);
 
             if (success) {
-                // Mensaje removido - el feedback visual viene del carrito
+                // El contador se actualiza automáticamente en la función addProduct del carrito
+                // No necesitamos actualizarlo manualmente aquí
             }
         }
 
@@ -847,6 +830,11 @@
             if (sidebar.classList.contains('translate-x-full')) {
                 sidebar.classList.remove('translate-x-full');
                 overlay.classList.remove('hidden');
+
+                // Forzar recarga del carrito cuando se abre
+                if (window.cart && typeof window.cart.loadCart === 'function') {
+                    window.cart.loadCart(true);
+                }
             } else {
                 sidebar.classList.add('translate-x-full');
                 overlay.classList.add('hidden');
@@ -865,6 +853,11 @@
                 const url = new URL(window.location);
                 url.searchParams.delete('token');
                 window.history.replaceState({}, document.title, url.pathname + url.hash);
+            }
+
+            // Inicializar carrito inmediatamente (antes de verificar autenticación)
+            if (window.cart && typeof window.cart.initCart === 'function' && !window.cart.isInitialized) {
+                window.cart.initCart();
             }
 
             // Cargar producto inmediatamente (no depende de autenticación completa)

@@ -22,7 +22,8 @@ from ..Controllers.usuarios import (
     change_user_password,
     get_user_orders,
     get_user_active_cart,
-    get_user_budgets
+    get_user_budgets,
+    get_order_details
 )
 
 logger = logging.getLogger(__name__)
@@ -215,9 +216,40 @@ async def routes_get_user_orders(user_data: dict = Depends(get_current_ecommerce
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener pedidos.")
 
 
-@router.get("/carritos/active")
-async def routes_get_user_active_cart(user_data: dict = Depends(get_current_ecommerce_user), db: Session = Depends(get_db)):
+@router.get("/pedidos/{pedido_id}")
+async def routes_get_order_details(pedido_id: int, user_data: dict = Depends(get_current_ecommerce_user), db: Session = Depends(get_db)):
     try:
+        user_email = user_data["user"]["email"]
+
+        # Obtener el id del usuario
+        user_result = db.execute(
+            text("SELECT id FROM ecomerce_usuarios WHERE email = :email"),
+            {"email": user_email}
+        ).first()
+
+        if not user_result:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
+
+        user_id = user_result[0]
+        order_details = get_order_details(db, pedido_id, user_id)
+        return order_details
+
+    except Exception as e:
+        logger.error(f"Error al obtener detalles del pedido: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener detalles del pedido.")
+
+
+@router.get("/carritos/active")
+async def routes_get_user_active_cart(user_data: dict = Depends(get_current_ecommerce_user)):
+    """
+    Obtiene el carrito activo del usuario con autenticación.
+    """
+    db = None
+    try:
+        # Crear sesión de base de datos manualmente
+        from db.database import SessionLocal
+        db = SessionLocal()
+
         user_email = user_data["user"]["email"]
 
         # Obtener el id del usuario
@@ -236,6 +268,9 @@ async def routes_get_user_active_cart(user_data: dict = Depends(get_current_ecom
     except Exception as e:
         logger.error(f"Error al obtener carrito activo: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener carrito.")
+    finally:
+        if db:
+            db.close()
 
 
 @router.get("/presupuestos/user")
@@ -286,6 +321,25 @@ async def get_perfil_pagina(user_data: dict = Depends(require_ecommerce_auth)):
     except Exception as e:
         logger.error(f"Error al obtener la pagina HTML del perfil: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener la pagina HTML del perfil.")
+
+
+@router.get("/pedidos", response_class=HTMLResponse)
+async def get_pedidos_pagina(user_data: dict = Depends(require_ecommerce_auth)):
+    """
+    Página de pedidos del usuario de e-commerce.
+    Requiere autenticación con token de e-commerce (ecommerce_token).
+    """
+    try:
+        # Buscar solo en la carpeta templates del proyecto
+        script_dir = Path(__file__).resolve().parent
+        html_path = script_dir.parent / "templates" / f"pedidos.html"
+        if not html_path.exists():
+            raise FileNotFoundError(f"No se encontró la página HTML: {html_path}")
+        html_content = html_path.read_text(encoding="utf-8")
+        return HTMLResponse(content=html_content)
+    except Exception as e:
+        logger.error(f"Error al obtener la pagina HTML de pedidos: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener la pagina HTML de pedidos.")
 
 
 @router.get("/geocode", dependencies=[])

@@ -14,8 +14,8 @@ class EcomerceProductos(Base):
     imagen_url = Column(String(255))
     active = Column(Boolean, default=False)
 
-class EcomerceProductVariants(Base):
-    __tablename__ = 'ecomerce_product_variants'
+class EcomerceProductosVariantes(Base):
+    __tablename__ = 'ecomerce_productos_variantes'
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     product_id = Column(Integer, ForeignKey('ecomerce_productos.id'), nullable=False)

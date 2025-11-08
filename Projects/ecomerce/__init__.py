@@ -35,6 +35,7 @@ from .routes.carritos import router as carritos_router
 from .routes.carrito_items import router as carrito_items_router
 from .routes.pedidos import router as pedidos_router
 from .routes.presupuesto import router as presupuesto_router
+from .routes.checkout import router as checkout_router
 
 # Lista de todos los componentes disponibles
 __all__ = [
@@ -45,5 +46,5 @@ __all__ = [
     # Controladores
     "create_usuarios", "get_usuarios", "gets_usuarios", "update_usuarios", "delete_usuarios", "create_categorias", "get_categorias", "gets_categorias", "update_categorias", "delete_categorias", "create_productos", "get_productos", "gets_productos", "update_productos", "delete_productos", "create_stock", "get_stock", "gets_stock", "update_stock", "delete_stock", "create_carritos", "get_carritos", "gets_carritos", "update_carritos", "delete_carritos", "create_carrito_items", "get_carrito_items", "gets_carrito_items", "update_carrito_items", "delete_carrito_items", "create_pedidos", "get_pedidos", "gets_pedidos", "update_pedidos", "delete_pedidos",
     # Rutas
-    "usuarios_router", "categorias_router", "productos_router", "stock_router", "carritos_router", "carrito_items_router", "pedidos_router", "presupuesto_router",
+    "usuarios_router", "categorias_router", "productos_router", "stock_router", "carritos_router", "carrito_items_router", "pedidos_router", "presupuesto_router", "checkout_router",
 ]

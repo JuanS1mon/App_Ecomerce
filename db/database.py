@@ -237,8 +237,8 @@ def run_alembic_upgrade():
         print(f"[Alembic] Excepción al ejecutar migraciones: {e}")
         return False
 
-# Ejecutar migraciones automáticamente al importar este módulo
-run_alembic_upgrade()
+# REMOVIDO: Ejecutar migraciones automáticamente al importar este módulo
+# run_alembic_upgrade()
 
 # La base de datos se crea pero las tablas no se crean automáticamente
 # para evitar problemas de orden de creación

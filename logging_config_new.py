@@ -32,10 +32,8 @@ LOGGING_CONFIG = {
         },
         "file": {
             "formatter": "default",
-            "class": "logging.handlers.RotatingFileHandler",
+            "class": "logging.FileHandler",
             "filename": LOG_FILE_PATH,
-            "maxBytes": 10 * 1024 * 1024,
-            "backupCount": 5,
             "encoding": "utf-8",
             "level": "DEBUG"
         }

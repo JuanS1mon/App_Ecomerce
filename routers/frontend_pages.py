@@ -129,17 +129,17 @@ async def envios_devoluciones_page():
         </body></html>
         """, status_code=404)
 
-@router.get("/static/politica_privacidad.html", response_class=HTMLResponse)
-async def politica_privacidad_page():
-    """Página de Política de Privacidad"""
+@router.get("/ecomerce/checkout", response_class=HTMLResponse)
+async def checkout_page():
+    """Página de checkout del ecommerce"""
     try:
-        with open("static/politica_privacidad.html", "r", encoding="utf-8") as f:
+        with open("static/checkout.html", "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
     except FileNotFoundError:
         return HTMLResponse("""
         <html><body>
         <h1>Error</h1>
-        <p>La página de Política de Privacidad no está disponible</p>
-        <a href="/">Volver al inicio</a>
+        <p>La página de checkout no está disponible</p>
+        <a href="/ecomerce/productos/tienda">Ir a la tienda</a>
         </body></html>
         """, status_code=404)

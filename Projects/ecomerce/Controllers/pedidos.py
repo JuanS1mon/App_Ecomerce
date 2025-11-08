@@ -49,16 +49,16 @@ def create_pedidos(db: Session, pedidos, user_data: dict = None, request: Reques
             pedidos_data = pedidos
         else:
             pedidos_data = {}
-            for field in ['id_usuario', 'fecha_pedido', 'total', 'estado']:
+            for field in ['id_usuario', 'fecha_pedido', 'total', 'estado', 'metodo_pago']:
                 if hasattr(pedidos, field):
                     pedidos_data[field] = getattr(pedidos, field)
         
         # Construir la consulta SQL INSERT con OUTPUT para SQL Server
         # ⚠️ ID autoincrement: se genera automáticamente
         query = text("""
-            INSERT INTO ecomerce_pedidos (id_usuario, fecha_pedido, total, estado)
-            OUTPUT INSERTED.id, INSERTED.id_usuario, INSERTED.fecha_pedido, INSERTED.total, INSERTED.estado
-            VALUES (:id_usuario, :fecha_pedido, :total, :estado)
+            INSERT INTO ecomerce_pedidos (id_usuario, fecha_pedido, total, estado, metodo_pago)
+            OUTPUT INSERTED.id, INSERTED.id_usuario, INSERTED.fecha_pedido, INSERTED.total, INSERTED.estado, INSERTED.metodo_pago
+            VALUES (:id_usuario, :fecha_pedido, :total, :estado, :metodo_pago)
         """)
         
         # Ejecutar la consulta y obtener el registro insertado directamente
@@ -79,6 +79,7 @@ def create_pedidos(db: Session, pedidos, user_data: dict = None, request: Reques
         new_pedidos.fecha_pedido = row[2]
         new_pedidos.total = row[3]
         new_pedidos.estado = row[4]
+        new_pedidos.metodo_pago = row[5]
         
         # Logging opcional de actividad (comentado por defecto)
         # if user_data and request:
@@ -111,7 +112,7 @@ def get_pedidos(db: Session, id: int) -> Optional[Pedidos]:
     """
     try:
         result = db.execute(
-            text("SELECT id, id_usuario, fecha_pedido, total, estado FROM ecomerce_pedidos WHERE id = :id"),
+            text("SELECT id, id_usuario, fecha_pedido, total, estado, metodo_pago FROM ecomerce_pedidos WHERE id = :id"),
             {"id": id}
         ).first()
         
@@ -125,6 +126,7 @@ def get_pedidos(db: Session, id: int) -> Optional[Pedidos]:
         pedidos.fecha_pedido = result[2]
         pedidos.total = result[3]
         pedidos.estado = result[4]
+        pedidos.metodo_pago = result[5]
         
         return pedidos
     except SQLAlchemyError as e:
@@ -136,7 +138,7 @@ def gets_pedidos(db: Session) -> List[Pedidos]:
     """
     try:
         result = db.execute(
-            text("SELECT id, id_usuario, fecha_pedido, total, estado FROM ecomerce_pedidos")
+            text("SELECT id, id_usuario, fecha_pedido, total, estado, metodo_pago FROM ecomerce_pedidos")
         )
         
         pedidoss = []
@@ -147,6 +149,7 @@ def gets_pedidos(db: Session) -> List[Pedidos]:
             pedidos.fecha_pedido = row[2]
             pedidos.total = row[3]
             pedidos.estado = row[4]
+            pedidos.metodo_pago = row[5]
             pedidoss.append(pedidos)
         
         return pedidoss
@@ -162,7 +165,7 @@ def delete_pedidos(db: Session, id: int, user_data: dict = None, request: Reques
         result = db.execute(
             text("""
                 DELETE FROM ecomerce_pedidos 
-                OUTPUT DELETED.id, DELETED.id_usuario, DELETED.fecha_pedido, DELETED.total, DELETED.estado
+                OUTPUT DELETED.id, DELETED.id_usuario, DELETED.fecha_pedido, DELETED.total, DELETED.estado, DELETED.metodo_pago
                 WHERE id = :id
             """),
             {"id": id}
@@ -178,6 +181,7 @@ def delete_pedidos(db: Session, id: int, user_data: dict = None, request: Reques
         deleted_pedidos.fecha_pedido = result[2]
         deleted_pedidos.total = result[3]
         deleted_pedidos.estado = result[4]
+        deleted_pedidos.metodo_pago = result[5]
         
         db.commit()
         
@@ -228,7 +232,7 @@ def update_pedidos(db: Session, id: int, pedidos_data: Dict[str, Any], user_data
         query = text(f"""
             UPDATE ecomerce_pedidos
             SET {set_clause_str}
-            OUTPUT INSERTED.id, INSERTED.id_usuario, INSERTED.fecha_pedido, INSERTED.total, INSERTED.estado
+            OUTPUT INSERTED.id, INSERTED.id_usuario, INSERTED.fecha_pedido, INSERTED.total, INSERTED.estado, INSERTED.metodo_pago
             WHERE id = :id
         """)
         
@@ -250,6 +254,7 @@ def update_pedidos(db: Session, id: int, pedidos_data: Dict[str, Any], user_data
         updated_pedidos.fecha_pedido = result[2]
         updated_pedidos.total = result[3]
         updated_pedidos.estado = result[4]
+        updated_pedidos.metodo_pago = result[5]
         
         # Logging opcional de actividad (comentado por defecto)
         # if user_data and request:

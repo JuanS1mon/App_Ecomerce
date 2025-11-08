@@ -10,6 +10,7 @@ import os.path
 from dotenv import load_dotenv
 import os
 import re
+import logging
 from fastapi import APIRouter, HTTPException, status, UploadFile, File, Form
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -388,4 +389,137 @@ async def enviar_email_con_adjunto_upload(
         )
 
 # Al final del archivo, para exportar explícitamente MAIL_CONFIG_OK
-__all__ = ["router", "MAIL_CONFIG_OK"]
+__all__ = ["router", "MAIL_CONFIG_OK", "enviar_correo_presupuesto", "enviar_multiples_emails"]
+
+async def enviar_correo_presupuesto(presupuesto_detalles: dict):
+    """
+    Envía un correo con los detalles del presupuesto solicitado
+
+    Args:
+        presupuesto_detalles: Diccionario con los detalles del presupuesto
+    """
+    import asyncio
+    logger = logging.getLogger(__name__)
+    
+    try:
+        destinatario = presupuesto_detalles.get('email')
+        usuario = presupuesto_detalles.get('usuario', 'Cliente')
+        pedido_id = presupuesto_detalles.get('pedido_id')
+        total = presupuesto_detalles.get('total', 0)
+        items = presupuesto_detalles.get('items', [])
+
+        # Crear el asunto
+        asunto = f"Presupuesto solicitado - Pedido #{pedido_id}"
+
+        # Crear el mensaje
+        mensaje = f"""
+Estimado/a {usuario},
+
+Gracias por solicitar un presupuesto. A continuación te detallamos la cotización para tu pedido #{pedido_id}:
+
+DETALLE DE PRODUCTOS:
+"""
+
+        for item in items:
+            mensaje += f"""
+- {item['nombre']}
+  Cantidad: {item['cantidad']}
+  Precio unitario: ${item['precio_unitario']:.2f}
+  Subtotal: ${item['subtotal']:.2f}
+"""
+
+        mensaje += f"""
+
+TOTAL DEL PRESUPUESTO: ${total:.2f}
+
+Este presupuesto tiene una validez de 30 días a partir de la fecha de emisión.
+
+Si tienes alguna pregunta o necesitas modificar algún aspecto del presupuesto, no dudes en contactarnos.
+
+Atentamente,
+Equipo de Ventas
+Tu Tienda Online
+"""
+
+        # Enviar el correo de forma asíncrona usando asyncio.to_thread()
+        await asyncio.to_thread(enviar_email_simple, destinatario, asunto, mensaje)
+        logger.info(f"Correo de presupuesto enviado exitosamente a {destinatario}")
+
+    except Exception as e:
+        logger.error(f"Error enviando correo de presupuesto: {e}")
+        raise e
+
+async def enviar_multiples_emails(emails_lista: list):
+    """
+    Envía múltiples emails de forma concurrente
+
+    Args:
+        emails_lista: Lista de diccionarios con 'destinatario', 'asunto', 'mensaje'
+
+    Returns:
+        dict: Resultado del envío con success, enviados, total, tiempo_total, errores
+    """
+    import asyncio
+    import time
+    logger = logging.getLogger(__name__)
+    
+    start_time = time.time()
+    total = len(emails_lista)
+    enviados = 0
+    errores = 0
+
+    try:
+        # Enviar emails de forma concurrente
+        tasks = []
+        for email_data in emails_lista:
+            task = asyncio.create_task(_enviar_email_async(email_data))
+            tasks.append(task)
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        for result in results:
+            if isinstance(result, Exception):
+                errores += 1
+                logger.error(f"Error enviando email: {result}")
+            else:
+                enviados += 1
+
+        tiempo_total = time.time() - start_time
+
+        return {
+            "success": errores == 0,
+            "enviados": enviados,
+            "total": total,
+            "tiempo_total": tiempo_total,
+            "errores": errores
+        }
+
+    except Exception as e:
+        logger.error(f"Error en enviar_multiples_emails: {e}")
+        return {
+            "success": False,
+            "enviados": 0,
+            "total": total,
+            "tiempo_total": time.time() - start_time,
+            "errores": total
+        }
+
+async def _enviar_email_async(email_data: dict):
+    """
+    Función auxiliar para enviar un email de forma asíncrona
+    """
+    logger = logging.getLogger(__name__)
+    
+    try:
+        destinatario = email_data.get('destinatario')
+        asunto = email_data.get('asunto')
+        mensaje = email_data.get('mensaje')
+
+        if not all([destinatario, asunto, mensaje]):
+            raise ValueError("Faltan datos requeridos: destinatario, asunto, mensaje")
+
+        enviar_email_simple(destinatario, asunto, mensaje)
+
+    except Exception as e:
+        logger.error(f"Error enviando email a {email_data.get('destinatario')}: {e}")
+        raise e

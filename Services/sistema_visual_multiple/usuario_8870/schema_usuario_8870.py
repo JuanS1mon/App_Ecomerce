@@ -29,7 +29,7 @@ class Usuario8870InDB(Usuario8870Base):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Alias para compatibilidad
 Usuario8870 = Usuario8870InDB

@@ -73,6 +73,10 @@ class Cart {
 
         // Cachear elementos DOM ahora que deberían estar disponibles
         this.cacheDOMElements();
+
+        // Inicializar contador en 0 después de cachear elementos DOM
+        this.updateGlobalCartCount(0);
+
         console.log('Elementos DOM cacheados:', {
             sidebar: !!this.elements.sidebar,
             overlay: !!this.elements.overlay,
@@ -89,9 +93,9 @@ class Cart {
                 this.renderEmptyCart();
             });
         } else {
-            console.log('Usuario no autenticado - mostrando carrito vacío');
-            // Usuario no autenticado - mostrar carrito vacío
-            this.renderEmptyCart();
+            console.log('Usuario no autenticado - cargando carrito local');
+            // Usuario no autenticado - cargar carrito local
+            this.renderLocalCart();
         }
     }
 
@@ -111,15 +115,20 @@ class Cart {
                 // Usuario autenticado - cargar carrito del servidor
                 await this.loadCart();
             } else {
-                // Usuario no autenticado - mostrar carrito vacío
-                console.log('Usuario no autenticado, mostrando carrito vacío');
-                this.renderEmptyCart();
+                // Usuario no autenticado - mostrar carrito local
+                console.log('Usuario no autenticado, mostrando carrito local');
+                this.renderLocalCart();
             }
         } catch (error) {
             console.error('Error loading user and cart:', error);
             // En caso de error, mostrar carrito vacío
             this.renderEmptyCart();
         }
+
+        // Asegurar que el contador se actualice después de cargar
+        setTimeout(() => {
+            this.updateGlobalCartCount(this.getItemCount());
+        }, 100);
     }
 
     /**
@@ -368,20 +377,30 @@ class Cart {
     async addProduct(productId, quantity = 1, price = 0, variantData = null) {
         // Verificar si hay token disponible
         const token = this.getCookie('ecommerce_token') || sessionStorage.getItem('ecommerce_token');
+
         if (!token) {
-            // Usuario no autenticado - redirigir al login
-            console.log('Usuario no autenticado, redirigiendo al login');
-            window.location.href = '/ecommerce/login?next=' + encodeURIComponent(window.location.pathname);
-            return false;
+            // Usuario no autenticado - usar carrito local
+            console.log('Usuario no autenticado, agregando al carrito local');
+            const success = this.addToLocalCart(productId, quantity, price, variantData);
+            if (success) {
+                // Renderizar carrito local
+                this.renderLocalCart();
+                // Mostrar mensaje de éxito
+            }
+            return success;
         }
 
         try {
             if (!this.userId) {
                 this.userId = await this.getCurrentUserId();
                 if (!this.userId) {
-                    // Si aún no hay userId después de intentar obtenerlo, redirigir al login
-                    window.location.href = '/ecommerce/login?next=' + encodeURIComponent(window.location.pathname);
-                    return false;
+                    // Si aún no hay userId después de intentar obtenerlo, usar carrito local como fallback
+                    console.warn('No se pudo obtener userId, usando carrito local como fallback');
+                    const success = this.addToLocalCart(productId, quantity, price, variantData);
+                    if (success) {
+                        this.renderLocalCart();
+                    }
+                    return success;
                 }
             }
 
@@ -390,7 +409,7 @@ class Cart {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.getCookie('ecommerce_token') || sessionStorage.getItem('ecommerce_token')}`,
+                    'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
@@ -404,19 +423,24 @@ class Cart {
             if (response.ok) {
                 const result = await response.json();
 
-                // Actualización optimizada: solo incrementar contador sin recargar todo el carrito
-                // La recarga completa se hará cuando el usuario abra el carrito
-                const currentCount = parseInt((this.elements.cartCount || document.getElementById('cart-count'))?.textContent || '0');
-                this.updateGlobalCartCount(currentCount + quantity);
+                // Recargar el carrito para mantener la sincronización y actualizar el contador
+                await this.loadCart(true);
+
+                // Mostrar mensaje de éxito
 
                 return true;
             } else if (response.status === 401) {
+                // Token inválido, limpiar y usar carrito local como fallback
                 sessionStorage.removeItem('ecommerce_token');
                 sessionStorage.removeItem('ecommerce_user_id');
                 this.deleteCookie('ecommerce_token');
-                // Redirigir al login
-                window.location.href = '/ecommerce/login?next=' + encodeURIComponent(window.location.pathname);
-                return false;
+
+                console.log('Token inválido, usando carrito local como fallback');
+                const success = this.addToLocalCart(productId, quantity, price, variantData);
+                if (success) {
+                    this.renderLocalCart();
+                }
+                return success;
             } else {
                 const error = await response.json();
                 console.error('Error agregando producto al carrito:', error);
@@ -424,9 +448,13 @@ class Cart {
             }
         } catch (error) {
             console.error('Error de conexión:', error);
-            // En caso de error de red, redirigir al login
-            window.location.href = '/ecommerce/login?next=' + encodeURIComponent(window.location.pathname);
-            return false;
+            // En caso de error de red, usar carrito local como fallback
+            console.log('Error de conexión, usando carrito local como fallback');
+            const success = this.addToLocalCart(productId, quantity, price, variantData);
+            if (success) {
+                this.renderLocalCart();
+            }
+            return success;
         }
     }
 
@@ -706,16 +734,33 @@ class Cart {
      * Actualiza el contador global del carrito
      */
     updateGlobalCartCount(count) {
+        // Asegurar que count sea un número válido
+        const validCount = parseInt(count) || 0;
+
+        // Función helper para actualizar un elemento específico
+        const updateElement = (element) => {
+            if (element) {
+                element.textContent = validCount.toString();
+                // Agregar clase para animación si hay items
+                if (validCount > 0) {
+                    element.classList.add('animate-pulse');
+                } else {
+                    element.classList.remove('animate-pulse');
+                }
+            }
+        };
+
         // Buscar el contador de la navbar (prioridad alta)
         const navbarCartCount = document.getElementById('cart-count');
-        if (navbarCartCount) {
-            navbarCartCount.textContent = count;
+        updateElement(navbarCartCount);
+
+        // También actualizar el contador del sidebar si existe y es diferente
+        if (this.elements.cartCount && this.elements.cartCount !== navbarCartCount) {
+            updateElement(this.elements.cartCount);
         }
 
-        // También actualizar el contador del sidebar si existe
-        if (this.elements.cartCount && this.elements.cartCount !== navbarCartCount) {
-            this.elements.cartCount.textContent = count;
-        }
+        // Log para debug (solo en desarrollo)
+        // console.log(`Contador del carrito actualizado a: ${validCount}`);
     }
 
     /**
@@ -950,12 +995,88 @@ class Cart {
 
     /**
      * Sincroniza el carrito local con el servidor cuando el usuario se autentica
-     * Nota: Este método ya no se usa ya que ahora requerimos autenticación para agregar productos
      */
     async syncLocalCartWithServer() {
-        // Este método se mantiene por compatibilidad pero ya no debería ser necesario
-        console.log('syncLocalCartWithServer: Método obsoleto, ya no se usa carrito local');
-        return;
+        try {
+            console.log('🔄 Sincronizando carrito local con servidor...');
+
+            // Cargar items del carrito local
+            const localCart = this.loadLocalCart();
+            if (localCart.length === 0) {
+                console.log('No hay items en carrito local para sincronizar');
+                return;
+            }
+
+            console.log(`Encontrados ${localCart.length} items en carrito local`);
+
+            // Obtener token de autenticación
+            const token = this.getCookie('ecommerce_token') || sessionStorage.getItem('ecommerce_token');
+            if (!token) {
+                console.warn('No hay token disponible para sincronización');
+                return;
+            }
+
+            // Obtener userId si no está disponible
+            if (!this.userId) {
+                this.userId = await this.getCurrentUserId();
+                if (!this.userId) {
+                    console.warn('No se pudo obtener userId para sincronización');
+                    return;
+                }
+            }
+
+            // Agregar cada item del carrito local al servidor
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (const localItem of localCart) {
+                try {
+                    console.log(`Agregando producto ${localItem.product_id} (cantidad: ${localItem.quantity}) al servidor...`);
+
+                    const response = await fetch(`/ecomerce/carrito_items/simple`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            product_id: localItem.product_id,
+                            quantity: localItem.quantity,
+                            price: localItem.price,
+                            variant_data: localItem.variant_data
+                        })
+                    });
+
+                    if (response.ok) {
+                        successCount++;
+                        console.log(`✅ Producto ${localItem.product_id} agregado exitosamente`);
+                    } else {
+                        const errorData = await response.json();
+                        console.error(`❌ Error agregando producto ${localItem.product_id}:`, errorData);
+                        errorCount++;
+                    }
+                } catch (error) {
+                    console.error(`❌ Error de conexión agregando producto ${localItem.product_id}:`, error);
+                    errorCount++;
+                }
+            }
+
+            console.log(`Sincronización completada: ${successCount} exitosos, ${errorCount} errores`);
+
+            // Limpiar carrito local después de sincronizar
+            if (successCount > 0) {
+                console.log('🧹 Limpiando carrito local después de sincronización exitosa');
+                this.saveLocalCart([]);
+                localStorage.removeItem(this.localCartKey);
+            }
+
+            // Recargar carrito del servidor para mostrar los items migrados
+            await this.loadCart(true);
+
+        } catch (error) {
+            console.error('❌ Error en sincronización del carrito:', error);
+        }
     }
 }
 
@@ -969,25 +1090,6 @@ const cart = new Cart();
 /**
  * Muestra un mensaje toast de notificación
  */
-function showToast(message, type = 'success') {
-    // Si ya existe una función showToast global, úsala
-    if (typeof window.showToast === 'function' && window.showToast !== showToast) {
-        return window.showToast(message, type);
-    }
-
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type} slide-in`;
-    toast.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>
-        ${message}
-    `;
-    document.getElementById('toast-container').appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.add('fade-out');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
 
 // Funciones globales para compatibilidad con HTML
 function toggleCart() {
@@ -1010,8 +1112,14 @@ function reloadCart() {
     cart.loadCart(true);
 }
 
-function syncCart() {
-    cart.syncWithServer();
+function syncCartAfterLogin() {
+    if (window.cart && typeof window.cart.syncLocalCartWithServer === 'function') {
+        console.log('🔄 Sincronizando carrito después del login...');
+        return window.cart.syncLocalCartWithServer();
+    } else {
+        console.warn('Función de sincronización de carrito no disponible');
+        return Promise.resolve();
+    }
 }
 
 function debugCart() {

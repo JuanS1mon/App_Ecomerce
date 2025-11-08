@@ -528,8 +528,9 @@ def get_user_active_cart(db: Session, user_id: int) -> dict:
             "total": total
         }
 
-    except SQLAlchemyError as e:
+    except Exception as e:
         logger.error(f"Error obteniendo carrito activo: {e}")
+        db.rollback()  # Asegurar rollback en caso de error
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error obteniendo carrito: {str(e)}")
 
 def get_user_budgets(db: Session, user_email: str) -> list:
@@ -564,3 +565,69 @@ def get_user_budgets(db: Session, user_email: str) -> list:
     except SQLAlchemyError as e:
         logger.error(f"Error obteniendo presupuestos: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error obteniendo presupuestos: {str(e)}")
+
+def get_order_details(db: Session, order_id: int, user_id: int) -> dict:
+    """
+    Obtiene los detalles completos de un pedido específico del usuario.
+    """
+    try:
+        # Verificar que el pedido pertenece al usuario
+        order_result = db.execute(
+            text("""
+                SELECT p.id, p.fecha_pedido, p.total, p.estado, p.metodo_pago
+                FROM ecomerce_pedidos p
+                WHERE p.id = :order_id AND p.id_usuario = :user_id
+            """),
+            {"order_id": order_id, "user_id": user_id}
+        ).first()
+
+        if not order_result:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pedido no encontrado")
+
+        # Obtener items del pedido con detalles de productos y variantes
+        items_result = db.execute(
+            text("""
+                SELECT pi.id, pi.cantidad, pi.precio_unitario,
+                       p.id as producto_id, p.nombre, p.imagen_url
+                FROM ecomerce_pedido_items pi
+                JOIN ecomerce_productos p ON pi.id_producto = p.id
+                WHERE pi.id_pedido = :order_id
+                ORDER BY pi.id
+            """),
+            {"order_id": order_id}
+        ).fetchall()
+
+        items = []
+        for row in items_result:
+            # Calcular el total del item
+            cantidad = row[1] or 0
+            precio_unitario = float(row[2]) if row[2] else 0.0
+            total_item = cantidad * precio_unitario
+
+            items.append({
+                "id": row[0],
+                "cantidad": cantidad,
+                "precio_unitario": precio_unitario,
+                "total": total_item,
+                "producto": {
+                    "id": row[3],
+                    "nombre": row[4],
+                    "imagen_url": row[5] or "/static/img/logo.png"
+                },
+                "variant_data": None  # No disponible en esta tabla
+            })
+
+        return {
+            "id": order_result[0],
+            "fecha": str(order_result[1]) if order_result[1] else None,
+            "total": float(order_result[2]) if order_result[2] else 0.0,
+            "estado": order_result[3],
+            "metodo_pago": order_result[4],
+            "items": items
+        }
+
+    except HTTPException:
+        raise
+    except SQLAlchemyError as e:
+        logger.error(f"Error obteniendo detalles del pedido: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error obteniendo detalles del pedido: {str(e)}")

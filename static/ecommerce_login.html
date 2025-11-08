@@ -536,26 +536,31 @@
             submitBtn.disabled = true;
             btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Iniciando sesión...';
 
-            try {
-                const formData = new FormData();
-                formData.append('email', document.getElementById('email').value.trim());
-                formData.append('password', document.getElementById('password').value);
+            const formData = new FormData();
+            formData.append('email', document.getElementById('email').value.trim());
+            formData.append('password', document.getElementById('password').value);
 
-                // Send login request (let browser follow redirects automatically)
+            console.log('📝 Form data:');
+            console.log('Email:', document.getElementById('email').value.trim());
+            console.log('Password length:', document.getElementById('password').value.length);
+
+            try {
+                console.log('📤 Sending login request...');
+
+                // Send login request (follow redirects automatically)
                 const response = await fetch('/ecommerce/auth/login', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    redirect: 'follow'  // Follow redirects automatically
                 });
 
-                console.log('Login response status:', response.status);
-                console.log('Login response headers:', Object.fromEntries(response.headers.entries()));
-                console.log('Login response type:', response.type);
-                console.log('Response URL:', response.url);
+                console.log('📥 Response received - Status:', response.status);
+                console.log('📋 Response URL:', response.url);
+                console.log('📋 Headers:', Object.fromEntries(response.headers.entries()));
 
-                // Check if browser followed redirect to store automatically
-                if (response.url.includes('/ecomerce/productos/tienda') || response.url.includes('token=')) {
-                    console.log('Browser followed redirect automatically to store');
-                    // Success - redirected to store
+                // Check if we were redirected to the store page
+                if (response.url.includes('/ecomerce/productos/tienda')) {
+                    console.log('✅ SUCCESS: Login successful - redirected to store!');
                     messageDiv.className = 'message message-success';
                     messageDiv.innerHTML = `
                         <i class="fas fa-check-circle"></i>
@@ -566,86 +571,24 @@
                     `;
                     messageDiv.classList.remove('hidden');
 
-                    // Redirect after short delay
                     setTimeout(() => {
+                        console.log('🚀 Redirecting to store...');
                         window.location.href = response.url;
                     }, 1500);
-                } else if (response.ok) {
-                    // Check if response is HTML (successful redirect that browser followed)
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('text/html')) {
-                        console.log('Response is HTML, assuming successful redirect');
-                        // Success - redirected to store
-                        messageDiv.className = 'message message-success';
-                        messageDiv.innerHTML = `
-                            <i class="fas fa-check-circle"></i>
-                            <div>
-                                <h3 class="font-semibold">¡Bienvenido!</h3>
-                                <p class="text-sm">Te estamos llevando a tu tienda personal...</p>
-                            </div>
-                        `;
-                        messageDiv.classList.remove('hidden');
-
-                        // Redirect after short delay
-                        setTimeout(() => {
-                            window.location.href = '/ecomerce/productos/tienda';
-                        }, 1500);
-                    } else {
-                        // Try to parse as JSON success
-                        try {
-                            const data = await response.json();
-                            console.log('JSON response:', data);
-                            // If we get here, it's unexpected - redirect anyway
-                            window.location.href = '/ecomerce/productos/tienda';
-                        } catch (jsonError) {
-                            console.log('Could not parse response as JSON');
-                            // Assume success and redirect
-                            messageDiv.className = 'message message-success';
-                            messageDiv.innerHTML = `
-                                <i class="fas fa-check-circle"></i>
-                                <div>
-                                    <h3 class="font-semibold">¡Bienvenido!</h3>
-                                    <p class="text-sm">Te estamos llevando a tu tienda personal...</p>
-                                </div>
-                            `;
-                            messageDiv.classList.remove('hidden');
-
-                            setTimeout(() => {
-                                window.location.href = '/ecomerce/productos/tienda';
-                            }, 1500);
-                        }
-                    }
+                    return;
                 } else {
-                    console.log('Response not OK, trying to parse JSON error...');
-                    // Try to parse as JSON error
-                    try {
-                        const data = await response.json();
-                        console.log('Error response:', data);
-
-                        // Error handling
-                        let errorMessage = 'Credenciales incorrectas';
-                        if (data.detail) {
-                            if (data.detail.includes('email')) {
-                                errorMessage = 'Correo electrónico no encontrado';
-                            } else if (data.detail.includes('password')) {
-                                errorMessage = 'Contraseña incorrecta';
-                            } else {
-                                errorMessage = data.detail;
-                            }
-                        }
-
-                        throw new Error(errorMessage);
-                    } catch (jsonError) {
-                        console.log('JSON parsing failed:', jsonError);
-                        // If JSON parsing fails, it's likely an HTML error page
-                        throw new Error('Error en el servidor. Inténtalo nuevamente.');
-                    }
+                    console.log('❌ ERROR: Not redirected to store');
+                    console.log('Response details:', {
+                        status: response.status,
+                        url: response.url,
+                        redirected: response.redirected,
+                        type: response.type
+                    });
+                    throw new Error('Respuesta inesperada del servidor');
                 }
 
             } catch (error) {
-                console.log('Login error caught:', error.message);
-                console.log('Error object:', error);
-                // Error display
+                console.log('💥 ERROR:', error.message);
                 messageDiv.className = 'message message-error';
                 messageDiv.innerHTML = `
                     <i class="fas fa-exclamation-triangle"></i>
@@ -662,7 +605,6 @@
                     messageDiv.style.animation = '';
                 }, 500);
             } finally {
-                // Restore button
                 submitBtn.disabled = false;
                 btnText.innerHTML = originalText;
             }

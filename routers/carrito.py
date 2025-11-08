@@ -92,14 +92,18 @@ async def add_to_cart_simple(
             cart_id = cart_rows[0][0]
         else:
             # Crear nuevo carrito
-            result = db.execute(text("""
+            db.execute(text("""
                 INSERT INTO ecomerce_carritos (id_usuario, estado, created_at)
                 VALUES (:user_id, 'activo', :created_at)
             """), {
                 "user_id": user_id,
                 "created_at": datetime.now()
             })
-            cart_id = result.lastrowid
+
+            # Obtener el ID del carrito insertado
+            result = db.execute(text("SELECT @@IDENTITY as cart_id"))
+            cart_id_row = result.fetchone()
+            cart_id = int(cart_id_row[0]) if cart_id_row and cart_id_row[0] else None
 
         # Verificar si el producto ya está en el carrito
         existing_item_result = db.execute(text("""
@@ -336,7 +340,7 @@ async def get_carrito_activo(
 
         # Buscar carrito activo del usuario
         result = db.execute(text("""
-            SELECT TOP 1 id, id_usuario, estado, created_at, updated_at
+            SELECT TOP 1 id, id_usuario, estado, created_at
             FROM ecomerce_carritos
             WHERE id_usuario = :user_id AND estado = 'activo'
             ORDER BY created_at DESC
@@ -351,30 +355,54 @@ async def get_carrito_activo(
                 "id_usuario": cart[1],
                 "estado": cart[2],
                 "created_at": cart[3].isoformat() if cart[3] else None,
-                "updated_at": cart[4].isoformat() if cart[4] else None
+                "updated_at": None
             }
         else:
             # No hay carrito activo, crear uno nuevo
             logger.info(f"Creando carrito activo para usuario {user_id}")
-            result = db.execute(text("""
-                INSERT INTO ecomerce_carritos (id_usuario, estado, created_at, updated_at)
-                VALUES (:user_id, 'activo', :created_at, :updated_at)
-            """), {
-                "user_id": user_id,
-                "created_at": datetime.now(),
-                "updated_at": datetime.now()
-            })
+            try:
+                # Insertar carrito
+                logger.info(f"Ejecutando INSERT para usuario {user_id}")
+                db.execute(text("""
+                    INSERT INTO ecomerce_carritos (id_usuario, estado, created_at)
+                    VALUES (:user_id, 'activo', :created_at)
+                """), {
+                    "user_id": user_id,
+                    "created_at": datetime.now()
+                })
+                logger.info(f"INSERT ejecutado exitosamente para usuario {user_id}")
 
-            cart_id = result.lastrowid
-            db.commit()
+                # Obtener el ID del carrito insertado usando @@IDENTITY
+                logger.info("Ejecutando @@IDENTITY()")
+                result = db.execute(text("SELECT @@IDENTITY as cart_id"))
+                cart_id_row = result.fetchone()
+                logger.info(f"Resultado de @@IDENTITY: {cart_id_row}")
 
-            return {
-                "id": cart_id,
-                "id_usuario": user_id,
-                "estado": "activo",
-                "created_at": datetime.now().isoformat(),
-                "updated_at": datetime.now().isoformat()
-            }
+                if cart_id_row and cart_id_row[0]:
+                    cart_id = int(cart_id_row[0])
+                    logger.info(f"Cart ID obtenido: {cart_id}")
+                else:
+                    logger.error("No se obtuvo ID del carrito insertado con @@IDENTITY")
+                    raise Exception("No se pudo obtener el ID del carrito insertado")
+
+                logger.info(f"Haciendo commit de la transacción para cart_id {cart_id}")
+                db.commit()
+                logger.info(f"Commit exitoso para cart_id {cart_id}")
+
+                return {
+                    "id": cart_id,
+                    "id_usuario": user_id,
+                    "estado": "activo",
+                    "created_at": datetime.now().isoformat(),
+                    "updated_at": datetime.now().isoformat()
+                }
+            except Exception as insert_error:
+                logger.error(f"Error creando carrito: {insert_error}")
+                logger.error(f"Tipo de error: {type(insert_error)}")
+                import traceback
+                logger.error(f"Traceback completo: {traceback.format_exc()}")
+                db.rollback()
+                raise
 
     except HTTPException:
         raise

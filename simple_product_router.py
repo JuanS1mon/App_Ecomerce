@@ -66,7 +66,7 @@ def get_producto_publico(id: int):
                 p.id, p.codigo, p.nombre, p.descripcion, p.id_categoria, p.precio, p.imagen_url, p.active,
                 v.id as variant_id, v.tipo as variant_nombre, v.precio_adicional, v.stock, v.active as variant_active
             FROM ecomerce_productos p
-            LEFT JOIN ecomerce_product_variants v ON p.id = v.product_id AND v.active = 1
+            LEFT JOIN ecomerce_productos_variantes v ON p.id = v.product_id AND v.active = 1
             WHERE p.active = 1 AND p.id = :id
             ORDER BY v.tipo
         """), {"id": id})
@@ -127,7 +127,7 @@ def get_productos_publicos():
                 p.id, p.codigo, p.nombre, p.descripcion, p.id_categoria, p.precio, p.imagen_url, p.active,
                 v.id as variant_id, v.tipo as variant_nombre, v.precio_adicional, v.stock, v.active as variant_active
             FROM ecomerce_productos p
-            LEFT JOIN ecomerce_product_variants v ON p.id = v.product_id AND v.active = 1
+            LEFT JOIN ecomerce_productos_variantes v ON p.id = v.product_id AND v.active = 1
             WHERE p.active = 1
             ORDER BY p.nombre, v.tipo
         """))
@@ -181,19 +181,23 @@ def get_categorias_publicas():
             SELECT id, nombre, descripcion, imagen_url, active
             FROM ecomerce_categorias
             WHERE active = 1
-            ORDER BY nombre
+            ORDER BY nombre, id
         """))
 
-        categorias = []
+        # Filtrar duplicados por nombre, manteniendo solo el primero
+        categorias_dict = {}
         for row in result:
-            categorias.append({
-                "id": row[0],
-                "nombre": row[1],
-                "descripcion": row[2],
-                "imagen_url": row[3],
-                "active": row[4]
-            })
+            nombre = row[1]
+            if nombre not in categorias_dict:
+                categorias_dict[nombre] = {
+                    "id": row[0],
+                    "nombre": row[1],
+                    "descripcion": row[2],
+                    "imagen_url": row[3],
+                    "active": row[4]
+                }
 
+        categorias = list(categorias_dict.values())
         return categorias
 
     except Exception as e:

@@ -82,20 +82,48 @@ def create_all_tables(create_tables_func, logger=None):
         if logger:
             logger.info(f"Modelos del sistema importados: {system_models_count}/{len(known_models)}")
         
-        # 2. Descubrir e importar modelos de servicios generados
+        # 2. Importar modelos de ecommerce
+        if logger:
+            logger.info("Importando modelos de ecommerce...")
+        
+        ecommerce_models = [
+            'Projects.ecomerce.models.categorias',
+            'Projects.ecomerce.models.productos',
+            'Projects.ecomerce.models.carritos',
+            'Projects.ecomerce.models.carrito_items',
+            'Projects.ecomerce.models.pedidos',
+            'Projects.ecomerce.models.presupuestos',
+            'Projects.ecomerce.models.stock',
+        ]
+        
+        ecommerce_models_count = 0
+        for module_name in ecommerce_models:
+            try:
+                importlib.import_module(module_name)
+                ecommerce_models_count += 1
+                if logger:
+                    logger.info(f"  Modelo ecommerce importado: {module_name}")
+            except ImportError as e:
+                if logger:
+                    logger.warning(f"  No se pudo importar el modelo ecommerce {module_name}: {e}")
+        
+        if logger:
+            logger.info(f"Modelos de ecommerce importados: {ecommerce_models_count}/{len(ecommerce_models)}")
+        
+        # 3. Descubrir e importar modelos de servicios generados
         if logger:
             logger.info("Descubriendo modelos de servicios en Services/...")
         
         service_models_count = discover_and_import_service_models(logger)
         
-        # 3. Crear todas las tablas
+        # 4. Crear todas las tablas
         if logger:
             logger.info("Creando tablas en la base de datos...")
         
         create_tables_func()
         
         if logger:
-            total_models = system_models_count + service_models_count
+            total_models = system_models_count + ecommerce_models_count + service_models_count
             logger.info(f"Tablas creadas/verificadas exitosamente ({total_models} modelos)")
             
     except Exception as e:

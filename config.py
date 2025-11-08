@@ -17,4 +17,8 @@ ORIGINS = os.getenv("ORIGINS", "*").split(",")
 STATIC_DIR = os.getenv("STATIC_DIR", "sql_app/static")
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
+# Configuración de MercadoPago
+MERCADOPAGO_ACCESS_TOKEN = os.getenv("MERCADOPAGO_ACCESS_TOKEN")
+MERCADOPAGO_PUBLIC_KEY = os.getenv("MERCADOPAGO_PUBLIC_KEY")
+
 SECRET = SECRET_KEY  # Alias para compatibilidad retroactiva

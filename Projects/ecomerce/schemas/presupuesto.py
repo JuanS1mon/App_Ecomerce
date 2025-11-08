@@ -10,7 +10,7 @@ class PresupuestoRequest(BaseModel):
     mensaje: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Modelo Pydantic para la respuesta
 class PresupuestoResponse(BaseModel):
@@ -23,4 +23,4 @@ class PresupuestoResponse(BaseModel):
     estado: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True

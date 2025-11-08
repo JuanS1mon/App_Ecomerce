@@ -16,4 +16,4 @@ class UserDB(BaseModel):
     roles: List[Role] = []
     
     class Config:
-        orm_mode = True
+        from_attributes = True
