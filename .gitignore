@@ -79,14 +79,20 @@ target/
 profile_default/
 ipython_config.py
 
-# Environments
+# Environments - CRÍTICO: NO SUBIR CREDENCIALES
 .env
+.env.*
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+*.env
+.env.local
+.env.production
+.env.development
+.env.test
 
 # Spyder project settings
 .spyderproject
@@ -237,8 +243,49 @@ mock_data/
 dump/
 dumps/
 
+# Archivos de documentación temporal y análisis
+ANALISIS_*.md
+CORRECCION*.md
+CONFIRMACION_*.md
+*_RESUELTO*.md
+*_COMPLETADO.md
+*_IMPLEMENTADO.md
+*_README.md
+*_SUMMARY.md
+COMANDOS_*.md
+
+# Archivos JSON de corrección/prueba
+*_corregido.json
+*_corrected.json
+*_test.json
+app_*.json
+biblioteca_*.json
+config_*.json
+ecommerce_*.json
+
+# Archivos de cookies y sesión
+cookies.txt
+session.txt
+
+# Node modules (si usas Node.js para herramientas)
+node_modules/
+package-lock.json
+package.json
+
+# Archivos de configuración de Alembic
+alembic.ini
+clean_alembic.py
+e2e_migraciones_cli.py
+
+# Scripts de limpieza
+cleanup_*.py
+clean_*.py
+
 # Scripts de prueba y debugging específicos
 test_*.py
+test_*.bat
+test_*.js
+test_*.html
 debug_*.py
 debug_*.js
 crear_usuario_test.py
@@ -250,7 +297,28 @@ test_password.py
 test_roles_api.py
 verify_*.py
 check_*.py
+check_*.js
 diagnose_*.py
+
+# Scripts create_ (inicialización y setup)
+create_*.py
+assign_*.py
+add_*.py
+setup_*.py
+
+# Archivos de servidor de prueba/debug
+server_debug*.py
+demo_*.py
+ejemplo_*.py
+ejemplo_*.js
+empty_server.py
+diagnostico_*.py
+
+# Docker files
+docker-compose*.yml
+Dockerfile*
+docker-entrypoint*.sh
+.dockerignore
 
 # Archivos generados por herramientas de desarrollo
 *_test_generator.py
