@@ -4,7 +4,7 @@
 		{
 			"type": "shell",
 			"label": "Run Stock Movement System",
-			"command": "uvicorn sql_app.main:app --reload",
+			"command": "uvicorn main:app --reload",
 			"isBackground": true,
 			"problemMatcher": [],
 			"group": "build"

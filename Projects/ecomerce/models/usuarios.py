@@ -18,3 +18,9 @@ class EcomerceUsuarios(Base):
     pais = Column(String(255))
     created_at = Column(DateTime, default=func.now())
     active = Column(Boolean, default=False)
+    
+    # Campos para autenticación con Google - DESHABILITADOS TEMPORALMENTE
+    # Descomentar cuando se ejecute la migración SQL y se habilite Google OAuth
+    # google_id = Column(String(255), unique=True, nullable=True, index=True)
+    # auth_provider = Column(String(50), default='local')  # 'local' o 'google'
+    # profile_picture = Column(String(500), nullable=True)  # URL de la imagen de perfil de Google

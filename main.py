@@ -346,6 +346,14 @@ for route in ecommerce_auth_router.routes:
 app.include_router(ecommerce_auth_router)
 logger.info("ecommerce_auth_router registrado")
 
+# Importar y registrar el router de autenticación con Google
+#from routers.google_oauth import router as google_oauth_router
+#logger.info(f"Registrando google_oauth_router con {len(google_oauth_router.routes)} rutas")
+#for route in google_oauth_router.routes:
+#    logger.info(f"  GOOGLE OAUTH ROUTE: {route.methods} {route.path}")
+#app.include_router(google_oauth_router)
+#logger.info("google_oauth_router registrado")
+
 
 # =============================
 # RUTAS PRINCIPALES

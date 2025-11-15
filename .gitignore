@@ -277,6 +277,17 @@ alembic.ini
 clean_alembic.py
 e2e_migraciones_cli.py
 
+# Azure - Archivos específicos de deployment
+.azure/
+*.publishsettings
+*.pubxml
+*.azurePubxml
+local.settings.json
+__blobstorage__
+__queuestorage__
+__azurite_db*__.json
+.python_packages/
+
 # Scripts de limpieza
 cleanup_*.py
 clean_*.py
