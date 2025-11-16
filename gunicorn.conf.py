@@ -2,12 +2,30 @@ import multiprocessing
 import sys
 import os
 
-# Limpiar PYTHONPATH para evitar conflictos con paquetes del sistema Azure
-# Mantener solo el directorio del entorno virtual
-if 'PYTHONPATH' in os.environ:
-    venv_paths = [p for p in os.environ['PYTHONPATH'].split(':') if 'antenv' in p or 'site-packages' in p]
-    if venv_paths:
-        os.environ['PYTHONPATH'] = ':'.join(venv_paths)
+# ============================================================================
+# HOOKS DE GUNICORN para limpiar PYTHONPATH en el momento correcto
+# ============================================================================
+
+def when_ready(server):
+    """Se ejecuta cuando Gunicorn está listo pero antes de cargar workers"""
+    print("[GUNICORN] Limpiando PYTHONPATH antes de cargar workers...")
+    if 'PYTHONPATH' in os.environ:
+        original = os.environ['PYTHONPATH']
+        paths = original.split(':')
+        # CRÍTICO: Remover /agents/python que tiene paquetes viejos de Azure
+        filtered = [p for p in paths if p and '/agents/python' not in p]
+        os.environ['PYTHONPATH'] = ':'.join(filtered)
+        print(f"[GUNICORN] PYTHONPATH original: {original}")
+        print(f"[GUNICORN] PYTHONPATH limpio: {os.environ['PYTHONPATH']}")
+
+def pre_fork(server, worker):
+    """Se ejecuta antes de hacer fork de cada worker"""
+    # Limpiar sys.path también
+    sys.path = [p for p in sys.path if '/agents/python' not in p]
+
+# ============================================================================
+# CONFIGURACIÓN DE GUNICORN
+# ============================================================================
 
 # Gestión de memoria y reciclaje de workers
 max_requests = 1000
