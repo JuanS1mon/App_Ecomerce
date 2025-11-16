@@ -1,4 +1,13 @@
 import multiprocessing
+import sys
+import os
+
+# Limpiar PYTHONPATH para evitar conflictos con paquetes del sistema Azure
+# Mantener solo el directorio del entorno virtual
+if 'PYTHONPATH' in os.environ:
+    venv_paths = [p for p in os.environ['PYTHONPATH'].split(':') if 'antenv' in p or 'site-packages' in p]
+    if venv_paths:
+        os.environ['PYTHONPATH'] = ':'.join(venv_paths)
 
 # Gestión de memoria y reciclaje de workers
 max_requests = 1000
