@@ -5,6 +5,11 @@
 # Contiene la configuración central, middlewares, rutas y manejadores de errores
 
 # =============================
+# PRE-IMPORTACIÓN CRÍTICA: Cargar typing_extensions correcto
+# =============================
+import pre_import  # DEBE ser el primer import para evitar conflictos
+
+# =============================
 # CONFIGURACIÓN Y ENTORNO
 # =============================
 from config import FRONTEND_URL, ORIGINS, STATIC_DIR, ENVIRONMENT
