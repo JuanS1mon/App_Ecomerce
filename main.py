@@ -256,25 +256,25 @@ except Exception as e:
     import traceback
     traceback.print_exc()
 
-# Importar y registrar el router simple de productos
-try:
-    from simple_product_router import router as productos_router
-    app.include_router(productos_router, prefix="/ecomerce", tags=["productos"])
-    logger.info("Router productos registrado correctamente")
-except Exception as e:
-    logger.error(f"❌ Error registrando router productos: {e}")
-    import traceback
-    traceback.print_exc()
+# Importar y registrar el router simple de productos (comentado - archivo no existe)
+# try:
+#     from simple_product_router import router as productos_router
+#     app.include_router(productos_router, prefix="/ecomerce", tags=["productos"])
+#     logger.info("Router productos registrado correctamente")
+# except Exception as e:
+#     logger.error(f"❌ Error registrando router productos: {e}")
+#     import traceback
+#     traceback.print_exc()
 
-# Importar y registrar el router API simple para ecommerce
-try:
-    # from simple_api_router import router as api_router
-    # app.include_router(api_router)
-    logger.info("Router API ecommerce integrado en simple_product_router")
-except Exception as e:
-    logger.error(f"❌ Error registrando router API ecommerce: {e}")
-    import traceback
-    traceback.print_exc()
+# Importar y registrar el router API simple para ecommerce (comentado - archivo no existe)
+# try:
+#     from simple_api_router import router as api_router
+#     app.include_router(api_router)
+#     logger.info("Router API ecommerce integrado en simple_product_router")
+# except Exception as e:
+#     logger.error(f"❌ Error registrando router API ecommerce: {e}")
+#     import traceback
+#     traceback.print_exc()
 
 # Importar y registrar el router de administración de categorías
 from routers.admin_categorias import router as admin_categorias_router
