@@ -169,7 +169,17 @@ def ensure_roles_model():
             
             if not os.path.exists(roles_file_path):
                 with open(roles_file_path, 'w') as f:
-                    f.write("""from sqlalchemy import Column, Integer, String\nfrom db.database import Baseclass Roles(Base):\n    __tablename__ = \"Roles\"\n    __table_args__ = {'extend_existing': True}\n    \n    id = Column(Integer, primary_key=True, index=True)\n    nombre = Column(String(50), unique=True)\n    descripcion = Column(String(255), nullable=True)\n""")
+                    f.write("""from sqlalchemy import Column, Integer, String
+from db.database import Base
+
+class Roles(Base):
+    __tablename__ = "Roles"
+    __table_args__ = {'extend_existing': True}
+    
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(50), unique=True)
+    descripcion = Column(String(255), nullable=True)
+""")
                 importlib.import_module("db.models.roles")
         
         # Crear solo la tabla Roles primero
@@ -228,7 +238,7 @@ if 'psycopg2' in sys.modules:
     print("Referencia a psycopg2 eliminada.")
 
 # Asegurar que SQLALCHEMY_DATABASE_URL esté configurado para SQL Server
-if not SQLALCHEMY_DATABASE_URL.startswith("mssql+pyodbc://"):
+if not (SQLALCHEMY_DATABASE_URL.startswith("mssql+pyodbc://") or SQLALCHEMY_DATABASE_URL.startswith("mssql+pymssql://")):
     raise ValueError("SQLALCHEMY_DATABASE_URL no está configurado correctamente para SQL Server.")
 
 # =============================
