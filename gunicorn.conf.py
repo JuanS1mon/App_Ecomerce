@@ -1,28 +1,19 @@
 import multiprocessing
-import os
 
-# Bind
-bind = "0.0.0.0:8000"
-
-# Workers
-workers = int(os.getenv("WORKERS", "4"))
-worker_class = "uvicorn.workers.UvicornWorker"
-
-# Timeout
-timeout = 600
-keepalive = 5
-
-# Logging
-accesslog = "-"
-errorlog = "-"
-loglevel = "info"
-
-# Graceful timeout
-graceful_timeout = 30
-
-# Max requests
+# Gestión de memoria y reciclaje de workers
 max_requests = 1000
 max_requests_jitter = 50
 
-# Process naming
-proc_name = "ecommerce_app"
+# Logging
+log_file = "-"
+
+# Configuración del servidor
+bind = "0.0.0.0"
+timeout = 230
+
+# Workers dinámicos basados en CPU
+num_cpus = multiprocessing.cpu_count()
+workers = (num_cpus * 2) + 1
+
+# Worker class para ASGI (FastAPI)
+worker_class = "uvicorn.workers.UvicornWorker"
