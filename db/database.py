@@ -38,6 +38,8 @@ DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_NAME = os.getenv("DB_NAME", "sqlapp")
 DB_DRIVER = os.getenv("DB_DRIVER", "ODBC Driver 17 for SQL Server")
+# Nueva opción: usar pymssql en lugar de pyodbc (más simple para Azure)
+USE_PYMSSQL = os.getenv("USE_PYMSSQL", "False").lower() in ('true', '1', 't', 'yes')
 
 POOL_SIZE = int(os.getenv("POOL_SIZE", "5"))
 MAX_OVERFLOW = int(os.getenv("MAX_OVERFLOW", "10"))
@@ -49,8 +51,17 @@ POOL_RECYCLE = int(os.getenv("POOL_RECYCLE", "3600"))
 # SECCIÓN: SQL SERVER (PRIORIDAD)
 # =============================
 if DB_TYPE == "sqlserver":
-    SQLALCHEMY_DATABASE_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?driver={DB_DRIVER}"
-    SQLALCHEMY_MASTER_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master?driver={DB_DRIVER}"
+    if USE_PYMSSQL:
+        # Usar pymssql (no requiere ODBC instalado - más simple para Azure)
+        SQLALCHEMY_DATABASE_URL = f"mssql+pymssql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+        SQLALCHEMY_MASTER_URL = f"mssql+pymssql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master"
+        print("✅ Usando pymssql driver (sin dependencia de ODBC)")
+    else:
+        # Usar pyodbc (requiere ODBC instalado)
+        SQLALCHEMY_DATABASE_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?driver={DB_DRIVER}"
+        SQLALCHEMY_MASTER_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master?driver={DB_DRIVER}"
+        print(f"✅ Usando pyodbc driver: {DB_DRIVER}")
+    
     master_engine = create_engine(SQLALCHEMY_MASTER_URL, isolation_level="AUTOCOMMIT")
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL,
@@ -60,13 +71,17 @@ if DB_TYPE == "sqlserver":
         pool_pre_ping=POOL_PRE_PING,
         pool_recycle=POOL_RECYCLE
     )
+    
     # Validación y advertencias
-    if not SQLALCHEMY_DATABASE_URL.startswith("mssql+pyodbc://"):
+    if USE_PYMSSQL and not SQLALCHEMY_DATABASE_URL.startswith("mssql+pymssql://"):
+        raise ValueError(f"Error en configuración pymssql: {SQLALCHEMY_DATABASE_URL}")
+    elif not USE_PYMSSQL and not SQLALCHEMY_DATABASE_URL.startswith("mssql+pyodbc://"):
         raise ValueError(
             f"SQLALCHEMY_DATABASE_URL no está configurado correctamente para SQL Server: {SQLALCHEMY_DATABASE_URL}\n"
             "Ejemplo correcto: mssql+pyodbc://usuario:clave@host/basededatos?driver=ODBC+Driver+17+for+SQL+Server"
         )
-    if "ODBC Driver 17 for SQL Server" not in DB_DRIVER and "ODBC Driver 18 for SQL Server" not in DB_DRIVER:
+    
+    if not USE_PYMSSQL and "ODBC Driver 17 for SQL Server" not in DB_DRIVER and "ODBC Driver 18 for SQL Server" not in DB_DRIVER:
         print("⚠️  ADVERTENCIA: El driver de SQL Server no es el recomendado. Usa 'ODBC Driver 17 for SQL Server' o 'ODBC Driver 18 for SQL Server'.")
 
 # =============================
