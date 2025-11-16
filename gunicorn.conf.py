@@ -3,25 +3,35 @@ import sys
 import os
 
 # ============================================================================
-# HOOKS DE GUNICORN para limpiar PYTHONPATH en el momento correcto
+# LIMPIEZA INMEDIATA del PYTHONPATH corrupto de Azure
+# ============================================================================
+# DEBE ejecutarse ANTES de cualquier import para evitar conflictos
+
+if 'PYTHONPATH' in os.environ:
+    original_pythonpath = os.environ['PYTHONPATH']
+    paths = original_pythonpath.split(':')
+    # Filtrar /agents/python que contiene typing_extensions.py obsoleto
+    clean_paths = [p for p in paths if p and '/agents/python' not in p]
+    os.environ['PYTHONPATH'] = ':'.join(clean_paths)
+    print(f"[STARTUP] PYTHONPATH limpiado: {original_pythonpath} -> {os.environ['PYTHONPATH']}")
+
+# Limpiar sys.path también para el proceso maestro
+sys.path = [p for p in sys.path if '/agents/python' not in p]
+print(f"[STARTUP] sys.path limpiado, rutas restantes: {len(sys.path)}")
+
+# ============================================================================
+# HOOKS DE GUNICORN para asegurar limpieza en workers
 # ============================================================================
 
 def when_ready(server):
     """Se ejecuta cuando Gunicorn está listo pero antes de cargar workers"""
-    print("[GUNICORN] Limpiando PYTHONPATH antes de cargar workers...")
-    if 'PYTHONPATH' in os.environ:
-        original = os.environ['PYTHONPATH']
-        paths = original.split(':')
-        # CRÍTICO: Remover /agents/python que tiene paquetes viejos de Azure
-        filtered = [p for p in paths if p and '/agents/python' not in p]
-        os.environ['PYTHONPATH'] = ':'.join(filtered)
-        print(f"[GUNICORN] PYTHONPATH original: {original}")
-        print(f"[GUNICORN] PYTHONPATH limpio: {os.environ['PYTHONPATH']}")
+    print("[GUNICORN] Hook when_ready: Verificando limpieza de PYTHONPATH...")
 
 def pre_fork(server, worker):
     """Se ejecuta antes de hacer fork de cada worker"""
-    # Limpiar sys.path también
+    # Doble verificación: limpiar sys.path en cada worker
     sys.path = [p for p in sys.path if '/agents/python' not in p]
+    print(f"[WORKER] sys.path limpiado en worker, total paths: {len(sys.path)}")
 
 # ============================================================================
 # CONFIGURACIÓN DE GUNICORN
