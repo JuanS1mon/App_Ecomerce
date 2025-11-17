@@ -158,9 +158,20 @@ def create_database():
     try:
         with master_engine.connect() as connection:
             if DB_TYPE == "sqlserver":
+                # Crear la base de datos si no existe
                 connection.execute(text(f"IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{DB_NAME}') CREATE DATABASE {DB_NAME}"))
-                connection.execute(text(f"ALTER DATABASE {DB_NAME} SET RECOVERY SIMPLE"))
-                connection.execute(text(f"ALTER DATABASE {DB_NAME} SET AUTO_SHRINK ON"))
+                
+                # Solo ejecutar comandos ALTER si usamos pyodbc (pymssql no los soporta)
+                if not USE_PYMSSQL:
+                    try:
+                        connection.execute(text(f"ALTER DATABASE {DB_NAME} SET RECOVERY SIMPLE"))
+                        connection.execute(text(f"ALTER DATABASE {DB_NAME} SET AUTO_SHRINK ON"))
+                        print("✅ Configuración de base de datos aplicada (pyodbc)")
+                    except Exception as alter_error:
+                        print(f"⚠️  No se pudieron aplicar configuraciones ALTER: {alter_error}")
+                else:
+                    print("ℹ️  Saltando configuraciones ALTER (no soportadas por pymssql)")
+                    
             elif DB_TYPE == "postgresql":
                 result = connection.execute(text(f"SELECT 1 FROM pg_database WHERE datname = '{DB_NAME}'"))
                 if not result.scalar():
