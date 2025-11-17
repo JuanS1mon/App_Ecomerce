@@ -9,14 +9,20 @@
 # =============================
 import pre_import  # DEBE ser el primer import para evitar conflictos
 
+print("✅ pre_import cargado correctamente")
+
 # =============================
 # CONFIGURACIÓN Y ENTORNO
 # =============================
 from config import FRONTEND_URL, ORIGINS, STATIC_DIR, ENVIRONMENT
 from logging_config_new import setup_logging
 
+print("✅ Configuración y logging importados")
+
 # CONFIGURAR LOGGING ULTRA VERBOSO
 setup_logging()
+
+print("✅ Logging configurado")
 
 # =============================
 # IMPORTACIONES ESTÁNDAR Y FASTAPI
@@ -29,6 +35,8 @@ from fastapi import Request, Depends
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from sqlalchemy.orm import Session
 
+print("✅ Importaciones básicas de FastAPI completadas")
+
 # =============================
 # IMPORTACIONES DE MIDDLEWARES Y HANDLERS
 # =============================
@@ -38,6 +46,8 @@ from middleware.custom import (
 from exception_handlers import register_exception_handlers
 from middleware.jwt_middleware import JWTMiddleware
 
+print("✅ Middlewares y handlers importados")
+
 # =============================
 # IMPORTACIONES DE DB Y ROUTERS
 # =============================
@@ -45,19 +55,11 @@ from db.database import get_db, create_database, create_tables, run_alembic_upgr
 from init_app import create_all_tables, ensure_directories
 from routers import usuarios as aut_usuario
 from routers import auth as auth_router
-#from routers import Blog
 from routers.config import  configDB,  Analisis,  usuarios_admin
 from routers.config.Admin import router as admin_router
 from routers import frontend_pages
-from routers.api.admin_api import router as admin_api_router
-from Services.mail.mail import MAIL_CONFIG_OK, router as mail_router
 
-from routers.static_pages import router as static_pages_router
-from logging_config import LOG_CONFIG
-from app_settings import CORS_CONFIG, DOCS_URL, REDOC_URL
-
-# Importar y registrar el router de mapas
-from routers.mapas import router as mapas_router
+print("✅ Importaciones de DB y routers básicos completadas")
 
 # =============================
 # INICIALIZACIÓN DE LA APP
