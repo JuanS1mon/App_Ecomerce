@@ -40,6 +40,8 @@ DB_NAME = os.getenv("DB_NAME", "sqlapp")
 DB_DRIVER = os.getenv("DB_DRIVER", "ODBC Driver 17 for SQL Server")
 # Nueva opción: usar pymssql en lugar de pyodbc (más simple para Azure)
 USE_PYMSSQL = os.getenv("USE_PYMSSQL", "False").lower() in ('true', '1', 't', 'yes')
+# Forzar fallback a SQLite en caso de necesitarlo para debugging/arranque
+FORCE_SQLITE = os.getenv("FORCE_SQLITE", "False").lower() in ('true', '1', 't', 'yes')
 
 POOL_SIZE = int(os.getenv("POOL_SIZE", "5"))
 MAX_OVERFLOW = int(os.getenv("MAX_OVERFLOW", "10"))
@@ -62,15 +64,31 @@ if DB_TYPE == "sqlserver":
         SQLALCHEMY_MASTER_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master?driver={DB_DRIVER}"
         print(f"✅ Usando pyodbc driver: {DB_DRIVER}")
     
-    master_engine = create_engine(SQLALCHEMY_MASTER_URL, isolation_level="AUTOCOMMIT")
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URL,
-        pool_size=POOL_SIZE,
-        max_overflow=MAX_OVERFLOW,
-        pool_timeout=POOL_TIMEOUT,
-        pool_pre_ping=POOL_PRE_PING,
-        pool_recycle=POOL_RECYCLE
-    )
+    # Crear master_engine y engine con manejo de errores para evitar que la app caiga
+    try:
+        master_engine = create_engine(SQLALCHEMY_MASTER_URL, isolation_level="AUTOCOMMIT")
+        engine = create_engine(
+            SQLALCHEMY_DATABASE_URL,
+            pool_size=POOL_SIZE,
+            max_overflow=MAX_OVERFLOW,
+            pool_timeout=POOL_TIMEOUT,
+            pool_pre_ping=POOL_PRE_PING,
+            pool_recycle=POOL_RECYCLE
+        )
+        print("✅ Engines SQL Server creados correctamente")
+        DB_FALLBACK_SQLITE = False
+    except Exception as e:
+        # Si falla al crear el engine (p. ej. problemas de red, driver o versión)
+        print(f"⚠️  No se pudo crear engines para SQL Server: {e}")
+        if FORCE_SQLITE:
+            print("ℹ️  FORCE_SQLITE activado: activando fallback a SQLite para evitar crash en startup")
+            SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sql_app/sql_app.db")
+            master_engine = None
+            engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+            DB_FALLBACK_SQLITE = True
+        else:
+            # Re-lanzar para que el proceso muestre el error y no silencie problemas de producción
+            raise
     
     # Validación y advertencias
     if USE_PYMSSQL and not SQLALCHEMY_DATABASE_URL.startswith("mssql+pymssql://"):
