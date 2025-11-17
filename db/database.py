@@ -41,6 +41,14 @@ DB_DRIVER = os.getenv("DB_DRIVER", "ODBC Driver 17 for SQL Server")
 # Nueva opción: usar pymssql en lugar de pyodbc (más simple para Azure)
 USE_PYMSSQL = os.getenv("USE_PYMSSQL", "False").lower() in ('true', '1', 't', 'yes')
 
+# DEBUG: Log de configuración de BD
+print(f"🔍 DB_TYPE: {DB_TYPE}")
+print(f"🔍 DB_HOST: {DB_HOST}")
+print(f"🔍 DB_NAME: {DB_NAME}")
+print(f"🔍 DB_USER: {DB_USER}")
+print(f"🔍 USE_PYMSSQL: {USE_PYMSSQL}")
+print(f"🔍 DB_DRIVER: {DB_DRIVER}")
+
 POOL_SIZE = int(os.getenv("POOL_SIZE", "5"))
 MAX_OVERFLOW = int(os.getenv("MAX_OVERFLOW", "10"))
 POOL_TIMEOUT = int(os.getenv("POOL_TIMEOUT", "30"))
@@ -51,26 +59,39 @@ POOL_RECYCLE = int(os.getenv("POOL_RECYCLE", "3600"))
 # SECCIÓN: SQL SERVER (PRIORIDAD)
 # =============================
 if DB_TYPE == "sqlserver":
-    if USE_PYMSSQL:
-        # Usar pymssql (no requiere ODBC instalado - más simple para Azure)
-        SQLALCHEMY_DATABASE_URL = f"mssql+pymssql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
-        SQLALCHEMY_MASTER_URL = f"mssql+pymssql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master"
-        print("✅ Usando pymssql driver (sin dependencia de ODBC)")
-    else:
-        # Usar pyodbc (requiere ODBC instalado)
-        SQLALCHEMY_DATABASE_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?driver={DB_DRIVER}"
-        SQLALCHEMY_MASTER_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master?driver={DB_DRIVER}"
-        print(f"✅ Usando pyodbc driver: {DB_DRIVER}")
-    
-    master_engine = create_engine(SQLALCHEMY_MASTER_URL, isolation_level="AUTOCOMMIT")
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URL,
-        pool_size=POOL_SIZE,
-        max_overflow=MAX_OVERFLOW,
-        pool_timeout=POOL_TIMEOUT,
-        pool_pre_ping=POOL_PRE_PING,
-        pool_recycle=POOL_RECYCLE
-    )
+    try:
+        if USE_PYMSSQL:
+            # Usar pymssql (no requiere ODBC instalado - más simple para Azure)
+            SQLALCHEMY_DATABASE_URL = f"mssql+pymssql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+            SQLALCHEMY_MASTER_URL = f"mssql+pymssql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master"
+            print("✅ Usando pymssql driver (sin dependencia de ODBC)")
+            print(f"🔍 URL BD: {SQLALCHEMY_DATABASE_URL.replace(DB_PASSWORD, '***')}")
+        else:
+            # Usar pyodbc (requiere ODBC instalado)
+            SQLALCHEMY_DATABASE_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?driver={DB_DRIVER}"
+            SQLALCHEMY_MASTER_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/master?driver={DB_DRIVER}"
+            print(f"✅ Usando pyodbc driver: {DB_DRIVER}")
+            print(f"🔍 URL BD: {SQLALCHEMY_DATABASE_URL.replace(DB_PASSWORD, '***')}")
+        
+        print("🔍 Creando master_engine...")
+        master_engine = create_engine(SQLALCHEMY_MASTER_URL, isolation_level="AUTOCOMMIT")
+        print("✅ master_engine creado exitosamente")
+        
+        print("🔍 Creando engine principal...")
+        engine = create_engine(
+            SQLALCHEMY_DATABASE_URL,
+            pool_size=POOL_SIZE,
+            max_overflow=MAX_OVERFLOW,
+            pool_timeout=POOL_TIMEOUT,
+            pool_pre_ping=POOL_PRE_PING,
+            pool_recycle=POOL_RECYCLE
+        )
+        print("✅ Engine principal creado exitosamente")
+        
+    except Exception as e:
+        print(f"❌ ERROR al crear engines: {e}")
+        print(f"❌ Tipo de error: {type(e)}")
+        raise
     
     # Validación y advertencias
     if USE_PYMSSQL and not SQLALCHEMY_DATABASE_URL.startswith("mssql+pymssql://"):
