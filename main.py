@@ -113,7 +113,11 @@ from contextlib import asynccontextmanager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup logic
-    alembic_ok = run_alembic_upgrade()  # HABILITADO: Ejecutar migraciones de Alembic
+    try:
+        alembic_ok = run_alembic_upgrade()  # HABILITADO: Ejecutar migraciones de Alembic
+    except Exception as e:
+        logger.error(f"❌ Error ejecutando Alembic: {e}")
+        alembic_ok = False
     mail_ok = check_mail_config()
 
     # Inicializar usuario administrador
