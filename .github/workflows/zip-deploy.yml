@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -31,6 +32,17 @@ jobs:
       run: |
         zip -r app.zip * -x ".git/*" -x "env/*" -x ".venv/*" -x ".github/*"
 
+    - name: Check Publish Profile Secret
+      run: |
+        if [ -z "$AZURE_WEBAPP_PUBLISH_PROFILE" ]; then
+          echo "AZURE_WEBAPP_PUBLISH_PROFILE is not set in this repository. Add it under Settings > Secrets and variables > Actions.";
+          exit 1;
+        else
+          echo "AZURE_WEBAPP_PUBLISH_PROFILE is set.";
+        fi
+      env:
+        AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
@@ -44,3 +56,15 @@ jobs:
     - name: Tail logs
       run: |
         echo "Deployment finished; use az webapp log tail or check the portal to view logs"
+
+    - name: Check Publish Profile Secret
+      if: always()
+      run: |
+        if [ -z "$AZURE_WEBAPP_PUBLISH_PROFILE" ]; then
+          echo "AZURE_WEBAPP_PUBLISH_PROFILE is not set in this repository. Add it under Settings > Secrets and variables > Actions.";
+          exit 1;
+        else
+          echo "AZURE_WEBAPP_PUBLISH_PROFILE is set.";
+        fi
+      env:
+        AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
