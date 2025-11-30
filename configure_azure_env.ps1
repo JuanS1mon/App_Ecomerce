@@ -9,7 +9,7 @@ Write-Host "Configurando variables de entorno en Azure App Service..." -Foregrou
 
 # Configurar variables de entorno básicas
 $envVars = @{
-    "SECRET" = "azure-production-secret-key-change-this-$(Get-Random)"
+    "SECRET" = "<REPLACE_WITH_YOUR_SECRET>"
     "ALGORITHM" = "HS256"
     "ACCESS_TOKEN_DURATION" = "30"
     "FRONTEND_URL" = "https://demoecomerce.azurewebsites.net"
@@ -21,7 +21,7 @@ $envVars = @{
     # Base de datos - SQL Server Azure
     "DB_TYPE" = "sqlserver"
     "DB_USER" = "Juadmin"
-    "DB_PASSWORD" = "Pantone123!"
+    "DB_PASSWORD" = "<REPLACE_WITH_DB_PASSWORD>"
     "DB_HOST" = "dbdemoecomerce.database.windows.net"
     "DB_NAME" = "db_ecomerce"
     "USE_PYMSSQL" = "true"
@@ -33,8 +33,8 @@ $envVars = @{
     "POOL_RECYCLE" = "3600"
 
     # Desactivar características que requieren servicios externos
-    "MERCADOPAGO_ACCESS_TOKEN" = ""
-    "MERCADOPAGO_PUBLIC_KEY" = ""
+    "MERCADOPAGO_ACCESS_TOKEN" = "<REPLACE_WITH_MERCADOPAGO_ACCESS_TOKEN>"
+    "MERCADOPAGO_PUBLIC_KEY" = "<REPLACE_WITH_MERCADOPAGO_PUBLIC_KEY>"
     "GOOGLE_CLIENT_ID" = ""
     "GOOGLE_CLIENT_SECRET" = ""
 }

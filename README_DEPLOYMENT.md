@@ -25,6 +25,7 @@ Ejecutar:
 
 ## 3) Importar variables de `.env`
 Se incluye `scripts/import_env_to_appsettings.ps1` que lee el archivo `.env` y sube las variables a App Settings; las variables sensibles se marcan como `slotSetting`.
+ **Importante:** Nunca incluyas tu archivo `.env` real en el repositorio. Usa `.env.example` como plantilla y guarda las credenciales sensibles en GitHub Secrets o Azure Key Vault.
 
 Ejecutar:
 ```powershell
@@ -51,3 +52,6 @@ az webapp config appsettings list -g Recur_test -n App_Ecomerce
 - Evita `ORIGINS=*` en producción: configura tu frontend real.
 - Reemplaza `sa` por un usuario con permisos mínimos.
 - Si usas pyodbc y ODBC driver, considera un contenedor. App Service Linux no trae drivers ODBC por defecto.
+
+## Eliminación de credenciales comprometidas (si aplica)
+- Si hay un archivo `.env` con valores reales en el historial del repo, se recomienda purgarlo del historial con `git filter-repo` o `bfg` y forzar los pushes, luego rotar las credenciales comprometidas.

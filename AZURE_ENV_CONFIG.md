@@ -14,7 +14,7 @@ La aplicación muestra "Application Error" porque faltan variables de entorno ne
 5. Agrega estas variables una por una haciendo clic en **+ New application setting**:
 
 ```
-SECRET = azure-production-secret-key-741445767
+SECRET = <REPLACE_WITH_YOUR_SECRET>
 ALGORITHM = HS256
 ACCESS_TOKEN_DURATION = 30
 FRONTEND_URL = https://demoecomerce.azurewebsites.net
@@ -38,7 +38,7 @@ winget install Microsoft.AzureCLI
 
 #### Luego ejecuta este comando:
 ```bash
-az webapp config appsettings set --name demoEcomerce --resource-group Ecomerce_test --subscription e08987ee-0468-4b1f-bcab-cf039163ccb6 --settings SECRET="azure-production-secret-key-741445767" ALGORITHM="HS256" ACCESS_TOKEN_DURATION="30" FRONTEND_URL="https://demoecomerce.azurewebsites.net" BACKEND_URL="https://demoecomerce.azurewebsites.net" ORIGINS="https://demoecomerce.azurewebsites.net,https://demoecomerce-fmb7asd5h0f5epdn.chilecentral-01.azurewebsites.net" ENVIRONMENT="production" STATIC_DIR="static" DB_TYPE="sqlite" DB_NAME="sqlapp.db"
+az webapp config appsettings set --name demoEcomerce --resource-group Ecomerce_test --subscription <SUBSCRIPTION_ID> --settings SECRET="<REPLACE_WITH_YOUR_SECRET>" ALGORITHM="HS256" ACCESS_TOKEN_DURATION="30" FRONTEND_URL="https://demoecomerce.azurewebsites.net" BACKEND_URL="https://demoecomerce.azurewebsites.net" ORIGINS="https://demoecomerce.azurewebsites.net,https://demoecomerce-fmb7asd5h0f5epdn.chilecentral-01.azurewebsites.net" ENVIRONMENT="production" STATIC_DIR="static" DB_TYPE="sqlite" DB_NAME="sqlapp.db"
 ```
 
 ## Variables Explicadas
