@@ -33,25 +33,30 @@ jobs:
       run: |
         zip -r app.zip * -x ".git/*" -x "env/*" -x ".venv/*" -x ".github/*"
 
-    - name: Check Publish Profile Secret
+    - name: Check Azure credentials
       run: |
-        if [ -z "$AZURE_WEBAPP_PUBLISH_PROFILE" ]; then
-          echo "AZURE_WEBAPP_PUBLISH_PROFILE is not set in this repository. Add it under Settings > Secrets and variables > Actions.";
+        if [ -z "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}" -a -z "${{ secrets.AZURE_CREDENTIALS }}" ]; then
+          echo "No deploy credentials found. Set AZURE_WEBAPP_PUBLISH_PROFILE or AZURE_CREDENTIALS in repository secrets.";
           exit 1;
-        else
-          echo "AZURE_WEBAPP_PUBLISH_PROFILE is set.";
         fi
-      env:
-        AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        if [ -n "${{ secrets.AZURE_CREDENTIALS }}" ]; then
+          echo "AZURE_CREDENTIALS is set (Service Principal will be used).";
+          echo "AZURE_USE_SP=true" >> $GITHUB_ENV
+        else
+          echo "AZURE_WEBAPP_PUBLISH_PROFILE is set (publish profile will be used).";
+        fi
+
+    - name: Login to Azure (Service Principal)
+      uses: azure/login@v1
+      if: ${{ secrets.AZURE_CREDENTIALS }}
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
-      env:
-        AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
       with:
         app-name: EcomerceApp
         package: app.zip
-        publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
         # Ensure that AZURE_WEBAPP_PUBLISH_PROFILE is set in your repository secrets:
         # Go to your GitHub repository > Settings > Secrets and variables > Actions > New repository secret
         # Name: AZURE_WEBAPP_PUBLISH_PROFILE, Value: <paste your Azure publish profile XML here>
