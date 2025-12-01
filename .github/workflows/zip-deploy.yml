@@ -3,6 +3,7 @@ name: Deploy to Azure Web App (ZIP) - FastAPI
 on:
   push:
     branches:
+      - main
       - master
   workflow_dispatch:
 
@@ -45,10 +46,12 @@ jobs:
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
+      env:
+        AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
       with:
-        app-name: App_Ecomerce
+        app-name: EcomerceApp
         package: app.zip
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
         # Ensure that AZURE_WEBAPP_PUBLISH_PROFILE is set in your repository secrets:
         # Go to your GitHub repository > Settings > Secrets and variables > Actions > New repository secret
         # Name: AZURE_WEBAPP_PUBLISH_PROFILE, Value: <paste your Azure publish profile XML here>
