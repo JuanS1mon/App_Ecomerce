@@ -58,6 +58,10 @@ from routers import auth as auth_router
 from routers.config import  configDB,  Analisis,  usuarios_admin
 from routers.config.Admin import router as admin_router
 from routers import frontend_pages
+from routers.static_pages import router as static_pages_router
+from Services.mail.mail import router as mail_router, MAIL_CONFIG_OK
+from routers.mapas import router as mapas_router
+from logging_config_new import LOG_CONFIG
 
 print("✅ Importaciones de DB y routers básicos completadas")
 
@@ -210,6 +214,7 @@ async def favicon():
 # =============================
 # MIDDLEWARES
 # =============================
+from app_settings import CORS_CONFIG
 from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(
     CORSMiddleware,
@@ -236,7 +241,6 @@ app.include_router(auth_router.router, prefix="/api/admin/auth", tags=["autentic
 app.include_router(usuarios_admin.router)
 app.include_router(configDB.router)
 app.include_router(admin_router)
-app.include_router(admin_api_router)
 app.include_router(frontend_pages.router)
 
 
@@ -246,6 +250,7 @@ app.include_router(frontend_pages.router)
 app.include_router(Analisis.router)
 app.include_router(mail_router)
 app.include_router(static_pages_router)
+app.include_router(mapas_router, prefix="/mapas", tags=["mapas"])
 from routers.usuarios import usuarios_router
 app.include_router(usuarios_router)
 # Importar y registrar el router de restablecimiento de contraseña

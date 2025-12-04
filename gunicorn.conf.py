@@ -70,7 +70,9 @@ max_requests_jitter = 50
 log_file = "-"
 
 # Configuración del servidor - Azure asigna el puerto automáticamente
-bind = "0.0.0.0:8000"
+# Usa la variable de entorno PORT si está presente (App Service)
+port = os.environ.get("PORT", "8000")
+bind = f"0.0.0.0:{port}"
 timeout = 230
 
 # Workers dinámicos basados en CPU
