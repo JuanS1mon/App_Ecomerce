@@ -10,6 +10,10 @@ on:
       - chore/ci-zip-deploy
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -52,6 +56,13 @@ jobs:
     needs: build
     
     steps:
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
@@ -63,4 +74,113 @@ jobs:
         with:
           app-name: 'EcomerceApp'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8ED627B9E24E4A42A9B612BAA74BE8F6 }}
+          package: .
+      
+      - name: 'Configure Environment Variables'
+        uses: azure/appservice-settings@v1
+        with:
+          app-name: 'EcomerceApp'
+          slot-name: 'Production'
+          app-settings-json: |
+            [
+              {
+                "name": "DB_TYPE",
+                "value": "sqlserver",
+                "slotSetting": false
+              },
+              {
+                "name": "DB_USER",
+                "value": "sa",
+                "slotSetting": false
+              },
+              {
+                "name": "DB_PASSWORD",
+                "value": "Pantone123",
+                "slotSetting": false
+              },
+              {
+                "name": "DB_HOST",
+                "value": "localhost",
+                "slotSetting": false
+              },
+              {
+                "name": "DB_NAME",
+                "value": "tecnolarUnificado",
+                "slotSetting": false
+              },
+              {
+                "name": "DB_DRIVER",
+                "value": "ODBC Driver 17 for SQL Server",
+                "slotSetting": false
+              },
+              {
+                "name": "SMTP_SERVER",
+                "value": "smtp.gmail.com",
+                "slotSetting": false
+              },
+              {
+                "name": "SMTP_PORT",
+                "value": "587",
+                "slotSetting": false
+              },
+              {
+                "name": "USERNAME_EMAIL",
+                "value": "fjuansimon@gmail.com",
+                "slotSetting": false
+              },
+              {
+                "name": "PASSWORD_EMAIL",
+                "value": "kfiq isrr gyjw qtng",
+                "slotSetting": false
+              },
+              {
+                "name": "MAIL_FROM",
+                "value": "fjuansimon@gmail.com",
+                "slotSetting": false
+              },
+              {
+                "name": "ALGORITHM",
+                "value": "HS256",
+                "slotSetting": false
+              },
+              {
+                "name": "ACCESS_TOKEN_DURATION",
+                "value": "360",
+                "slotSetting": false
+              },
+              {
+                "name": "SECRET",
+                "value": "11018517e34d137b782c1f6af9d9e20ebb8ec6425b5b97689e2715b6cb3187c4",
+                "slotSetting": false
+              },
+              {
+                "name": "ENVIRONMENT",
+                "value": "production",
+                "slotSetting": false
+              },
+              {
+                "name": "BASE_URL",
+                "value": "https://ecomerceapp.azurewebsites.net",
+                "slotSetting": false
+              },
+              {
+                "name": "FRONTEND_URL",
+                "value": "https://ecomerceapp.azurewebsites.net",
+                "slotSetting": false
+              },
+              {
+                "name": "MERCADOPAGO_ACCESS_TOKEN",
+                "value": "TEST-4638869150198277-110316-202a1385377cfc96c5f43eab7829c5ce-168706559",
+                "slotSetting": false
+              },
+              {
+                "name": "MERCADOPAGO_PUBLIC_KEY",
+                "value": "TEST-6c596386-b72b-444b-8402-d59bab22540f",
+                "slotSetting": false
+              },
+              {
+                "name": "ORIGINS",
+                "value": "https://ecomerceapp.azurewebsites.net",
+                "slotSetting": false
+              }
+            ]
