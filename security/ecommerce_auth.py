@@ -17,13 +17,14 @@ from config import SECRET_KEY, ALGORITHM
 logger = logging.getLogger(__name__)
 
 # Configuración de contraseñas
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Usar argon2 en lugar de bcrypt para evitar problemas de compatibilidad de versiones
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # Configuración de tokens
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 horas para usuarios ecommerce
 
 def hash_password(password: str) -> str:
-    """Encripta una contraseña usando bcrypt"""
+    """Encripta una contraseña usando argon2"""
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -199,6 +200,7 @@ def register_ecommerce_user(db: Session, user_data: Dict[str, Any]) -> Optional[
 
         # Hash de la contraseña
         password_hash = hash_password(user_data['contraseña'])
+        logger.info(f"Contraseña hasheada para usuario: {user_data['email']}")
 
         # Insertar usuario
         insert_query = text("""
@@ -208,17 +210,23 @@ def register_ecommerce_user(db: Session, user_data: Dict[str, Any]) -> Optional[
                     :ciudad, :provincia, :pais, 1)
         """)
 
-        db.execute(insert_query, {
-            "nombre": user_data['nombre'],
-            "apellido": user_data['apellido'],
-            "email": user_data['email'],
-            "password_hash": password_hash,
-            "telefono": user_data.get('telefono'),
-            "direccion": user_data.get('direccion'),
-            "ciudad": user_data.get('ciudad'),
-            "provincia": user_data.get('provincia'),
-            "pais": user_data.get('pais')
-        })
+        try:
+            db.execute(insert_query, {
+                "nombre": user_data['nombre'],
+                "apellido": user_data['apellido'],
+                "email": user_data['email'],
+                "password_hash": password_hash,
+                "telefono": user_data.get('telefono'),
+                "direccion": user_data.get('direccion'),
+                "ciudad": user_data.get('ciudad'),
+                "provincia": user_data.get('provincia'),
+                "pais": user_data.get('pais')
+            })
+            logger.info(f"Usuario insertado en BD: {user_data['email']}")
+        except Exception as insert_error:
+            logger.error(f"Error al insertar usuario {user_data['email']}: {str(insert_error)}")
+            db.rollback()
+            raise
 
         # Obtener el usuario recién insertado
         select_query = text("""
@@ -226,9 +234,15 @@ def register_ecommerce_user(db: Session, user_data: Dict[str, Any]) -> Optional[
             FROM ecomerce_usuarios
             WHERE email = :email
         """)
-        result = db.execute(select_query, {"email": user_data['email']})
-        row = result.first()
-        db.commit()
+        try:
+            result = db.execute(select_query, {"email": user_data['email']})
+            row = result.first()
+            db.commit()
+            logger.info(f"Usuario seleccionado de BD: {row}")
+        except Exception as select_error:
+            logger.error(f"Error al seleccionar usuario {user_data['email']}: {str(select_error)}")
+            db.rollback()
+            raise
 
         if not row:
             logger.error("Error al obtener usuario ecommerce recién insertado")

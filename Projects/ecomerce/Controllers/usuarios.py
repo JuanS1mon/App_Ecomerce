@@ -11,6 +11,7 @@ from ..models.productos import EcomerceProductos
 from db.models.logs.activity_log import ActivityLog
 from typing import List, Optional, Dict, Any
 import logging
+from security.ecommerce_auth import hash_password, verify_password
 
 logger = logging.getLogger(__name__)
 
@@ -392,11 +393,6 @@ def change_user_password(db: Session, user_email: str, current_password: str, ne
     Cambia la contraseña del usuario verificando la contraseña actual.
     """
     try:
-        from passlib.context import CryptContext
-
-        # Configurar el contexto de hash de contraseñas
-        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
         # Obtener el usuario por email
         user_result = db.execute(
             text("SELECT id, contraseña_hash FROM ecomerce_usuarios WHERE email = :email"),
@@ -409,12 +405,12 @@ def change_user_password(db: Session, user_email: str, current_password: str, ne
         user_id = user_result[0]
         stored_hash = user_result[1]
 
-        # Verificar la contraseña actual
-        if not pwd_context.verify(current_password, stored_hash):
+        # Verificar la contraseña actual con el mismo algoritmo que el login (argon2)
+        if not verify_password(current_password, stored_hash):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La contraseña actual es incorrecta")
 
-        # Hash de la nueva contraseña
-        new_hash = pwd_context.hash(new_password)
+        # Hash de la nueva contraseña usando la misma política (argon2)
+        new_hash = hash_password(new_password)
 
         # Actualizar la contraseña en la base de datos
         db.execute(
@@ -463,7 +459,7 @@ def get_user_orders(db: Session, user_id: int) -> list:
                 "fecha": str(row[1]) if row[1] else None,  # Convertir fecha a string
                 "total": float(row[2]) if row[2] else 0.0,
                 "estado": row[3],
-                "items": [{"count": row[4] or 0}]  # Simplificado para compatibilidad
+                "items": [{"count": row[4] or 0}]  # Simplificado
             })
 
         return orders
@@ -516,8 +512,8 @@ def get_user_active_cart(db: Session, user_id: int) -> dict:
                     "imagen_url": row[2] or "/static/images/placeholder.png"
                 },
                 "cantidad": row[3],
-                "precio_unitario": row[4],
-                "total": item_total
+                "precio_unitario": float(row[4]) if row[4] is not None else 0.0,
+                "total": float(item_total)
             })
 
         return {
@@ -525,7 +521,7 @@ def get_user_active_cart(db: Session, user_id: int) -> dict:
             "estado": cart_result[1],
             "created_at": cart_result[2],
             "items": items,
-            "total": total
+            "total": float(total)
         }
 
     except Exception as e:

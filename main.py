@@ -259,9 +259,9 @@ app.include_router(password_reset_router)
 
 # Importar y registrar el router de productos públicos ecommerce
 try:
-    # from routers.ecommerce_public import router as ecommerce_public_router
-    # app.include_router(ecommerce_public_router)
-    logger.info("Router ecommerce_public omitido temporalmente")
+    from routers.ecommerce_public import router as ecommerce_public_router
+    app.include_router(ecommerce_public_router)
+    logger.info("Router ecommerce_public registrado")
 except Exception as e:
     logger.error(f"❌ Error registrando router ecommerce_public: {e}")
     import traceback

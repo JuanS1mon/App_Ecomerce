@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status, Form
 from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from pydantic import BaseModel
 
 from db.database import get_db
@@ -108,7 +109,7 @@ def register_ecommerce_user_endpoint(
         if not registered_user:
             # Verificar si el email ya existe
             existing_user = db.execute(
-                "SELECT id FROM ecomerce_usuarios WHERE email = :email",
+                text("SELECT id FROM ecomerce_usuarios WHERE email = :email"),
                 {"email": user_data.email}
             ).first()
             if existing_user:
